@@ -42,7 +42,7 @@
 
 ### 2.1 What to Test
 
-**✅ DO Test:**
+**[OK] DO Test:**
 - Pure functions (deterministic output)
 - Business logic and calculations
 - Data transformations
@@ -50,7 +50,7 @@
 - State management
 - Edge cases and boundary conditions
 
-**❌ DON'T Test:**
+**[FAIL] DON'T Test:**
 - Third-party libraries (they test themselves)
 - Framework internals
 - Trivial getters/setters
@@ -101,19 +101,19 @@ Examples:
 ### 2.4 Mocking Guidelines
 
 ```javascript
-// ✅ Good: Mock at boundaries
+// [OK] Good: Mock at boundaries
 jest.mock('@/lib/api', () => ({
   fetchUser: jest.fn().mockResolvedValue({ id: 1, name: 'Test' })
 }));
 
-// ✅ Good: Use factory functions
+// [OK] Good: Use factory functions
 const createMockUser = (overrides = {}) => ({
   id: 1,
   name: 'Test User',
   ...overrides
 });
 
-// ❌ Bad: Over-mocking internals
+// [FAIL] Bad: Over-mocking internals
 jest.mock('./utils', () => ({
   // Testing implementation details
   helper: jest.fn().mockReturnValue('mocked')
@@ -386,12 +386,12 @@ jobs:
 
 ### 7.1 When to Use
 
-**✅ Good for:**
+**[OK] Good for:**
 - UI component rendering
 - API response structure
 - Generated output
 
-**❌ Bad for:**
+**[FAIL] Bad for:**
 - Dynamic data (timestamps, UUIDs)
 - Large objects (maintenance burden)
 

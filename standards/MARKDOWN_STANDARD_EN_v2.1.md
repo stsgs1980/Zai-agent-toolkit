@@ -107,11 +107,11 @@ Use text labels instead of Unicode symbols:
 
 | Correct | Incorrect |
 |---------|-----------|
-| `[OK]` | ✓ (ref) |
-| `[FAIL]` | ✗ (ref) |
-| `[DONE]` | ✅ (ref) |
+| `[OK]` | [v] (ref) |
+| `[FAIL]` | [x] (ref) |
+| `[DONE]` | [OK] (ref) |
 | `[TODO]` |  (ref) |
-| `[WARNING]` | ⚠ (ref) |
+| `[WARNING]` | [WARN] (ref) |
 | `[INFO]` | ℹ (ref) |
 
 ---

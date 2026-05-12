@@ -31,17 +31,17 @@
 ### 2.1 Never Store Secrets in Code
 
 ```typescript
-// ❌ NEVER DO THIS
+// [FAIL] NEVER DO THIS
 const API_KEY = "sk-live-abc123xyz";
 const DB_PASSWORD = "admin123";
 const JWT_SECRET = "my-secret-key";
 
-// ✅ Use environment variables
+// [OK] Use environment variables
 const API_KEY = process.env.API_KEY;
 const DB_PASSWORD = process.env.DATABASE_PASSWORD;
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// ✅ Validate secrets at startup
+// [OK] Validate secrets at startup
 function validateSecrets() {
   const required = [
     'DATABASE_URL',
@@ -175,7 +175,7 @@ async function verifyPassword(
   return bcrypt.compare(password, hash);
 }
 
-// ✅ Use constant-time comparison for tokens
+// [OK] Use constant-time comparison for tokens
 import { timingSafeEqual } from 'crypto';
 
 function secureCompare(a: string, b: string): boolean {
@@ -386,14 +386,14 @@ async function getDocument(req: Request, res: Response) {
 ### 4.3 Principle of Least Privilege
 
 ```typescript
-// ✅ Good: Minimal permissions for service accounts
+// [OK] Good: Minimal permissions for service accounts
 const dbUser = {
   role: 'app_user',
   permissions: ['SELECT', 'INSERT', 'UPDATE'],
   tables: ['users', 'documents'], // Only needed tables
 };
 
-// ❌ Bad: Over-privileged
+// [FAIL] Bad: Over-privileged
 const dbUser = {
   role: 'superuser', // Too much access
 };
@@ -445,14 +445,14 @@ function validateUserRegistration(data: unknown) {
 ### 5.2 SQL Injection Prevention
 
 ```typescript
-// ❌ NEVER: String concatenation
+// [FAIL] NEVER: String concatenation
 const query = `SELECT * FROM users WHERE id = ${userId}`;
 
-// ✅ Parameterized queries
+// [OK] Parameterized queries
 const query = 'SELECT * FROM users WHERE id = $1';
 const result = await db.query(query, [userId]);
 
-// ✅ ORM with automatic escaping
+// [OK] ORM with automatic escaping
 const user = await prisma.user.findFirst({
   where: { id: userId },
 });

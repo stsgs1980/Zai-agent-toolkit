@@ -214,7 +214,7 @@ export class ExternalServiceError extends ApplicationError {
 ### 3.1 Базовый паттерн
 
 ```typescript
-// ✅ Хорошо: Специфичная обработка ошибок
+// [OK] Хорошо: Специфичная обработка ошибок
 async function getUser(id: string): Promise<User> {
   try {
     const user = await db.users.find(id);
@@ -233,7 +233,7 @@ async function getUser(id: string): Promise<User> {
   }
 }
 
-// ❌ Плохо: Глушение ошибок
+// [FAIL] Плохо: Глушение ошибок
 async function getUser(id: string) {
   try {
     return await db.users.find(id);

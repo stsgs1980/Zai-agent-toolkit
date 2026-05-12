@@ -31,17 +31,17 @@
 ### 2.1 Никогда не храните секреты в коде
 
 ```typescript
-// ❌ НИКОГДА НЕ ДЕЛАЙТЕ ТАК
+// [FAIL] НИКОГДА НЕ ДЕЛАЙТЕ ТАК
 const API_KEY = "sk-live-abc123xyz";
 const DB_PASSWORD = "admin123";
 const JWT_SECRET = "my-secret-key";
 
-// ✅ Используйте переменные окружения
+// [OK] Используйте переменные окружения
 const API_KEY = process.env.API_KEY;
 const DB_PASSWORD = process.env.DATABASE_PASSWORD;
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// ✅ Валидируйте секреты при старте
+// [OK] Валидируйте секреты при старте
 function validateSecrets() {
   const required = [
     'DATABASE_URL',
@@ -175,7 +175,7 @@ async function verifyPassword(
   return bcrypt.compare(password, hash);
 }
 
-// ✅ Используйте сравнение с постоянным временем для токенов
+// [OK] Используйте сравнение с постоянным временем для токенов
 import { timingSafeEqual } from 'crypto';
 
 function secureCompare(a: string, b: string): boolean {
@@ -386,14 +386,14 @@ async function getDocument(req: Request, res: Response) {
 ### 4.3 Принцип минимальных привилегий
 
 ```typescript
-// ✅ Хорошо: Минимальные права для сервисных аккаунтов
+// [OK] Хорошо: Минимальные права для сервисных аккаунтов
 const dbUser = {
   role: 'app_user',
   permissions: ['SELECT', 'INSERT', 'UPDATE'],
   tables: ['users', 'documents'], // Только нужные таблицы
 };
 
-// ❌ Плохо: Избыточные права
+// [FAIL] Плохо: Избыточные права
 const dbUser = {
   role: 'superuser', // Слишком много доступа
 };
@@ -445,14 +445,14 @@ function validateUserRegistration(data: unknown) {
 ### 5.2 Защита от SQL-инъекций
 
 ```typescript
-// ❌ НИКОГДА: Конкатенация строк
+// [FAIL] НИКОГДА: Конкатенация строк
 const query = `SELECT * FROM users WHERE id = ${userId}`;
 
-// ✅ Параметризованные запросы
+// [OK] Параметризованные запросы
 const query = 'SELECT * FROM users WHERE id = $1';
 const result = await db.query(query, [userId]);
 
-// ✅ ORM с автоматическим экранированием
+// [OK] ORM с автоматическим экранированием
 const user = await prisma.user.findFirst({
   where: { id: userId },
 });
