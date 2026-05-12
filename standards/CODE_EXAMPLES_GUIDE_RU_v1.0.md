@@ -361,7 +361,7 @@ match value:
 
 ````markdown
 <details>
-<summary>📁 Полный код сервера (нажмите, чтобы раскрыть)</summary>
+<summary> Полный код сервера (нажмите, чтобы раскрыть)</summary>
 
 ```python
 from flask import Flask

@@ -110,7 +110,7 @@
 | `[OK]` | `✓` (ref) |
 | `[FAIL]` | `✗` (ref) |
 | `[DONE]` | `✅` (ref) |
-| `[TODO]` | `📋` (ref) |
+| `[TODO]` | `` (ref) |
 | `[WARNING]` | `⚠` (ref) |
 | `[INFO]` | `ℹ` (ref) |
 
