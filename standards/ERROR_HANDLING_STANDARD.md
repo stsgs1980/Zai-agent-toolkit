@@ -65,23 +65,23 @@ interface ApplicationError {
   id: string;           // Unique error ID for tracking
   code: string;         // Machine-readable code (e.g., 'USER_NOT_FOUND')
   name: string;         // Error class name
-  
+
   // Context
   message: string;      // User-friendly message
   details?: unknown;    // Additional context
-  
+
   // Debugging
   stack?: string;       // Stack trace (dev only)
   cause?: Error;        // Original error (for wrapping)
-  
+
   // HTTP
   statusCode: number;   // HTTP status code
-  
+
   // Metadata
   timestamp: string;    // ISO 8601
   path?: string;        // Request path
   requestId?: string;   // Request correlation ID
-  
+
   // Recovery
   recoverable: boolean;
   retryAfter?: number;  // Seconds until retry
@@ -101,7 +101,7 @@ export class ApplicationError extends Error {
   public readonly recoverable: boolean;
   public readonly details?: unknown;
   public readonly cause?: Error;
-  
+
   constructor({
     code,
     message,
@@ -119,11 +119,11 @@ export class ApplicationError extends Error {
     this.recoverable = recoverable;
     this.details = details;
     this.cause = cause;
-    
+
     // Maintain proper stack trace
     Error.captureStackTrace(this, this.constructor);
   }
-  
+
   toJSON(): ApplicationErrorJSON {
     return {
       id: this.id,
@@ -261,11 +261,11 @@ async function processPayment(order: Order): Promise<PaymentResult> {
         message: error.message,
       });
     }
-    
+
     if (error instanceof StripeAPIError) {
       throw new ExternalServiceError('Stripe', error);
     }
-    
+
     throw new InternalError('Payment processing failed', {
       orderId: order.id,
       cause: error,
@@ -387,9 +387,9 @@ export function errorLogger(error: Error, req: Request, res: Response, next: Nex
     user: req.user ? { id: req.user.id, role: req.user.role } : null,
     environment: process.env.NODE_ENV,
   };
-  
+
   logger.error(errorLog, 'Request error');
-  
+
   next(error);
 }
 ```
@@ -448,7 +448,7 @@ export function errorHandler(
       error: error.toJSON(),
     });
   }
-  
+
   // Handle known external errors
   if (error instanceof ZodError) {
     const validationError = new ValidationError(
@@ -463,7 +463,7 @@ export function errorHandler(
       error: validationError.toJSON(),
     });
   }
-  
+
   // Handle unexpected errors
   logger.fatal({
     error: {
@@ -476,7 +476,7 @@ export function errorHandler(
       path: req.path,
     },
   }, 'Unhandled error');
-  
+
   // Don't leak internal details
   return res.status(500).json({
     success: false,
@@ -511,20 +511,20 @@ interface State {
 
 class ErrorBoundary extends React.Component<Props, State> {
   state: State = { hasError: false, error: null };
-  
+
   static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
-  
+
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     logger.error({
       error: error.message,
       stack: errorInfo.componentStack,
     }, 'React error boundary caught');
-    
+
     this.props.onError?.(error, errorInfo);
   }
-  
+
   render() {
     if (this.state.hasError) {
       return this.props.fallback;
@@ -554,24 +554,24 @@ class APIClient {
         },
         body: config.body ? JSON.stringify(config.body) : undefined,
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new APIError(data.error);
       }
-      
+
       return data.data;
     } catch (error) {
       if (error instanceof APIError) {
         throw error;
       }
-      
+
       if (error instanceof TypeError) {
         // Network error
         throw new NetworkError('Unable to connect to server');
       }
-      
+
       throw new UnknownError('An unexpected error occurred');
     }
   }
@@ -629,29 +629,29 @@ export async function withRetry<T>(
   config: RetryConfig
 ): Promise<T> {
   let lastError: Error;
-  
+
   for (let attempt = 1; attempt <= config.maxAttempts; attempt++) {
     try {
       return await fn();
     } catch (error) {
       lastError = error;
-      
+
       if (!config.retryIf(error)) {
         throw error;
       }
-      
+
       if (attempt === config.maxAttempts) {
         throw error;
       }
-      
+
       const delay = config.backoff === 'exponential'
         ? Math.min(config.delay * Math.pow(2, attempt - 1), config.maxDelay)
         : config.delay * attempt;
-      
+
       await sleep(delay);
     }
   }
-  
+
   throw lastError;
 }
 
@@ -678,13 +678,13 @@ class CircuitBreaker {
   private state = State.CLOSED;
   private failures = 0;
   private lastFailureTime: number;
-  
+
   constructor(
     private threshold: number,
     private timeout: number,
     private halfOpenRequests: number = 1
   ) {}
-  
+
   async execute<T>(fn: () => Promise<T>): Promise<T> {
     if (this.state === State.OPEN) {
       if (Date.now() - this.lastFailureTime > this.timeout) {
@@ -693,7 +693,7 @@ class CircuitBreaker {
         throw new CircuitOpenError('Circuit breaker is open');
       }
     }
-    
+
     try {
       const result = await fn();
       this.onSuccess();
@@ -703,16 +703,16 @@ class CircuitBreaker {
       throw error;
     }
   }
-  
+
   private onSuccess(): void {
     this.failures = 0;
     this.state = State.CLOSED;
   }
-  
+
   private onFailure(): void {
     this.failures++;
     this.lastFailureTime = Date.now();
-    
+
     if (this.failures >= this.threshold) {
       this.state = State.OPEN;
     }
@@ -730,7 +730,7 @@ async function getUser(id: string): Promise<User> {
     return await database.getUser(id);
   } catch (error) {
     logger.warn({ error, userId: id }, 'Database fetch failed, trying cache');
-    
+
     try {
       // Fallback: cache
       const cached = await cache.get(`user:${id}`);
@@ -738,7 +738,7 @@ async function getUser(id: string): Promise<User> {
     } catch (cacheError) {
       logger.error({ cacheError }, 'Cache fallback failed');
     }
-    
+
     // Final fallback: stale data or default
     throw new ExternalServiceError('User service');
   }
@@ -758,11 +758,11 @@ const errorMetrics = {
   errors_total: counter,           // Total errors by code
   errors_by_endpoint: counter,     // Errors by API endpoint
   errors_by_service: counter,      // Errors by service
-  
+
   // Rates
   error_rate: gauge,               // Errors per minute
   error_rate_p95: histogram,       // 95th percentile response time on errors
-  
+
   // Recovery
   retry_success_rate: gauge,       // Successful retries
   circuit_breaker_opens: counter,  // Circuit breaker activations
@@ -783,14 +783,14 @@ groups:
           severity: warning
         annotations:
           summary: "High error rate detected"
-          
+
       - alert: CriticalError
         expr: increase(errors_total{code="INTERNAL_ERROR"}[1h]) > 5
         labels:
           severity: critical
         annotations:
           summary: "Critical internal errors detected"
-          
+
       - alert: CircuitBreakerOpen
         expr: increase(circuit_breaker_opens[5m]) > 0
         labels:

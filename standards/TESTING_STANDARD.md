@@ -21,7 +21,7 @@
   ╱            ╲   - API endpoints
  ╱              ╲  - Database operations
 ╱────────────────╲ - External services
-                  
+
   Unit Tests (70%)
   - Pure functions
   - Components
@@ -64,22 +64,22 @@ describe('calculateDiscount', () => {
     // Arrange
     const user = { tier: 'premium', orders: 15 };
     const price = 100;
-    
+
     // Act
     const result = calculateDiscount(price, user);
-    
+
     // Assert
     expect(result).toBe(90);
   });
-  
+
   it('should return original price for non-premium users', () => {
     // Arrange
     const user = { tier: 'regular', orders: 5 };
     const price = 100;
-    
+
     // Act
     const result = calculateDiscount(price, user);
-    
+
     // Assert
     expect(result).toBe(100);
   });
@@ -132,38 +132,38 @@ import { createTestServer, createTestUser } from '@/test/helpers';
 
 describe('POST /api/users', () => {
   let server: TestServer;
-  
+
   beforeAll(async () => {
     server = await createTestServer();
   });
-  
+
   afterAll(async () => {
     await server.close();
   });
-  
+
   beforeEach(async () => {
     await server.db.clear();
   });
-  
+
   it('should create user with valid data', async () => {
     const response = await server
       .post('/api/users')
       .send({ email: 'test@example.com', name: 'Test' });
-    
+
     expect(response.status).toBe(201);
     expect(response.body.data).toMatchObject({
       email: 'test@example.com',
       name: 'Test'
     });
   });
-  
+
   it('should reject duplicate email', async () => {
     await createTestUser({ email: 'existing@example.com' });
-    
+
     const response = await server
       .post('/api/users')
       .send({ email: 'existing@example.com', name: 'Test' });
-    
+
     expect(response.status).toBe(409);
   });
 });
@@ -175,19 +175,19 @@ describe('POST /api/users', () => {
 // Use transactions for isolation
 describe('UserRepository', () => {
   let tx: Transaction;
-  
+
   beforeEach(async () => {
     tx = await db.beginTx();
   });
-  
+
   afterEach(async () => {
     await tx.rollback();
   });
-  
+
   it('should create and find user', async () => {
     const user = await tx.users.create({ email: 'test@example.com' });
     const found = await tx.users.findByEmail('test@example.com');
-    
+
     expect(found).toEqual(user);
   });
 });
@@ -203,12 +203,12 @@ describe('PaymentService', () => {
     nock('https://api.stripe.com')
       .post('/v1/charges')
       .reply(200, { id: 'ch_123', status: 'succeeded' });
-    
+
     const result = await paymentService.charge({
       amount: 1000,
       token: 'tok_test'
     });
-    
+
     expect(result.status).toBe('succeeded');
   });
 });
@@ -243,29 +243,29 @@ test.describe('Checkout Flow', () => {
     await page.goto('/');
     await login(page, 'user@test.com', 'password');
   });
-  
+
   test('complete purchase flow', async ({ page }) => {
     // Add item to cart
     await page.click('[data-testid="add-to-cart"]');
     await expect(page.locator('.cart-count')).toHaveText('1');
-    
+
     // Go to checkout
     await page.click('[data-testid="checkout-btn"]');
     await expect(page).toHaveURL(/\/checkout/);
-    
+
     // Fill payment
     await page.fill('[name="card-number"]', '4242424242424242');
     await page.fill('[name="expiry"]', '12/25');
     await page.fill('[name="cvc"]', '123');
-    
+
     // Submit
     await page.click('[data-testid="place-order"]');
-    
+
     // Verify success
     await expect(page).toHaveURL(/\/order-confirmation/);
     await expect(page.locator('.order-number')).toBeVisible();
   });
-  
+
   test('shows error for declined card', async ({ page }) => {
     // ... test error handling
   });
@@ -300,10 +300,10 @@ export const userFactory = {
     createdAt: new Date(),
     ...overrides
   }),
-  
-  buildMany: (count: number, overrides = {}) => 
+
+  buildMany: (count: number, overrides = {}) =>
     Array.from({ length: count }, () => userFactory.build(overrides)),
-  
+
   create: async (overrides = {}) => {
     const data = userFactory.build(overrides);
     return db.users.create(data);
@@ -318,10 +318,10 @@ export const userFactory = {
 export const fixtures = {
   admin: () => userFactory.create({ role: 'admin' }),
   customer: () => userFactory.create({ role: 'customer' }),
-  
+
   product: () => productFactory.create(),
   order: (user, products) => orderFactory.create({ userId: user.id, products }),
-  
+
   // Complex setup
   completedOrder: async () => {
     const user = await fixtures.customer();

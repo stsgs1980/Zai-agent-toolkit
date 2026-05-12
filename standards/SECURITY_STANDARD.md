@@ -48,12 +48,12 @@ function validateSecrets() {
     'JWT_SECRET',
     'API_KEY',
   ];
-  
+
   const missing = required.filter(key => !process.env[key]);
   if (missing.length > 0) {
     throw new Error(`Missing required secrets: ${missing.join(', ')}`);
   }
-  
+
   // Validate secret strength
   if (process.env.JWT_SECRET.length < 32) {
     throw new Error('JWT_SECRET must be at least 32 characters');
@@ -137,22 +137,22 @@ function validatePassword(password: string): ValidationResult {
   if (password.length < passwordPolicy.minLength) {
     return { valid: false, error: 'Password too short' };
   }
-  
+
   if (password.length > passwordPolicy.maxLength) {
     return { valid: false, error: 'Password too long' };
   }
-  
+
   for (const pattern of passwordPolicy.blockedPatterns) {
     if (password.toLowerCase().includes(pattern)) {
       return { valid: false, error: 'Password contains blocked pattern' };
     }
   }
-  
+
   // Check against breached passwords database
   if (await isBreachedPassword(password)) {
     return { valid: false, error: 'Password found in data breach' };
   }
-  
+
   return { valid: true };
 }
 ```
@@ -181,11 +181,11 @@ import { timingSafeEqual } from 'crypto';
 function secureCompare(a: string, b: string): boolean {
   const bufA = Buffer.from(a, 'utf8');
   const bufB = Buffer.from(b, 'utf8');
-  
+
   if (bufA.length !== bufB.length) {
     return false;
   }
-  
+
   return timingSafeEqual(bufA, bufB);
 }
 ```
@@ -278,12 +278,12 @@ async function setupMFA(userId: string): Promise<MFASecret> {
     name: `YourApp (${userId})`,
     length: 20,
   });
-  
+
   // Store secret encrypted
   await storeEncryptedSecret(userId, secret.base32);
-  
+
   const qrUrl = await qrcode.toDataURL(secret.otpauth_url);
-  
+
   return {
     secret: secret.base32,
     qrCode: qrUrl,
@@ -336,7 +336,7 @@ function hasPermission(
 ): boolean {
   const role = ROLES[userRole];
   if (!role) return false;
-  
+
   if (role.permissions.includes('*')) return true;
   return role.permissions.includes(permission);
 }
@@ -365,20 +365,20 @@ app.delete('/api/users/:id',
 // Always check resource ownership
 async function getDocument(req: Request, res: Response) {
   const document = await db.documents.find(req.params.id);
-  
+
   if (!document) {
     throw new NotFoundError('Document');
   }
-  
+
   // Check ownership or permission
-  const canAccess = 
+  const canAccess =
     document.ownerId === req.user.id ||
     hasPermission(req.user.role, 'documents:read_all');
-  
+
   if (!canAccess) {
     throw new AuthorizationError('Cannot access this document');
   }
-  
+
   return document;
 }
 ```
@@ -420,7 +420,7 @@ const UserRegistrationSchema = z.object({
     .email()
     .max(255)
     .transform(email => email.toLowerCase().trim()),
-    
+
   password: z.string()
     .min(12)
     .max(128)
@@ -428,7 +428,7 @@ const UserRegistrationSchema = z.object({
     .regex(/[a-z]/, 'Must contain lowercase')
     .regex(/[0-9]/, 'Must contain number')
     .regex(/[^A-Za-z0-9]/, 'Must contain symbol'),
-    
+
   name: z.string()
     .min(1)
     .max(100)
@@ -551,16 +551,16 @@ app.use(helmet({
 app.use((req, res, next) => {
   // Prevent clickjacking
   res.setHeader('X-Frame-Options', 'DENY');
-  
+
   // Prevent MIME sniffing
   res.setHeader('X-Content-Type-Options', 'nosniff');
-  
+
   // XSS protection
   res.setHeader('X-XSS-Protection', '1; mode=block');
-  
+
   // Referrer policy
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  
+
   // Permissions policy
   res.setHeader('Permissions-Policy', [
     'geolocation=()',
@@ -568,7 +568,7 @@ app.use((req, res, next) => {
     'microphone=()',
     'payment=()',
   ].join(', '));
-  
+
   next();
 });
 ```
@@ -679,20 +679,20 @@ const SECURITY_EVENTS = {
   'auth.mfa.disabled': { userId },
   'auth.password.changed': { userId },
   'auth.password.reset': { userId, email },
-  
+
   // Authorization
   'auth.access.denied': { userId, resource, action },
   'auth.role.changed': { userId, oldRole, newRole },
-  
+
   // Data access
   'data.export': { userId, resource, records },
   'data.delete': { userId, resource, recordId },
-  
+
   // Admin
   'admin.user.created': { adminId, newUserId },
   'admin.user.deleted': { adminId, deletedUserId },
   'admin.config.changed': { adminId, key },
-  
+
   // Security
   'security.rate_limited': { ip, endpoint },
   'security.injection_attempt': { ip, payload },
@@ -738,13 +738,13 @@ const SENSITIVE_FIELDS = [
 
 function sanitizeLog(data: Record<string, unknown>): Record<string, unknown> {
   const sanitized = { ...data };
-  
+
   for (const field of SENSITIVE_FIELDS) {
     if (sanitized[field]) {
       sanitized[field] = '[REDACTED]';
     }
   }
-  
+
   return sanitized;
 }
 ```
@@ -779,13 +779,13 @@ const securityConfig = {
     cors: { origin: 'http://localhost:3000' },
     csp: { 'upgrade-insecure-requests': false },
   },
-  
+
   staging: {
     https: true,
     cors: { origin: 'https://staging.example.com' },
     csp: { 'upgrade-insecure-requests': true },
   },
-  
+
   production: {
     https: true,
     cors: { origin: 'https://example.com' },

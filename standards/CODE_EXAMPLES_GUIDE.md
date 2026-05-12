@@ -224,7 +224,7 @@ def process(user_data):
     # Check for empty dictionary
     if not user_data:
         return None
-    
+
     # Extract name
     name = user_data.get("name", "Anonymous")
     return name.upper()
@@ -489,7 +489,7 @@ Format the following example correctly:
 $ python
 >>> def foo(x,y):
 ...     return x+y
-... 
+...
 >>> foo(5,3)
 8
 ```
