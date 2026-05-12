@@ -1,7 +1,7 @@
 # Standard: GitHub v1.0
 
 > ID: STD-GIT-001
-> Version: 1.1
+> Version: 1.2
 > Level: **[C] Critical**
 > Reference: https://www.conventionalcommits.org/
 
@@ -445,6 +445,127 @@ git commit -m "chore: session checkpoint"
 git push --force-with-lease origin main
 ```
 
+### 10.3 Deadlock Problem
+
+Sandbox performs automatic `git pull` / `git merge` on session restart. If local repository state diverges from remote (unpushed commits, uncommitted files, dirty working tree) — a merge conflict occurs.
+
+Merge conflict blocks `git status` (exit code != 0). Infrastructure uses `git status` as pre-check before executing ANY tool (Bash, Read, Write, Edit, Glob, Grep, etc.). Result: **complete deadlock** — no tool can execute, including tools to fix the conflict itself.
+
+**Vicious cycle:**
+```
+git status -> merge conflict -> exit code != 0
+-> tool pre-check fails -> tool blocked
+-> cannot fix merge -> git status still fails
+-> DEADLOCK
+```
+
+### 10.4 Mandatory Rules to Prevent Deadlock
+
+#### Rule 1: Push After Every Stage
+
+Each completed stage of work = commit + push. No exceptions.
+
+```bash
+git add -A
+git commit -m "stage: description"
+git push origin main
+```
+
+**Forbidden:**
+- Accumulating multiple stages in one commit
+- Making commit without subsequent push
+- Leaving uncommitted files when moving to next task
+
+#### Rule 2: Checklist Before Session End
+
+Before session closes / breaks / restarts:
+
+```bash
+# 1. All changes committed?
+git status
+# Expected: "nothing to commit, working tree clean"
+
+# 2. All commits pushed?
+git log --oneline -5
+# Compare with remote:
+git log origin/main..HEAD
+# Expected: empty (no unpushed commits)
+
+# 3. Final push
+git push origin main
+
+# 4. Re-check
+git status
+# Expected: "nothing to commit, working tree clean"
+```
+
+#### Rule 3: Dirty Working Tree = No Stop
+
+If `git status` shows uncommitted changes — session MUST NOT interrupt without prior commit + push. If session breaks unexpectedly — first command on next start: `git status` to check.
+
+#### Rule 4: One Task = One Commit + Push
+
+```
+Task -> code -> test -> git add -> git commit -> git push -> next task
+```
+
+Not "10 tasks -> 1 commit -> push", but "1 task -> 1 commit -> 1 push".
+
+### 10.5 Deadlock Recovery Procedure
+
+If deadlock already occurred (all tools blocked):
+
+**Level 1 - Manual Terminal (if available):**
+```bash
+rm -f .git/MERGE_HEAD .git/MERGE_MSG .git/MERGE_MODE
+git reset --hard HEAD
+git status  # check if clean
+git push origin main --force  # if needed to sync with remote
+```
+
+**Level 2 - Sandbox Restart:**
+- All code is on GitHub (if push rules were followed)
+- Sandbox will clone fresh repository on clean start
+- Merge conflict won't occur since starting state = remote
+
+**Level 3 - Nuclear Reset (if Level 1 and 2 don't help):**
+```bash
+mv .git .git.broken
+git init
+git remote add origin <remote-url>
+git fetch origin
+git reset origin/main
+```
+
+### 10.6 Signs of Standard Violation
+
+| Sign | Meaning | Action |
+|------|---------|--------|
+| `git status` != clean before restart | Deadlock risk | Immediate commit + push |
+| `git log origin/main..HEAD` != empty | Unpushed commits | Immediate push |
+| Commits without push at session end | Conflict on restart | Push before ending |
+| `git status` shows "needs merge" | Deadlock already started | Recovery procedure |
+
+### 10.7 Integration with Other Standards
+
+- **STD-FE-001** (Anti-Monolith): after file refactoring -> commit + push
+- **Worklog**: after updating worklog.md -> commit + push
+- **New skill/documentation**: after creation -> commit + push
+
+**Principle:** any action changing filesystem must end with commit + push before moving to next action.
+
+### 10.8 AI Agent Checklist (mandatory before each stage)
+
+```
+[ ] Code written/changed
+[ ] git add -A
+[ ] git commit -m "description"
+[ ] git push origin main
+[ ] git status -> clean
+[ ] Logged to worklog.md
+[ ] git add worklog.md && git commit && git push (if worklog updated)
+```
+
 ---
 
 ## 11. Log Everything
@@ -467,6 +588,7 @@ After every git operation, log to `worklog.md`:
 |---------|------|---------|
 | 1.0 | 2025-01 | Initial version: Conventional Commits, branching, forbidden operations, backup rules |
 | 1.1 | 2025-05 | Added Checkpoint System (WIP, Milestone, Pre-risk, Recovery Tags); systematic versioning during work |
+| 1.2 | 2025-05 | Added Deadlock Problem section, mandatory push rules, recovery procedures, violation signs, AI agent checklist |
 
 ---
 
