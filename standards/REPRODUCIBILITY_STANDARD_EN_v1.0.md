@@ -1,241 +1,241 @@
-# Стандарт: Reproducibility v1.0
+# Standard: Reproducibility v1.0
 
 > ID: STD-ENV-001
 > Version: 1.0
 > Level: **[C] Critical**
 
-**`git clone` + `bun install` + `bun run dev` = работающее приложение.**
-Всегда. Везде. На любой машине. Без исключений.
+**`git clone` + `bun install` + `bun run dev` = working application.**
+Always. Everywhere. On any machine. Without exceptions.
 
 ---
 
-## Уровни
+## Levels
 
 ```
-L1 -- Environment     Файлы, пути, зависимости, окружение
-L2 -- Code           Исходный код, БД, API, безопасность
-L3 -- Delivery       CI, Docker, сборка, деплой
-L4 -- Process        Аудит, тесты, чеклист, работа с репо
+L1 -- Environment     Files, paths, dependencies, environment
+L2 -- Code           Source code, DB, API, security
+L3 -- Delivery       CI, Docker, build, deploy
+L4 -- Process        Audit, tests, checklist, repo work
 ```
 
 #### L1 -- Environment
 
-**`.env.example` -- обязательный.** Содержит все переменные с безопасными дефолтами. Секреты -- плейсхолдерами. `.env` -- в gitignore.
+**`.env.example` -- required.** Contains all variables with safe defaults. Secrets as placeholders. `.env` -- in gitignore.
 
-**Пути -- только относительные.** Запрещены: `/home/`, `/Users/`, `http://localhost:` в коде.
+**Paths -- relative only.** Prohibited: `/home/`, `/Users/`, `http://localhost:` in code.
 
 ```typescript
-// ЗАПРЕЩЕНО
+// PROHIBITED
 fetch('http://localhost:3000/api/documents')
 
-// ОБЯЗАТЕЛЬНО
+// REQUIRED
 fetch('/api/documents')
 ```
 
-Для кросс-портовых сервисов -- только `XTransformPort`:
+For cross-port services -- only `XTransformPort`:
 
 ```typescript
-// ЗАПРЕЩЕНО
+// PROHIBITED
 fetch('http://localhost:3003/api/chat')
 
-// ОБЯЗАТЕЛЬНО
+// REQUIRED
 fetch('/api/chat?XTransformPort=3003')
 ```
 
-**Runtime-валидация окружения.** Критичные переменные проверяются при старте. Missing vars -- warning, не crash.
+**Runtime environment validation.** Critical variables checked at startup. Missing vars -- warning, not crash.
 
-**Бинарные файлы -- вне git.** В git попадает только исходный код и конфигурация. Нет `.db`, `.sqlite`, изображений в upload/, бэкапов, логов, build-артефактов.
+**Binary files -- outside git.** Only source code and configuration in git. No `.db`, `.sqlite`, images in upload/, backups, logs, build artifacts.
 
 #### L2 -- Code
 
-**База данных: относительный путь через `path.resolve()`:**
+**Database: relative path via `path.resolve()`:**
 
 ```typescript
 const dbPath = resolve(process.cwd(), rawUrl.replace(/^file:/, ''))
 if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
 ```
 
-**База данных: безопасные права:** `0o755` для директорий, `0o644` для файлов.
+**Database: safe permissions:** `0o755` for directories, `0o644` for files.
 
-**SQLite: нет `mode: 'insensitive'`** -- SQLite не поддерживает case-insensitive в Prisma. Использовать `contains`.
+**SQLite: no `mode: 'insensitive'`** -- SQLite doesn't support case-insensitive in Prisma. Use `contains`.
 
-**Error handling: не утечь внутренние ошибки.** API-роуты никогда не отдают Prisma error messages клиенту:
+**Error handling: don't leak internal errors.** API routes never return Prisma error messages to client:
 
 ```typescript
-// ЗАПРЕЩЕНО -- утечка internal details
+// PROHIBITED -- leaks internal details
 catch (error) {
   const msg = error instanceof Error ? error.message : 'Failed'
   return NextResponse.json({ error: msg }, { status: 500 })
 }
 
-// ОБЯЗАТЕЛЬНО -- generic message + log
+// REQUIRED -- generic message + log
 catch (error) {
   console.error('Error creating document:', error)
   return NextResponse.json({ error: 'Failed to create document' }, { status: 500 })
 }
 ```
 
-**Anti-fragility: изоляция ошибок.** Не-критичные операции (бэкап, AI-анализ) не ломают основную. Критичные операции (save, delete) ДОЛЖНЫ показывать ошибку пользователю через toast.
+**Anti-fragility: error isolation.** Non-critical operations (backup, AI analysis) don't break main one. Critical operations (save, delete) MUST show error to user via toast.
 
-**Тёмная тема: обязательна.** Использовать только CSS-переменные: `bg-primary`, `text-foreground`, `bg-muted`, `text-muted-foreground`.
+**Dark theme: required.** Use only CSS variables: `bg-primary`, `text-foreground`, `bg-muted`, `text-muted-foreground`.
 
-**Цветовая палитра:** по умолчанию `stone`, `slate`, `neutral`, `green`, `emerald`. `indigo` / `blue` -- только если явно запрошено.
+**Color palette:** default `stone`, `slate`, `neutral`, `green`, `emerald`. `indigo` / `blue` -- only if explicitly requested.
 
-**Зависимости:** никаких мёртвых пакетов. Каждый пакет в `dependencies` ДОЛЖЕН использоваться в `src/`.
+**Dependencies:** no dead packages. Each package in `dependencies` MUST be used in `src/`.
 
-**UI-компоненты:** `src/components/ui/` -- библиотека shadcn/ui, исключается из проверки на мёртвые файлы. Каждый кастомный файл в `src/components/codex/` ДОЛЖЕН импортироваться в `src/`.
+**UI components:** `src/components/ui/` -- shadcn/ui library, excluded from dead file check. Each custom file in `src/components/codex/` MUST be imported in `src/`.
 
 #### L3 -- Delivery
 
-**Default branch:** `main`. Lockfile закоммичен (`bun.lock`). Semantic Versioning в `package.json`.
+**Default branch:** `main`. Lockfile committed (`bun.lock`). Semantic Versioning in `package.json`.
 
-**CI pipeline (рекомендуется):** `.github/workflows/ci.yml` -- lint, type-check, тесты при каждом push/PR.
+**CI pipeline (recommended):** `.github/workflows/ci.yml` -- lint, type-check, tests on every push/PR.
 
-**Dockerfile (рекомендуется):** production-образ на базе `node:20-alpine`, многоступенчатая сборка, Bun runtime. Не содержит `.env`, `.db`, бэкапов.
+**Dockerfile (recommended):** production image based on `node:20-alpine`, multi-stage build, Bun runtime. No `.env`, `.db`, backups.
 
 #### L4 -- Process
 
-**Чеклист перед каждым коммитом:**
+**Checklist before each commit:**
 
-- [ ] `bun run lint` -- 0 ошибок
-- [ ] Нет абсолютных путей в коде
-- [ ] Нет `console.log` (только `console.error` в catch)
-- [ ] Нет неиспользуемых пакетов / файлов
+- [ ] `bun run lint` -- 0 errors
+- [ ] No absolute paths in code
+- [ ] No `console.log` (only `console.error` in catch)
+- [ ] No unused packages / files
 - [ ] API error handling -- generic messages
-- [ ] Бинарные файлы не в git
+- [ ] Binary files not in git
 
-**Чеклист перед релизом:**
+**Checklist before release:**
 
-- [ ] Всё из чеклиста коммита
-- [ ] `.env.example` существует со всеми переменными
-- [ ] `bun install && bun run dev` на чистом клоне -- работает
-- [ ] Тёмная тема работает
-- [ ] Все API-роуты возвращают корректные статусы
-- [ ] Тесты (при наличии) -- проходят без ошибок
+- [ ] All from commit checklist
+- [ ] `.env.example` exists with all variables
+- [ ] `bun install && bun run dev` on clean clone -- works
+- [ ] Dark theme works
+- [ ] All API routes return correct statuses
+- [ ] Tests (if present) -- pass without errors
 
-**Worklog:** файл `worklog.md` в корне, добавлять (не перезаписывать).
+**Worklog:** file `worklog.md` in root, append (don't overwrite).
 
-**Формула чистого репозитория:**
+**Clean repository formula:**
 
 ```
-clone + install + dev = работает
+clone + install + dev = works
 ```
 
-Всё что нарушает эту формулу -- баг.
+Everything violating this formula is a bug.
 
 ---
 
-### Правило 3. Deduplication-First
+### Rule 3. Deduplication-First
 
-Все create-эндпоинты **обязаны** проверять существование записи перед созданием.
+All create endpoints **MUST** check for existing record before creating.
 
-**Алгоритм (два уровня):**
-1. Точное совпадение: `findFirst({ where: { name: { equals: value } } })`
-2. Case-insensitive fallback (для SQLite): `findFirst({ where: { name: { equals: value.toLowerCase() } } })`
+**Algorithm (two levels):**
+1. Exact match: `findFirst({ where: { name: { equals: value } } })`
+2. Case-insensitive fallback (for SQLite): `findFirst({ where: { name: { equals: value.toLowerCase() } } })`
 
-**Если найдено** -- вернуть существующую запись (HTTP 200), не создавать дубликат.
+**If found** -- return existing record (HTTP 200), don't create duplicate.
 
-**Применяется ко всем сущностям:** Category, Tag, Term, Document (по title)
-
----
-
-### Правило 4. Auto-Backup Policy
-
-Каждая пишущая мутация (POST, PATCH, DELETE) вызывает `autoBackup()`.
-
-- Место: `db/backups/custom_YYYY-MM-DD_HH-MM.db`
-- Хранится: последние 10 бэкапов, старые удаляются автоматически
-- Ошибка бэкапа **никогда** не прерывает основную операцию
-
-**Где:** `src/lib/backup.ts` -- `autoBackup()`
+**Applies to all entities:** Category, Tag, Term, Document (by title)
 
 ---
 
-### Правило 5. SQLite Safety (connection_limit=1)
+### Rule 4. Auto-Backup Policy
 
-PrismaClient использует `connection_limit=1&pool_timeout=0` для избежания ошибок P2025 (database locked).
+Every write mutation (POST, PATCH, DELETE) calls `autoBackup()`.
 
-**Где:** `src/lib/db.ts` -- `datasourceUrl: file:${dbPath}?connection_limit=1&pool_timeout=0`
+- Location: `db/backups/custom_YYYY-MM-DD_HH-MM.db`
+- Kept: last 10 backups, old ones deleted automatically
+- Backup error **never** interrupts main operation
 
----
-
-### Правило 6. AI Prompt Language Standard
-
-Все AI system-промпты написаны **на русском языке** (кроме промпта извлечения инструкций -- на английском по No-Unicode Policy).
-
-| Задача | Temperature |
-|---|---|
-| Извлечение инструкций / терминов / семантический поиск | 0.1--0.2 (максимальная детерминированность) |
-| Анализ документов / заметок / категорий | 0.3 (баланс креативности и точности) |
-
-**Формат ответа:** все AI-эндпоинты требуют `ТОЛЬКО валидный JSON, без markdown-форматирования`.
+**Where:** `src/lib/backup.ts` -- `autoBackup()`
 
 ---
 
-### Правило 7. Counter Synchronization
+### Rule 5. SQLite Safety (connection_limit=1)
 
-Все счётчики в sidebar синхронизированы с реальным состоянием БД + localStorage.
+PrismaClient uses `connection_limit=1&pool_timeout=0` to avoid P2025 errors (database locked).
 
-- `fetchGlobalCounters()` вызывается при init и после каждой мутации
+**Where:** `src/lib/db.ts` -- `datasourceUrl: file:${dbPath}?connection_limit=1&pool_timeout=0`
+
+---
+
+### Rule 6. AI Prompt Language Standard
+
+All AI system prompts are written **in Russian** (except instruction extraction prompt -- in English per No-Unicode Policy).
+
+| Task | Temperature |
+|------|-------------|
+| Instruction / term extraction / semantic search | 0.1--0.2 (maximum determinism) |
+| Document / note / category analysis | 0.3 (balance of creativity and accuracy) |
+
+**Response format:** all AI endpoints require `ONLY valid JSON, without markdown formatting`.
+
+---
+
+### Rule 7. Counter Synchronization
+
+All counters in sidebar synchronized with real DB state + localStorage.
+
+- `fetchGlobalCounters()` called on init and after each mutation
 - Instructions counter = `(BUILTIN_COUNT - hiddenTemplates) + dbInstructionsTotal`
-- Documents counter = `data.allTotal` (из API)
-- Notes counter = `notesData.length` (из API)
-- Terms counter = `data.total` (из API)
-- При удалении -- немедленный `refreshAll()`
+- Documents counter = `data.allTotal` (from API)
+- Notes counter = `notesData.length` (from API)
+- Terms counter = `data.total` (from API)
+- On delete -- immediate `refreshAll()`
 
 ---
 
-### Правило 8. Safe Delete Policy
+### Rule 8. Safe Delete Policy
 
-Удаление любой сущности требует **явного подтверждения** через AlertDialog. Все 7 сущностей. Без исключений.
-
----
-
-### Правило 9. localStorage Persistence
-
-Данные, не хранимые в БД, сохраняются в localStorage с ключами `wiki-codex:*`:
-
-- `wiki-codex:hidden-templates` -- массив ID скрытых встроенных инструкций
-- `wiki-codex:sidebar-collapsed` -- состояние sidebar
-- `wiki-codex:theme` -- выбранная тема
+Deleting any entity requires **explicit confirmation** via AlertDialog. All 7 entities. Without exceptions.
 
 ---
 
-### Правило 10. JSON-Only AI Responses
+### Rule 9. localStorage Persistence
 
-Все AI-эндпоинты используют **parsing-защиту**: strip markdown fences, regex-экстракция JSON.
-Если JSON не распознан -- fallback-значение, ошибка не пробрасывается наверх.
+Data not stored in DB is saved to localStorage with keys `wiki-codex:*`:
+
+- `wiki-codex:hidden-templates` -- array of hidden built-in instructions IDs
+- `wiki-codex:sidebar-collapsed` -- sidebar state
+- `wiki-codex:theme` -- selected theme
 
 ---
 
-### Правило 11. Push Policy
+### Rule 10. JSON-Only AI Responses
 
-**Пушить после каждого значимого изменения** -- не копить полуфабрикаты в локальной ветке.
+All AI endpoints use **parsing protection**: strip markdown fences, regex extract JSON.
+If JSON not recognized -- fallback value, error not propagated up.
 
-| Ситуация | Действие |
-|---|---|
-| Завершён фича или фикс | Пушить сразу |
-| Конец рабочей сессии | Пушить даже если есть незавершённые изменения |
-| CI красный | Пушить можно, но исправить в ближайшее время |
-| Экспериментальная ветка | Пушить сразу (в отдельной ветке), не сливать в main без проверки |
-| Токен протух | Обновить токен, обновить remote URL, пушить |
+---
 
-**Минимум:** 1 push в конце каждой сессии. Локальные изменения без пуша = потеря при сбросе среды Z.ai.
+### Rule 11. Push Policy
 
-**Формула:**
+**Push after every significant change** -- don't accumulate half-finished work in local branch.
+
+| Situation | Action |
+|-----------|--------|
+| Feature or fix completed | Push immediately |
+| End of work session | Push even if unfinished changes |
+| CI red | Push OK, but fix soon |
+| Experimental branch | Push immediately (in separate branch), don't merge to main without review |
+| Token expired | Update token, update remote URL, push |
+
+**Minimum:** 1 push at end of each session. Local changes without push = loss on Z.ai environment reset.
+
+**Formula:**
 
 ```
-работа -> commit -> push -> спокойствие
+work -> commit -> push -> peace of mind
 ```
 
-## Удаление
+## Deletion
 
-| Сущность | Где | Как |
-|---|---|---|
-| Заметка | Список + Редактор | Кнопка Trash2 + AlertDialog подтверждение |
-| Извлечённая инструкция | Список | Кнопка Trash2 + AlertDialog подтверждение |
-| Встроенная инструкция | Список | Кнопка Trash2 + AlertDialog (localStorage, персистенция) |
-| Документ | Просмотр | Кнопка Trash2 + AlertDialog подтверждение |
-| Категория | Sidebar | Кнопка Trash2 (hover) + AlertDialog подтверждение |
-| Тег | Sidebar | Кнопка X (hover) + AlertDialog подтверждение |
-| Термин | Словарь | Кнопка Trash2 (hover) + AlertDialog, массовое выделение + удаление |
+| Entity | Where | How |
+|--------|-------|-----|
+| Note | List + Editor | Trash2 button + AlertDialog confirmation |
+| Extracted instruction | List | Trash2 button + AlertDialog confirmation |
+| Built-in instruction | List | Trash2 button + AlertDialog (localStorage, persistence) |
+| Document | View | Trash2 button + AlertDialog confirmation |
+| Category | Sidebar | Trash2 button (hover) + AlertDialog confirmation |
+| Tag | Sidebar | X button (hover) + AlertDialog confirmation |
+| Term | Dictionary | Trash2 button (hover) + AlertDialog, bulk select + delete |

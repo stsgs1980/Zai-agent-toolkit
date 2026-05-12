@@ -1,143 +1,143 @@
-# Стандарт: No-Unicode Policy v2.1
+# Standard: No-Unicode Policy v2.1
 
 > ID: STD-DOC-003
 > Version: 2.1.3
 > Level: **[C] Critical** + **[W] Warning** + **[I] Info**
 > Related: Markdown Standard (STD-DOC-001, STD-DOC-002)
 
-Стандарт использования символов, иконок и графики. Уровень Design System / Engineering Governance.
+Standard for character, icon, and graphics usage. Design System / Engineering Governance level.
 
 ---
 
-## 1. Назначение
+## 1. Purpose
 
-Данный стандарт устанавливает правила использования Unicode-графических символов во всех слоях продукта: интерфейс, контент, код, коммуникации системы.
+This standard establishes rules for using Unicode graphic characters across all product layers: interface, content, code, system communications.
 
-### Цели:
+### Goals:
 
-- обеспечить визуальную консистентность
-- сохранить профессиональный уровень продукта
-- гарантировать управляемость через дизайн-систему
-- исключить неконтролируемые визуальные артефакты
-
----
-
-## 2. Разделение ответственности
-
-| Документ | Уровень | Область применения |
-|----------|---------|-------------------|
-| **No-Unicode Policy v2.1** (этот документ) | [C] Critical, [W] Warning, [I] Info | UI, продакшн-код, AI-чат, прототипы |
-| **MARKDOWN_STANDARD v2.1** | [W] Warning | README.md, документация проекта |
+- ensure visual consistency
+- maintain professional product level
+- guarantee controllability through design system
+- exclude uncontrolled visual artifacts
 
 ---
 
-## 3. Уровни строгости
+## 2. Responsibility Separation
 
-Стандарт применяет **уровневый подход** вместо абсолютного запрета:
-
-| Уровень | Обозначение | Контекст | Действие |
-|---------|-------------|----------|----------|
-| Critical | [C] | UI, продакшн-код | Блокирует merge |
-| Warning | [W] | Документация, README, AI-чат | Предупреждение в review (см. MARKDOWN_STANDARD) |
-| Info | [I] | Внутренние заметки, прототипы | Рекомендация |
-
-### Применение уровней:
-
-| Контекст | Уровень | Обоснование |
-|----------|---------|-------------|
-| UI компоненты | [C] Critical | Прямое влияние на пользователя |
-| API ответы, ошибки | [C] Critical | Отображается в интерфейсе |
-| Продакшн-код | [C] Critical | Может попасть в UI |
-| Документация проекта | [W] Warning | См. MARKDOWN_STANDARD |
-| README файлы | [W] Warning | См. MARKDOWN_STANDARD |
-| Внутренние заметки | [I] Info | Только разработчики |
-| Прототипы / MVP | [I] Info | Временный код |
-| Логи, debug | [I] Info | Не видны пользователю |
-| AI-коммуникация (чат) | [W] Warning | Профессиональный стиль общения агентов |
-
-**Примечание для AI-коммуникации:** Ответы AI-агентов в чате не должны содержать эмодзи и Unicode-графику. Это обеспечивает единый профессиональный стиль наравне с кодом и документацией. Сообщения пользователя не регламентируются данным стандартом.
+| Document | Level | Scope |
+|----------|-------|-------|
+| **No-Unicode Policy v2.1** (this document) | [C] Critical, [W] Warning, [I] Info | UI, production code, AI-chat, prototypes |
+| **MARKDOWN_STANDARD v2.1** | [W] Warning | README.md, project documentation |
 
 ---
 
-## 4. Что запрещено
+## 3. Strictness Levels
 
-### 4.1. Категории запрещённых символов
+The standard applies a **tiered approach** instead of absolute prohibition:
 
-| Категория | Примеры | Уровень |
-|-----------|---------|---------|
-| Эмодзи | любые пиктограммы: эмоции, объекты, UI-символы | [C] |
-| Unicode-иконки | символы статусов, действий, уведомлений | [C] |
-| Декоративные символы | псевдографика, маркеры, выделения | [W] |
+| Level | Notation | Context | Action |
+|-------|----------|---------|--------|
+| Critical | [C] | UI, production code | Blocks merge |
+| Warning | [W] | Documentation, README, AI-chat | Warning in review (see MARKDOWN_STANDARD) |
+| Info | [I] | Internal notes, prototypes | Recommendation |
 
-### 4.2. Область действия по слоям
+### Level Application:
 
-| Слой | Critical [C] | Info [I] |
-|------|--------------|----------|
-| Интерфейс (UI) | кнопки, меню, таблицы, уведомления | - |
-| API | ответы, ошибки, статусы | - |
-| Контент | тексты в продукте | черновики |
-| Код | UI-строки, сообщения | debug-код |
-| Логирование | - | console.log, trace |
+| Context | Level | Rationale |
+|---------|-------|-----------|
+| UI components | [C] Critical | Direct impact on user |
+| API responses, errors | [C] Critical | Displayed in interface |
+| Production code | [C] Critical | May reach UI |
+| Project documentation | [W] Warning | See MARKDOWN_STANDARD |
+| README files | [W] Warning | See MARKDOWN_STANDARD |
+| Internal notes | [I] Info | Developers only |
+| Prototypes / MVP | [I] Info | Temporary code |
+| Logs, debug | [I] Info | Not visible to user |
+| AI-communication (chat) | [W] Warning | Professional agent communication style |
 
----
-
-## 5. Причины ограничений
-
-| Проблема | Описание |
-|----------|----------|
-| Неконсистентность рендера | Unicode отображается по-разному на разных ОС, браузерах, устройствах |
-| Отсутствие контроля | Невозможно централизованно менять стиль, управлять темами |
-| Отсутствие масштабируемости | Нет управления размером, нет адаптивности |
-| Нарушение профессионального стандарта | Снижает доверие, ломает визуальную иерархию |
+**Note for AI-communication:** AI-agent responses in chat must not contain emoji and Unicode graphics. This ensures a consistent professional style alongside code and documentation. User messages are not regulated by this standard.
 
 ---
 
-## 6. Разрешённые символы
+## 4. What is Prohibited
 
-### 6.1. Базовый набор
+### 4.1. Prohibited Character Categories
 
-| Категория | Диапазон | Примеры |
-|-----------|----------|---------|
-| ASCII буквы | a-z, A-Z | text, TEXT |
-| Кириллица | а-я, А-Я | текст, ТЕКСТ |
-| Цифры | 0-9 | 123 |
-| Пунктуация | . , ; : ! ? - _ | стандартная |
-| Пробелы | space, tab, newline | форматирование |
+| Category | Examples | Level |
+|----------|----------|-------|
+| Emoji | any pictograms: emotions, objects, UI-symbols | [C] |
+| Unicode-icons | status symbols, actions, notifications | [C] |
+| Decorative symbols | pseudographics, markers, highlights | [W] |
 
-### 6.2. Whitelist для диаграмм (только в коде [I])
+### 4.2. Scope by Layers
 
-Для технических диаграмм в коде разрешены:
+| Layer | Critical [C] | Info [I] |
+|-------|--------------|----------|
+| Interface (UI) | buttons, menus, tables, notifications | - |
+| API | responses, errors, statuses | - |
+| Content | texts in product | drafts |
+| Code | UI-strings, messages | debug-code |
+| Logging | - | console.log, trace |
 
-| Символ | Применение |
-|--------|------------|
-| -> | стрелка вправо |
-| <- | стрелка влево |
-| => | импликация |
-| <= | обратная импликация |
-| \| | вертикальная линия |
-| + | соединение линий |
-| - | горизонтальная линия |
-| v | стрелка вниз |
-| ^ | стрелка вверх |
-| > | указатель |
-| < | обратный указатель |
+---
 
-### 6.3. Оформление кода в комментариях и документации
+## 5. Reasons for Restrictions
 
-При оформлении кода в комментариях и встроенной документации:
+| Problem | Description |
+|---------|-------------|
+| Inconsistent render | Unicode displays differently on different OS, browsers, devices |
+| Lack of control | Cannot centrally change style, manage themes |
+| No scalability | No size control, no responsiveness |
+| Professional standard violation | Reduces trust, breaks visual hierarchy |
 
-| Элемент | Оформление |
-|---------|------------|
-| Inline код | `` `код` `` |
-| Блок кода | `` ```язык `` |
+---
 
-**Правила:**
+## 6. Allowed Characters
 
-- Указывайте язык для блоков кода (подсветка синтаксиса)
-- Не используйте HTML-теги для окраски кода
-- Цвет — ответственность IDE/рендерера
+### 6.1. Basic Set
 
-### 6.4. Пример разрешённой диаграммы (уровень [I])
+| Category | Range | Examples |
+|----------|-------|----------|
+| ASCII letters | a-z, A-Z | text, TEXT |
+| Cyrillic | a-ya, A-YA | tekst, TEKST |
+| Digits | 0-9 | 123 |
+| Punctuation | . , ; : ! ? - _ | standard |
+| Whitespace | space, tab, newline | formatting |
+
+### 6.2. Whitelist for Diagrams (code [I] only)
+
+For technical diagrams in code, allowed:
+
+| Symbol | Usage |
+|--------|-------|
+| -> | right arrow |
+| <- | left arrow |
+| => | implication |
+| <= | reverse implication |
+| \| | vertical line |
+| + | line junction |
+| - | horizontal line |
+| v | down arrow |
+| ^ | up arrow |
+| > | pointer |
+| < | reverse pointer |
+
+### 6.3. Code Formatting in Comments and Documentation
+
+When formatting code in comments and embedded documentation:
+
+| Element | Format |
+|---------|--------|
+| Inline code | `` `code` `` |
+| Code block | `` ```language `` |
+
+**Rules:**
+
+- Specify language for code blocks (syntax highlighting)
+- Do not use HTML tags for code coloring
+- Color is IDE/renderer responsibility
+
+### 6.4. Example Allowed Diagram (level [I])
 
 ```text
 +-------------------+
@@ -154,90 +154,90 @@
 
 ---
 
-## 7. Стандарт иконок
+## 7. Icon Standard
 
-### 7.1. Базовое правило
+### 7.1. Basic Rule
 
-Любой визуальный символ в UI = **только SVG**
+Any visual symbol in UI = **SVG only**
 
-### 7.2. Требования к SVG
+### 7.2. SVG Requirements
 
-- быть частью Design System
-- использовать design tokens
-- поддерживать theming
-- быть оптимизированы (SVGO)
-- иметь единый stroke/fill стиль
+- be part of Design System
+- use design tokens
+- support theming
+- be optimized (SVGO)
+- have unified stroke/fill style
 
-### 7.3. Библиотеки иконок
+### 7.3. Icon Libraries
 
-| Библиотека | Статус | Применение |
-|------------|--------|------------|
-| Lucide | Основная | Все иконки проекта |
-| Бренд-логотипы | Обязательные | Технологии, интеграции |
+| Library | Status | Usage |
+|---------|--------|-------|
+| Lucide | Primary | All project icons |
+| Brand logos | Required | Technologies, integrations |
 
-### 7.4. Бренд-логотипы
+### 7.4. Brand Logos
 
-При упоминании технологий использовать официальные SVG:
+When mentioning technologies, use official SVG:
 
-| Технология | Требование |
-|------------|------------|
-| Next.js | Официальный SVG логотип |
-| TypeScript | Официальный SVG логотип |
-| Tailwind CSS | Официальный SVG логотип |
-| Prisma ORM | Официальный SVG логотип |
+| Technology | Requirement |
+|------------|-------------|
+| Next.js | Official SVG logo |
+| TypeScript | Official SVG logo |
+| Tailwind CSS | Official SVG logo |
+| Prisma ORM | Official SVG logo |
 
 ---
 
-## 8. AI-промпты
+## 8. AI Prompts
 
-### 8.1. Корректная формулировка
+### 8.1. Correct Formulation
 
 ```text
 Output must contain only:
 - ASCII characters (a-z, A-Z, 0-9, standard punctuation)
-- Cyrillic characters (а-я, А-Я)
-- Whitelisted diagram symbols (for [I] level): -> <- => <= | + - v ^ > <
+- Cyrillic characters (a-ya, A-YA)
+- Whitelisted diagram symbols (for [I] level): -> <- => <= \| + - v ^ > <
 ```
 
-### 8.2. Очистка документа перед анализом
+### 8.2. Document Cleaning Before Analysis
 
 ```javascript
-// Удаление эмодзи и Unicode-графики
+// Remove emoji and Unicode graphics
 text.replace(/[\u{1F000}-\u{1FFFF}]|[\u{2600}-\u{27BF}]|[\u{FE00}-\u{FEFF}]|[\u{1F900}-\u{1F9FF}]|[\u{2702}-\u{27B0}]/gu, '')
 ```
 
-### 8.3. Финальная санитизация
+### 8.3. Final Sanitization
 
 ```javascript
-// Для [C] уровня (код/UI) - только ASCII + кириллица (типографика строго запрещена)
+// For [C] level (code/UI) - ASCII + Cyrillic only (typography strictly prohibited)
 text.replace(/[^\x20-\x7E\u0400-\u04FF]/g, '')
 
-// Для [I] уровня - с whitelist для диаграмм
-// Примечание: 'v' удалена из явного перечисления, так как входит в базовый диапазон ASCII \x20-\x7E
+// For [I] level - with whitelist for diagrams
+// Note: 'v' removed from explicit enumeration as it's in basic ASCII range \x20-\x7E
 text.replace(/[^\x20-\x7E\u0400-\u04FF\-\>\<\=\|\+\^]/g, '')
 
-// ВНИМАНИЕ: Уровень [W] (документация) регулируется MARKDOWN_STANDARD v2.1.
-// Там типографские символы (em dash, en dash, degree, copyright) РАЗРЕШЕНЫ в обычном тексте, поэтому данная
-// жесткая санитизация к .md файлам не применяется.
+// ATTENTION: Level [W] (documentation) is regulated by MARKDOWN_STANDARD v2.1.
+// There typographic characters (em dash, en dash, degree, copyright) ARE ALLOWED in plain text, therefore this
+// strict sanitization is NOT applied to .md files.
 ```
 
 ---
 
-## 9. Fallback-стратегия
+## 9. Fallback Strategy
 
-### 9.1. Когда SVG недоступен
+### 9.1. When SVG Unavailable
 
-| Ситуация | Решение |
-|----------|---------|
-| Ошибка загрузки SVG | Текстовая альтернатива (hidden, aria-label) |
-| Email-клиенты | Текст + стилизованный span |
-| Терминал / CLI | Текст + ANSI-цвета |
-| Plain text | Только текст |
+| Situation | Solution |
+|-----------|----------|
+| SVG load error | Text alternative (hidden, aria-label) |
+| Email clients | Text + styled span |
+| Terminal / CLI | Text + ANSI colors |
+| Plain text | Text only |
 
-### 9.2. Реализация fallback
+### 9.2. Fallback Implementation
 
 ```html
-<!-- SVG с fallback через onerror -->
+<!-- SVG with fallback via onerror -->
 <span class="icon">
   <svg onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"
        aria-hidden="true">
@@ -251,16 +251,16 @@ text.replace(/[^\x20-\x7E\u0400-\u04FF\-\>\<\=\|\+\^]/g, '')
 .icon-fallback {
   display: none;
 }
-/* Fallback показывается через JS onerror на SVG-элементе */
+/* Fallback shown via JS onerror on SVG element */
 ```
 
 ---
 
-## 10. Контроль и enforcement
+## 10. Control and Enforcement
 
 ### 10.1. Linting
 
-Файл: `eslint-rules/no-unicode-policy.js`
+File: `eslint-rules/no-unicode-policy.js`
 
 ```javascript
 module.exports = {
@@ -310,108 +310,108 @@ module.exports = {
 
 ### 10.2. Code Review
 
-| Уровень | Действие |
-|---------|----------|
-| [C] violation | PR отклоняется |
-| [I] violation | Рекомендация (опционально) |
+| Level | Action |
+|-------|--------|
+| [C] violation | PR rejected |
+| [I] violation | Recommendation (optional) |
 
 ### 10.3. Design Review
 
-- соответствие icon system
-- использование бренд-логотипов
-- наличие fallback
+- icon system compliance
+- brand logo usage
+- fallback presence
 
 ---
 
-## 11. Исключения
+## 11. Exceptions
 
-### 11.1. Безусловно разрешены
+### 11.1. Unconditionally Allowed
 
-| Категория | Примеры |
-|-----------|---------|
-| Буквы | a-z, A-Z, а-я, А-Я |
-| Цифры | 0-9 |
-| Пунктуация | . , ; : ! ? - _ ( ) [ ] { } |
-| Whitelist символы [I] | -> <- => <= \| + - v ^ > < |
+| Category | Examples |
+|----------|----------|
+| Letters | a-z, A-Z, a-ya, A-YA |
+| Digits | 0-9 |
+| Punctuation | . , ; : ! ? - _ ( ) [ ] { } |
+| Whitelist symbols [I] | -> <- => <= \| + - v ^ > < |
 
-### 11.2. Исключения по согласованию
+### 11.2. Exceptions by Agreement
 
-| Ситуация | Требование |
-|----------|------------|
-| Внешние требования | Email-рассылки с эмодзи - согласование с маркетингом |
-| Локализация | Языки с не-ASCII символами (китайский, арабский) |
-| Accessibility | Unicode-символы для screen readers |
+| Situation | Requirement |
+|-----------|-------------|
+| External requirements | Email newsletters with emoji - coordinate with marketing |
+| Localization | Languages with non-ASCII characters (Chinese, Arabic) |
+| Accessibility | Unicode characters for screen readers |
 
-### 11.3. Процесс согласования
+### 11.3. Approval Process
 
-1. Создать issue с обоснованием
-2. Получить approval от Tech Lead
-3. Документировать исключение в коде
-4. Добавить в whitelist при необходимости
-
----
-
-## 12. Применение по типам проектов
-
-| Тип проекта | Уровень применения |
-|-------------|-------------------|
-| Enterprise | Полный [C] везде |
-| B2B SaaS | [C] в UI, [W] в документации (MARKDOWN_STANDARD) |
-| B2C продукт | [C] в UI, [W] в документации (MARKDOWN_STANDARD) |
-| MVP / Прототип | [I] везде |
-| Внутренний инструмент | [I] в коде, [W] в README (MARKDOWN_STANDARD) |
-| Open Source | [C] в UI, [W] в документации (MARKDOWN_STANDARD) |
+1. Create issue with justification
+2. Get approval from Tech Lead
+3. Document exception in code
+4. Add to whitelist if necessary
 
 ---
 
-## 13. Чек-лист соответствия
+## 12. Application by Project Types
 
-### Перед merge (код [C]):
-
-- [ ] Нет эмодзи в UI-компонентах
-- [ ] Нет Unicode-иконок в продакшн-коде
-- [ ] Иконки реализованы через SVG
-- [ ] Бренд-логотипы - официальные SVG
-- [ ] Есть fallback для критичных иконок
-- [ ] AI-промпты используют корректную формулировку
-
-### Для документации [W]:
-
-- [ ] См. MARKDOWN_STANDARD v2.1
-
-### Для AI-коммуникации (чат) [W]:
-
-- [ ] Нет эмодзи в ответах AI-агентов
-- [ ] Нет Unicode-графики в чате
+| Project Type | Application Level |
+|--------------|-------------------|
+| Enterprise | Full [C] everywhere |
+| B2B SaaS | [C] in UI, [W] in documentation (MARKDOWN_STANDARD) |
+| B2C product | [C] in UI, [W] in documentation (MARKDOWN_STANDARD) |
+| MVP / Prototype | [I] everywhere |
+| Internal tool | [I] in code, [W] in README (MARKDOWN_STANDARD) |
+| Open Source | [C] in UI, [W] in documentation (MARKDOWN_STANDARD) |
 
 ---
 
-## 14. Формат подписи стека
+## 13. Compliance Checklist
 
-- Размещение: правый нижний угол (только для корневых `README.md` и `CHANGELOG.md`)
-- Формат: `Built with: <технологии проекта>` (конкретный стек определяется проектом, а не стандартом)
-- Пример (для Next.js-проектов): `Built with: Next.js 16 + TypeScript + Tailwind CSS`
-- Разрешено: латиница, кириллица, цифры, знаки + и :
-- Запрещено: эмодзи, Unicode-графика
+### Before merge (code [C]):
 
-**Примечание:** Стандарт задаёт формат (структуру) подписи, а не конкретные технологии. Дефолтное значение для проектов данного стека см. в `README_TEMPLATE.md`.
+- [ ] No emoji in UI components
+- [ ] No Unicode-icons in production code
+- [ ] Icons implemented via SVG
+- [ ] Brand logos are official SVG
+- [ ] Fallback exists for critical icons
+- [ ] AI prompts use correct formulation
 
----
+### For documentation [W]:
 
-## 15. История версий
+- [ ] See MARKDOWN_STANDARD v2.1
 
-| Версия | Дата | Изменения |
-|--------|------|-----------|
-| 1.0 | 2024-Q4 | Первоначальная версия, абсолютный запрет |
-| 2.0 | 2025-01 | Уровневый подход, whitelist, fallback-стратегия, связь с MARKDOWN_STANDARD, правила оформления кода |
-| 2.1 | 2025-01 | Синхронизация с MARKDOWN_STANDARD v2.1 (допуск типографики в тексте для [W], исправление regex для диаграмм, уточнение подписи стека) |
-| 2.1.1 | 2025-01 | Исправлен невалидный CSS `:loaded` на `onerror`, добавлена проверка TemplateLiteral и JSXText в ESLint-правило, удалены emoji из тела документа, убран двойной разделитель |
-| 2.1.2 | 2025-01 | Добавлена AI-коммуникация (чат) как контекст уровня [W]; ответы AI-агентов не должны содержать эмодзи и Unicode-графику; сообщения пользователя не регламентируются |
-| 2.1.3 | 2025-01 | Подпись стека параметризована: стандарт задаёт формат `Built with: <технологии>`, конкретный стек — ответственность проекта; дефолтное значение вынесено в README_TEMPLATE |
+### For AI-communication (chat) [W]:
+
+- [ ] No emoji in AI-agent responses
+- [ ] No Unicode-graphics in chat
 
 ---
 
-**Документ соответствует стандарту No-Unicode Policy v2.1**
+## 14. Stack Signature Format
+
+- Placement: bottom right corner (for root `README.md` and `CHANGELOG.md` only)
+- Format: `Built with: <project technologies>` (specific stack defined by project, not standard)
+- Example (for Next.js projects): `Built with: Next.js 16 + TypeScript + Tailwind CSS`
+- Allowed: Latin, Cyrillic, digits, + and : characters
+- Prohibited: emoji, Unicode graphics
+
+**Note:** The standard defines the format (structure), not specific technologies. Default value for projects of this stack see in `README_TEMPLATE.md`.
+
+---
+
+## 15. Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2024-Q4 | Initial version, absolute prohibition |
+| 2.0 | 2025-01 | Tiered approach, whitelist, fallback strategy, MARKDOWN_STANDARD link, code formatting rules |
+| 2.1 | 2025-01 | Sync with MARKDOWN_STANDARD v2.1 (allow typography in text for [W], fix regex for diagrams, clarify stack signature) |
+| 2.1.1 | 2025-01 | Fixed invalid CSS `:loaded` to `onerror`, added TemplateLiteral and JSXText checks to ESLint rule, removed emoji from document body, removed double separator |
+| 2.1.2 | 2025-01 | Added AI-communication (chat) as [W] level context; AI-agent responses must not contain emoji and Unicode graphics; user messages not regulated |
+| 2.1.3 | 2025-01 | Stack signature parameterized: standard defines format `Built with: <technologies>`, specific stack is project responsibility; default value moved to README_TEMPLATE |
+
+---
+
+**Document complies with No-Unicode Policy v2.1**
 
 ---
 Built with: Next.js 16 + TypeScript + Tailwind CSS

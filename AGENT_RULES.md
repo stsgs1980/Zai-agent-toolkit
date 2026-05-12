@@ -1,6 +1,6 @@
 # Agent Rules
 
-> Toolkit version: **v1.8.0**
+> Toolkit version: **v1.8.1**
 >
 > Mandatory rules for AI agents working with this toolkit.
 > Read before starting work on any project.
@@ -245,14 +245,14 @@ This toolkit organizes files into two groups:
 
 Apply FIRST. Define rules that all other documents must follow.
 
+**English versions:**
+
 | ID | File | Version | Level | Purpose |
 |----|------|---------|-------|---------|
-| STD-DOC-001 | `MARKDOWN_STANDARD_RU_v2.1.md` | v2.1.5 | [W] | Markdown formatting rules (Russian) |
-| STD-DOC-002 | `MARKDOWN_STANDARD_EN_v2.1.md` | v2.1.5 | [W] | Markdown formatting rules (English) |
+| STD-DOC-002 | `MARKDOWN_STANDARD_EN_v2.1.md` | v2.1.5 | [W] | Markdown formatting rules |
 | STD-DOC-003 | `UNICODE_POLICY_EN_v2.1.md` | v2.1.3 | [C]+[W]+[I] | Unicode/emoji prohibition |
-| STD-DOC-004 | `README_TEMPLATE_EN_v2.1.md` | v2.1 | [W] | Mandatory README structure + stack default |
-| STD-DOC-005 | `CODE_EXAMPLES_GUIDE_RU_v1.0.md` | v1.0 | [W] | Code examples formatting (Russian) |
-| STD-DOC-006 | `CODE_EXAMPLES_GUIDE_EN_v1.0.md` | v1.0 | [W] | Code examples formatting (English) |
+| STD-DOC-004 | `README_TEMPLATE_EN_v2.1.md` | v2.1 | [W] | Mandatory README structure |
+| STD-DOC-006 | `CODE_EXAMPLES_GUIDE_EN_v1.0.md` | v1.0 | [W] | Code examples formatting |
 | STD-ENV-001 | `REPRODUCIBILITY_STANDARD_EN_v1.0.md` | v1.0 | [C] | Clone+install+dev = works |
 | STD-ARCH-001 | `IMPLEMENTATION_ORDER_EN_v2.1.md` | v2.1 | [W] | Implementation sequence (6 steps) |
 | STD-META-001 | `STANDARD_ID_SYSTEM_EN_v1.0.md` | v1.0 | [W] | Standard ID registry and rules |
@@ -262,6 +262,24 @@ Apply FIRST. Define rules that all other documents must follow.
 | STD-TEST-001 | `TESTING_STANDARD_EN_v1.0.md` | v1.0 | [C] | Unit, integration, E2E testing standards |
 | STD-ERR-001 | `ERROR_HANDLING_STANDARD_EN_v1.0.md` | v1.0 | [C] | Error classification, logging, recovery |
 | STD-SEC-001 | `SECURITY_STANDARD_EN_v1.0.md` | v1.0 | [C] | Authentication, secrets, OWASP compliance |
+
+**Russian versions:**
+
+| ID | File | Version | Level | Purpose |
+|----|------|---------|-------|---------|
+| STD-DOC-001 | `MARKDOWN_STANDARD_RU_v2.1.md` | v2.1.5 | [W] | Markdown formatting rules |
+| STD-DOC-003 | `UNICODE_POLICY_RU_v2.1.md` | v2.1.3 | [C]+[W]+[I] | Unicode/emoji prohibition |
+| STD-DOC-004 | `README_TEMPLATE_RU_v2.1.md` | v2.1 | [W] | Mandatory README structure |
+| STD-DOC-005 | `CODE_EXAMPLES_GUIDE_RU_v1.0.md` | v1.0 | [W] | Code examples formatting |
+| STD-ENV-001 | `REPRODUCIBILITY_STANDARD_RU_v1.0.md` | v1.0 | [C] | Clone+install+dev = works |
+| STD-ARCH-001 | `IMPLEMENTATION_ORDER_RU_v2.1.md` | v2.1 | [W] | Implementation sequence (6 steps) |
+| STD-META-001 | `STANDARD_ID_SYSTEM_RU_v1.0.md` | v1.0 | [W] | Standard ID registry and rules |
+| STD-FE-001 | `FRONTEND_STANDARD_RU_v1.3.md` | v1.3 | [C] | Frontend development (React/Next.js) |
+| STD-GIT-001 | `GITHUB_STANDARD_RU_v1.1.md` | v1.1 | [C] | Git/GitHub operations standard |
+| STD-A11Y-001 | `WCAG_STANDARD_RU_v1.0.md` | v1.0 | [C] | Accessibility compliance (WCAG 2.1 AA) |
+| STD-TEST-001 | `TESTING_STANDARD_RU_v1.0.md` | v1.0 | [C] | Unit, integration, E2E testing standards |
+| STD-ERR-001 | `ERROR_HANDLING_STANDARD_RU_v1.0.md` | v1.0 | [C] | Error classification, logging, recovery |
+| STD-SEC-001 | `SECURITY_STANDARD_RU_v1.0.md` | v1.0 | [C] | Authentication, secrets, OWASP compliance |
 
 ### Group A -- Operational (templates)
 

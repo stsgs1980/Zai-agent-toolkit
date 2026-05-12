@@ -4,13 +4,13 @@
 
 # Agent Toolkit
 
-[![Version: 1.8.0](https://img.shields.io/badge/Version-1.8.0-blue.svg)]()
+[![Version: 1.8.1](https://img.shields.io/badge/Version-1.8.1-blue.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status: Pre-release](https://img.shields.io/badge/Status-Pre--release-orange.svg)]()
 
 **Standards + Skills + Rules** for AI-driven development
 
-> Toolkit version: **v1.8.0**
+> Toolkit version: **v1.8.1**
 
 ---
 
@@ -101,23 +101,32 @@ agent-toolkit/
     favicon.png               Browser favicon (64x64)
 
   standards/                  Group B: Governance documents (apply first)
-    MARKDOWN_STANDARD_RU_v2.1.md    Markdown formatting (Russian) v2.1.5
     MARKDOWN_STANDARD_EN_v2.1.md    Markdown formatting (English) v2.1.5
-    UNICODE_POLICY_EN_v2.1.md       Unicode/emoji prohibition v2.1.3
-    README_TEMPLATE_EN_v2.1.md      Mandatory README structure v2.1
-    REPRODUCIBILITY_STANDARD_EN_v1.0.md Clone + install + dev = works
-    IMPLEMENTATION_ORDER_EN_v2.1.md Implementation sequence v2.1 (English)
-    IMPLEMENTATION_ORDER_RU_v2.1.md Implementation sequence v2.1 (Russian)
-    STANDARD_ID_SYSTEM_EN_v1.0.md   Standard ID registry v1.0 (English)
-    STANDARD_ID_SYSTEM_RU_v1.0.md   Standard ID registry v1.0 (Russian)
+    MARKDOWN_STANDARD_RU_v2.1.md    Markdown formatting (Russian) v2.1.5
+    UNICODE_POLICY_EN_v2.1.md       Unicode/emoji prohibition (English) v2.1.3
+    UNICODE_POLICY_RU_v2.1.md       Unicode/emoji prohibition (Russian) v2.1.3
+    README_TEMPLATE_EN_v2.1.md      Mandatory README structure (English) v2.1
+    README_TEMPLATE_RU_v2.1.md      Mandatory README structure (Russian) v2.1
+    REPRODUCIBILITY_STANDARD_EN_v1.0.md Clone + install + dev = works (English)
+    REPRODUCIBILITY_STANDARD_RU_v1.0.md Clone + install + dev = works (Russian)
+    IMPLEMENTATION_ORDER_EN_v2.1.md Implementation sequence (English) v2.1
+    IMPLEMENTATION_ORDER_RU_v2.1.md Implementation sequence (Russian) v2.1
+    STANDARD_ID_SYSTEM_EN_v1.0.md   Standard ID registry (English) v1.0
+    STANDARD_ID_SYSTEM_RU_v1.0.md   Standard ID registry (Russian) v1.0
     CODE_EXAMPLES_GUIDE_EN_v1.0.md  Code examples formatting (English) v1.0
     CODE_EXAMPLES_GUIDE_RU_v1.0.md  Code examples formatting (Russian) v1.0
-    FRONTEND_STANDARD_EN_v1.3.md    Frontend development standard v1.3
-    GITHUB_STANDARD_EN_v1.1.md      Git/GitHub operations standard v1.1
-    WCAG_STANDARD_EN_v1.0.md        Accessibility standard (WCAG 2.1 AA) v1.0
-    TESTING_STANDARD_EN_v1.0.md     Unit, integration, E2E testing v1.0
-    ERROR_HANDLING_STANDARD_EN_v1.0.md Error classification, logging, recovery v1.0
-    SECURITY_STANDARD_EN_v1.0.md    Authentication, secrets, OWASP v1.0
+    FRONTEND_STANDARD_EN_v1.3.md    Frontend development (English) v1.3
+    FRONTEND_STANDARD_RU_v1.3.md    Frontend development (Russian) v1.3
+    GITHUB_STANDARD_EN_v1.1.md      Git/GitHub operations (English) v1.1
+    GITHUB_STANDARD_RU_v1.1.md      Git/GitHub operations (Russian) v1.1
+    WCAG_STANDARD_EN_v1.0.md        Accessibility WCAG 2.1 AA (English) v1.0
+    WCAG_STANDARD_RU_v1.0.md        Accessibility WCAG 2.1 AA (Russian) v1.0
+    TESTING_STANDARD_EN_v1.0.md     Unit, integration, E2E testing (English) v1.0
+    TESTING_STANDARD_RU_v1.0.md     Unit, integration, E2E testing (Russian) v1.0
+    ERROR_HANDLING_STANDARD_EN_v1.0.md Error handling (English) v1.0
+    ERROR_HANDLING_STANDARD_RU_v1.0.md Error handling (Russian) v1.0
+    SECURITY_STANDARD_EN_v1.0.md    Security, OWASP (English) v1.0
+    SECURITY_STANDARD_RU_v1.0.md    Security, OWASP (Russian) v1.0
 
   templates/                  Group A: Operational templates (deploy after B)
     WORKLOG.md                Agent work journal v2.1.1
@@ -152,14 +161,14 @@ agent-toolkit/
 
 These define rules. They are read and accepted, not modified per project.
 
+**English versions:**
+
 | ID | Document | Version | Level | Scope |
 |----|----------|---------|-------|-------|
-| STD-DOC-001 | `MARKDOWN_STANDARD_RU_v2.1.md` | v2.1.5 | [W] | README, project documentation (Russian) |
-| STD-DOC-002 | `MARKDOWN_STANDARD_EN_v2.1.md` | v2.1.5 | [W] | README, project documentation (English) |
+| STD-DOC-002 | `MARKDOWN_STANDARD_EN_v2.1.md` | v2.1.5 | [W] | README, project documentation |
 | STD-DOC-003 | `UNICODE_POLICY_EN_v2.1.md` | v2.1.3 | [C]+[W]+[I] | UI code [C], AI-chat + docs [W], prototypes [I] |
 | STD-DOC-004 | `README_TEMPLATE_EN_v2.1.md` | v2.1 | [W] | Mandatory README structure |
-| STD-DOC-005 | `CODE_EXAMPLES_GUIDE_RU_v1.0.md` | v1.0 | [W] | Code examples in documentation (Russian) |
-| STD-DOC-006 | `CODE_EXAMPLES_GUIDE_EN_v1.0.md` | v1.0 | [W] | Code examples in documentation (English) |
+| STD-DOC-006 | `CODE_EXAMPLES_GUIDE_EN_v1.0.md` | v1.0 | [W] | Code examples in documentation |
 | STD-ENV-001 | `REPRODUCIBILITY_STANDARD_EN_v1.0.md` | v1.0 | [C] | Environment, paths, DB |
 | STD-ARCH-001 | `IMPLEMENTATION_ORDER_EN_v2.1.md` | v2.1 | [W] | 6-step implementation sequence |
 | STD-META-001 | `STANDARD_ID_SYSTEM_EN_v1.0.md` | v1.0 | [W] | Standard ID registry and rules |
@@ -169,6 +178,24 @@ These define rules. They are read and accepted, not modified per project.
 | STD-TEST-001 | `TESTING_STANDARD_EN_v1.0.md` | v1.0 | [C] | Unit, integration, E2E testing |
 | STD-ERR-001 | `ERROR_HANDLING_STANDARD_EN_v1.0.md` | v1.0 | [C] | Error handling, logging, recovery |
 | STD-SEC-001 | `SECURITY_STANDARD_EN_v1.0.md` | v1.0 | [C] | Authentication, secrets, OWASP |
+
+**Russian versions:**
+
+| ID | Document | Version | Level | Scope |
+|----|----------|---------|-------|-------|
+| STD-DOC-001 | `MARKDOWN_STANDARD_RU_v2.1.md` | v2.1.5 | [W] | README, project documentation |
+| STD-DOC-003 | `UNICODE_POLICY_RU_v2.1.md` | v2.1.3 | [C]+[W]+[I] | UI code [C], AI-chat + docs [W], prototypes [I] |
+| STD-DOC-004 | `README_TEMPLATE_RU_v2.1.md` | v2.1 | [W] | Mandatory README structure |
+| STD-DOC-005 | `CODE_EXAMPLES_GUIDE_RU_v1.0.md` | v1.0 | [W] | Code examples in documentation |
+| STD-ENV-001 | `REPRODUCIBILITY_STANDARD_RU_v1.0.md` | v1.0 | [C] | Environment, paths, DB |
+| STD-ARCH-001 | `IMPLEMENTATION_ORDER_RU_v2.1.md` | v2.1 | [W] | 6-step implementation sequence |
+| STD-META-001 | `STANDARD_ID_SYSTEM_RU_v1.0.md` | v1.0 | [W] | Standard ID registry and rules |
+| STD-FE-001 | `FRONTEND_STANDARD_RU_v1.3.md` | v1.3 | [C] | React/Next.js frontend development |
+| STD-GIT-001 | `GITHUB_STANDARD_RU_v1.1.md` | v1.1 | [C] | Git operations, commit format, branching |
+| STD-A11Y-001 | `WCAG_STANDARD_RU_v1.0.md` | v1.0 | [C] | UI accessibility compliance |
+| STD-TEST-001 | `TESTING_STANDARD_RU_v1.0.md` | v1.0 | [C] | Unit, integration, E2E testing |
+| STD-ERR-001 | `ERROR_HANDLING_STANDARD_RU_v1.0.md` | v1.0 | [C] | Error handling, logging, recovery |
+| STD-SEC-001 | `SECURITY_STANDARD_RU_v1.0.md` | v1.0 | [C] | Authentication, secrets, OWASP |
 
 ### Group A -- Operational (templates)
 
@@ -222,7 +249,7 @@ These are deployed into a project. They SUBMIT to Group B standards.
 
 | Component | ID | Version |
 |-----------|----|---------|
-| **Toolkit** | -- | **v1.8.0** |
+| **Toolkit** | -- | **v1.8.1** |
 | MARKDOWN_STANDARD (RU) | STD-DOC-001 | v2.1.5 |
 | MARKDOWN_STANDARD (EN) | STD-DOC-002 | v2.1.5 |
 | UNICODE_POLICY | STD-DOC-003 | v2.1.3 |
@@ -297,7 +324,8 @@ This toolkit is provided as-is for use with AI-driven development workflows.
 
 | Version | Changes |
 |---------|---------|
-| **v1.8.0** | Unified naming convention: all files renamed to NAME_STANDARD_XX_vX.X.md format; all references updated |
+| **v1.8.1** | Full Russian localization: all 13 standards now have EN/RU versions (26 total files); complete parity between languages |
+| **v1.8.1** | Unified naming convention: all files renamed to NAME_STANDARD_XX_vX.X.md format; all references updated |
 | **v1.7.0** | Full English localization: IMPLEMENTATION_ORDER_EN, STANDARD_ID_SYSTEM_EN, CODE_EXAMPLES_GUIDE_EN; updated all registries |
 | **v1.6.0** | Added 3 critical standards: TESTING_STANDARD, ERROR_HANDLING_STANDARD, SECURITY_STANDARD |
 | **v1.5.3** | Added sanitize-validate skill for input security (XSS, SQL injection, CSRF, validation, sanitization) |
