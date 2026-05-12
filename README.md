@@ -35,7 +35,7 @@ It solves three problems:
 git clone https://github.com/stsgs1980/agent-toolkit.git
 
 # Copy English standards and templates to your project
-cp -r agent-toolkit/standards/*_EN_*.md your-project/standards/
+cp -r agent-toolkit/standards/*.md your-project/standards/
 cp -r agent-toolkit/templates/          your-project/templates/
 cp -r agent-toolkit/instructions/       your-project/instructions/
 cp agent-toolkit/AGENT_RULES.md         your-project/
@@ -48,7 +48,7 @@ cp agent-toolkit/PROJECT_CONFIG.md      your-project/
 
 ```bash
 git clone https://github.com/stsgs1980/agent-toolkit.git
-cp agent-toolkit/standards/*_EN_*.md your-project/standards/
+cp agent-toolkit/standards/*.md your-project/standards/
 ```
 
 ### Option C: Single Document
@@ -93,8 +93,7 @@ Full details: see `standards/IMPLEMENTATION_ORDER_EN_v2.1.md`
 agent-toolkit/
   AGENT_RULES.md              Behavioral rules for AI agents
   PROJECT_CONFIG.md           Project-specific settings (stack, server, paths)
-  README_EN.md                This file (English version)
-  README_RU.md                Russian version
+  README.md                   This file
 
   assets/                     Visual assets
     logo.png                  Main logo (1024x1024)
@@ -231,7 +230,7 @@ These are deployed into a project. They SUBMIT to Group B standards.
 | SECURITY_STANDARD | STD-SEC-001 | v1.0 |
 | WORKLOG / TASK_TEMPLATE / README_WORKLOG | -- | v2.1.1 |
 
-When updating individual standards, update the toolkit version in `AGENT_RULES.md` and `README_EN.md`.
+When updating individual standards, update the toolkit version in `AGENT_RULES.md` and `README.md`.
 
 ---
 
