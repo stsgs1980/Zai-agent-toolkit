@@ -1,8 +1,11 @@
 # Стандарт: No-Unicode Policy v2.1
 
-> Стандарт использования символов, иконок и графики. Уровень Design System / Engineering Governance.
->
-> **Связанный документ:** MARKDOWN_STANDARD v2.1 (уровень [W]) — для README и документации
+> ID: STD-DOC-003
+> Version: 2.1.3
+> Level: **[C] Critical** + **[W] Warning** + **[I] Info**
+> Related: Markdown Standard (STD-DOC-001, STD-DOC-002)
+
+Стандарт использования символов, иконок и графики. Уровень Design System / Engineering Governance.
 
 ---
 

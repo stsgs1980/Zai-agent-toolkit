@@ -4,9 +4,13 @@
 
 # Agent Toolkit
 
+[![Version: 1.8.0](https://img.shields.io/badge/Version-1.8.0-blue.svg)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Status: Pre-release](https://img.shields.io/badge/Status-Pre--release-orange.svg)]()
+
 **Standards + Skills + Rules** for AI-driven development
 
-> Toolkit version: **v1.4.2**
+> Toolkit version: **v1.8.0**
 
 ---
 
@@ -69,7 +73,7 @@ Step 2: Deploy Worklog (Group A)        Copy templates, verify against B
 Step 3: REPRODUCIBILITY                 Configure env, DB, paths
          |                              Log to WORKLOG
          v
-Step 4: No-Unicode Policy [C]           ESLint rule + UI code cleanup
+Step 4: Unicode Policy [C]           ESLint rule + UI code cleanup
          |                              Log to WORKLOG
          v
 Step 5: MARKDOWN_STANDARD [W]           .md file cleanup (incl. Group A)
@@ -79,7 +83,7 @@ Step 6: README_TEMPLATE                 Assemble README from template
                                         Log to WORKLOG
 ```
 
-Full details: see `standards/ПОРЯДОК_внедрения_стандартов.md`
+Full details: see `standards/IMPLEMENTATION_ORDER_EN_v2.1.md`
 
 ---
 
@@ -97,12 +101,23 @@ agent-toolkit/
     favicon.png               Browser favicon (64x64)
 
   standards/                  Group B: Governance documents (apply first)
-    MARKDOWN_STANDARD_RU_v2.1.md    Markdown formatting (Russian) v2.1.4
-    MARKDOWN_STANDARD_EN_v2.1.md    Markdown formatting (English) v2.1.4
-    No-Unicode_Policy_v2.1.md       Unicode/emoji prohibition v2.1.3
-    README_TEMPLATE.md              Mandatory README structure v2.1
-    REPRODUCIBILITY-STANDARD.md     Clone + install + dev = works
-    ПОРЯДОК_внедрения_стандартов.md Implementation sequence v2.0
+    MARKDOWN_STANDARD_RU_v2.1.md    Markdown formatting (Russian) v2.1.5
+    MARKDOWN_STANDARD_EN_v2.1.md    Markdown formatting (English) v2.1.5
+    UNICODE_POLICY_EN_v2.1.md       Unicode/emoji prohibition v2.1.3
+    README_TEMPLATE_EN_v2.1.md      Mandatory README structure v2.1
+    REPRODUCIBILITY_STANDARD_EN_v1.0.md Clone + install + dev = works
+    IMPLEMENTATION_ORDER_EN_v2.1.md Implementation sequence v2.1 (English)
+    IMPLEMENTATION_ORDER_RU_v2.1.md Implementation sequence v2.1 (Russian)
+    STANDARD_ID_SYSTEM_EN_v1.0.md   Standard ID registry v1.0 (English)
+    STANDARD_ID_SYSTEM_RU_v1.0.md   Standard ID registry v1.0 (Russian)
+    CODE_EXAMPLES_GUIDE_EN_v1.0.md  Code examples formatting (English) v1.0
+    CODE_EXAMPLES_GUIDE_RU_v1.0.md  Code examples formatting (Russian) v1.0
+    FRONTEND_STANDARD_EN_v1.3.md    Frontend development standard v1.3
+    GITHUB_STANDARD_EN_v1.1.md      Git/GitHub operations standard v1.1
+    WCAG_STANDARD_EN_v1.0.md        Accessibility standard (WCAG 2.1 AA) v1.0
+    TESTING_STANDARD_EN_v1.0.md     Unit, integration, E2E testing v1.0
+    ERROR_HANDLING_STANDARD_EN_v1.0.md Error classification, logging, recovery v1.0
+    SECURITY_STANDARD_EN_v1.0.md    Authentication, secrets, OWASP v1.0
 
   templates/                  Group A: Operational templates (deploy after B)
     WORKLOG.md                Agent work journal v2.1.1
@@ -118,7 +133,13 @@ agent-toolkit/
 
   skills/                     Automated agent skills
     git-safe-ops/             Safe git push/pull/rebase
+    git-checkpoint/           Systematic checkpoints during work
+    sanitize-validate/        Input sanitization, validation, security
     dev-watchdog/             Dev server management
+    health-check/             System health diagnostics
+    fallback/                 Graceful degradation
+    api-retry/                API retry with backoff
+    anti-monolith/            React/Next.js architecture enforcement
 
 
 ```
@@ -131,14 +152,23 @@ agent-toolkit/
 
 These define rules. They are read and accepted, not modified per project.
 
-| Document | Version | Level | Scope |
-|----------|---------|-------|-------|
-| `No-Unicode_Policy_v2.1.md` | v2.1.3 | [C]+[W]+[I] | UI code [C], AI-chat + docs [W], prototypes [I] |
-| `MARKDOWN_STANDARD_RU_v2.1.md` | v2.1.4 | [W] | README, project documentation |
-| `MARKDOWN_STANDARD_EN_v2.1.md` | v2.1.4 | [W] | Same in English |
-| `README_TEMPLATE.md` | v2.1 | -- | Mandatory README structure |
-| `ПОРЯДОК_внедрения_стандартов.md` | v2.0 | -- | 6-step implementation sequence |
-| `REPRODUCIBILITY-STANDARD.md` | v1.0 | [C] | Environment, paths, DB |
+| ID | Document | Version | Level | Scope |
+|----|----------|---------|-------|-------|
+| STD-DOC-001 | `MARKDOWN_STANDARD_RU_v2.1.md` | v2.1.5 | [W] | README, project documentation (Russian) |
+| STD-DOC-002 | `MARKDOWN_STANDARD_EN_v2.1.md` | v2.1.5 | [W] | README, project documentation (English) |
+| STD-DOC-003 | `UNICODE_POLICY_EN_v2.1.md` | v2.1.3 | [C]+[W]+[I] | UI code [C], AI-chat + docs [W], prototypes [I] |
+| STD-DOC-004 | `README_TEMPLATE_EN_v2.1.md` | v2.1 | [W] | Mandatory README structure |
+| STD-DOC-005 | `CODE_EXAMPLES_GUIDE_RU_v1.0.md` | v1.0 | [W] | Code examples in documentation (Russian) |
+| STD-DOC-006 | `CODE_EXAMPLES_GUIDE_EN_v1.0.md` | v1.0 | [W] | Code examples in documentation (English) |
+| STD-ENV-001 | `REPRODUCIBILITY_STANDARD_EN_v1.0.md` | v1.0 | [C] | Environment, paths, DB |
+| STD-ARCH-001 | `IMPLEMENTATION_ORDER_EN_v2.1.md` | v2.1 | [W] | 6-step implementation sequence |
+| STD-META-001 | `STANDARD_ID_SYSTEM_EN_v1.0.md` | v1.0 | [W] | Standard ID registry and rules |
+| STD-FE-001 | `FRONTEND_STANDARD_EN_v1.3.md` | v1.3 | [C] | React/Next.js frontend development |
+| STD-GIT-001 | `GITHUB_STANDARD_EN_v1.1.md` | v1.1 | [C] | Git operations, commit format, branching |
+| STD-A11Y-001 | `WCAG_STANDARD_EN_v1.0.md` | v1.0 | [C] | UI accessibility compliance |
+| STD-TEST-001 | `TESTING_STANDARD_EN_v1.0.md` | v1.0 | [C] | Unit, integration, E2E testing |
+| STD-ERR-001 | `ERROR_HANDLING_STANDARD_EN_v1.0.md` | v1.0 | [C] | Error handling, logging, recovery |
+| STD-SEC-001 | `SECURITY_STANDARD_EN_v1.0.md` | v1.0 | [C] | Authentication, secrets, OWASP |
 
 ### Group A -- Operational (templates)
 
@@ -162,7 +192,7 @@ These are deployed into a project. They SUBMIT to Group B standards.
 
 ## Key Rules Summary
 
-### No-Unicode Policy
+### Unicode Policy
 
 - No emoji or Unicode graphic characters in source code, UI text, or AI chat responses
 - `(ref)` exception: identification symbols in tables and code blocks
@@ -190,15 +220,25 @@ These are deployed into a project. They SUBMIT to Group B standards.
 
 ## Toolkit Versioning
 
-| Component | Version |
-|-----------|---------|
-| **Toolkit** | **v1.4.2** |
-| MARKDOWN_STANDARD (RU/EN) | v2.1.4 |
-| No-Unicode_Policy | v2.1.3 |
-| WORKLOG / TASK_TEMPLATE / README_WORKLOG | v2.1.1 |
-| ПОРЯДОК_внедрения_стандартов | v2.0 |
-| REPRODUCIBILITY-STANDARD | v1.0 |
-| README_TEMPLATE | v2.1 |
+| Component | ID | Version |
+|-----------|----|---------|
+| **Toolkit** | -- | **v1.8.0** |
+| MARKDOWN_STANDARD (RU) | STD-DOC-001 | v2.1.5 |
+| MARKDOWN_STANDARD (EN) | STD-DOC-002 | v2.1.5 |
+| UNICODE_POLICY | STD-DOC-003 | v2.1.3 |
+| README_TEMPLATE | STD-DOC-004 | v2.1 |
+| CODE_EXAMPLES_GUIDE_RU | STD-DOC-005 | v1.0 |
+| CODE_EXAMPLES_GUIDE_EN | STD-DOC-006 | v1.0 |
+| REPRODUCIBILITY_STANDARD | STD-ENV-001 | v1.0 |
+| IMPLEMENTATION_ORDER | STD-ARCH-001 | v2.1 |
+| STANDARD_ID_SYSTEM | STD-META-001 | v1.0 |
+| FRONTEND_STANDARD | STD-FE-001 | v1.3 |
+| GITHUB_STANDARD | STD-GIT-001 | v1.1 |
+| WCAG_STANDARD | STD-A11Y-001 | v1.0 |
+| TESTING_STANDARD | STD-TEST-001 | v1.0 |
+| ERROR_HANDLING_STANDARD | STD-ERR-001 | v1.0 |
+| SECURITY_STANDARD | STD-SEC-001 | v1.0 |
+| WORKLOG / TASK_TEMPLATE / README_WORKLOG | -- | v2.1.1 |
 
 When updating individual standards, update the toolkit version in `AGENT_RULES.md` and `README.md`.
 
@@ -257,6 +297,13 @@ This toolkit is provided as-is for use with AI-driven development workflows.
 
 | Version | Changes |
 |---------|---------|
+| **v1.8.0** | Unified naming convention: all files renamed to NAME_STANDARD_XX_vX.X.md format; all references updated |
+| **v1.7.0** | Full English localization: IMPLEMENTATION_ORDER_EN, STANDARD_ID_SYSTEM_EN, CODE_EXAMPLES_GUIDE_EN; updated all registries |
+| **v1.6.0** | Added 3 critical standards: TESTING_STANDARD, ERROR_HANDLING_STANDARD, SECURITY_STANDARD |
+| **v1.5.3** | Added sanitize-validate skill for input security (XSS, SQL injection, CSRF, validation, sanitization) |
+| **v1.5.2** | GITHUB_STANDARD v1.1: Checkpoint System (WIP, Recovery Tags); git-checkpoint skill for systematic versioning |
+| **v1.5.1** | MARKDOWN_STANDARD v2.1.5: added Badges section with shields.io rules; version sync across docs |
+| **v1.5.0** | Added 4 new standards (Code Examples, Frontend, GitHub, WCAG), Standard ID System, anti-monolith skill |
 | **v1.4.2** | Re-added assets (logo, banner, favicon) as real PNG; banner in README header |
 | **v1.4.1** | Added Readiness Checklist section to README |
 | **v1.4.0** | Unified toolkit: AGENT_RULES rewritten, PROJECT_CONFIG.md added, README overhauled, No-Unicode levels synced [C]+[W]+[I], REPRODUCIBILITY classified as Group B |

@@ -1,8 +1,9 @@
-# MARKDOWN FORMATTING GUIDE (v2.1)
+# Standard: Markdown Formatting v2.1 (EN)
 
-> Level: **[W] Warning** | Scope: README, project documentation
->
-> Related standard: **No-Unicode Policy v2.1** (for code and UI - levels [C]/[W]/[I])
+> ID: STD-DOC-002
+> Version: 2.1.5
+> Level: **[W] Warning**
+> Related: No-Unicode Policy v2.1 (STD-DOC-003)
 
 ---
 
@@ -233,7 +234,44 @@ Use official SVG when mentioning technologies in UI:
 
 ---
 
-## 7. Stack Signature
+## 7. Badges
+
+Badges are graphical indicators of project metadata (version, build status, license). Place them at the beginning of README.md after the heading.
+
+### 7.1. Allowed Sources
+
+| Source | Usage |
+|--------|-------|
+| shields.io | Recommended — generates PNG/SVG without emoji |
+| custom SVG | Allowed if compliant with No-Unicode Policy |
+
+### 7.2. Prohibited
+
+- Emoji in badges (shields.io supports it, but do not use)
+- External icons inside badges
+- Badges with statuses that do not reflect reality
+
+### 7.3. Typical Badges for npm Package
+
+```markdown
+[![npm version](https://img.shields.io/npm/v/agent-toolkit.svg)](https://www.npmjs.com/package/agent-toolkit)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+```
+
+### 7.4. Placeholders (for projects without CI)
+
+If CI is not configured, use static badges:
+
+```markdown
+[![Status: Draft](https://img.shields.io/badge/Status-Draft-yellow.svg)]()
+[![Version: 1.5.0](https://img.shields.io/badge/Version-1.5.0-blue.svg)]()
+```
+
+When CI is configured, replace with dynamic ones.
+
+---
+
+## 8. Stack Signature
 
 Root documentation files must contain a stack signature at the end of the file.
 
@@ -267,9 +305,9 @@ For the default value in this stack, see `README_TEMPLATE.md`.
 
 ---
 
-## 8. Control and Enforcement
+## 9. Control and Enforcement
 
-### 8.1. Level [W] Warning - Blocking Policy
+### 9.1. Level [W] Warning - Blocking Policy
 
 | Stage | Action | Blocks merge? |
 |-------|--------|---------------|
@@ -285,7 +323,7 @@ For the default value in this stack, see `README_TEMPLATE.md`.
 
 **Escalation:** On systematic violations (3+ PRs without fixes) — merge blocked until discussion with Tech Lead.
 
-### 8.2. Mandatory Validation of All .md Files
+### 9.2. Mandatory Validation of All .md Files
 
 **Rule:** Any created or added `.md` file in the project **must** pass validation and editing according to this standard.
 
@@ -317,7 +355,7 @@ jobs:
       - run: npx eslint --plugin markdown '**/*.md' --rule 'no-irregular-whitespace: error'
 ```
 
-### 8.3. PR Rejection Criteria
+### 9.3. PR Rejection Criteria
 
 PR **recommended for rejection** if it contains:
 
@@ -326,7 +364,7 @@ PR **recommended for rejection** if it contains:
 3. Missing stack signature in root technical documents (`README.md`, `CHANGELOG.md`)
 4. Typographic symbols inside code blocks or headings
 
-### 8.4. Linting - Application Stages
+### 9.4. Linting - Application Stages
 
 | Stage | When | Tool | Action |
 |-------|------|------|--------|
@@ -359,9 +397,9 @@ replace(/[^\x20-\x7E\u0400-\u04FF\-\>\<\=\|\+\^]/g, '')
 
 ---
 
-## 9. Exceptions
+## 10. Exceptions
 
-### 9.1. Unconditionally Allowed
+### 10.1. Unconditionally Allowed
 
 | Category | Examples |
 |----------|----------|
@@ -370,7 +408,7 @@ replace(/[^\x20-\x7E\u0400-\u04FF\-\>\<\=\|\+\^]/g, '')
 | Punctuation | . , ; : ! ? - _ ( ) [ ] { } |
 | Typographics (plain text) | `—` (ref), `–` (ref), `°` (ref), `©` (ref), `±` (ref) |
 
-### 9.2. Exceptions by Agreement
+### 10.2. Exceptions by Agreement
 
 | Situation | Requirement |
 |-----------|-------------|
@@ -379,11 +417,11 @@ replace(/[^\x20-\x7E\u0400-\u04FF\-\>\<\=\|\+\^]/g, '')
 
 ---
 
-## 10. ASCII Diagram Examples
+## 11. ASCII Diagram Examples
 
 ASCII diagrams are **allowed** in documentation (README, docs/).
 
-### 10.1. Architecture Diagram Example
+### 11.1. Architecture Diagram Example
 
 ```text
 +-------------------+
@@ -398,7 +436,7 @@ ASCII diagrams are **allowed** in documentation (README, docs/).
           +-----> Component C
 ```
 
-### 10.2. Flow Diagram Example
+### 11.2. Flow Diagram Example
 
 ```text
 User Request --> API Gateway --> Auth Service
@@ -410,7 +448,7 @@ User Request --> API Gateway --> Auth Service
                                Response --> User
 ```
 
-### 10.3. Sequence Diagram Example
+### 11.3. Sequence Diagram Example
 
 ```text
 Client          Server          Database
@@ -423,7 +461,7 @@ Client          Server          Database
 
 ---
 
-## 11. Pre-merge Checklist
+## 12. Pre-merge Checklist
 
 - [ ] No emoji in documentation
 - [ ] No Unicode icons
@@ -437,7 +475,7 @@ Client          Server          Database
 
 ---
 
-## 12. Version History
+## 13. Version History
 
 | Version | Date | Changes |
 |--------|------|---------|
@@ -448,6 +486,7 @@ Client          Server          Database
 | 2.1.2 | 2025-01 | Introduced `(ref)` exception for reference tables: characters in identifier cells allowed with marker; restored specific Unicode characters in prohibited/allowed element tables; `Incorrect` examples again show the actual prohibited character |
 | 2.1.3 | 2025-01 | Extended `(ref)` exception to code blocks: identifier characters allowed with marker in code blocks too; `Incorrect` examples in code blocks now contain the actual symbol with `(ref)`; restored Unicode symbols in EN table 4.4 |
 | 2.1.4 | 2025-01 | Stack signature parameterized: format `Built with: <technologies>`, specific stack is project responsibility; default value moved to README_TEMPLATE |
+| 2.1.5 | 2025-05 | Added section 7 "Badges" with shields.io rules, placeholders for projects without CI; section numbering shifted |
 
 ---
 

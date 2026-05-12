@@ -1,9 +1,15 @@
-### Стандарт : Z.ai Reproducibility Standard v1.0
+# Стандарт: Reproducibility v1.0
 
-> **`git clone` + `bun install` + `bun run dev` = работающее приложение.**
-> Всегда. Везде. На любой машине. Без исключений.
+> ID: STD-ENV-001
+> Version: 1.0
+> Level: **[C] Critical**
 
-#### 2.1 Уровни
+**`git clone` + `bun install` + `bun run dev` = работающее приложение.**
+Всегда. Везде. На любой машине. Без исключений.
+
+---
+
+## Уровни
 
 ```
 L1 -- Environment     Файлы, пути, зависимости, окружение

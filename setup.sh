@@ -9,7 +9,7 @@ set -e
 # === Configuration ===
 GITHUB_USER="stsgs1980"
 REPO="agent-toolkit"
-TOOLKIT_VERSION="v1.4.1"
+TOOLKIT_VERSION="v1.5.0"
 TMP_DIR="/tmp/agent-toolkit-setup"
 
 # === Functions ===

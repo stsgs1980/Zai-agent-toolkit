@@ -1,4 +1,9 @@
-# Последовательность применения стандартов и системы worklog
+# Стандарт: Implementation Order v2.1 (RU)
+
+> ID: STD-ARCH-001
+> Version: 2.1
+> Level: **[W] Warning**
+> Related: All Group B standards
 
 Документ описывает порядок внедрения всех документов проекта — от чтения стандартов до сборки README. Каждый следующий шаг опирается на результаты предыдущего. Нарушение порядка ведёт к повторной работе.
 
@@ -10,12 +15,24 @@
 
 Задают правила. Не меняются при старте нового проекта — только читаются и принимаются.
 
-| Документ | Уровень | Область |
-|----------|---------|---------|
-| No-Unicode_Policy_v2.1.md | [C] + [W] + [I] | UI, продакшн-код, AI-чат, прототипы |
-| MARKDOWN_STANDARD_RU_v2.1.md | [W] | README, документация проекта |
-| MARKDOWN_STANDARD_EN_v2.1.md | [W] | То же на английском |
-| README_TEMPLATE.md | - | Структура README.md |
+**Система идентификаторов:** Все стандарты имеют уникальный ID (например, `STD-FE-001`). См. **STD-META-001** для реестра ID и правил назначения.
+
+| ID | Документ | Уровень | Область |
+|----|----------|---------|---------|
+| STD-ENV-001 | REPRODUCIBILITY-STANDARD.md | [C] | Инфраструктура, env, БД |
+| STD-FE-001 | FRONTEND_STANDARD_EN_v1.3.md | [C] | React, Next.js, FSD |
+| STD-GIT-001 | GITHUB_STANDARD_v1.1.md | [C] | Коммиты, ветки, пуш-политика |
+| STD-A11Y-001 | WCAG_2.1_AA_STANDARD_v1.0.md | [C] | WCAG, ARIA, контраст |
+| STD-TEST-001 | TESTING_STANDARD_v1.0.md | [C] | Unit, integration, E2E тестирование |
+| STD-ERR-001 | ERROR_HANDLING_STANDARD_v1.0.md | [C] | Ошибки, логирование, восстановление |
+| STD-SEC-001 | SECURITY_STANDARD_v1.0.md | [C] | OWASP, секреты, аутентификация |
+| STD-DOC-001 | MARKDOWN_STANDARD_RU_v2.1.md | [W] | README, документация проекта |
+| STD-DOC-002 | MARKDOWN_STANDARD_EN_v2.1.md | [W] | То же на английском |
+| STD-DOC-003 | No-Unicode_Policy_v2.1.md | [C]+[W]+[I] | UI, продакшн-код, AI-чат |
+| STD-DOC-004 | README_TEMPLATE.md | - | Структура README.md |
+| STD-DOC-005 | CODE_EXAMPLES_GUIDE_RU_v1.0.md | [W] | Примеры кода в документации |
+| STD-ARCH-001 | ПОРЯДОК_внедрения_стандартов.md | [W] | Порядок внедрения |
+| STD-META-001 | STANDARD_ID_SYSTEM_v1.0.md | [W] | Система ID стандартов |
 
 ### Группа A: Операционная система (worklog)
 

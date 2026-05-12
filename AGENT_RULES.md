@@ -1,6 +1,6 @@
 # Agent Rules
 
-> Toolkit version: **v1.5.0**
+> Toolkit version: **v1.8.0**
 >
 > Mandatory rules for AI agents working with this toolkit.
 > Read before starting work on any project.
@@ -91,9 +91,9 @@ for the stack and project structure before proceeding.
 This toolkit enforces the following standards. All files referenced below
 are in the `standards/` directory.
 
-### 4.1 No-Unicode Policy v2.1
+### 4.1 Unicode Policy v2.1
 
-> File: `standards/No-Unicode_Policy_v2.1.md`
+> File: `standards/UNICODE_POLICY_EN_v2.1.md`
 > Levels: **[C] Critical** (code, UI) + **[W] Warning** (AI-communication, docs) + **[I] Info** (prototypes, internal)
 
 Prohibits emoji and Unicode graphic characters in:
@@ -117,11 +117,11 @@ Governs formatting of all .md files in the project:
 - 4 backticks for nested code blocks, language tags required
 - Dash `-` for unordered lists
 - Stack signature format: `Built with: <project technologies>`
-  (default value defined in `standards/README_TEMPLATE.md`)
+  (default value defined in `standards/README_TEMPLATE_EN_v2.1.md`)
 
-### 4.3 REPRODUCIBILITY-STANDARD
+### 4.3 Reproducibility Standard
 
-> File: `standards/REPRODUCIBILITY-STANDARD.md`
+> File: `standards/REPRODUCIBILITY_STANDARD_EN_v1.0.md`
 > Level: **[C] Critical**
 
 Ensures `clone + install + dev = works` on any machine. Key rules:
@@ -141,7 +141,55 @@ See the full document for 11 rules across 4 levels (Environment, Code, Delivery,
 ### 4.4 Implementation Order
 
 Standards must be applied in a specific order.
-See `standards/ПОРЯДОК_внедрения_стандартов.md` for the full 6-step sequence.
+See `standards/IMPLEMENTATION_ORDER_EN_v2.1.md` for the full 6-step sequence.
+
+### 4.5 Frontend Development Standard
+
+> File: `standards/FRONTEND_STANDARD_EN_v1.1.md`
+> Level: **[C] Critical**
+
+Governs all React/Next.js frontend development:
+- Component size limits: 150 lines max
+- File size limits: 200 lines max
+- State management: max 3 useState per component
+- Architecture: Feature-Sliced Design (FSD)
+- Data isolation: no direct API calls in UI components
+
+### 4.6 GitHub Standard
+
+> File: `standards/GITHUB_STANDARD_EN_v1.1.md`
+> Level: **[C] Critical**
+
+Governs all git operations:
+- Conventional Commits format required
+- Branch naming: `<type>/<description>`
+- Force push: only `--force-with-lease`
+- Backup before any history rewrite
+- Push after every significant change
+
+### 4.7 WCAG Accessibility
+
+> File: `standards/WCAG_STANDARD_EN_v1.0.md`
+> Level: **[C] Critical**
+
+Ensures UI accessibility:
+- Text contrast: 4.5:1 minimum
+- Non-text contrast: 3:1 minimum
+- Keyboard navigation for all interactive elements
+- Focus visible indicators
+- Touch targets: 44x44px minimum
+- ARIA roles and states
+
+### 4.8 Code Examples Guide
+
+> File: `standards/CODE_EXAMPLES_GUIDE_EN_v1.0.md`
+> Level: **[W] Warning**
+
+Governs code examples in documentation:
+- Self-contained and executable
+- Copy-paste ready (no line numbers, prompts)
+- Proper syntax highlighting
+- Security warnings for dangerous operations
 
 ## 5. Diagnostic Disclosure
 
@@ -170,10 +218,12 @@ See `instructions/writing-plans.md` for full details.
 
 | Skill | When to Use |
 |-------|-------------|
+| `git-checkpoint` | Every 15-20 min during active work, before risky operations |
+| `git-safe-ops` | Before any git push/pull/rebase/merge with remote |
+| `sanitize-validate` | User input, form data, API requests, file uploads, security |
 | `api-retry` | Making HTTP requests to external APIs, encountering 502/503/504 errors |
 | `health-check` | Checking availability of chat.z.ai, monitoring API response times |
 | `fallback` | chat.z.ai is unavailable, need alternative providers |
-| `git-safe-ops` | Before any git push/pull/rebase/merge with remote |
 | `dev-watchdog` | Starting, restarting, or checking dev server |
 
 ## 8. Instructions to Follow
@@ -195,14 +245,23 @@ This toolkit organizes files into two groups:
 
 Apply FIRST. Define rules that all other documents must follow.
 
-| File | Version | Level | Purpose |
-|------|---------|-------|---------|
-| `MARKDOWN_STANDARD_RU_v2.1.md` | v2.1.4 | [W] | Markdown formatting rules (Russian) |
-| `MARKDOWN_STANDARD_EN_v2.1.md` | v2.1.4 | [W] | Markdown formatting rules (English) |
-| `No-Unicode_Policy_v2.1.md` | v2.1.3 | [C]+[W]+[I] | Unicode/emoji prohibition |
-| `README_TEMPLATE.md` | v2.1 | -- | Mandatory README structure + stack default |
-| `ПОРЯДОК_внедрения_стандартов.md` | v2.0 | -- | Implementation sequence (6 steps) |
-| `REPRODUCIBILITY-STANDARD.md` | v1.0 | [C] | Clone+install+dev = works |
+| ID | File | Version | Level | Purpose |
+|----|------|---------|-------|---------|
+| STD-DOC-001 | `MARKDOWN_STANDARD_RU_v2.1.md` | v2.1.5 | [W] | Markdown formatting rules (Russian) |
+| STD-DOC-002 | `MARKDOWN_STANDARD_EN_v2.1.md` | v2.1.5 | [W] | Markdown formatting rules (English) |
+| STD-DOC-003 | `UNICODE_POLICY_EN_v2.1.md` | v2.1.3 | [C]+[W]+[I] | Unicode/emoji prohibition |
+| STD-DOC-004 | `README_TEMPLATE_EN_v2.1.md` | v2.1 | [W] | Mandatory README structure + stack default |
+| STD-DOC-005 | `CODE_EXAMPLES_GUIDE_RU_v1.0.md` | v1.0 | [W] | Code examples formatting (Russian) |
+| STD-DOC-006 | `CODE_EXAMPLES_GUIDE_EN_v1.0.md` | v1.0 | [W] | Code examples formatting (English) |
+| STD-ENV-001 | `REPRODUCIBILITY_STANDARD_EN_v1.0.md` | v1.0 | [C] | Clone+install+dev = works |
+| STD-ARCH-001 | `IMPLEMENTATION_ORDER_EN_v2.1.md` | v2.1 | [W] | Implementation sequence (6 steps) |
+| STD-META-001 | `STANDARD_ID_SYSTEM_EN_v1.0.md` | v1.0 | [W] | Standard ID registry and rules |
+| STD-FE-001 | `FRONTEND_STANDARD_EN_v1.3.md` | v1.3 | [C] | Frontend development (React/Next.js) |
+| STD-GIT-001 | `GITHUB_STANDARD_EN_v1.1.md` | v1.1 | [C] | Git/GitHub operations standard |
+| STD-A11Y-001 | `WCAG_STANDARD_EN_v1.0.md` | v1.0 | [C] | Accessibility compliance (WCAG 2.1 AA) |
+| STD-TEST-001 | `TESTING_STANDARD_EN_v1.0.md` | v1.0 | [C] | Unit, integration, E2E testing standards |
+| STD-ERR-001 | `ERROR_HANDLING_STANDARD_EN_v1.0.md` | v1.0 | [C] | Error classification, logging, recovery |
+| STD-SEC-001 | `SECURITY_STANDARD_EN_v1.0.md` | v1.0 | [C] | Authentication, secrets, OWASP compliance |
 
 ### Group A -- Operational (templates)
 
