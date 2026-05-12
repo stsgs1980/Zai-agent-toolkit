@@ -45,17 +45,8 @@ jobs:
               echo "OK: $f"
             fi
           done
-          # Standards EN (Group B) - Toolkit v1.8.0
-          for f in standards/MARKDOWN_STANDARD_EN_v2.1.md standards/UNICODE_POLICY_EN_v2.1.md standards/README_TEMPLATE_EN_v2.1.md standards/REPRODUCIBILITY_STANDARD_EN_v1.0.md standards/IMPLEMENTATION_ORDER_EN_v2.1.md standards/STANDARD_ID_SYSTEM_EN_v1.0.md standards/CODE_EXAMPLES_GUIDE_EN_v1.0.md standards/FRONTEND_STANDARD_EN_v1.3.md standards/GITHUB_STANDARD_EN_v1.1.md standards/WCAG_STANDARD_EN_v1.0.md standards/TESTING_STANDARD_EN_v1.0.md standards/ERROR_HANDLING_STANDARD_EN_v1.0.md standards/SECURITY_STANDARD_EN_v1.0.md; do
-            if [ ! -f "$f" ]; then
-              echo "MISSING: $f"
-              MISSING=1
-            else
-              echo "OK: $f"
-            fi
-          done
-          # Standards RU (Group B) - Toolkit v1.8.0
-          for f in standards/MARKDOWN_STANDARD_RU_v2.1.md standards/UNICODE_POLICY_RU_v2.1.md standards/README_TEMPLATE_RU_v2.1.md standards/REPRODUCIBILITY_STANDARD_RU_v1.0.md standards/IMPLEMENTATION_ORDER_RU_v2.1.md standards/STANDARD_ID_SYSTEM_RU_v1.0.md standards/CODE_EXAMPLES_GUIDE_RU_v1.0.md standards/FRONTEND_STANDARD_RU_v1.3.md standards/GITHUB_STANDARD_RU_v1.1.md standards/WCAG_STANDARD_RU_v1.0.md standards/TESTING_STANDARD_RU_v1.0.md standards/ERROR_HANDLING_STANDARD_RU_v1.0.md standards/SECURITY_STANDARD_RU_v1.0.md; do
+          # Standards (no language suffixes, no versions)
+          for f in standards/MARKDOWN_STANDARD.md standards/UNICODE_POLICY.md standards/README_TEMPLATE.md standards/REPRODUCIBILITY-STANDARD.md standards/IMPLEMENTATION_ORDER.md standards/STANDARD_ID_SYSTEM.md standards/CODE_EXAMPLES_GUIDE.md standards/FRONTEND_STANDARD.md standards/GITHUB_STANDARD.md standards/WCAG_2.1_AA_STANDARD.md standards/TESTING_STANDARD.md standards/ERROR_HANDLING_STANDARD.md standards/SECURITY_STANDARD.md; do
             if [ ! -f "$f" ]; then
               echo "MISSING: $f"
               MISSING=1
