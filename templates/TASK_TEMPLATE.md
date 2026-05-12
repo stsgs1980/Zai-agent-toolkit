@@ -1,42 +1,42 @@
-# Шаблоны промптов для подагентов
+# Prompt Templates for Subagents
 
-> Шаблоны для вызова подагентов с интеграцией worklog.
-> Полное руководство: см. `README_WORKLOG.md`
-
----
-
-## Быстрый старт
-
-Скопируйте нужный шаблон, замените `<ID>` и `<описание>` на ваши значения.
+> Templates for calling subagents with worklog integration.
+> Full guide: see `README_WORKLOG.md`
 
 ---
 
-## Шаблон: full-stack-developer
+## Quick Start
+
+Copy the needed template, replace `<ID>` and `<description>` with your values.
+
+---
+
+## Template: full-stack-developer
 
 ```javascript
 Task({
-  description: "<описание>",
+  description: "<description>",
   prompt: `
-## WORKLOG - ОБЯЗАТЕЛЬНО
+## WORKLOG - MANDATORY
 
 Task ID: **<ID>**
 
-1. Прочитай /home/z/my-project/worklog.md
-2. После работы добавь запись (НЕ перезаписывать!)
+1. Read /home/z/my-project/worklog.md
+2. After work add entry (DO NOT overwrite!)
 
 ---
 Task ID: <ID>
 Agent: full-stack-developer
-Task: <описание>
+Task: <description>
 Work Log:
-- <действия>
+- <actions>
 Stage Summary:
-- Files: <список>
+- Files: <list>
 - Status: completed
 ---
 
-## ЗАДАЧА
-<описание задачи>
+## TASK
+<task description>
 `,
   subagent_type: "full-stack-developer"
 });
@@ -44,32 +44,32 @@ Stage Summary:
 
 ---
 
-## Шаблон: Explore
+## Template: Explore
 
 ```javascript
 Task({
-  description: "<описание>",
+  description: "<description>",
   prompt: `
-## WORKLOG - ОБЯЗАТЕЛЬНО
+## WORKLOG - MANDATORY
 
 Task ID: **<ID>**
 
-1. Прочитай /home/z/my-project/worklog.md
-2. После работы добавь запись (НЕ перезаписывать!)
+1. Read /home/z/my-project/worklog.md
+2. After work add entry (DO NOT overwrite!)
 
 ---
 Task ID: <ID>
 Agent: Explore
-Task: <описание>
+Task: <description>
 Work Log:
-- <действия>
+- <actions>
 Stage Summary:
-- Findings: <результаты>
+- Findings: <results>
 - Status: completed
 ---
 
-## ЗАДАЧА
-<описание задачи>
+## TASK
+<task description>
 `,
   subagent_type: "Explore"
 });
@@ -77,32 +77,32 @@ Stage Summary:
 
 ---
 
-## Шаблон: general-purpose
+## Template: general-purpose
 
 ```javascript
 Task({
-  description: "<описание>",
+  description: "<description>",
   prompt: `
-## WORKLOG - ОБЯЗАТЕЛЬНО
+## WORKLOG - MANDATORY
 
 Task ID: **<ID>**
 
-1. Прочитай /home/z/my-project/worklog.md
-2. После работы добавь запись (НЕ перезаписывать!)
+1. Read /home/z/my-project/worklog.md
+2. After work add entry (DO NOT overwrite!)
 
 ---
 Task ID: <ID>
 Agent: general-purpose
-Task: <описание>
+Task: <description>
 Work Log:
-- <действия>
+- <actions>
 Stage Summary:
-- Result: <результат>
+- Result: <result>
 - Status: completed
 ---
 
-## ЗАДАЧА
-<описание задачи>
+## TASK
+<task description>
 `,
   subagent_type: "general-purpose"
 });
@@ -110,29 +110,29 @@ Stage Summary:
 
 ---
 
-## Формат записи в worklog
+## Worklog Entry Format
 
 ````markdown
 ---
 Task ID: <ID>
-Agent: <тип агента>
-Task: <описание задачи>
+Agent: <agent type>
+Task: <task description>
 
 Work Log:
-- <действие 1>
-- <действие 2>
+- <action 1>
+- <action 2>
 
 Stage Summary:
-- Files created: <список>
-- Files modified: <список>
-- Key decisions: <решения>
+- Files created: <list>
+- Files modified: <list>
+- Key decisions: <decisions>
 - Status: completed
 ---
 ````
 
 ---
 
-Подробное описание системы worklog, чек-листы и FAQ: см. `README_WORKLOG.md`
+For detailed worklog system description, checklists and FAQ: see `README_WORKLOG.md`
 
 ---
 Built with: Next.js 16 + TypeScript + Tailwind CSS

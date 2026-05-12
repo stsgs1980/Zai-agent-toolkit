@@ -1,97 +1,97 @@
-# Система Worklog - Полное руководство
+# Worklog System - Complete Guide
 
-> Сохраните эту папку себе и используйте как справочник
-
----
-
-## Суть в одном абзаце
-
-**Worklog** - это общий журнал работы агентов. Super Z (главный агент) координирует работу и вызывает подагентов. Подагенты - это **отдельные модели с другими инструкциями**, поэтому они НЕ знают о worklog автоматически. Чтобы они работали с worklog - нужно **явно передать инструкции в промпте при вызове Task()**.
+> Save this folder and use it as a reference
 
 ---
 
-## Файлы системы
+## The Essence in One Paragraph
 
-| Файл | Назначение |
-|------|------------|
-| worklog.md | Журнал работы агентов (на сервере) |
-| README_WORKLOG.md | Это руководство (главный документ) |
-| TASK_TEMPLATE.md | Готовые шаблоны промптов |
-| No-Unicode_Policy_v2.1.md | Стандарт использования символов |
-| MARKDOWN_STANDARD_RU_v2.1.md | Стандарт оформления .md файлов |
-| README_TEMPLATE.md | Шаблон README |
+**Worklog** is a shared journal of agent work. Super Z (main agent) coordinates work and calls subagents. Subagents are **separate models with different instructions**, so they do NOT know about worklog automatically. To make them work with worklog, you need to **explicitly pass instructions in the prompt when calling Task()**.
 
 ---
 
-## Структура worklog.md
+## System Files
+
+| File | Purpose |
+|------|---------|
+| worklog.md | Agent work journal (on server) |
+| README_WORKLOG.md | This guide (main document) |
+| TASK_TEMPLATE.md | Ready-to-use prompt templates |
+| UNICODE_POLICY.md | Character usage standard |
+| MARKDOWN_STANDARD.md | .md file formatting standard |
+| README_TEMPLATE.md | README template |
+
+---
+
+## worklog.md Structure
 
 ```text
 /home/z/my-project/worklog.md
 |
-+-- Заголовок и описание
-+-- Таблица Task ID
-+-- История работы
-    +-- Запись агента 1
-    +-- Запись агента 2
++-- Header and description
++-- Task ID table
++-- Work history
+    +-- Agent 1 entry
+    +-- Agent 2 entry
     +-- ...
 ```
 
 ---
 
-## Система Task ID
+## Task ID System
 
-| Паттерн | Пример | Когда использовать |
-|---------|--------|-------------------|
-| N | 1, 2, 3 | Последовательные задачи |
-| N-x | 2-a, 2-b | Параллельные задачи |
-| N-x-y | 2-a-1 | Вложенные подзадачи |
+| Pattern | Example | When to Use |
+|---------|---------|-------------|
+| N | 1, 2, 3 | Sequential tasks |
+| N-x | 2-a, 2-b | Parallel tasks |
+| N-x-y | 2-a-1 | Nested subtasks |
 
 ---
 
-## ГЛАВНОЕ ПРАВИЛО
+## THE MAIN RULE
 
 ```text
-Super Z - ЗНАЕТ о worklog (из системных инструкций)
+Super Z - KNOWS about worklog (from system instructions)
 
-Подагенты - НЕ ЗНАЮТ о worklog (другие инструкции)
+Subagents - DO NOT KNOW about worklog (different instructions)
             |
             v
-Нужно ПЕРЕДАТЬ в промпте при вызове Task()
+Need to PASS in prompt when calling Task()
 ```
 
 ---
 
-## Как вызывать подагента
+## How to Call a Subagent
 
-### Копируйте этот шаблон:
+### Copy this template:
 
 ```javascript
 Task({
-  description: "Краткое описание",
+  description: "Brief description",
   prompt: `
-## WORKLOG - ОБЯЗАТЕЛЬНО
+## WORKLOG - MANDATORY
 
-Твой Task ID: **2-a**
+Your Task ID: **2-a**
 
-1. ПЕРЕД работой: прочитай /home/z/my-project/worklog.md
-2. ПОСЛЕ работы: ДОБАВИТЬ запись в конец файла (НЕ перезаписывать!)
+1. BEFORE work: read /home/z/my-project/worklog.md
+2. AFTER work: ADD entry to end of file (DO NOT overwrite!)
 
-Формат записи:
+Entry format:
 ---
 Task ID: 2-a
 Agent: full-stack-developer
-Task: <что сделал>
+Task: <what was done>
 Work Log:
-- <действие 1>
-- <действие 2>
+- <action 1>
+- <action 2>
 Stage Summary:
-- Files: <список файлов>
+- Files: <file list>
 - Status: completed
 ---
 
-## ЗАДАЧА
+## TASK
 
-<Опишите задачу здесь>
+<Describe the task here>
 `,
   subagent_type: "full-stack-developer"
 });
@@ -99,18 +99,18 @@ Stage Summary:
 
 ---
 
-## Формат записи в worklog
+## Worklog Entry Format
 
 ```markdown
 ---
 Task ID: 2-a
 Agent: full-stack-developer
-Task: Создание API пользователей
+Task: Create Users API
 
 Work Log:
-- Создан файл /app/api/users/route.ts
-- Добавлена валидация Zod
-- Написаны тесты
+- Created file /app/api/users/route.ts
+- Added Zod validation
+- Wrote tests
 
 Stage Summary:
 - Files created: src/app/api/users/route.ts
@@ -121,96 +121,96 @@ Stage Summary:
 
 ---
 
-## Workflow диаграмма
+## Workflow Diagram
 
 ```text
-1. Super Z создаёт TODO-лист и определяет Task ID
+1. Super Z creates TODO list and determines Task ID
    |
    v
-2. Super Z вызывает подагента с промптом (включая правила worklog)
+2. Super Z calls subagent with prompt (including worklog rules)
    |
    v
-3. Подагент:
-   a) Читает worklog.md
-   b) Выполняет задачу
-   c) Добавляет запись в worklog.md
+3. Subagent:
+   a) Reads worklog.md
+   b) Performs task
+   c) Adds entry to worklog.md
    |
    v
-4. Super Z проверяет worklog и обновляет TODO-лист
+4. Super Z checks worklog and updates TODO list
 ```
 
 ---
 
-## Чек-лист перед вызовом агента
+## Checklist Before Calling Agent
 
-- [ ] Определён Task ID
-- [ ] В промпте есть путь к worklog.md
-- [ ] В промпте есть инструкция "ПРОЧИТАТЬ перед работой"
-- [ ] В промпте есть инструкция "ДОБАВИТЬ после работы"
-- [ ] В промпте есть формат записи
-- [ ] В промпте есть "НЕ перезаписывать"
+- [ ] Task ID defined
+- [ ] Prompt includes path to worklog.md
+- [ ] Prompt includes "READ before work" instruction
+- [ ] Prompt includes "ADD after work" instruction
+- [ ] Prompt includes entry format
+- [ ] Prompt includes "DO NOT overwrite"
 
 ---
 
-## Быстрые шаблоны
+## Quick Templates
 
-### Для full-stack-developer:
+### For full-stack-developer:
 
 ```javascript
 Task({
-  description: "<описание>",
+  description: "<description>",
   prompt: `
-## WORKLOG - ОБЯЗАТЕЛЬНО
+## WORKLOG - MANDATORY
 
 Task ID: **<ID>**
 
-1. Прочитай /home/z/my-project/worklog.md
-2. После работы добавь запись (НЕ перезаписывать!)
+1. Read /home/z/my-project/worklog.md
+2. After work add entry (DO NOT overwrite!)
 
 ---
 Task ID: <ID>
 Agent: full-stack-developer
-Task: <описание>
+Task: <description>
 Work Log:
-- <действия>
+- <actions>
 Stage Summary:
-- Files: <список>
+- Files: <list>
 - Status: completed
 ---
 
-## ЗАДАЧА
-<описание задачи>
+## TASK
+<task description>
 `,
   subagent_type: "full-stack-developer"
 });
 ```
 
-### Для Explore:
+### For Explore:
 
 ```javascript
 Task({
-  description: "<описание>",
+  description: "<description>",
   prompt: `
-## WORKLOG - ОБЯЗАТЕЛЬНО
+## WORKLOG - MANDATORY
 
 Task ID: **<ID>**
 
-1. Прочитай /home/z/my-project/worklog.md
-2. После работы добавь запись (НЕ перезаписывать!)
+1. Read /home/z/my-project/worklog.md
+2. After work add entry (DO NOT overwrite!)
 
 ---
 Task ID: <ID>
 Agent: Explore
-Task: <описание>
+Task: <description>
 Work Log:
-- <действия>
+- <actions>
 Stage Summary:
-- Findings: <результаты>
+- Findings: <results>
 - Status: completed
 ---
 
-## ЗАДАЧА
-<описание задачи>
+## TASK
+<task description>
 `,
   subagent_type: "Explore"
 });
@@ -218,39 +218,39 @@ Stage Summary:
 
 ---
 
-## Частые вопросы
+## Frequently Asked Questions
 
-**Q: Почему подагент не пишет в worklog?**
-A: Вы не передали инструкции в промпте. Подагенты не знают о worklog автоматически.
+**Q: Why doesn't the subagent write to worklog?**
+A: You didn't pass instructions in the prompt. Subagents don't know about worklog automatically.
 
-**Q: Где должен быть worklog.md?**
-A: Только на сервере: /home/z/my-project/worklog.md. Агенты не имеют доступа к вашему локальному компьютеру.
+**Q: Where should worklog.md be?**
+A: Only on the server: /home/z/my-project/worklog.md. Agents don't have access to your local machine.
 
-**Q: Как скачать worklog себе?**
-A: После завершения проекта скачайте папку /home/z/my-project/ через интерфейс.
+**Q: How do I download worklog?**
+A: After project completion, download the /home/z/my-project/ folder via the interface.
 
-**Q: Можно ли использовать другие ID?**
-A: Да, но следуйте системе: 1, 2, 3 - последовательно, 2-a, 2-b - параллельно.
+**Q: Can I use different IDs?**
+A: Yes, but follow the system: 1, 2, 3 - sequential, 2-a, 2-b - parallel.
 
 ---
 
-## Что сохранить себе
+## What to Save
 
 ```text
 worklog-system/
-+-- README_WORKLOG.md     <- Главный документ (этот)
-+-- TASK_TEMPLATE.md      <- Шаблоны промптов
-+-- worklog.md            <- Пример структуры журнала
-+-- No-Unicode_Policy_v2.1.md  <- Стандарт символов
-+-- MARKDOWN_STANDARD_RU_v2.1.md <- Стандарт оформления .md
-+-- README_TEMPLATE.md <- Шаблон README
++-- README_WORKLOG.md     <- Main document (this)
++-- TASK_TEMPLATE.md      <- Prompt templates
++-- worklog.md            <- Journal structure example
++-- UNICODE_POLICY.md     <- Character standard
++-- MARKDOWN_STANDARD.md  <- .md formatting standard
++-- README_TEMPLATE.md    <- README template
 ```
 
 ---
 
-Версия: 2.1.1
-Обновлено: 2025-01-09
-Соответствует: No-Unicode Policy v2.1, MARKDOWN_STANDARD v2.1
+Version: 2.1.1
+Updated: 2025-01-09
+Complies with: UNICODE_POLICY.md, MARKDOWN_STANDARD.md
 
 ---
 Built with: Next.js 16 + TypeScript + Tailwind CSS

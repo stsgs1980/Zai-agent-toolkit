@@ -1,29 +1,29 @@
 # Project Worklog
 
-> Единый журнал работы всех агентов над проектом.
-> Путь: /home/z/my-project/worklog.md
+> Unified journal of all agent work on the project.
+> Path: /home/z/my-project/worklog.md
 
 ---
 
-## Система Task ID
+## Task ID System
 
-| Паттерн | Пример | Использование |
-|---------|--------|---------------|
-| N | 1, 2, 3 | Последовательные задачи |
-| N-x | 2-a, 2-b | Параллельные задачи |
-| N-x-y | 2-a-1 | Вложенные подзадачи |
-
----
-
-## Правила для агентов
-
-1. ПЕРЕД работой - прочитать этот файл
-2. ПОСЛЕ работы - добавить запись в конец
-3. НЕ перезаписывать - только добавлять!
+| Pattern | Example | Usage |
+|---------|---------|-------|
+| N | 1, 2, 3 | Sequential tasks |
+| N-x | 2-a, 2-b | Parallel tasks |
+| N-x-y | 2-a-1 | Nested subtasks |
 
 ---
 
-## История работы
+## Rules for Agents
+
+1. BEFORE work - read this file
+2. AFTER work - add entry to the end
+3. DO NOT overwrite - only append!
+
+---
+
+## Work History
 
 ---
 Built with: Next.js 16 + TypeScript + Tailwind CSS
