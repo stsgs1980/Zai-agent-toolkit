@@ -4,13 +4,13 @@
 
 # Agent Toolkit
 
-[![Version: 1.8.2](https://img.shields.io/badge/Version-1.8.2-blue.svg)]()
+[![Version: 1.8.3](https://img.shields.io/badge/Version-1.8.3-blue.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status: Pre-release](https://img.shields.io/badge/Status-Pre--release-orange.svg)]()
 
 **Standards + Skills + Rules** for AI-driven development
 
-> Toolkit version: **v1.8.2** | Language: **English**
+> Toolkit version: **v1.8.3** | Language: **English**
 
 ---
 
@@ -83,7 +83,7 @@ Step 6: README_TEMPLATE                 Assemble README from template
                                         Log to WORKLOG
 ```
 
-Full details: see `standards/IMPLEMENTATION_ORDER_EN_v2.1.md`
+Full details: see `standards/IMPLEMENTATION_ORDER.md`
 
 ---
 
@@ -101,24 +101,24 @@ agent-toolkit/
     favicon.png               Browser favicon (64x64)
 
   standards/                  Group B: Governance documents (apply first)
-    MARKDOWN_STANDARD_EN_v2.1.md    Markdown formatting v2.1.5
-    UNICODE_POLICY_EN_v2.1.md       Unicode/emoji prohibition v2.1.3
-    README_TEMPLATE_EN_v2.1.md      Mandatory README structure v2.1
-    REPRODUCIBILITY_STANDARD_EN_v1.0.md Clone + install + dev = works
-    IMPLEMENTATION_ORDER_EN_v2.1.md Implementation sequence v2.1
-    STANDARD_ID_SYSTEM_EN_v1.0.md   Standard ID registry v1.0
-    CODE_EXAMPLES_GUIDE_EN_v1.0.md  Code examples formatting v1.0
-    FRONTEND_STANDARD_EN_v1.3.md    Frontend development v1.3
-    GITHUB_STANDARD_EN_v1.1.md      Git/GitHub operations v1.1
-    WCAG_STANDARD_EN_v1.0.md        Accessibility WCAG 2.1 AA v1.0
-    TESTING_STANDARD_EN_v1.0.md     Unit, integration, E2E testing v1.0
-    ERROR_HANDLING_STANDARD_EN_v1.0.md Error handling v1.0
-    SECURITY_STANDARD_EN_v1.0.md    Security, OWASP v1.0
+    MARKDOWN_STANDARD.md      Markdown formatting
+    UNICODE_POLICY.md         Unicode/emoji prohibition
+    README_TEMPLATE.md        Mandatory README structure
+    REPRODUCIBILITY-STANDARD.md Clone + install + dev = works
+    IMPLEMENTATION_ORDER.md   Implementation sequence
+    STANDARD_ID_SYSTEM.md     Standard ID registry
+    CODE_EXAMPLES_GUIDE.md    Code examples formatting
+    FRONTEND_STANDARD.md      Frontend development
+    GITHUB_STANDARD.md        Git/GitHub operations
+    WCAG_2.1_AA_STANDARD.md   Accessibility WCAG 2.1 AA
+    TESTING_STANDARD.md       Unit, integration, E2E testing
+    ERROR_HANDLING_STANDARD.md Error handling
+    SECURITY_STANDARD.md      Security, OWASP
 
   templates/                  Group A: Operational templates (deploy after B)
-    WORKLOG.md                Agent work journal v2.1.1
-    TASK_TEMPLATE.md          Sub-agent prompt templates v2.1.1
-    README_WORKLOG.md         Worklog system guide v2.1.1
+    WORKLOG.md                Agent work journal
+    TASK_TEMPLATE.md          Sub-agent prompt templates
+    README_WORKLOG.md         Worklog system guide
 
   instructions/               Detailed behavioral instructions
     onboarding-protocol.md    What to do when entering a project
@@ -146,31 +146,31 @@ agent-toolkit/
 
 These define rules. They are read and accepted, not modified per project.
 
-| ID | Document | Version | Level | Scope |
-|----|----------|---------|-------|-------|
-| STD-DOC-002 | `MARKDOWN_STANDARD_EN_v2.1.md` | v2.1.5 | [W] | README, project documentation |
-| STD-DOC-003 | `UNICODE_POLICY_EN_v2.1.md` | v2.1.3 | [C]+[W]+[I] | UI code [C], AI-chat + docs [W], prototypes [I] |
-| STD-DOC-004 | `README_TEMPLATE_EN_v2.1.md` | v2.1 | [W] | Mandatory README structure |
-| STD-DOC-006 | `CODE_EXAMPLES_GUIDE_EN_v1.0.md` | v1.0 | [W] | Code examples in documentation |
-| STD-ENV-001 | `REPRODUCIBILITY_STANDARD_EN_v1.0.md` | v1.0 | [C] | Environment, paths, DB |
-| STD-ARCH-001 | `IMPLEMENTATION_ORDER_EN_v2.1.md` | v2.1 | [W] | 6-step implementation sequence |
-| STD-META-001 | `STANDARD_ID_SYSTEM_EN_v1.0.md` | v1.0 | [W] | Standard ID registry and rules |
-| STD-FE-001 | `FRONTEND_STANDARD_EN_v1.3.md` | v1.3 | [C] | React/Next.js frontend development |
-| STD-GIT-001 | `GITHUB_STANDARD_EN_v1.1.md` | v1.1 | [C] | Git operations, commit format, branching |
-| STD-A11Y-001 | `WCAG_STANDARD_EN_v1.0.md` | v1.0 | [C] | UI accessibility compliance |
-| STD-TEST-001 | `TESTING_STANDARD_EN_v1.0.md` | v1.0 | [C] | Unit, integration, E2E testing |
-| STD-ERR-001 | `ERROR_HANDLING_STANDARD_EN_v1.0.md` | v1.0 | [C] | Error handling, logging, recovery |
-| STD-SEC-001 | `SECURITY_STANDARD_EN_v1.0.md` | v1.0 | [C] | Authentication, secrets, OWASP |
+| ID | Document | Level | Scope |
+|----|----------|-------|-------|
+| STD-DOC-002 | `MARKDOWN_STANDARD.md` | [W] | README, project documentation |
+| STD-DOC-003 | `UNICODE_POLICY.md` | [C]+[W]+[I] | UI code [C], AI-chat + docs [W], prototypes [I] |
+| STD-DOC-004 | `README_TEMPLATE.md` | [W] | Mandatory README structure |
+| STD-DOC-006 | `CODE_EXAMPLES_GUIDE.md` | [W] | Code examples in documentation |
+| STD-ENV-001 | `REPRODUCIBILITY-STANDARD.md` | [C] | Environment, paths, DB |
+| STD-ARCH-001 | `IMPLEMENTATION_ORDER.md` | [W] | 6-step implementation sequence |
+| STD-META-001 | `STANDARD_ID_SYSTEM.md` | [W] | Standard ID registry and rules |
+| STD-FE-001 | `FRONTEND_STANDARD.md` | [C] | React/Next.js frontend development |
+| STD-GIT-001 | `GITHUB_STANDARD.md` | [C] | Git operations, commit format, branching |
+| STD-A11Y-001 | `WCAG_2.1_AA_STANDARD.md` | [C] | UI accessibility compliance |
+| STD-TEST-001 | `TESTING_STANDARD.md` | [C] | Unit, integration, E2E testing |
+| STD-ERR-001 | `ERROR_HANDLING_STANDARD.md` | [C] | Error handling, logging, recovery |
+| STD-SEC-001 | `SECURITY_STANDARD.md` | [C] | Authentication, secrets, OWASP |
 
 ### Group A -- Operational (templates)
 
 These are deployed into a project. They SUBMIT to Group B standards.
 
-| Document | Version | Purpose |
-|----------|---------|---------|
-| `WORKLOG.md` | v2.1.1 | Agent work journal (live file) |
-| `TASK_TEMPLATE.md` | v2.1.1 | Sub-agent prompt templates |
-| `README_WORKLOG.md` | v2.1.1 | Worklog system guide |
+| Document | Purpose |
+|----------|---------|
+| `WORKLOG.md` | Agent work journal (live file) |
+| `TASK_TEMPLATE.md` | Sub-agent prompt templates |
+| `README_WORKLOG.md` | Worklog system guide |
 
 ### Infrastructure
 
@@ -214,17 +214,17 @@ These are deployed into a project. They SUBMIT to Group B standards.
 
 | Component | ID | Version |
 |-----------|----|---------|
-| **Toolkit** | -- | **v1.8.2** |
+| **Toolkit** | -- | **v1.8.3** |
 | MARKDOWN_STANDARD | STD-DOC-002 | v2.1.5 |
 | UNICODE_POLICY | STD-DOC-003 | v2.1.3 |
 | README_TEMPLATE | STD-DOC-004 | v2.1 |
 | CODE_EXAMPLES_GUIDE | STD-DOC-006 | v1.0 |
-| REPRODUCIBILITY_STANDARD | STD-ENV-001 | v1.0 |
+| REPRODUCIBILITY-STANDARD | STD-ENV-001 | v1.0 |
 | IMPLEMENTATION_ORDER | STD-ARCH-001 | v2.1 |
 | STANDARD_ID_SYSTEM | STD-META-001 | v1.0 |
 | FRONTEND_STANDARD | STD-FE-001 | v1.3 |
-| GITHUB_STANDARD | STD-GIT-001 | v1.1 |
-| WCAG_STANDARD | STD-A11Y-001 | v1.0 |
+| GITHUB_STANDARD | STD-GIT-001 | v1.2 |
+| WCAG_2.1_AA_STANDARD | STD-A11Y-001 | v1.0 |
 | TESTING_STANDARD | STD-TEST-001 | v1.0 |
 | ERROR_HANDLING_STANDARD | STD-ERR-001 | v1.0 |
 | SECURITY_STANDARD | STD-SEC-001 | v1.0 |
@@ -286,6 +286,7 @@ This toolkit is provided as-is for use with AI-driven development workflows.
 
 | Version | Changes |
 |---------|---------|
+| **v1.8.3** | Unified file naming: removed language suffixes and versions from filenames; updated all workflows; added deadlock prevention rules to GITHUB_STANDARD |
 | **v1.8.2** | Split into two repositories: agent-toolkit (EN) + agent-toolkit-ru (RU); removed emoji from all standards |
 | **v1.8.1** | Full Russian localization: all 13 standards now have EN/RU versions (26 total files); complete parity between languages |
 | **v1.8.1** | Unified naming convention: all files renamed to NAME_STANDARD_XX_vX.X.md format; all references updated |

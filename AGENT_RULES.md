@@ -1,6 +1,6 @@
 # Agent Rules
 
-> Toolkit version: **v1.8.2**
+> Toolkit version: **v1.8.3**
 >
 > Mandatory rules for AI agents working with this toolkit.
 > Read before starting work on any project.
@@ -253,7 +253,7 @@ Apply FIRST. Define rules that all other documents must follow.
 | STD-DOC-005 | `CODE_EXAMPLES_GUIDE.md` | [W] | Code examples formatting |
 | STD-ENV-001 | `REPRODUCIBILITY-STANDARD.md` | [C] | Clone+install+dev = works |
 | STD-ARCH-001 | `IMPLEMENTATION_ORDER.md` | [W] | Implementation sequence (6 steps) |
-| STD-META-001 | `STANDARD_ID_SYSTEM_v1.0.md` | [W] | Standard ID registry and rules |
+| STD-META-001 | `STANDARD_ID_SYSTEM.md` | [W] | Standard ID registry and rules |
 | STD-FE-001 | `FRONTEND_STANDARD.md` | [C] | Frontend development (React/Next.js) |
 | STD-GIT-001 | `GITHUB_STANDARD.md` | [C] | Git/GitHub operations standard |
 | STD-A11Y-001 | `WCAG_2.1_AA_STANDARD.md` | [C] | Accessibility compliance (WCAG 2.1 AA) |

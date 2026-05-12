@@ -1,4 +1,4 @@
-# Standard: Implementation Order v2.1 (EN)
+# Standard: Implementation Order v2.1
 
 > ID: STD-ARCH-001
 > Version: 2.1
@@ -20,19 +20,18 @@ Define rules. Not modified when starting a new project — only read and accepte
 | ID | Document | Level | Scope |
 |----|----------|-------|-------|
 | STD-ENV-001 | REPRODUCIBILITY-STANDARD.md | [C] | Infrastructure, env, DB |
-| STD-FE-001 | FRONTEND_STANDARD_EN_v1.3.md | [C] | React, Next.js, FSD |
-| STD-GIT-001 | GITHUB_STANDARD_v1.1.md | [C] | Commits, branches, push policy |
-| STD-A11Y-001 | WCAG_2.1_AA_STANDARD_v1.0.md | [C] | WCAG, ARIA, contrast |
-| STD-TEST-001 | TESTING_STANDARD_v1.0.md | [C] | Unit, integration, E2E testing |
-| STD-ERR-001 | ERROR_HANDLING_STANDARD_v1.0.md | [C] | Error types, logging, recovery |
-| STD-SEC-001 | SECURITY_STANDARD_v1.0.md | [C] | OWASP, secrets, authentication |
-| STD-DOC-001 | MARKDOWN_STANDARD_RU_v2.1.md | [W] | README, project documentation (RU) |
-| STD-DOC-002 | MARKDOWN_STANDARD_EN_v2.1.md | [W] | README, project documentation (EN) |
-| STD-DOC-003 | No-Unicode_Policy_v2.1.md | [C]+[W]+[I] | UI, production code, AI-chat |
+| STD-FE-001 | FRONTEND_STANDARD.md | [C] | React, Next.js, FSD |
+| STD-GIT-001 | GITHUB_STANDARD.md | [C] | Commits, branches, push policy |
+| STD-A11Y-001 | WCAG_2.1_AA_STANDARD.md | [C] | WCAG, ARIA, contrast |
+| STD-TEST-001 | TESTING_STANDARD.md | [C] | Unit, integration, E2E testing |
+| STD-ERR-001 | ERROR_HANDLING_STANDARD.md | [C] | Error types, logging, recovery |
+| STD-SEC-001 | SECURITY_STANDARD.md | [C] | OWASP, secrets, authentication |
+| STD-DOC-001 | MARKDOWN_STANDARD.md | [W] | README, project documentation |
+| STD-DOC-003 | UNICODE_POLICY.md | [C]+[W]+[I] | UI, production code, AI-chat |
 | STD-DOC-004 | README_TEMPLATE.md | - | README.md structure |
-| STD-DOC-005 | CODE_EXAMPLES_GUIDE_EN_v1.0.md | [W] | Code examples in documentation |
-| STD-ARCH-001 | IMPLEMENTATION_ORDER_EN_v2.1.md | [W] | Implementation sequence |
-| STD-META-001 | STANDARD_ID_SYSTEM_v1.0.md | [W] | Standard ID system |
+| STD-DOC-005 | CODE_EXAMPLES_GUIDE.md | [W] | Code examples in documentation |
+| STD-ARCH-001 | IMPLEMENTATION_ORDER.md | [W] | Implementation sequence |
+| STD-META-001 | STANDARD_ID_SYSTEM.md | [W] | Standard ID system |
 
 ### Group A: Operational System (worklog)
 
@@ -103,7 +102,7 @@ Work tools. Copied into the project and used from day one.
 
 ---
 
-### Step 4: No-Unicode Policy v2.1 [C] (UI Code Protection)
+### Step 4: UNICODE_POLICY [C] (UI Code Protection)
 
 **What is done:**
 
@@ -119,7 +118,7 @@ Work tools. Copied into the project and used from day one.
 
 ---
 
-### Step 5: MARKDOWN_STANDARD v2.1 [W] (Documentation)
+### Step 5: MARKDOWN_STANDARD [W] (Documentation)
 
 **What is done:**
 
@@ -164,7 +163,7 @@ Step 2: Worklog (Group A)            Deploy, verify compliance with B
 Step 3: REPRODUCIBILITY              Configure infrastructure (env, db, paths)
         |                            Log to WORKLOG
         v
-Step 4: No-Unicode Policy [C]        ESLint rule + UI code cleanup
+Step 4: UNICODE_POLICY [C]           ESLint rule + UI code cleanup
         |                            Log to WORKLOG
         v
 Step 5: MARKDOWN_STANDARD [W]        Clean .md files (including Group A)
