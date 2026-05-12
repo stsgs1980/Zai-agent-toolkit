@@ -286,7 +286,7 @@ This toolkit is provided as-is for use with AI-driven development workflows.
 
 | Version | Changes |
 |---------|---------|
-| **v1.8.2** | Split README into EN/RU versions; removed emoji from all standards |
+| **v1.8.2** | Split into two repositories: agent-toolkit (EN) + agent-toolkit-ru (RU); removed emoji from all standards |
 | **v1.8.1** | Full Russian localization: all 13 standards now have EN/RU versions (26 total files); complete parity between languages |
 | **v1.8.1** | Unified naming convention: all files renamed to NAME_STANDARD_XX_vX.X.md format; all references updated |
 | **v1.7.0** | Full English localization: IMPLEMENTATION_ORDER_EN, STANDARD_ID_SYSTEM_EN, CODE_EXAMPLES_GUIDE_EN; updated all registries |
