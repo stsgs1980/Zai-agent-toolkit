@@ -3,26 +3,26 @@
 **ID стандарта:** STD-SEC-001
 **Версия:** 1.0
 **Статус:** Активен
-**Применяется к:** Всем проектам с пользовательскими данными, аутентификацией или внешними API
+**Применяется к:** Всем проектам, обрабатывающим пользовательские данные, аутентификацию или внешние API
 
 ---
 
 ## 1. Соответствие OWASP Top 10
 
-### 1.1 Краткий справочник
+### 1.1 Краткая справка
 
 | # | Риск | Митигация | Статус |
 |---|------|-----------|--------|
 | A01 | Broken Access Control | RBAC, принцип минимальных привилегий | Обязательно |
 | A02 | Cryptographic Failures | TLS, шифрование хранилища, ротация ключей | Обязательно |
 | A03 | Injection | Параметризованные запросы, валидация ввода | Обязательно |
-| A04 | Insecure Design | Моделирование угроз, паттерны безопасности | Обязательно |
+| A04 | Insecure Design | Threat modeling, паттерны безопасности | Обязательно |
 | A05 | Security Misconfiguration | Харденинг, заголовки безопасности | Обязательно |
 | A06 | Vulnerable Components | Сканирование зависимостей, обновления | Обязательно |
 | A07 | Authentication Failures | MFA, управление сессиями | Обязательно |
 | A08 | Software/Data Integrity | Подписание кода, безопасность CI/CD | Обязательно |
 | A09 | Logging/Monitoring Failures | Аудит-логи, алертинг | Обязательно |
-| A10 | SSRF | Allow-списки, сегментация сети | Обязательно |
+| A10 | SSRF | Allow-листы, сегментация сети | Обязательно |
 
 ---
 
@@ -61,10 +61,10 @@ function validateSecrets() {
 }
 ```
 
-### 2.2 Обработка .env файлов
+### 2.2 Обработка .env файла
 
 ```bash
-# .env.example (коммитится в репозиторий)
+# .env.example (коммитится в репо)
 DATABASE_URL=postgresql://user:password@localhost:5432/db
 JWT_SECRET=your-secret-key-here
 API_KEY=your-api-key-here
@@ -91,14 +91,14 @@ credentials.json
 |-------------|-----------------|-----------|
 | API Keys | Каждые 90 дней | Сгенерировать новый, задеплоить, отозвать старый |
 | Пароли БД | Каждые 90 дней | Обновить в vault, ротировать соединения |
-| JWT Secret | Каждые 180 дней | Льготный период с multi-secret валидацией |
+| JWT Secret | Каждые 180 дней | Grace period с multi-secret валидацией |
 | Ключи шифрования | Каждые 365 дней | Перешифровать данные новым ключом |
 | SSH Keys | Каждые 365 дней | Заменить на всех серверах |
 
 ### 2.4 Секреты в CI/CD
 
 ```yaml
-# GitHub Actions - Использовать secrets, никогда не хардкодить
+# GitHub Actions - Используйте secrets, никогда не хардкодьте
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -148,7 +148,7 @@ function validatePassword(password: string): ValidationResult {
     }
   }
 
-  // Проверка по базе утекших паролей
+  // Проверка против базы утекших паролей
   if (await isBreachedPassword(password)) {
     return { valid: false, error: 'Пароль найден в базе утечек' };
   }
@@ -162,7 +162,7 @@ function validatePassword(password: string): ValidationResult {
 ```typescript
 import bcrypt from 'bcrypt';
 
-const HASH_ROUNDS = 12; // Настраивать под железо
+const HASH_ROUNDS = 12; // Настройте под железо
 
 async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, HASH_ROUNDS);
@@ -175,7 +175,7 @@ async function verifyPassword(
   return bcrypt.compare(password, hash);
 }
 
-// ✅ Использовать сравнение с постоянным временем для токенов
+// ✅ Используйте сравнение с постоянным временем для токенов
 import { timingSafeEqual } from 'crypto';
 
 function secureCompare(a: string, b: string): boolean {
@@ -209,7 +209,7 @@ const sessionConfig = {
   },
 };
 
-// Регенерировать сессию при аутентификации
+// Регенерация сессии при аутентификации
 async function login(req: Request, user: User) {
   await req.session.regenerate();
   req.session.userId = user.id;
@@ -226,9 +226,9 @@ import jwt from 'jsonwebtoken';
 
 interface TokenPayload {
   sub: string;        // User ID
-  iat: number;        // Выдан в
-  exp: number;        // Истекает
-  jti: string;        // Уникальный ID токена (для отзыва)
+  iat: number;        // Issued at
+  exp: number;        // Expiration
+  jti: string;        // Unique token ID (для отзыва)
   type: 'access' | 'refresh';
 }
 
@@ -296,7 +296,7 @@ function verifyMFA(secret: string, token: string): boolean {
     secret,
     encoding: 'base32',
     token,
-    window: 1, // Допустить 1 шаг дрейфа
+    window: 1, // Разрешить 1 шаг дрифта
   });
 }
 ```
@@ -305,13 +305,13 @@ function verifyMFA(secret: string, token: string): boolean {
 
 ## 4. Авторизация
 
-### 4.1 Ролевое управление доступом (RBAC)
+### 4.1 Role-Based Access Control (RBAC)
 
 ```typescript
-// Определить роли и разрешения
+// Определение ролей и прав
 const ROLES = {
   ADMIN: {
-    permissions: ['*'], // Все разрешения
+    permissions: ['*'], // Все права
   },
   MANAGER: {
     permissions: [
@@ -329,7 +329,7 @@ const ROLES = {
   },
 };
 
-// Проверка разрешения
+// Проверка прав
 function hasPermission(
   userRole: string,
   permission: string
@@ -345,7 +345,7 @@ function hasPermission(
 function requirePermission(permission: string) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!hasPermission(req.user.role, permission)) {
-      throw new AuthorizationError(`Нет разрешения: ${permission}`);
+      throw new AuthorizationError(`Нет права: ${permission}`);
     }
     next();
   };
@@ -359,18 +359,18 @@ app.delete('/api/users/:id',
 );
 ```
 
-### 4.2 Авторизация на уровне ресурса
+### 4.2 Авторизация на уровне ресурсов
 
 ```typescript
-// Всегда проверять владение ресурсом
+// Всегда проверяйте владение ресурсом
 async function getDocument(req: Request, res: Response) {
   const document = await db.documents.find(req.params.id);
 
   if (!document) {
-    throw new NotFoundError('Документ');
+    throw new NotFoundError('Document');
   }
 
-  // Проверить владение или разрешение
+  // Проверка владения или права
   const canAccess =
     document.ownerId === req.user.id ||
     hasPermission(req.user.role, 'documents:read_all');
@@ -398,7 +398,7 @@ const dbUser = {
   role: 'superuser', // Слишком много доступа
 };
 
-// API токены с конкретными scope
+// API токены со специфичными скоупами
 const apiToken = {
   scopes: ['read:users', 'write:documents'],
   expiresAt: Date.now() + 3600000, // 1 час
@@ -427,7 +427,7 @@ const UserRegistrationSchema = z.object({
     .regex(/[A-Z]/, 'Должен содержать заглавную букву')
     .regex(/[a-z]/, 'Должен содержать строчную букву')
     .regex(/[0-9]/, 'Должен содержать цифру')
-    .regex(/[^A-Za-z0-9]/, 'Должен содержать спецсимвол'),
+    .regex(/[^A-Za-z0-9]/, 'Должен содержать символ'),
 
   name: z.string()
     .min(1)
@@ -436,7 +436,7 @@ const UserRegistrationSchema = z.object({
     .transform(name => name.trim()),
 });
 
-// Валидировать и распарсить
+// Валидация и парсинг
 function validateUserRegistration(data: unknown) {
   return UserRegistrationSchema.safeParse(data);
 }
@@ -463,7 +463,7 @@ const user = await prisma.user.findFirst({
 ```typescript
 import DOMPurify from 'dompurify';
 
-// Санитизация HTML-ввода
+// Санитизация HTML ввода
 function sanitizeHTML(input: string): string {
   return DOMPurify.sanitize(input, {
     ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a'],
@@ -549,10 +549,10 @@ app.use(helmet({
 ```typescript
 // Кастомные заголовки безопасности
 app.use((req, res, next) => {
-  // Защита от кликджекинга
+  // Защита от clickjacking
   res.setHeader('X-Frame-Options', 'DENY');
 
-  // Защита от MIME-sniffing
+  // Защита от MIME sniffing
   res.setHeader('X-Content-Type-Options', 'nosniff');
 
   // XSS защита
@@ -592,7 +592,7 @@ const apiLimiter = rateLimit({
   keyGenerator: (req) => req.ip || req.user?.id,
 });
 
-// Строгие лимиты для аутентификации
+// Строжайшие лимиты для аутентификации
 const authLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 час
   max: 5,                    // 5 попыток в час
@@ -614,7 +614,7 @@ const speedLimiter = slowDown({
   windowMs: 15 * 60 * 1000,
   delayAfter: 50,    // Разрешить 50 запросов на полной скорости
   delayMs: 500,      // Добавить 500мс задержки на запрос после
-  maxDelayMs: 20000, // Кап на 20 секунд
+  maxDelayMs: 20000, // Максимум 20 секунд
 });
 
 app.use('/api/', speedLimiter);
@@ -649,18 +649,18 @@ jobs:
       - uses: actions/checkout@v4
       - run: npm audit --audit-level=moderate
       - uses: dependabot/fetch-metadata@v1
-      # Авто-merge обновлений безопасности
+      # Авто-мёрдж security обновлений
 ```
 
-### 8.2 Политики зависимостей
+### 8.2 Политика зависимостей
 
 | Политика | Требование |
 |----------|------------|
-| Уязвимости безопасности | Ни одной с CVSS > 7 |
-| Лицензия | Только из allow-списка |
-| Возраст | Предпочитать стабильные, поддерживаемые пакеты |
-| Загрузки | Предпочитать пакеты со значимым использованием |
-| Lock File | Всегда коммитить package-lock.json |
+| Уязвимости безопасности | Нет с CVSS > 7 |
+| Лицензия | Только allow-list |
+| Возраст | Предпочтительны стабильные, поддерживаемые пакеты |
+| Загрузки | Предпочтительны пакеты со значительным использованием |
+| Lock File | Всегда коммитьте package-lock.json |
 
 ---
 
@@ -726,7 +726,7 @@ interface SecurityLog {
 ### 9.3 Обработка чувствительных данных
 
 ```typescript
-// Никогда не логировать чувствительные данные
+// Никогда не логируйте чувствительные данные
 const SENSITIVE_FIELDS = [
   'password',
   'token',
@@ -761,18 +761,18 @@ function sanitizeLog(data: Record<string, unknown>): Record<string, unknown> {
 - [ ] Rate limiting включён
 - [ ] Валидация ввода на всех эндпоинтах
 - [ ] Аутентификация требуется где нужно
-- [ ] Авторизация проверяется по ресурсу
+- [ ] Авторизация проверяется для каждого ресурса
 - [ ] Нет чувствительных данных в логах
 - [ ] Зависимости проверены
 - [ ] CSP настроен
-- [ ] Сообщения об ошибках не утекают
+- [ ] Сообщения об ошибках не утекают информацию
 - [ ] Соединения с БД зашифрованы
 - [ ] Бэкапы зашифрованы
 
 ### 10.2 Конфигурация окружения
 
 ```typescript
-// Безопасность в зависимости от окружения
+// Безопасность, специфичная для окружения
 const securityConfig = {
   development: {
     https: false,
@@ -802,11 +802,11 @@ const securityConfig = {
 ### 11.1 Фазы реагирования
 
 ```
-1. DETECT -> Выявить инцидент
-2. CONTAIN -> Ограничить ущерб
-3. ERADICATE -> Устранить угрозу
-4. RECOVER -> Восстановить сервисы
-5. LEARN -> Пост-мортем и улучшения
+1. DETECT → Выявить инцидент
+2. CONTAIN → Ограничить ущерб
+3. ERADICATE → Устранить угрозу
+4. RECOVER → Восстановить сервисы
+5. LEARN → Пост-мортем и улучшения
 ```
 
 ### 11.2 Немедленные действия
@@ -817,7 +817,7 @@ const securityConfig = {
 ### Немедленно (0-1 час)
 - [ ] Подтвердить инцидент
 - [ ] Уведомить команду безопасности
-- [ ] Сохранить доказательства (логи, скриншоты)
+- [ ] Сохранить улики (логи, скриншоты)
 - [ ] Оценить масштаб и влияние
 - [ ] Изолировать при активной атаке
 
@@ -826,7 +826,7 @@ const securityConfig = {
 - [ ] Идентифицировать затронутых пользователей/системы
 - [ ] Исправить уязвимость
 - [ ] Сбросить скомпрометированные учётные данные
-- [ ] Уведомить затронутых пользователей если требуется
+- [ ] Уведомить затронутых пользователей при необходимости
 
 ### Долгосрочно (1-7 дней)
 - [ ] Завершить пост-мортем
@@ -844,18 +844,18 @@ const securityConfig = {
 - [ ] Шифрование данных в покое
 - [ ] Шифрование данных при передаче
 - [ ] Возможность права на удаление
-- [ ] Переносимость данных
+- [ ] Портативность данных
 - [ ] Политика конфиденциальности
 - [ ] Согласие на cookies
 - [ ] Политика хранения данных
 
 ### Требования SOC 2
 
-- [ ] Контроль доступа задокументирован
+- [ ] Документированные контроли доступа
 - [ ] Процесс управления изменениями
 - [ ] План реагирования на инциденты
 - [ ] Сканирование уязвимостей
-- [ ] Проверка сотрудников
+- [ ] Проверка биографий сотрудников
 - [ ] Обучение безопасности
 
 ---

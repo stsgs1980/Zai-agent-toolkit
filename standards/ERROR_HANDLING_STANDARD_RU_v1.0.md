@@ -13,7 +13,7 @@
 
 ```
 Error
-├── ApplicationError (База для всех ошибок приложения)
+├── ApplicationError (Базовый для всех ошибок приложения)
 │   ├── ValidationError
 │   │   ├── SchemaValidationError
 │   │   └── BusinessRuleViolationError
@@ -36,21 +36,21 @@ Error
 │   │   ├── CacheError
 │   │   └── ThirdPartyAPIError
 │   └── InternalError
-└── SystemError (Неожиданные, невосстановимые)
+└── SystemError (Неожиданные, невосстанавливаемые)
 ```
 
 ### 1.2 Категории ошибок
 
-| Категория | HTTP статус | Восстановимо | Сообщение пользователю |
-|-----------|-------------|--------------|----------------------|
+| Категория | HTTP статус | Восстанавливаемо | Сообщение пользователю |
+|-----------|-------------|------------------|------------------------|
 | Validation | 400 | Да | Показать ошибки конкретных полей |
-| Authentication | 401 | Да | Запросить логин |
+| Authentication | 401 | Да | Предложить логин |
 | Authorization | 403 | Нет | Показать сообщение о правах |
 | Not Found | 404 | Нет | Показать сообщение "не найдено" |
-| Conflict | 409 | Да | Запросить разрешение |
+| Conflict | 409 | Да | Предложить разрешение |
 | Rate Limit | 429 | Да | Показать время повторной попытки |
-| Server Error | 500 | Нет | Общая ошибка, логировать детали |
-| Service Unavailable | 503 | Да | Показать опцию повторной попытки |
+| Server Error | 500 | Нет | Обобщённая ошибка, логировать детали |
+| Service Unavailable | 503 | Да | Показать опцию повтора |
 
 ---
 
@@ -71,7 +71,7 @@ interface ApplicationError {
   details?: unknown;    // Дополнительный контекст
 
   // Отладка
-  stack?: string;       // Стек-трейс (только dev)
+  stack?: string;       // Стек вызовов (только dev)
   cause?: Error;        // Исходная ошибка (для обёртки)
 
   // HTTP
@@ -80,7 +80,7 @@ interface ApplicationError {
   // Метаданные
   timestamp: string;    // ISO 8601
   path?: string;        // Путь запроса
-  requestId?: string;   // ID корреляции запроса
+  requestId?: string;   // Correlation ID запроса
 
   // Восстановление
   recoverable: boolean;
@@ -120,7 +120,7 @@ export class ApplicationError extends Error {
     this.details = details;
     this.cause = cause;
 
-    // Сохранить правильный стек-трейс
+    // Сохранить правильный стек вызовов
     Error.captureStackTrace(this, this.constructor);
   }
 
@@ -162,7 +162,7 @@ export class NotFoundError extends ApplicationError {
   constructor(resource: string, identifier?: string | number) {
     super({
       code: 'NOT_FOUND',
-      message: `${resource} не найден`,
+      message: `${resource} не найден(а)`,
       statusCode: 404,
       recoverable: false,
       details: { resource, identifier },
@@ -219,7 +219,7 @@ async function getUser(id: string): Promise<User> {
   try {
     const user = await db.users.find(id);
     if (!user) {
-      throw new NotFoundError('Пользователь', id);
+      throw new NotFoundError('User', id);
     }
     return user;
   } catch (error) {
@@ -227,7 +227,7 @@ async function getUser(id: string): Promise<User> {
       throw error; // Перебросить известные ошибки
     }
     if (error instanceof DatabaseError) {
-      throw new ExternalServiceError('База данных', error);
+      throw new ExternalServiceError('Database', error);
     }
     throw new InternalError('Не удалось получить пользователя', error);
   }
@@ -247,7 +247,7 @@ async function getUser(id: string) {
 ### 3.2 Обёртка ошибок
 
 ```typescript
-// Обёртывать внешние ошибки с контекстом
+// Обёртка внешних ошибок с контекстом
 async function processPayment(order: Order): Promise<PaymentResult> {
   try {
     return await stripe.charges.create({
@@ -256,7 +256,7 @@ async function processPayment(order: Order): Promise<PaymentResult> {
     });
   } catch (error) {
     if (error instanceof StripeCardError) {
-      throw new ValidationError('Платёж отклонён', {
+      throw new ValidationError('Оплата не прошла', {
         field: 'card',
         message: error.message,
       });
@@ -323,11 +323,11 @@ if (result.ok) {
 
 | Уровень | Когда использовать | Содержит |
 |---------|-------------------|----------|
-| DEBUG | Детали разработки | Стек-трейсы, переменные |
-| INFO | Бизнес-события | Действия пользователей, изменения состояния |
-| WARN | Восстановимые проблемы | Деградация сервиса, фоллбэки |
+| DEBUG | Детали разработки | Стек вызовов, переменные |
+| INFO | Бизнес-события | Действия пользователя, изменения состояния |
+| WARN | Восстанавливаемые проблемы | Деградация сервиса, fallback-ы |
 | ERROR | Сбои, требующие внимания | Полный контекст ошибки |
-| FATAL | Невосстановимые | Состояние системы, немедленные действия |
+| FATAL | Невосстанавливаемые | Состояние системы, немедленные действия |
 
 ### 4.2 Структурированное логирование
 
@@ -396,7 +396,7 @@ export function errorLogger(error: Error, req: Request, res: Response, next: Nex
 
 ---
 
-## 5. Ответы API с ошибками
+## 5. API-ответы с ошибками
 
 ### 5.1 Стандартный формат ответа
 
@@ -413,15 +413,15 @@ export function errorLogger(error: Error, req: Request, res: Response, next: Nex
   "error": {
     "id": "err_abc123",
     "code": "VALIDATION_ERROR",
-    "message": "Неверные входные данные",
+    "message": "Некорректные входные данные",
     "details": [
       {
         "field": "email",
-        "message": "Неверный формат email"
+        "message": "Некорректный формат email"
       },
       {
         "field": "password",
-        "message": "Пароль должен содержать минимум 8 символов"
+        "message": "Пароль должен быть минимум 8 символов"
       }
     ],
     "recoverable": true,
@@ -452,7 +452,7 @@ export function errorHandler(
   // Обработка известных внешних ошибок
   if (error instanceof ZodError) {
     const validationError = new ValidationError(
-      'Неверные входные данные',
+      'Некорректные входные данные',
       error.errors.map(e => ({
         field: e.path.join('.'),
         message: e.message,
@@ -595,12 +595,12 @@ const { data, error, isError } = useQuery({
 // lib/errors/messages.ts
 const errorMessages: Record<string, string> = {
   VALIDATION_ERROR: 'Проверьте введённые данные и попробуйте снова.',
-  AUTHENTICATION_ERROR: 'Пожалуйста, войдите в систему.',
+  AUTHENTICATION_ERROR: 'Войдите в систему, чтобы продолжить.',
   PERMISSION_DENIED: 'У вас нет прав для выполнения этого действия.',
   NOT_FOUND: 'Запрашиваемый ресурс не найден.',
   RATE_LIMIT_EXCEEDED: 'Слишком много запросов. Подождите немного.',
   EXTERNAL_SERVICE_ERROR: 'Сервис временно недоступен. Попробуйте позже.',
-  INTERNAL_ERROR: 'Что-то пошло не так. Наша команда уведомлена.',
+  INTERNAL_ERROR: 'Что-то пошло не так. Команда уже уведомлена.',
 };
 
 export function getUserMessage(error: ApplicationError): string {
@@ -720,7 +720,7 @@ class CircuitBreaker {
 }
 ```
 
-### 7.3 Механизмы фоллбэка
+### 7.3 Fallback-механизмы
 
 ```typescript
 // lib/fallback.ts
@@ -729,17 +729,17 @@ async function getUser(id: string): Promise<User> {
     // Основной источник
     return await database.getUser(id);
   } catch (error) {
-    logger.warn({ error, userId: id }, 'Ошибка получения из БД, пробуем кэш');
+    logger.warn({ error, userId: id }, 'Ошибка загрузки из БД, пробуем кэш');
 
     try {
-      // Фоллбэк: кэш
+      // Fallback: кэш
       const cached = await cache.get(`user:${id}`);
       if (cached) return cached;
     } catch (cacheError) {
-      logger.error({ cacheError }, 'Ошибка фоллбэка кэша');
+      logger.error({ cacheError }, 'Fallback кэша не удался');
     }
 
-    // Финальный фоллбэк: устаревшие данные или дефолт
+    // Финальный fallback: устаревшие данные или дефолт
     throw new ExternalServiceError('Сервис пользователей');
   }
 }
@@ -764,7 +764,7 @@ const errorMetrics = {
   error_rate_p95: histogram,       // 95-й перцентиль времени ответа при ошибках
 
   // Восстановление
-  retry_success_rate: gauge,       // Успешные повторные попытки
+  retry_success_rate: gauge,       // Успешные повторы
   circuit_breaker_opens: counter,  // Активации circuit breaker
 };
 ```
@@ -782,7 +782,7 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: "Обнаружена высокая частота ошибок"
+          summary: "Обнаружен высокий уровень ошибок"
 
       - alert: CriticalError
         expr: increase(errors_total{code="INTERNAL_ERROR"}[1h]) > 5
@@ -807,11 +807,11 @@ groups:
 
 - [ ] Все async-функции имеют try-catch
 - [ ] Ошибки правильно классифицированы
-- [ ] Нет чувствительных данных в сообщениях об ошибках
+- [ ] Чувствительные данные не в сообщениях об ошибках
 - [ ] Логирование настроено корректно
 - [ ] Ответы с ошибками согласованы
-- [ ] Frontend имеет error boundaries
-- [ ] Логика повторных попыток для внешних вызовов
+- [ ] На frontend есть error boundaries
+- [ ] Логика повторных попыток на месте для внешних вызовов
 - [ ] Circuit breakers настроены для критичных сервисов
 - [ ] Алерты настроены
 - [ ] Документация ошибок актуальна
@@ -819,9 +819,9 @@ groups:
 ### Code Review
 
 - [ ] Нет заглушённых ошибок
-- [ ] Нет console.log в production-коде
+- [ ] Нет console.log в продакшн-коде
 - [ ] Контекст ошибки достаточен для отладки
-- [ ] Сообщения пользователям полезны
+- [ ] Сообщения пользователю полезны
 - [ ] Стратегии восстановления уместны
 
 ---

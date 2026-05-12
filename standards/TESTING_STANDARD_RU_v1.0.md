@@ -14,7 +14,7 @@
 ```
         ╱╲
        ╱  ╲        E2E тесты (10%)
-      ╱    ╲       - Критичные пользовательские потоки
+      ╱    ╲       - Критичные пользовательские сценарии
      ╱──────╲      - Полная интеграция системы
     ╱        ╲
    ╱──────────╲    Интеграционные тесты (20%)
@@ -22,7 +22,7 @@
  ╱              ╲  - Операции с базой данных
 ╱────────────────╲ - Внешние сервисы
 
-  Unit-тесты (70%)
+  Юнит-тесты (70%)
   - Чистые функции
   - Компоненты
   - Бизнес-логика
@@ -32,35 +32,35 @@
 
 | Слой | Минимальное покрытие | Целевое покрытие |
 |------|---------------------|------------------|
-| Unit | 80% | 90% |
-| Integration | 60% | 75% |
-| E2E | Критичные пути | Все пользовательские потоки |
+| Юнит | 80% | 90% |
+| Интеграция | 60% | 75% |
+| E2E | Критичные пути | Все пользовательские сценарии |
 
 ---
 
-## 2. Unit-тестирование
+## 2. Юнит-тестирование
 
 ### 2.1 Что тестировать
 
-**✅ ТЕСТИРОВАТЬ:**
+**✅ ТЕСТИРУЙТЕ:**
 - Чистые функции (детерминированный вывод)
 - Бизнес-логику и вычисления
-- Трансформации данных
+- Преобразования данных
 - Рендеринг компонентов (UI)
 - Управление состоянием
-- Краевые случаи и граничные условия
+- Граничные случаи и пограничные условия
 
-**❌ НЕ ТЕСТИРОВАТЬ:**
+**❌ НЕ ТЕСТИРУЙТЕ:**
 - Сторонние библиотеки (они тестируют себя сами)
 - Внутренности фреймворка
 - Тривиальные геттеры/сеттеры
 - Сгенерированный код
 
-### 2.2 Структура теста (паттерн AAA)
+### 2.2 Структура теста (Паттерн AAA)
 
 ```javascript
 describe('calculateDiscount', () => {
-  it('должен применять скидку 10% для премиум-пользователей', () => {
+  it('should apply 10% discount for premium users', () => {
     // Arrange
     const user = { tier: 'premium', orders: 15 };
     const price = 100;
@@ -72,7 +72,7 @@ describe('calculateDiscount', () => {
     expect(result).toBe(90);
   });
 
-  it('должен возвращать оригинальную цену для обычных пользователей', () => {
+  it('should return original price for non-premium users', () => {
     // Arrange
     const user = { tier: 'regular', orders: 5 };
     const price = 100;
@@ -89,7 +89,7 @@ describe('calculateDiscount', () => {
 ### 2.3 Соглашение об именовании
 
 ```
-<единица>_<сценарий>_<ожидаемыйРезультат>
+<unit>_<scenario>_<expectedResult>
 
 Примеры:
 - calculateDiscount_premiumUser_applies10Percent
@@ -98,7 +98,7 @@ describe('calculateDiscount', () => {
 - render_loadingState_showsSpinner
 ```
 
-### 2.4 Правила мокирования
+### 2.4 Руководство по мокам
 
 ```javascript
 // ✅ Хорошо: Мок на границах
@@ -106,14 +106,14 @@ jest.mock('@/lib/api', () => ({
   fetchUser: jest.fn().mockResolvedValue({ id: 1, name: 'Test' })
 }));
 
-// ✅ Хорошо: Использовать фабричные функции
+// ✅ Хорошо: Используйте фабричные функции
 const createMockUser = (overrides = {}) => ({
   id: 1,
   name: 'Test User',
   ...overrides
 });
 
-// ❌ Плохо: Избыточное мокирование внутренностей
+// ❌ Плохо: Чрезмерный мокинг внутренностей
 jest.mock('./utils', () => ({
   // Тестирование деталей реализации
   helper: jest.fn().mockReturnValue('mocked')
@@ -145,7 +145,7 @@ describe('POST /api/users', () => {
     await server.db.clear();
   });
 
-  it('должен создать пользователя с валидными данными', async () => {
+  it('should create user with valid data', async () => {
     const response = await server
       .post('/api/users')
       .send({ email: 'test@example.com', name: 'Test' });
@@ -157,7 +157,7 @@ describe('POST /api/users', () => {
     });
   });
 
-  it('должен отклонить дублирующийся email', async () => {
+  it('should reject duplicate email', async () => {
     await createTestUser({ email: 'existing@example.com' });
 
     const response = await server
@@ -172,7 +172,7 @@ describe('POST /api/users', () => {
 ### 3.2 Тестирование базы данных
 
 ```typescript
-// Использовать транзакции для изоляции
+// Используйте транзакции для изоляции
 describe('UserRepository', () => {
   let tx: Transaction;
 
@@ -184,7 +184,7 @@ describe('UserRepository', () => {
     await tx.rollback();
   });
 
-  it('должен создать и найти пользователя', async () => {
+  it('should create and find user', async () => {
     const user = await tx.users.create({ email: 'test@example.com' });
     const found = await tx.users.findByEmail('test@example.com');
 
@@ -196,9 +196,9 @@ describe('UserRepository', () => {
 ### 3.3 Внешние сервисы
 
 ```typescript
-// Использовать контрактное тестирование для внешних API
+// Используйте контрактное тестирование для внешних API
 describe('PaymentService', () => {
-  it('должен обработать платёж', async () => {
+  it('should process payment', async () => {
     // Мок внешнего сервиса
     nock('https://api.stripe.com')
       .post('/v1/charges')
@@ -218,17 +218,17 @@ describe('PaymentService', () => {
 
 ## 4. E2E тестирование
 
-### 4.1 Критичные потоки (Обязательно тестировать)
+### 4.1 Критичные сценарии (Обязательно тестировать)
 
 ```
 ┌─────────────────────────────────────────┐
-│           E2E тестовые сценарии         │
+│         E2E тестовые сценарии           │
 ├─────────────────────────────────────────┤
-│ 1. Регистрация -> Логин -> Логаут       │
-│ 2. Просмотр товаров -> Корзина -> Чекаут│
-│ 3. Поиск -> Фильтрация -> Результаты    │
-│ 4. Обновление профиля -> Сохранение     │
-│ 5. Состояния ошибок -> Восстановление   │
+│ 1. Регистрация → Логин → Логаут         │
+│ 2. Просмотр товаров → Корзина → Чекаут  │
+│ 3. Поиск → Фильтрация → Результаты      │
+│ 4. Обновление профиля → Сохранение      │
+│ 5. Состояния ошибок → Восстановление    │
 └─────────────────────────────────────────┘
 ```
 
@@ -238,18 +238,18 @@ describe('PaymentService', () => {
 // tests/e2e/checkout.spec.ts
 import { test, expect } from '@playwright/test';
 
-test.describe('Поток оформления заказа', () => {
+test.describe('Checkout Flow', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     await login(page, 'user@test.com', 'password');
   });
 
-  test('полный поток покупки', async ({ page }) => {
+  test('complete purchase flow', async ({ page }) => {
     // Добавить товар в корзину
     await page.click('[data-testid="add-to-cart"]');
     await expect(page.locator('.cart-count')).toHaveText('1');
 
-    // Перейти к оформлению
+    // Перейти к чекауту
     await page.click('[data-testid="checkout-btn"]');
     await expect(page).toHaveURL(/\/checkout/);
 
@@ -266,21 +266,21 @@ test.describe('Поток оформления заказа', () => {
     await expect(page.locator('.order-number')).toBeVisible();
   });
 
-  test('показывает ошибку для отклонённой карты', async ({ page }) => {
+  test('shows error for declined card', async ({ page }) => {
     // ... тест обработки ошибок
   });
 });
 ```
 
-### 4.3 Best practices E2E
+### 4.3 Best Practices E2E
 
 | Практика | Описание |
 |----------|----------|
-| Использовать data-testid | `data-testid="submit-btn"` для стабильных селекторов |
-| Ждать состояния | `await expect(locator).toBeVisible()` не `waitForTimeout` |
-| Изолировать тесты | Каждый тест должен быть независимым |
-| Очищать состояние | Сброс БД или использование тестовых фикстур |
-| Параллельный запуск | Настроить workers для скорости |
+| Используйте data-testid | `data-testid="submit-btn"` для стабильных селекторов |
+| Ждите состояния | `await expect(locator).toBeVisible()` не `waitForTimeout` |
+| Изолируйте тесты | Каждый тест должен быть независимым |
+| Очищайте состояние | Сброс БД или использование тестовых фикстур |
+| Параллельный запуск | Настройте workers для скорости |
 
 ---
 
@@ -322,7 +322,7 @@ export const fixtures = {
   product: () => productFactory.create(),
   order: (user, products) => orderFactory.create({ userId: user.id, products }),
 
-  // Сложная настройка
+  // Сложная установка
   completedOrder: async () => {
     const user = await fixtures.customer();
     const product = await fixtures.product();
@@ -335,7 +335,7 @@ export const fixtures = {
 
 ## 6. Интеграция CI/CD
 
-### 6.1 Этапы пайплайна
+### 6.1 Стадии пайплайна
 
 ```yaml
 # .github/workflows/test.yml
@@ -375,25 +375,25 @@ jobs:
 
 | Gate | Требование | Действие |
 |------|------------|----------|
-| Unit Coverage | >= 80% | Блокировать merge |
-| New Code Coverage | >= 90% | Блокировать merge |
-| E2E Critical Paths | 100% pass | Блокировать merge |
-| Performance Tests | Без регрессии > 10% | Предупреждение |
+| Юнит покрытие | >= 80% | Блокировать merge |
+| Покрытие нового кода | >= 90% | Блокировать merge |
+| E2E критичные пути | 100% pass | Блокировать merge |
+| Перформанс-тесты | Нет регрессии > 10% | Предупреждение |
 
 ---
 
-## 7. Snapshot-тестирование
+## 7. Снэпшот-тестирование
 
 ### 7.1 Когда использовать
 
-**✅ Подходит для:**
-- Рендеринг UI-компонентов
-- Структура ответа API
-- Сгенерированный вывод
+**✅ Хорошо для:**
+- Рендеринга UI-компонентов
+- Структуры ответов API
+- Сгенерированного вывода
 
-**❌ Не подходит для:**
-- Динамические данные (timestamps, UUIDs)
-- Большие объекты (нагрузка на поддержку)
+**❌ Плохо для:**
+- Динамических данных (timestamps, UUIDs)
+- Больших объектов (обременительно поддерживать)
 
 ### 7.2 Пример
 
@@ -401,17 +401,17 @@ jobs:
 // React component snapshot
 expect(container).toMatchSnapshot();
 
-// API response snapshot с динамическими полями
+// API response snapshot with dynamic fields
 expect(response.body).toMatchInlineSnapshot({
   id: expect.any(String),
   createdAt: expect.any(String),
-  // ... статические поля
+  // ... static fields
 });
 ```
 
 ---
 
-## 8. Тестирование производительности
+## 8. Перформанс-тестирование
 
 ### 8.1 Нагрузочное тестирование
 
@@ -421,21 +421,21 @@ import { check } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '30s', target: 20 },  // Разгон
-    { duration: '1m', target: 20 },   // Стабильная нагрузка
-    { duration: '30s', target: 0 },   // Снижение
+    { duration: '30s', target: 20 },  // Ramp up
+    { duration: '1m', target: 20 },   // Steady
+    { duration: '30s', target: 0 },   // Ramp down
   ],
   thresholds: {
-    http_req_duration: ['p(95)<500'], // 95% менее 500мс
-    http_req_failed: ['rate<0.01'],   // <1% ошибок
+    http_req_duration: ['p(95)<500'], // 95% under 500ms
+    http_req_failed: ['rate<0.01'],   // <1% errors
   },
 };
 
 export default function () {
   const res = http.get('https://api.example.com/users');
   check(res, {
-    'статус 200': (r) => r.status === 200,
-    'время ответа < 500мс': (r) => r.timings.duration < 500,
+    'status is 200': (r) => r.status === 200,
+    'response time < 500ms': (r) => r.timings.duration < 500,
   });
 }
 ```
@@ -444,21 +444,21 @@ export default function () {
 
 ## 9. Чек-лист качества тестов
 
-### Перед слиянием
+### Перед мёрджем
 
 - [ ] Все существующие тесты проходят
-- [ ] Новый код имеет тесты
+- [ ] Новый код покрыт тестами
 - [ ] Покрытие соответствует порогу
 - [ ] Нет пропущенных тестов без причины
 - [ ] Моки на границах
 - [ ] Тесты детерминированы
-- [ ] Нет хардкоженных учётных данных
+- [ ] Нет захардкоженных учётных данных
 - [ ] E2E тесты покрывают критичные пути
 
 ### Code Review
 
-- [ ] Тесты читаемые
-- [ ] Краевые случаи покрыты
+- [ ] Тесты читаемы
+- [ ] Граничные случаи покрыты
 - [ ] Пути ошибок протестированы
 - [ ] Нет взаимозависимостей тестов
 - [ ] Описательные имена тестов
@@ -470,20 +470,20 @@ export default function () {
 ### Frontend
 
 ```
-├── Vitest / Jest        # Unit-тесты
+├── Vitest / Jest        # Юнит-тесты
 ├── React Testing Library # Тесты компонентов
 ├── Playwright / Cypress  # E2E тесты
-├── MSW                   # Мокирование API
+├── MSW                   # Мокинг API
 └── @faker-js/faker       # Тестовые данные
 ```
 
 ### Backend
 
 ```
-├── Vitest / Jest        # Unit-тесты
+├── Vitest / Jest        # Юнит-тесты
 ├── Supertest            # API тесты
 ├── Playwright           # E2E тесты
-├── Nock / MSW           # Мокирование внешних API
+├── Nock / MSW           # Мокинг внешних API
 └── K6 / Artillery       # Нагрузочные тесты
 ```
 
@@ -491,11 +491,11 @@ export default function () {
 
 ## Ссылки
 
-- Jest документация: https://jestjs.io/
-- Vitest документация: https://vitest.dev/
-- Playwright документация: https://playwright.dev/
+- Документация Jest: https://jestjs.io/
+- Документация Vitest: https://vitest.dev/
+- Документация Playwright: https://playwright.dev/
 - Testing Library: https://testing-library.com/
-- K6 документация: https://k6.io/
+- Документация K6: https://k6.io/
 
 ---
 
