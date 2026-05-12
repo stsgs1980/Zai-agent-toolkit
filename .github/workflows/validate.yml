@@ -30,9 +30,8 @@ jobs:
             instructions/diagnostic-disclosure.md \
             instructions/writing-plans.md \
             standards/README_TEMPLATE.md \
-            standards/No-Unicode_Policy_v2.1.md \
-            standards/MARKDOWN_STANDARD_RU_v2.1.md \
-            standards/MARKDOWN_STANDARD_EN_v2.1.md \
+            standards/UNICODE_POLICY.md \
+            standards/MARKDOWN_STANDARD.md \
             standards/REPRODUCIBILITY-STANDARD.md \
             templates/WORKLOG.md \
             templates/TASK_TEMPLATE.md \
