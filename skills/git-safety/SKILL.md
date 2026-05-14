@@ -320,6 +320,104 @@ git status  # verify: "nothing to commit, working tree clean"
 
 ---
 
+## Post-Deadlock Clean Clone Procedure
+
+### The Nested Project Trap
+
+After a git deadlock, another agent might clone the repository **inside** the broken project instead of **replacing** it. This creates a nested structure that breaks everything:
+
+```
+WRONG (nested project - NOTHING WORKS):
+/home/z/my-project/                          ← old broken project (git deadlock)
+  ├── .git/                                  ← BLOCKED rebase
+  ├── src/
+  ├── package.json
+  └── Z.Code-Guide-Coding-Tool-Helper/       ← clone INSIDE old project!
+       ├── .git/                             ← clean git
+       ├── src/
+       └── package.json
+
+CORRECT (clean replacement):
+/home/z/my-project/                          ← clean clone (replacement)
+  ├── .git/                                  ← clean git
+  ├── src/
+  └── package.json
+```
+
+**Why nested projects fail:**
+- Dev server won't find correct paths
+- Port 3000 won't bind correctly
+- Imports resolve to wrong node_modules
+- Environment files not found
+- Git operations affect wrong repository
+
+### Correct Procedure After Deadlock
+
+**Step 1: Verify if project is corrupted**
+
+```bash
+# Check for deadlock state
+ls /home/z/my-project/.git/rebase-merge/ 2>/dev/null && echo "DEADLOCKED"
+ls /home/z/my-project/.git/MERGE_HEAD 2>/dev/null && echo "DEADLOCKED"
+
+# Check for nested project (WRONG structure)
+ls -d /home/z/my-project/*/  # should show src/, not another project!
+```
+
+**Step 2: If corrupted, DELETE ENTIRE directory and re-clone**
+
+```bash
+# DELETE the entire corrupted project
+rm -rf /home/z/my-project
+
+# Clone DIRECTLY to the target path (NOT as subdirectory)
+git clone https://<token>@github.com/<owner>/<repo>.git /home/z/my-project
+
+# Verify correct structure
+ls /home/z/my-project/
+# Should show: src/, package.json, .git/ — NOT another project folder!
+
+# Setup
+cd /home/z/my-project
+bun install
+cp .env.example .env
+bun run db:push  # if applicable
+bun run dev
+```
+
+### The Critical Difference
+
+| Wrong | Correct |
+|-------|---------|
+| `git clone <url>` (creates subdirectory) | `git clone <url> /home/z/my-project` |
+| `cd /home/z/my-project && git clone <url>` | `rm -rf /home/z/my-project && git clone <url> /home/z/my-project` |
+
+**Key insight:** Always specify the target directory explicitly when cloning after deadlock:
+
+```bash
+# WRONG - creates nested project
+git clone https://github.com/user/repo.git
+# Result: /home/z/my-project/repo/  ← WRONG!
+
+# CORRECT - replaces old project
+git clone https://github.com/user/repo.git /home/z/my-project
+# Result: /home/z/my-project/  ← CORRECT!
+```
+
+### Cleanup Checklist After Deadlock Recovery
+
+```bash
+[ ] Old directory completely removed (rm -rf)
+[ ] Clone command specifies target path explicitly
+[ ] No nested project structure exists
+[ ] .git/ is at correct level (/home/z/my-project/.git/)
+[ ] package.json is at correct level
+[ ] bun install runs successfully
+[ ] bun run dev starts on correct port
+```
+
+---
+
 ## Quick Reference Card
 
 | Situation | Command |
@@ -332,6 +430,7 @@ git status  # verify: "nothing to commit, working tree clean"
 | Network hang | `kill <pid>` → `rm -f .git/*.lock` |
 | Detached HEAD | `git checkout -b rescue && git push` |
 | Session end | `git add -A && git commit && git push` |
+| Nested project trap | `rm -rf /home/z/my-project && git clone <url> /home/z/my-project` |
 
 ---
 
