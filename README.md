@@ -4,13 +4,13 @@
 
 # Agent Toolkit
 
-[![Version: 1.8.3](https://img.shields.io/badge/Version-1.8.3-blue.svg)]()
+[![Version: 1.9.0](https://img.shields.io/badge/Version-1.9.0-blue.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status: Pre-release](https://img.shields.io/badge/Status-Pre--release-orange.svg)]()
 
 **Standards + Skills + Rules** for AI-driven development
 
-> Toolkit version: **v1.8.3** | Language: **English**
+> Toolkit version: **v1.9.0** | Language: **English**
 
 ---
 
@@ -136,6 +136,7 @@ agent-toolkit/
     fallback/                 Graceful degradation
     api-retry/                API retry with backoff
     anti-monolith/            React/Next.js architecture enforcement
+    z-ai-web-dev-sdk/         Z.ai SDK integration (chat, image gen, web search)
 ```
 
 ---
@@ -153,6 +154,7 @@ These define rules. They are read and accepted, not modified per project.
 | STD-DOC-004 | `README_TEMPLATE.md` | [W] | Mandatory README structure |
 | STD-DOC-006 | `CODE_EXAMPLES_GUIDE.md` | [W] | Code examples in documentation |
 | STD-ENV-001 | `REPRODUCIBILITY-STANDARD.md` | [C] | Environment, paths, DB |
+| STD-ENV-002 | `ZAI_INTEGRATION_STANDARD.md` | [C] | Z.ai sandbox integration |
 | STD-ARCH-001 | `IMPLEMENTATION_ORDER.md` | [W] | 6-step implementation sequence |
 | STD-META-001 | `STANDARD_ID_SYSTEM.md` | [W] | Standard ID registry and rules |
 | STD-FE-001 | `FRONTEND_STANDARD.md` | [C] | React/Next.js frontend development |
@@ -214,12 +216,13 @@ These are deployed into a project. They SUBMIT to Group B standards.
 
 | Component | ID | Version |
 |-----------|----|---------|
-| **Toolkit** | -- | **v1.8.3** |
+| **Toolkit** | -- | **v1.9.0** |
 | MARKDOWN_STANDARD | STD-DOC-002 | v2.1.5 |
 | UNICODE_POLICY | STD-DOC-003 | v2.1.3 |
 | README_TEMPLATE | STD-DOC-004 | v2.1 |
 | CODE_EXAMPLES_GUIDE | STD-DOC-006 | v1.0 |
 | REPRODUCIBILITY-STANDARD | STD-ENV-001 | v1.0 |
+| ZAI_INTEGRATION_STANDARD | STD-ENV-002 | v1.1 |
 | IMPLEMENTATION_ORDER | STD-ARCH-001 | v2.1 |
 | STANDARD_ID_SYSTEM | STD-META-001 | v1.0 |
 | FRONTEND_STANDARD | STD-FE-001 | v1.3 |
@@ -286,6 +289,7 @@ This toolkit is provided as-is for use with AI-driven development workflows.
 
 | Version | Changes |
 |---------|---------|
+| **v1.9.0** | Added z-ai-web-dev-sdk skill for AI SDK integration; updated ZAI_INTEGRATION_STANDARD to v1.1 with SDK usage rules; added Z.ai SDK Integration section to AGENT_RULES |
 | **v1.8.3** | Unified file naming: removed language suffixes and versions from filenames; updated all workflows; added deadlock prevention rules to GITHUB_STANDARD |
 | **v1.8.2** | Split into two repositories: agent-toolkit (EN) + agent-toolkit-ru (RU); removed emoji from all standards |
 | **v1.8.1** | Full Russian localization: all 13 standards now have EN/RU versions (26 total files); complete parity between languages |
