@@ -4,13 +4,13 @@
 
 # Agent Toolkit
 
-[![Version: 1.9.0](https://img.shields.io/badge/Version-1.9.0-blue.svg)]()
+[![Version: 1.9.1](https://img.shields.io/badge/Version-1.9.1-blue.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status: Pre-release](https://img.shields.io/badge/Status-Pre--release-orange.svg)]()
 
 **Standards + Skills + Rules** for AI-driven development
 
-> Toolkit version: **v1.9.0** | Language: **English**
+> Toolkit version: **v1.9.1** | Language: **English**
 
 ---
 
@@ -235,7 +235,7 @@ These are deployed into a project. They SUBMIT to Group B standards.
 
 | Component | ID | Version |
 |-----------|----|---------|
-| **Toolkit** | -- | **v1.9.0** |
+| **Toolkit** | -- | **v1.9.1** |
 | MARKDOWN_STANDARD | STD-DOC-002 | v2.1.5 |
 | UNICODE_POLICY | STD-DOC-003 | v2.1.3 |
 | README_TEMPLATE | STD-DOC-004 | v2.1 |
@@ -308,6 +308,7 @@ This toolkit is provided as-is for use with AI-driven development workflows.
 
 | Version | Changes |
 |---------|---------|
+| **v1.9.1** | Added Read-Only Usage rule (Section 0) to AGENT_RULES.md; agents must never commit changes to agent-toolkit after cloning
 | **v1.9.0** | Added z-ai-web-dev-sdk skill for AI SDK integration; updated ZAI_INTEGRATION_STANDARD to v1.1 with SDK usage rules; added Z.ai SDK Integration section to AGENT_RULES |
 | **v1.8.3** | Unified file naming: removed language suffixes and versions from filenames; updated all workflows; added deadlock prevention rules to GITHUB_STANDARD |
 | **v1.8.2** | Split into two repositories: agent-toolkit (EN) + agent-toolkit-ru (RU); removed emoji from all standards |

@@ -1,13 +1,27 @@
 # Agent Rules
 
-> Toolkit version: **v1.8.3**
+> Toolkit version: **v1.9.1**
 >
 > Mandatory rules for AI agents working with this toolkit.
 > Read before starting work on any project.
 
 ---
 
-## 0. Onboarding Protocol
+## 0. Read-Only Usage
+
+> **CRITICAL**: Agent Toolkit is a reference, not part of your project code.
+
+When cloned into a project, agent-toolkit must be treated as read-only:
+
+1. **NEVER commit changes to agent-toolkit/**
+2. **NEVER modify files inside agent-toolkit/**
+3. **Add to .gitignore**: `agent-toolkit/`
+
+If the toolkit needs updates, clone a fresh copy from the repository.
+
+---
+
+## 1. Onboarding Protocol
 
 When entering a project (new chat, session restart, context loss),
 you MUST complete the onboarding protocol before starting any work:
