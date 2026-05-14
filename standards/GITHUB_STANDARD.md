@@ -1,7 +1,7 @@
 # Standard: GitHub v1.0
 
 > ID: STD-GIT-001
-> Version: 1.2
+> Version: 1.3
 > Level: **[C] Critical**
 > Reference: https://www.conventionalcommits.org/
 
@@ -566,6 +566,200 @@ git reset origin/main
 [ ] git add worklog.md && git commit && git push (if worklog updated)
 ```
 
+### 10.9 Network Failure Recovery
+
+Network interruptions during git operations can leave the repository in a locked or inconsistent state. This section describes how to recover safely.
+
+#### 10.9.1 Signs of Network Failure During Git Operation
+
+| Sign | Meaning | Detection |
+|------|---------|-----------|
+| Command hangs > 30 seconds | Network timeout | No output, process stuck |
+| `fatal: unable to access` | Connection lost | Error message with URL |
+| `Connection timed out` | Server unreachable | Error message |
+| `index.lock` exists | Interrupted operation | `ls .git/index.lock` |
+| `Could not resolve host` | DNS failure | Error message |
+
+#### 10.9.2 Safe Interruption of Hung Git Operations
+
+If a git command hangs (no response for 30+ seconds):
+
+```bash
+# Step 1: Do NOT force-kill the process immediately
+# Wait 10-15 seconds more, it might recover
+
+# Step 2: If still stuck, find the process
+ps aux | grep git
+
+# Step 3: Graceful termination first
+kill <pid>  # SIGTERM
+
+# Step 4: Wait 5 seconds
+sleep 5
+
+# Step 5: Force kill only if still running
+kill -9 <pid>  # SIGKILL (last resort)
+```
+
+**CRITICAL:** Never use `kill -9` as first action — it leaves `.lock` files.
+
+#### 10.9.3 Removing Git Lock Files
+
+After interrupting a git operation, lock files may remain:
+
+```bash
+# Check for lock files
+ls -la .git/*.lock 2>/dev/null
+ls -la .git/objects/*.lock 2>/dev/null
+ls -la .git/refs/*.lock 2>/dev/null
+
+# Remove index lock (safe if no other git process running)
+rm -f .git/index.lock
+
+# Remove object locks
+rm -f .git/objects/*.lock
+
+# Remove ref locks
+rm -f .git/refs/**/*.lock
+
+# Verify no git processes running
+ps aux | grep git
+```
+
+**Rule:** Only remove `.lock` files when NO other git process is running.
+
+#### 10.9.4 Repository Integrity Check After Failure
+
+After network recovery, verify repository integrity:
+
+```bash
+# Step 1: Check repository integrity
+git fsck --full
+
+# Expected output:
+# "dangling commit" or "dangling blob" = OK (orphaned objects)
+# "missing blob" or "corrupt" = PROBLEM (requires repair)
+
+# Step 2: Check if HEAD is valid
+git rev-parse HEAD
+
+# Step 3: Verify working tree
+git status
+
+# Step 4: If status shows errors, re-read index
+git read-tree HEAD
+
+# Step 5: Hard reset if needed (WARNING: loses uncommitted changes)
+git reset --hard HEAD
+```
+
+#### 10.9.5 Recovery Scenarios
+
+**Scenario A: Push interrupted mid-transfer**
+
+```bash
+# 1. Check what was pushed
+git log origin/main..HEAD
+
+# 2. Remove any partial upload locks
+rm -f .git/objects/pack/*.lock
+
+# 3. Retry push
+git push origin main
+
+# If push fails with "non-fast-forward":
+git push --force-with-lease origin main
+```
+
+**Scenario B: Fetch/Pull interrupted**
+
+```bash
+# 1. Remove fetch locks
+rm -f .git/FETCH_HEAD
+rm -f .git/objects/pack/*.lock
+
+# 2. Re-fetch
+git fetch origin
+
+# 3. Then merge/rebase as needed
+git merge origin/main
+# OR
+git rebase origin/main
+```
+
+**Scenario C: Clone interrupted**
+
+```bash
+# If clone was interrupted, delete partial clone and restart
+cd ..
+rm -rf <repo-name>
+git clone <url>
+```
+
+**Scenario D: Merge interrupted by network (during pull)**
+
+```bash
+# 1. Check merge state
+ls .git/MERGE_HEAD
+
+# 2. If exists and you want to abort:
+rm -f .git/MERGE_HEAD .git/MERGE_MSG .git/MERGE_MODE
+git reset --hard HEAD
+
+# 3. If you want to continue:
+git merge --continue
+```
+
+#### 10.9.6 Git Timeout Configuration
+
+Configure git to fail faster on network issues instead of hanging indefinitely:
+
+```bash
+# Set timeout for git operations (seconds)
+git config --global http.lowSpeedLimit 1000
+git config --global http.lowSpeedTime 10
+
+# Connection timeout (seconds)
+# Note: git uses curl, so this helps:
+git config --global http.postBuffer 524288000
+
+# For SSH connections, add to ~/.ssh/config:
+# Host github.com
+#     ConnectTimeout 10
+#     ServerAliveInterval 5
+#     ServerAliveCountMax 3
+```
+
+#### 10.9.7 Offline Work Protocol
+
+When you know internet is unstable or unavailable:
+
+```bash
+# Before going offline:
+git fetch --all
+git status  # ensure clean
+
+# Work offline (commits are local)
+git add -A
+git commit -m "work offline checkpoint"
+
+# When back online:
+git push origin main
+```
+
+**Critical:** Never end session with uncommitted work + no internet. Wait for connection or document the risk.
+
+#### 10.9.8 Network Failure Prevention Checklist
+
+```
+[ ] Git timeouts configured
+[ ] No `.lock` files present before starting work
+[ ] Clean working tree (git status) before network operations
+[ ] SSH config has timeouts set
+[ ] Working on feature branch (not main) for risky operations
+[ ] Recovery tag created before large operations
+```
+
 ---
 
 ## 11. Log Everything
@@ -589,6 +783,7 @@ After every git operation, log to `worklog.md`:
 | 1.0 | 2025-01 | Initial version: Conventional Commits, branching, forbidden operations, backup rules |
 | 1.1 | 2025-05 | Added Checkpoint System (WIP, Milestone, Pre-risk, Recovery Tags); systematic versioning during work |
 | 1.2 | 2025-05 | Added Deadlock Problem section, mandatory push rules, recovery procedures, violation signs, AI agent checklist |
+| 1.3 | 2025-05 | Added Network Failure Recovery section: signs of failure, safe interruption, lock removal, integrity check, timeout configuration, offline protocol |
 
 ---
 
