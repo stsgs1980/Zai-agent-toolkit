@@ -1,7 +1,7 @@
 # Standard: GitHub v1.0
 
 > ID: STD-GIT-001
-> Version: 1.4
+> Version: 1.5
 > Level: **[C] Critical**
 > Reference: https://www.conventionalcommits.org/
 
@@ -1049,6 +1049,102 @@ echo "If ANY warnings above: RESOLVE FIRST"
 | Auto-file conflict | Accept ours | `git checkout --ours <file>` |
 | Hook blocking | Bypass hook | `git commit --no-verify` |
 
+### 10.11 Post-Deadlock Clone Recovery
+
+After a git deadlock, another agent might clone the repository **inside** the broken project instead of **replacing** it. This creates a nested structure that breaks everything.
+
+#### 10.11.1 The Nested Project Trap
+
+```
+WRONG (nested project - NOTHING WORKS):
+/home/z/my-project/                          ← old broken project (git deadlock)
+  ├── .git/                                  ← BLOCKED rebase
+  ├── src/
+  ├── package.json
+  └── Z.Code-Guide-Coding-Tool-Helper/       ← clone INSIDE old project!
+       ├── .git/                             ← clean git
+       ├── src/
+       └── package.json
+
+CORRECT (clean replacement):
+/home/z/my-project/                          ← clean clone (replacement)
+  ├── .git/                                  ← clean git
+  ├── src/
+  └── package.json
+```
+
+**Why nested projects fail:**
+- Dev server won't find correct paths
+- Port 3000 won't bind correctly
+- Imports resolve to wrong node_modules
+- Environment files not found
+- Git operations affect wrong repository
+
+#### 10.11.2 Correct Procedure After Deadlock
+
+**Step 1: Verify if project is corrupted**
+
+```bash
+# Check for deadlock state
+ls /home/z/my-project/.git/rebase-merge/ 2>/dev/null && echo "DEADLOCKED"
+ls /home/z/my-project/.git/MERGE_HEAD 2>/dev/null && echo "DEADLOCKED"
+
+# Check for nested project (WRONG structure)
+ls -d /home/z/my-project/*/  # should show src/, not another project!
+```
+
+**Step 2: If corrupted, DELETE ENTIRE directory and re-clone**
+
+```bash
+# DELETE the entire corrupted project
+rm -rf /home/z/my-project
+
+# Clone DIRECTLY to the target path (NOT as subdirectory)
+git clone https://<token>@github.com/<owner>/<repo>.git /home/z/my-project
+
+# Verify correct structure
+ls /home/z/my-project/
+# Should show: src/, package.json, .git/ — NOT another project folder!
+
+# Setup
+cd /home/z/my-project
+bun install
+cp .env.example .env
+bun run db:push  # if applicable
+bun run dev
+```
+
+#### 10.11.3 The Critical Difference
+
+| Wrong | Correct |
+|-------|---------|
+| `git clone <url>` (creates subdirectory) | `git clone <url> /home/z/my-project` |
+| `cd /home/z/my-project && git clone <url>` | `rm -rf /home/z/my-project && git clone <url> /home/z/my-project` |
+
+**Key insight:** Always specify the target directory explicitly when cloning after deadlock:
+
+```bash
+# WRONG - creates nested project
+git clone https://github.com/user/repo.git
+# Result: /home/z/my-project/repo/  ← WRONG!
+
+# CORRECT - replaces old project
+git clone https://github.com/user/repo.git /home/z/my-project
+# Result: /home/z/my-project/  ← CORRECT!
+```
+
+#### 10.11.4 Cleanup Checklist After Deadlock Recovery
+
+```
+[ ] Old directory completely removed (rm -rf)
+[ ] Clone command specifies target path explicitly
+[ ] No nested project structure exists
+[ ] .git/ is at correct level (/home/z/my-project/.git/)
+[ ] package.json is at correct level
+[ ] bun install runs successfully
+[ ] bun run dev starts on correct port
+```
+
 ---
 
 ## 11. Log Everything
@@ -1074,6 +1170,7 @@ After every git operation, log to `worklog.md`:
 | 1.2 | 2025-05 | Added Deadlock Problem section, mandatory push rules, recovery procedures, violation signs, AI agent checklist |
 | 1.3 | 2025-05 | Added Network Failure Recovery section: signs of failure, safe interruption, lock removal, integrity check, timeout configuration, offline protocol |
 | 1.4 | 2025-05 | Added Sandbox Git Safety Rules: middleware hook deadlock, absolute prohibitions, pre-command checklist, remote ahead decision tree, rebase deadlock recovery, auto-generated files, stash safety, detached HEAD, git hooks, GPG signing, emergency recovery summary |
+| 1.5 | 2025-05 | Added Post-Deadlock Clone Recovery section: nested project trap, correct clone procedure after deadlock, cleanup checklist |
 
 ---
 

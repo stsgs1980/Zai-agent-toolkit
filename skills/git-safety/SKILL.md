@@ -5,10 +5,12 @@ description: >
   Prevents complete system deadlock caused by middleware hooks that block all
   commands when git enters conflict state. Covers: middleware deadlock mechanism,
   absolute prohibitions, pre-command checklist, remote ahead decision tree,
-  rebase deadlock recovery, network failure handling, auto-generated file conflicts.
+  rebase deadlock recovery, network failure handling, auto-generated file conflicts,
+  nested clone trap after deadlock.
   Activate whenever: performing git operations, encountering "remote ahead" situation,
   seeing git conflict or lock files, after session restart with dirty git state,
-  before ANY git pull/rebase/merge operation, when git commands hang or fail.
+  before ANY git pull/rebase/merge operation, when git commands hang or fail,
+  after deadlock when cloning repository.
   CRITICAL: Failure to follow this skill can cause UNRECOVERABLE deadlock requiring
   session restart and potential data loss.
 ---
