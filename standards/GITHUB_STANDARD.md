@@ -1,7 +1,7 @@
 # Standard: GitHub v1.0
 
 > ID: STD-GIT-001
-> Version: 1.3
+> Version: 1.4
 > Level: **[C] Critical**
 > Reference: https://www.conventionalcommits.org/
 
@@ -760,6 +760,295 @@ git push origin main
 [ ] Recovery tag created before large operations
 ```
 
+### 10.10 Sandbox Git Safety Rules
+
+This section covers additional safety rules specific to Z.ai sandbox environment, addressing the middleware hook mechanism and other sandbox-specific risks.
+
+#### 10.10.1 Middleware Hook Deadlock Mechanism
+
+Z.ai sandbox infrastructure uses a **pre-command hook** that intercepts ALL shell commands. This hook:
+
+1. Runs `git status` before executing ANY command
+2. If `git status` returns non-zero (merge conflict, rebase in progress, dirty state) — **command is BLOCKED**
+3. Blocking applies to ALL tools: Bash, Read, Write, Edit, Glob, Grep, etc.
+4. Even `echo`, `ls`, `rm` are blocked when git is in conflict state
+
+**This creates absolute deadlock:**
+```
+git conflict -> middleware blocks all commands
+-> cannot run recovery commands
+-> cannot fix conflict
+-> DEADLOCK
+```
+
+**Recovery from middleware deadlock is ONLY possible via:**
+- Session restart (if code was pushed to remote)
+- Manual intervention by platform administrators
+- Using a bypass terminal (if available in UI)
+
+#### 10.10.2 Absolute Prohibitions for Z.ai Sandbox
+
+These operations are **ABSOLUTELY FORBIDDEN** in Z.ai sandbox:
+
+| Operation | Why | Consequence |
+|-----------|-----|-------------|
+| `git pull --rebase` | Creates rebase conflict | Middleware deadlock |
+| `git pull` (without prior fetch) | Unexpected merge conflict | Middleware deadlock |
+| `git rebase` on dirty tree | Cannot abort, conflict stuck | Middleware deadlock |
+| `git stash` with conflict markers | Stash apply fails | Potential deadlock |
+| `git merge` without commit | Leaves merge state | Middleware deadlock |
+| Long-running rebase | Session timeout = stuck rebase | Middleware deadlock |
+| Editing files during rebase/merge | Conflict resolution required | Extended deadlock risk |
+
+**When in doubt, the safe path is ALWAYS:**
+```bash
+git push --force-with-lease origin main
+```
+
+#### 10.10.3 Pre-Command Checklist (MUST run before any git operation)
+
+Before executing ANY git operation, verify:
+
+```bash
+# 1. Check current state
+git status
+# Expected: "nothing to commit, working tree clean" OR known changes
+
+# 2. Check for lock files
+ls .git/*.lock 2>/dev/null && echo "LOCK EXISTS - remove first"
+ls .git/rebase-merge/ 2>/dev/null && echo "REBASE IN PROGRESS - abort first"
+
+# 3. Check remote state
+git fetch origin
+git log HEAD..origin/main --oneline
+# If output NOT empty: remote is ahead
+
+# 4. Check for uncommitted work
+git diff --stat
+# If output NOT empty: working tree dirty
+```
+
+**Decision matrix:**
+
+| State | Action |
+|-------|--------|
+| Clean tree, remote up-to-date | Safe to proceed |
+| Dirty tree, no remote changes | Commit + push, then proceed |
+| Remote ahead, clean tree | `git push --force-with-lease` (your project) |
+| Remote ahead, dirty tree | Commit + `git push --force-with-lease` |
+| Lock files exist | Remove locks, verify clean, then proceed |
+| Rebase/merge in progress | ABORT first: `git rebase --abort` or `git merge --abort` |
+
+#### 10.10.4 Remote Ahead Decision Tree
+
+When `git log HEAD..origin/main` shows remote has commits:
+
+```
+REMOTE AHEAD?
+    |
+    v
+Is this YOUR project (solo work)?
+    |
+    +-- YES --> git push --force-with-lease origin main
+    |           (your local state is authoritative)
+    |
+    +-- NO --> Is remote change important?
+                |
+                +-- YES --> git fetch origin
+                |           git log origin/main
+                |           # Review changes
+                |           git reset --hard origin/main
+                |           # Then reapply your work
+                |
+                +-- NO --> git push --force-with-lease origin main
+                           (your work overrides)
+```
+
+#### 10.10.5 Rebase Deadlock Recovery
+
+If rebase deadlock occurred (middleware blocked all commands):
+
+**You CANNOT recover without session restart.**
+
+Before restart, remember:
+- All local uncommitted work WILL be lost
+- Unpushed commits MAY be lost
+
+**After restart (fresh session):**
+```bash
+# 1. Check state
+ls .git/rebase-merge/ 2>/dev/null && echo "REBASE STILL EXISTS"
+
+# 2. Abort rebase immediately
+git rebase --abort 2>/dev/null || rm -rf .git/rebase-merge .git/rebase-apply
+
+# 3. Reset to clean state
+git reset --hard HEAD
+
+# 4. Sync with remote
+git fetch origin
+git reset --hard origin/main
+
+# 5. Verify clean
+git status
+
+# 6. Push if needed
+git push --force-with-lease origin main
+```
+
+#### 10.10.6 Auto-Generated Files Conflict Prevention
+
+Files like `*.log`, `dev.log`, `*.db` often cause merge conflicts because they change automatically.
+
+**Prevention:**
+```bash
+# Add to .gitignore
+echo "*.log" >> .gitignore
+echo "dev.log" >> .gitignore
+echo "*.db" >> .gitignore
+
+# If already tracked, remove from git
+git rm --cached *.log
+git rm --cached dev.log
+
+# Commit the fix
+git add .gitignore
+git commit -m "chore: ignore auto-generated files"
+git push origin main
+```
+
+**If conflict already happened on auto-generated file:**
+```bash
+# Accept your version (usually safe for logs)
+git checkout --ours dev.log
+git add dev.log
+git commit -m "fix: resolve log file conflict"
+git push origin main
+```
+
+#### 10.10.7 Stash Safety in Sandbox
+
+`git stash` can create problems in sandbox:
+
+| Stash Risk | Why | Prevention |
+|------------|-----|------------|
+| Stash with conflict | Apply fails | Never stash during conflict |
+| Stash + session end | Stash lost | Push instead of stash |
+| Stash pop on dirty tree | Unexpected merge | Clean tree before pop |
+
+**Safe stash workflow:**
+```bash
+# Only stash clean changes
+git status  # verify what will be stashed
+git stash push -m "descriptive message"
+
+# Immediately commit to preserve
+git stash pop
+git add -A
+git commit -m "wip: stashed changes"
+git push origin main
+```
+
+#### 10.10.8 Detached HEAD Recovery
+
+Detached HEAD can occur after:
+- Checking out a specific commit
+- Checking out a tag
+- Failed rebase continuation
+
+**Recovery:**
+```bash
+# 1. Identify current state
+git branch -v
+git log --oneline -5
+
+# 2. If work needs saving
+git checkout -b rescue-branch
+git push origin rescue-branch
+
+# 3. Return to main
+git checkout main
+git pull origin main
+
+# 4. Merge or reapply work
+git merge rescue-branch
+# OR manually reapply
+```
+
+#### 10.10.9 Git Hooks Interference
+
+Git hooks in `.git/hooks/` can interfere with automated operations:
+
+| Hook | Potential Issue | Solution |
+|------|-----------------|----------|
+| `pre-commit` | Blocks automated commits | Disable or make idempotent |
+| `pre-push` | Blocks force push | Accept or modify hook |
+| `commit-msg` | Rejects commit format | Follow format or disable |
+
+**Bypass hooks when necessary:**
+```bash
+git commit --no-verify -m "message"
+git push --no-verify origin main
+```
+
+**Warning:** Only bypass hooks when you understand the consequences.
+
+#### 10.10.10 GPG Signing in Sandbox
+
+GPG signing may block commits in sandbox if not configured:
+
+```bash
+# Check if GPG signing is enabled
+git config commit.gpgsign
+
+# If "true" and causing issues:
+git config --global commit.gpgsign false
+
+# Or configure GPG properly
+git config --global gpg.program gpg2
+git config --global user.signingkey <key-id>
+```
+
+#### 10.10.11 Comprehensive Pre-Operation Checklist
+
+Run this before ANY complex git operation:
+
+```bash
+# === STATE CHECK ===
+echo "=== Git State Check ==="
+git status
+ls .git/*.lock 2>/dev/null && echo "WARNING: Lock files exist"
+ls .git/rebase-merge/ 2>/dev/null && echo "WARNING: Rebase in progress"
+ls .git/MERGE_HEAD 2>/dev/null && echo "WARNING: Merge in progress"
+
+# === REMOTE SYNC ===
+echo "=== Remote Sync Check ==="
+git fetch origin
+git log HEAD..origin/main --oneline
+git log origin/main..HEAD --oneline
+
+# === WORKING TREE ===
+echo "=== Working Tree ==="
+git diff --stat
+git diff --cached --stat
+
+# === DECISION ===
+echo "=== Safe to proceed? ==="
+echo "If ANY warnings above: RESOLVE FIRST"
+```
+
+#### 10.10.12 Emergency Recovery Summary
+
+| Situation | Immediate Action | Recovery Command |
+|-----------|-----------------|------------------|
+| Rebase deadlock | Session restart | `git rebase --abort` |
+| Merge deadlock | Session restart | `git merge --abort` |
+| Lock files | Remove locks | `rm -f .git/*.lock` |
+| Remote ahead (solo) | Force push | `git push --force-with-lease origin main` |
+| Detached HEAD | Create branch | `git checkout -b rescue && git push` |
+| Auto-file conflict | Accept ours | `git checkout --ours <file>` |
+| Hook blocking | Bypass hook | `git commit --no-verify` |
+
 ---
 
 ## 11. Log Everything
@@ -784,6 +1073,7 @@ After every git operation, log to `worklog.md`:
 | 1.1 | 2025-05 | Added Checkpoint System (WIP, Milestone, Pre-risk, Recovery Tags); systematic versioning during work |
 | 1.2 | 2025-05 | Added Deadlock Problem section, mandatory push rules, recovery procedures, violation signs, AI agent checklist |
 | 1.3 | 2025-05 | Added Network Failure Recovery section: signs of failure, safe interruption, lock removal, integrity check, timeout configuration, offline protocol |
+| 1.4 | 2025-05 | Added Sandbox Git Safety Rules: middleware hook deadlock, absolute prohibitions, pre-command checklist, remote ahead decision tree, rebase deadlock recovery, auto-generated files, stash safety, detached HEAD, git hooks, GPG signing, emergency recovery summary |
 
 ---
 
