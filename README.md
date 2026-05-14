@@ -26,6 +26,25 @@ It solves three problems:
 
 ---
 
+## Important: Read-Only Usage
+
+> Agent Toolkit is intended for read-only use as a reference.
+
+When cloning into your project, **add to `.gitignore`**:
+
+```gitignore
+# Agent Toolkit — read-only reference
+agent-toolkit/
+```
+
+### Why this matters:
+
+1. **Toolkit is a reference**, not part of your code
+2. **Agents should not commit changes** to agent-toolkit
+3. **Avoid conflicts** when updating the toolkit
+
+---
+
 ## Quick Start
 
 ### Option A: Full Toolkit (recommended)
