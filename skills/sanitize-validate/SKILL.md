@@ -1,5 +1,6 @@
 ---
 name: sanitize-validate
+version: 1.0
 description: >
   Input sanitization, validation, and security hardening for user-facing applications.
   Use this skill when the user works with user input, form data, API request handling,

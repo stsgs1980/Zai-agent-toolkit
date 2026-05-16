@@ -678,13 +678,15 @@ git push --force-with-lease origin main
 rm -f .git/FETCH_HEAD
 rm -f .git/objects/pack/*.lock
 
-# 2. Re-fetch
+# 2. Re-fetch (safe — does not modify working tree)
 git fetch origin
 
-# 3. Then merge/rebase as needed
-git merge origin/main
-# OR
-git rebase origin/main
+# 3. Reset to remote state (SAFE for sandbox — no merge conflict risk)
+git reset --hard origin/main
+
+# IMPORTANT: Do NOT use `git merge origin/main` or `git rebase origin/main`
+# in Z.ai sandbox. These can create merge conflicts that trigger middleware
+# deadlock. Always use `git reset --hard origin/main` instead.
 ```
 
 **Scenario C: Clone interrupted**
@@ -1111,7 +1113,7 @@ cd /home/z/my-project
 bun install
 cp .env.example .env
 bun run db:push  # if applicable
-bun run dev
+npx next dev -p 3000
 ```
 
 #### 10.11.3 The Critical Difference
@@ -1142,7 +1144,7 @@ git clone https://github.com/user/repo.git /home/z/my-project
 [ ] .git/ is at correct level (/home/z/my-project/.git/)
 [ ] package.json is at correct level
 [ ] bun install runs successfully
-[ ] bun run dev starts on correct port
+[ ] npx next dev -p 3000 starts on correct port
 ```
 
 ---

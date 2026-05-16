@@ -37,6 +37,21 @@ All projects MUST reside in `/home/z/my-project/`:
 - Output files go to `/home/z/my-project/download/`
 - Dev server logs go to `/tmp/zdev.log`
 
+### 3.1 Absolute Path Exception
+
+`/home/z/my-project/` is the ONLY absolute path allowed in Z.ai sandbox code. All other absolute paths are prohibited by REPRODUCIBILITY-STANDARD (STD-ENV-001).
+
+| Path | Status | Reason |
+|------|--------|--------|
+| `/home/z/my-project/` | Allowed | Designated sandbox working directory |
+| `/home/z/my-project/download/` | Allowed | Designated output directory |
+| `/tmp/zdev.log` | Allowed | Dev server log (not in source code) |
+| `/tmp/` (for backups) | Allowed | Temporary backups (not committed) |
+| `/home/user/`, `/Users/`, `C:\` | Prohibited | Platform-specific, breaks reproducibility |
+| `http://localhost:` in source | Prohibited | Use relative paths or XTransformPort |
+
+Relative paths are preferred when `process.cwd()` resolves to `/home/z/my-project/`. Use `path.resolve(process.cwd(), ...)` for database and file paths.
+
 ---
 
 ## 4. Git Operations in Sandbox

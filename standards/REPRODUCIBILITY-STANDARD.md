@@ -4,8 +4,10 @@
 > Version: 1.0
 > Level: **[C] Critical**
 
-**`git clone` + `bun install` + `bun run dev` = working application.**
+**`git clone` + `bun install` + `npx next dev -p 3000` = working application.**
 Always. Everywhere. On any machine. Without exceptions.
+
+**Note on package manager vs. runtime:** Use `bun install` for dependency installation (fast, reliable). Use `npx next dev` for dev server (not `bun run dev` — the Bun wrapper for Next.js is unstable in sandbox environments). Use `bun run` for other scripts (lint, build, test).
 
 ---
 
@@ -108,7 +110,7 @@ catch (error) {
 
 - [ ] All from commit checklist
 - [ ] `.env.example` exists with all variables
-- [ ] `bun install && bun run dev` on clean clone -- works
+- [ ] `bun install && npx next dev -p 3000` on clean clone -- works
 - [ ] Dark theme works
 - [ ] All API routes return correct statuses
 - [ ] Tests (if present) -- pass without errors
@@ -159,7 +161,62 @@ PrismaClient uses `connection_limit=1&pool_timeout=0` to avoid P2025 errors (dat
 
 ---
 
-### Rule 6. AI Prompt Language Standard
+### Rule 6. Database Migration Rules for Z.ai Sandbox
+
+Database migrations in Z.ai sandbox require special handling due to process mortality and shared filesystem constraints.
+
+**Use `prisma db push` for development (NOT `prisma migrate`):**
+
+```typescript
+// CORRECT for sandbox development
+bunx prisma db push        // Schema-first: pushes schema to DB directly
+bunx prisma generate       // Regenerates Prisma Client
+
+// PROHIBITED in sandbox for development
+bunx prisma migrate dev    // Creates migration files, can leave DB in partial state
+bunx prisma migrate deploy // Production only
+```
+
+**Why `db push` over `migrate` in sandbox:**
+
+| Aspect | `db push` | `migrate dev` |
+|--------|-----------|---------------|
+| Creates migration files | No | Yes |
+| Can be run repeatedly | Yes (idempotent) | No (creates new migration each time) |
+| Risk of partial state | Low | High (if interrupted) |
+| Suitable for prototype | Yes | No |
+| Suitable for production | No | Yes |
+
+**Recovery from failed migration:**
+
+```bash
+# If prisma migrate dev was interrupted and DB is in partial state:
+rm -f prisma/dev.db prisma/dev.db-journal
+bunx prisma db push
+bunx prisma generate
+```
+
+**Migration workflow for production:**
+
+```bash
+# Create migration (NOT in sandbox)
+bunx prisma migrate dev --name description_of_change
+
+# Apply migrations (in production/CI)
+bunx prisma migrate deploy
+```
+
+**Schema change checklist:**
+
+- [ ] Update `prisma/schema.prisma`
+- [ ] Run `bunx prisma db push` (sandbox) or `bunx prisma migrate dev --name <desc>` (production)
+- [ ] Run `bunx prisma generate`
+- [ ] Verify: `bunx prisma studio` or API test
+- [ ] Commit `schema.prisma` and `prisma/migrations/` (if using migrate)
+
+---
+
+### Rule 7. AI Prompt Language Standard
 
 All AI system prompts are written **in Russian** (except instruction extraction prompt -- in English per No-Unicode Policy).
 
@@ -172,7 +229,7 @@ All AI system prompts are written **in Russian** (except instruction extraction 
 
 ---
 
-### Rule 7. Counter Synchronization
+### Rule 8. Counter Synchronization
 
 All counters in sidebar synchronized with real DB state + localStorage.
 
@@ -185,13 +242,13 @@ All counters in sidebar synchronized with real DB state + localStorage.
 
 ---
 
-### Rule 8. Safe Delete Policy
+### Rule 9. Safe Delete Policy
 
 Deleting any entity requires **explicit confirmation** via AlertDialog. All 7 entities. Without exceptions.
 
 ---
 
-### Rule 9. localStorage Persistence
+### Rule 10. localStorage Persistence
 
 Data not stored in DB is saved to localStorage with keys `wiki-codex:*`:
 
@@ -201,14 +258,14 @@ Data not stored in DB is saved to localStorage with keys `wiki-codex:*`:
 
 ---
 
-### Rule 10. JSON-Only AI Responses
+### Rule 11. JSON-Only AI Responses
 
 All AI endpoints use **parsing protection**: strip markdown fences, regex extract JSON.
 If JSON not recognized -- fallback value, error not propagated up.
 
 ---
 
-### Rule 11. Push Policy
+### Rule 12. Push Policy
 
 **Push after every significant change** -- don't accumulate half-finished work in local branch.
 

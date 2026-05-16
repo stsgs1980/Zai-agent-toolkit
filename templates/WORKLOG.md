@@ -1,7 +1,15 @@
-# Project Worklog
+# Worklog
 
-> Unified journal of all agent work on the project.
-> Path: /home/z/my-project/worklog.md
+## Current State
+
+> Auto-updated at the end of each task. Read this section first when resuming work.
+
+- **Active task**: --none--
+- **Task ID**: --none--
+- **Dev server**: unknown
+- **Last commit**: --none--
+- **Blocked by**: --none--
+- **Known issues**: --none--
 
 ---
 
@@ -23,7 +31,7 @@
 
 ---
 
-## Work History
+## History
 
----
-Built with: Next.js 16 + TypeScript + Tailwind CSS
+<!-- Append new entries below this line. NEVER delete or modify existing entries. -->
+<!-- Use the format described in README_WORKLOG.md -->

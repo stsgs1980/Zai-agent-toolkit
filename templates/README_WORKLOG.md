@@ -28,13 +28,34 @@
 ```text
 /home/z/my-project/worklog.md
 |
-+-- Header and description
++-- Current State (auto-updated, read first when resuming)
+|   +-- Active task, Task ID, Dev server status
+|   +-- Last commit, Blocked by, Known issues
 +-- Task ID table
 +-- Work history
     +-- Agent 1 entry
     +-- Agent 2 entry
     +-- ...
 ```
+
+### Current State Section
+
+The top of worklog.md contains a structured "Current State" block that enables fast context recovery after session breaks. This section MUST be updated at the end of each task:
+
+```markdown
+## Current State
+
+> Auto-updated at the end of each task. Read this section first when resuming work.
+
+- **Active task**: --none--
+- **Task ID**: --none--
+- **Dev server**: unknown
+- **Last commit**: --none--
+- **Blocked by**: --none--
+- **Known issues**: --none--
+```
+
+When the `session-resume` skill activates, it reads this section first to understand the project state before reviewing the full history.
 
 ---
 

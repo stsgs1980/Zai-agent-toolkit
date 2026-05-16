@@ -1,5 +1,6 @@
 ---
 name: anti-monolith
+version: 1.0
 description: >
   Anti-monolith standard for React/Next.js projects. Enforces modular component architecture,
   file size limits, single-responsibility components, custom hook extraction, data-layer separation,

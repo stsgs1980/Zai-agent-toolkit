@@ -1,5 +1,6 @@
 ---
 name: z-ai-web-dev-sdk
+version: 1.0
 description: >
   Comprehensive integration guide for Z.ai Web Development SDK (z-ai-web-dev-sdk).
   Covers chat completions, image generation, web search, function invocation,

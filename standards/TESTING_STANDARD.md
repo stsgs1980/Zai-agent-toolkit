@@ -489,6 +489,90 @@ export default function () {
 
 ---
 
+## 11. Testing in Z.ai Sandbox
+
+The Z.ai sandbox environment has specific constraints that affect testing strategy. This section provides realistic guidelines for projects developed within the sandbox.
+
+### 11.1. Sandbox Testing Constraints
+
+| Constraint | Impact | Mitigation |
+|-----------|--------|------------|
+| Dev server dies after ~5 min | E2E tests cannot rely on long-running server | Restart server before each E2E suite |
+| Shared filesystem | Test databases may conflict across sessions | Use unique temp directories per session |
+| No persistent processes | Watch mode unreliable | Run tests in single-run mode |
+| Limited resources | Heavy test suites may timeout | Prioritize unit tests, minimize E2E |
+| No headless browser by default | Playwright may need setup | Use `npx playwright install --with-deps` |
+
+### 11.2. Adjusted Coverage Targets for Sandbox
+
+| Layer | Standard Target | Sandbox Target | Reason |
+|-------|----------------|----------------|--------|
+| Unit | 80-90% | 60% minimum | Prototype/MVP stage, focus on critical paths |
+| Integration | 60-75% | 40% minimum | API route testing with in-memory SQLite |
+| E2E | Critical paths | Optional | Setup overhead high, manual testing acceptable |
+
+### 11.3. Recommended Testing Workflow in Sandbox
+
+```bash
+# 1. Unit tests (fast, no server needed)
+bunx vitest run --reporter=verbose
+
+# 2. Integration tests (use test database)
+DATABASE_URL="file:./test.db" bunx vitest run --config vitest.integration.ts
+
+# 3. E2E tests (if Playwright installed)
+npx playwright install --with-deps 2>/dev/null
+npx playwright test
+```
+
+### 11.4. Test Database Strategy
+
+For integration tests in sandbox, use a temporary SQLite database:
+
+```typescript
+// test/helpers/test-db.ts
+import { execSync } from 'child_process'
+import { existsSync, unlinkSync } from 'fs'
+
+const TEST_DB_PATH = '/tmp/test-' + Date.now() + '.db'
+
+export function setupTestDB() {
+  process.env.DATABASE_URL = `file:${TEST_DB_PATH}`
+  execSync('bunx prisma db push --skip-generate', { stdio: 'inherit' })
+}
+
+export function teardownTestDB() {
+  if (existsSync(TEST_DB_PATH)) unlinkSync(TEST_DB_PATH)
+  if (existsSync(TEST_DB_PATH + '-journal')) unlinkSync(TEST_DB_PATH + '-journal')
+}
+```
+
+### 11.5. Pre-commit Test Check
+
+Run unit tests before every commit (not after — to avoid committing broken code):
+
+```bash
+# Recommended git hook pattern
+bunx vitest run --related src/ && git add -A && git commit -m "..."
+```
+
+### 11.6. When to Skip E2E in Sandbox
+
+E2E tests are acceptable to skip in sandbox when:
+- Project is in prototype/MVP stage
+- Manual testing via browser is sufficient
+- Playwright installation fails due to dependencies
+- Dev server stability is insufficient for reliable test runs
+
+Document skipped E2E with a comment in the test configuration:
+
+```typescript
+// E2E tests temporarily disabled for sandbox environment
+// Re-enable when deploying to CI/CD with stable server
+```
+
+---
+
 ## References
 
 - Jest Documentation: https://jestjs.io/

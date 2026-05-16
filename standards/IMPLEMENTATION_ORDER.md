@@ -201,4 +201,69 @@ Step 6: README_TEMPLATE              Assemble README from template
 
 ---
 
+## Path B: Existing Project Integration
+
+The 6-step sequence above assumes a project built from scratch. When integrating agent-toolkit into an **existing project**, the order must adapt — you cannot start from nothing when code already exists.
+
+### When to Use Path B
+
+- Adding agent-toolkit to a project that already has source code
+- Onboarding onto a project that was developed without standards
+- After a git deadlock recovery that requires re-establishing standards
+
+### Audit Phase (Before Step 1)
+
+Before applying any standards, audit the existing project:
+
+```bash
+# 1. Scan for absolute paths
+grep -rn "/home/" src/ --include="*.ts" --include="*.tsx" | grep -v "node_modules"
+grep -rn "http://localhost:" src/ --include="*.ts" --include="*.tsx"
+
+# 2. Check for emoji/Unicode in source
+grep -rn "[\x{1F000}-\x{1FFFF}]" src/ --include="*.ts" --include="*.tsx"
+
+# 3. Check .env.example exists
+ls .env.example 2>/dev/null || echo "MISSING: .env.example"
+
+# 4. Check .gitignore
+grep -q ".env" .gitignore || echo "WARNING: .env not in .gitignore"
+
+# 5. Scan file sizes
+find src/ -name "*.tsx" -exec wc -l {} \; | sort -rn | head -10
+```
+
+### Adapted Sequence for Existing Projects
+
+| Step | Action | Difference from Path A |
+|------|--------|----------------------|
+| 1 | Accept Standards | Same — read and understand all standards |
+| 2 | Deploy Worklog | Same — copy templates, verify compliance |
+| 3 | Fix Critical Issues | Different — audit and fix existing violations (absolute paths, missing .env.example, error leaks) |
+| 4 | Apply Unicode Policy | Different — clean existing code + add ESLint rule |
+| 5 | Apply Markdown Standard | Different — clean existing .md files |
+| 6 | Update README | Different — rewrite existing README to match template |
+
+### Step 3 Detail: Fix Critical Issues
+
+For existing projects, this step becomes a remediation phase:
+
+1. **Replace absolute paths** with `process.cwd()` + relative paths
+2. **Create `.env.example`** from existing `.env` (replace secrets with placeholders)
+3. **Add `.gitignore` entries** for `.env`, `*.db`, `node_modules/`
+4. **Fix error handling** — replace `error.message` leaks with generic messages
+5. **Add `connection_limit=1`** to SQLite URL if missing
+6. **Remove dead packages** — `npx depcheck`
+
+### Risk Mitigation for Path B
+
+| Risk | Mitigation |
+|------|-----------|
+| Existing code breaks after fixes | Create git tag before remediation: `git tag pre-standards-audit` |
+| Too many violations to fix at once | Prioritize by severity: [C] first, then [W], then [I] |
+| Team resistance to standard changes | Apply incrementally, explain reasoning, show CI benefits |
+| Large monolith files | Use anti-monolith skill for incremental refactoring |
+
+---
+
 Built with: Next.js 16 + TypeScript + Tailwind CSS

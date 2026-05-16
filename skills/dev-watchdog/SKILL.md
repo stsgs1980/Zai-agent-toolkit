@@ -1,5 +1,6 @@
 ---
 name: dev-watchdog
+version: 1.0
 description: >
   Dev server keepalive and health monitoring for Next.js projects in sandboxed environments.
   Use this skill when: (1) the dev server needs to be started or restarted,

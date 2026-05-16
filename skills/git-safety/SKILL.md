@@ -1,5 +1,6 @@
 ---
 name: git-safety
+version: 1.0
 description: >
   Critical safety rules for git operations in Z.ai/ZCode sandbox environments.
   Prevents complete system deadlock caused by middleware hooks that block all
@@ -384,7 +385,7 @@ cd /home/z/my-project
 bun install
 cp .env.example .env
 bun run db:push  # if applicable
-bun run dev
+npx next dev -p 3000
 ```
 
 ### The Critical Difference
@@ -415,7 +416,7 @@ git clone https://github.com/user/repo.git /home/z/my-project
 [ ] .git/ is at correct level (/home/z/my-project/.git/)
 [ ] package.json is at correct level
 [ ] bun install runs successfully
-[ ] bun run dev starts on correct port
+[ ] npx next dev -p 3000 starts on correct port
 ```
 
 ---

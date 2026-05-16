@@ -1,5 +1,6 @@
 ---
 name: fallback
+version: 1.0
 description: >
   Fallback provider strategy for when primary APIs (chat.z.ai) are unavailable.
   Use this skill when: (1) chat.z.ai returns 502/503/504 errors repeatedly,

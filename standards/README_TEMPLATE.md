@@ -68,7 +68,7 @@ cp .env.example .env
 bun run db:push
 
 # Run development server
-bun run dev
+npx next dev -p 3000
 ```
 
 ## Project Structure
@@ -82,7 +82,7 @@ bun run dev
 
 | Script | Description |
 |--------|-------------|
-| `bun run dev` | Development server |
+| `npx next dev -p 3000` | Development server |
 | `bun run build` | Production build |
 | `bun run lint` | Lint check |
 

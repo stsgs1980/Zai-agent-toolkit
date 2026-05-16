@@ -105,112 +105,26 @@ for the stack and project structure before proceeding.
 This toolkit enforces the following standards. All files referenced below
 are in the `standards/` directory.
 
-### 4.1 Unicode Policy v2.1
+**IMPORTANT:** The table below is a reference index, not a substitute for reading the full standard. Always read the complete standard document before applying rules.
 
-> File: `standards/UNICODE_POLICY.md`
-> Levels: **[C] Critical** (code, UI) + **[W] Warning** (AI-communication, docs) + **[I] Info** (prototypes, internal)
+| ID | Standard | Level | Key Rule | File |
+|----|----------|-------|----------|------|
+| STD-DOC-003 | Unicode Policy | [C]+[W]+[I] | No emoji in code/UI; `(ref)` exception for identification | `standards/UNICODE_POLICY.md` |
+| STD-DOC-002 | Markdown Standard | [W] | ASCII + typography in text; `-` for lists; stack signature | `standards/MARKDOWN_STANDARD.md` |
+| STD-ENV-001 | Reproducibility | [C] | Relative paths; `.env.example`; `connection_limit=1`; auto-backup | `standards/REPRODUCIBILITY-STANDARD.md` |
+| STD-ENV-002 | Z.ai Integration | [C] | Sandbox constraints; dev server protocol; session continuity | `standards/ZAI_INTEGRATION_STANDARD.md` |
+| STD-ARCH-001 | Implementation Order | [W] | 6-step mandatory sequence; Group A submits to Group B | `standards/IMPLEMENTATION_ORDER.md` |
+| STD-FE-001 | Frontend Development | [C] | 150-line limit; max 3 useState; FSD layers; no client fetch | `standards/FRONTEND_STANDARD.md` |
+| STD-GIT-001 | GitHub Standard | [C] | Conventional commits; `--force-with-lease`; push after every stage | `standards/GITHUB_STANDARD.md` |
+| STD-A11Y-001 | WCAG Accessibility | [C] | 4.5:1 contrast; keyboard nav; 44px touch targets | `standards/WCAG_2.1_AA_STANDARD.md` |
+| STD-TEST-001 | Testing Standard | [C] | 70/20/10 pyramid; AAA pattern; 60% sandbox minimum | `standards/TESTING_STANDARD.md` |
+| STD-ERR-001 | Error Handling | [C] | ApplicationError hierarchy; structured logging; circuit breaker | `standards/ERROR_HANDLING_STANDARD.md` |
+| STD-SEC-001 | Security Standard | [C] | OWASP Top 10; secrets management; RBAC; Zod validation | `standards/SECURITY_STANDARD.md` |
 
-Prohibits emoji and Unicode graphic characters in:
-- Source code and UI text **[C]**
-- AI agent chat responses **[W]** -- user messages are NOT regulated
-- Project documentation **[W]** (subject to MARKDOWN_STANDARD)
-
-Exceptions:
-- `(ref)` marking in tables and code blocks for identification purposes
-- Typographic characters (em dash, copyright, degree) in plain text only
-- Cyrillic characters in Russian-language content
-
-### 4.2 MARKDOWN_STANDARD v2.1
-
-> File: `standards/MARKDOWN_STANDARD.md`
-> Level: **[W] Warning**
-
-Governs formatting of all .md files in the project:
-- ASCII + Cyrillic + typographic characters in text
-- No Unicode in headings, code, or tables (except `(ref)`)
-- 4 backticks for nested code blocks, language tags required
-- Dash `-` for unordered lists
-- Stack signature format: `Built with: <project technologies>`
-  (default value defined in `standards/README_TEMPLATE.md`)
-
-### 4.3 Reproducibility Standard
-
-> File: `standards/REPRODUCIBILITY-STANDARD.md`
-> Level: **[C] Critical**
-
-Ensures `clone + install + dev = works` on any machine. Key rules:
-- `.env.example` required with all variables and safe defaults
-- Relative paths only (no `/home/`, `http://localhost:` in code)
-- SQLite: `connection_limit=1`, relative path via `path.resolve()`
-- Error handling: generic messages to client, no Prisma error leakage
-- Anti-fragility: non-critical ops must not break critical ones
-- Dark theme required via CSS variables
-- No dead packages in dependencies
-- Auto-backup before every write mutation
-- Deduplication-first on all create endpoints
-- Safe delete with explicit confirmation for all entities
-
-See the full document for 11 rules across 4 levels (Environment, Code, Delivery, Process).
-
-### 4.3.1 Z.ai Integration Standard
-
-> File: `standards/ZAI_INTEGRATION_STANDARD.md`
-> Level: **[C] Critical**
-
-Defines rules for operating in the Z.ai sandbox environment, including git safety, dev server management, session continuity, and API communication.
-
-### 4.4 Implementation Order
+### 4.1 Implementation Order
 
 Standards must be applied in a specific order.
 See `standards/IMPLEMENTATION_ORDER.md` for the full 6-step sequence.
-
-### 4.5 Frontend Development Standard
-
-> File: `standards/FRONTEND_STANDARD.md`
-> Level: **[C] Critical**
-
-Governs all React/Next.js frontend development:
-- Component size limits: 150 lines max
-- File size limits: 200 lines max
-- State management: max 3 useState per component
-- Architecture: Feature-Sliced Design (FSD)
-- Data isolation: no direct API calls in UI components
-
-### 4.6 GitHub Standard
-
-> File: `standards/GITHUB_STANDARD.md`
-> Level: **[C] Critical**
-
-Governs all git operations:
-- Conventional Commits format required
-- Branch naming: `<type>/<description>`
-- Force push: only `--force-with-lease`
-- Backup before any history rewrite
-- Push after every significant change
-
-### 4.7 WCAG Accessibility
-
-> File: `standards/WCAG_2.1_AA_STANDARD.md`
-> Level: **[C] Critical**
-
-Ensures UI accessibility:
-- Text contrast: 4.5:1 minimum
-- Non-text contrast: 3:1 minimum
-- Keyboard navigation for all interactive elements
-- Focus visible indicators
-- Touch targets: 44x44px minimum
-- ARIA roles and states
-
-### 4.8 Code Examples Guide
-
-> File: `standards/CODE_EXAMPLES_GUIDE.md`
-> Level: **[W] Warning**
-
-Governs code examples in documentation:
-- Self-contained and executable
-- Copy-paste ready (no line numbers, prompts)
-- Proper syntax highlighting
-- Security warnings for dangerous operations
 
 ## 5. Diagnostic Disclosure
 
@@ -239,6 +153,7 @@ See `instructions/writing-plans.md` for full details.
 
 | Skill | When to Use |
 |-------|-------------|
+| `session-resume` | Start of every new session, after context loss, after "continue" |
 | `git-checkpoint` | Every 15-20 min during active work, before risky operations |
 | `git-safe-ops` | Before any git push/pull/rebase/merge with remote |
 | `sanitize-validate` | User input, form data, API requests, file uploads, security |
@@ -247,6 +162,7 @@ See `instructions/writing-plans.md` for full details.
 | `fallback` | chat.z.ai is unavailable, need alternative providers |
 | `dev-watchdog` | Starting, restarting, or checking dev server |
 | `z-ai-web-dev-sdk` | Chat, image gen, web search via z-ai-web-dev-sdk |
+| `doc-gen` | Generating PDF, DOCX, XLSX documents following toolkit standards |
 
 ## 8. Instructions to Follow
 

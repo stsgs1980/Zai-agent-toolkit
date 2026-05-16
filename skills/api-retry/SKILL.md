@@ -1,5 +1,6 @@
 ---
 name: api-retry
+version: 1.0
 description: >
   Retry logic for HTTP requests with exponential backoff and circuit breaker pattern.
   Use this skill when: (1) making HTTP requests to external APIs,

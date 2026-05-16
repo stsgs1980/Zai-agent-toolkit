@@ -837,7 +837,71 @@ const securityConfig = {
 
 ---
 
-## 12. Compliance Checklist
+## 13. Scope Tiers: Core vs Extended
+
+Not all projects require the full security standard. Sandbox prototypes and MVPs need a focused subset, while production applications require complete coverage.
+
+### 13.1. Core (Required for ALL projects)
+
+These sections apply to every project, including sandbox prototypes:
+
+| Section | Topic | Why Always Required |
+|---------|-------|---------------------|
+| 2 | Secrets Management | .env files, gitignore — prevents credential leaks |
+| 5.1-5.3 | Input Validation & Sanitization | Zod validation, SQL injection prevention, XSS prevention |
+| 5.5 | CSRF Protection | Required for any form submission |
+| 6.1-6.2 | Security Headers | Helmet configuration — one-time setup |
+| 8.1 | Dependency Auditing | npm audit — automated check |
+| 9.3 | Sensitive Data Handling | Never log passwords/tokens |
+
+### 13.2. Extended (Required for production / user-facing projects)
+
+These sections apply when the project handles real user data, is deployed to production, or serves external users:
+
+| Section | Topic | When Required |
+|---------|-------|---------------|
+| 3.1-3.5 | Authentication (MFA, JWT, Sessions) | When users log in |
+| 4.1-4.3 | Authorization (RBAC, Resource-Level) | When roles exist |
+| 7.1-7.2 | Rate Limiting & DDoS Protection | When exposed to internet |
+| 9.1-9.2 | Security Event Logging & Audit | When compliance required |
+| 10.1-10.2 | Secure Deployment Configuration | When deploying to production |
+| 11.1-11.2 | Incident Response | When serving real users |
+| 12 | Compliance (GDPR, SOC 2) | When handling personal data |
+
+### 13.3. Decision Matrix
+
+```
+Is this project in Z.ai sandbox (prototype/MVP)?
+  |
+  +-- YES --> Apply Core only
+  |           Focus on: .env, Zod validation, no leaked errors
+  |
+  +-- NO --> Is it user-facing / production?
+              |
+              +-- YES --> Apply Core + Extended
+              |           Full security standard required
+              |
+              +-- NO --> Internal tool?
+                          |
+                          +-- YES --> Apply Core
+                                      Add RBAC if multi-user
+```
+
+### 13.4. Quick Core Checklist (for sandbox projects)
+
+- [ ] Secrets in .env (not in code)
+- [ ] .env in .gitignore
+- [ ] Input validated with Zod on all API routes
+- [ ] SQL injection prevented (Prisma parameterized queries)
+- [ ] XSS prevented (DOMPurify for user HTML, escape for output)
+- [ ] Error responses do not leak internal details
+- [ ] No passwords/tokens in logs
+- [ ] Dependencies audited (`npm audit`)
+- [ ] Security headers configured (helmet)
+
+---
+
+## 14. Compliance Checklist
 
 ### GDPR Requirements
 
@@ -860,7 +924,7 @@ const securityConfig = {
 
 ---
 
-## References
+## 15. References
 
 - OWASP Top 10: https://owasp.org/Top10/
 - OWASP Cheat Sheet Series: https://cheatsheetseries.owasp.org/

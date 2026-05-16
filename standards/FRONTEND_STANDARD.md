@@ -297,7 +297,134 @@ Deviations require:
 
 ---
 
-## 10. Version History
+## 10. API Route Standard (Next.js App Router)
+
+### 10.1. Route Handler Structure
+
+Each route handler MUST be a single file with maximum 80 lines of logic:
+
+```text
+src/app/api/
++-- users/
+|   +-- route.ts          <- GET (list), POST (create)
+|   +-- [id]/
+|       +-- route.ts      <- GET (detail), PATCH (update), DELETE (remove)
++-- documents/
+|   +-- route.ts
+|   +-- [id]/
+|       +-- route.ts
+```
+
+### 10.2. Response Format
+
+All API responses MUST follow a consistent structure:
+
+```typescript
+// Success response
+return NextResponse.json({ success: true, data: result })
+
+// Error response
+return NextResponse.json(
+  { success: false, error: { code: 'VALIDATION_ERROR', message: 'Invalid input' } },
+  { status: 400 }
+)
+```
+
+### 10.3. Input Validation
+
+All input MUST be validated with Zod before processing:
+
+```typescript
+import { z } from 'zod'
+
+const CreateUserSchema = z.object({
+  name: z.string().min(1).max(100),
+  email: z.string().email().max(255),
+})
+
+export async function POST(request: Request) {
+  const body = await request.json()
+  const result = CreateUserSchema.safeParse(body)
+
+  if (!result.success) {
+    return NextResponse.json(
+      { success: false, error: { code: 'VALIDATION_ERROR', message: 'Invalid input', details: result.error.errors } },
+      { status: 400 }
+    )
+  }
+
+  // Process validated data
+  const user = await db.user.create({ data: result.data })
+  return NextResponse.json({ success: true, data: user }, { status: 201 })
+}
+```
+
+### 10.4. Error Handling
+
+API routes MUST NOT leak internal error details to clients:
+
+```typescript
+// PROHIBITED -- leaks Prisma error details
+catch (error) {
+  return NextResponse.json({ error: error.message }, { status: 500 })
+}
+
+// REQUIRED -- generic message + server-side logging
+catch (error) {
+  console.error('Error creating user:', error)
+  return NextResponse.json(
+    { success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to create user' } },
+    { status: 500 }
+  )
+}
+```
+
+### 10.5. Auto-Backup Before Mutations
+
+Write mutations (POST, PATCH, DELETE) SHOULD call autoBackup() before execution:
+
+```typescript
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  try {
+    await autoBackup()  // Non-critical — failure logged but does not block
+    await db.user.delete({ where: { id: params.id } })
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Error deleting user:', error)
+    return NextResponse.json(
+      { success: false, error: { code: 'NOT_FOUND', message: 'User not found' } },
+      { status: 404 }
+    )
+  }
+}
+```
+
+### 10.6. Deduplication on Create
+
+All POST endpoints MUST check for existing records before creating:
+
+```typescript
+const existing = await db.user.findFirst({
+  where: { email: { equals: result.data.email } }
+})
+if (existing) {
+  return NextResponse.json({ success: true, data: existing }, { status: 200 })
+}
+```
+
+### 10.7. Pre-merge Checklist for API Routes
+
+- [ ] Input validated with Zod
+- [ ] Response format is { success, data? / error? }
+- [ ] No internal error details in responses
+- [ ] Write mutations call autoBackup()
+- [ ] Create endpoints check for duplicates
+- [ ] File is under 80 lines of logic
+- [ ] DELETE requires confirmation (client-side AlertDialog)
+
+---
+
+## 11. Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
