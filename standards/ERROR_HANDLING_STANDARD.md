@@ -834,4 +834,4 @@ groups:
 
 ---
 
-*Standard STD-ERR-001 v1.0 — Part of agent-toolkit*
+*Standard STD-ERR-001 v1.0 — Part of zai-agent-toolkit*

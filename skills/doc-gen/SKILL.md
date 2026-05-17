@@ -2,7 +2,7 @@
 name: doc-gen
 version: 1.0
 description: >
-  Generate professional documents (PDF, DOCX, XLSX) following agent-toolkit standards.
+  Generate professional documents (PDF, DOCX, XLSX) following zai-agent-toolkit standards.
   Enforces No-Unicode Policy in generated content, proper typography, anti-fragile file
   writing, and reproducible output paths (/home/z/my-project/download/). Activate when
   the user needs to create reports, documents, spreadsheets, or any file-based deliverable.

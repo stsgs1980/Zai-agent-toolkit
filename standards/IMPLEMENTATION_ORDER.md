@@ -203,11 +203,11 @@ Step 6: README_TEMPLATE              Assemble README from template
 
 ## Path B: Existing Project Integration
 
-The 6-step sequence above assumes a project built from scratch. When integrating agent-toolkit into an **existing project**, the order must adapt — you cannot start from nothing when code already exists.
+The 6-step sequence above assumes a project built from scratch. When integrating zai-agent-toolkit into an **existing project**, the order must adapt — you cannot start from nothing when code already exists.
 
 ### When to Use Path B
 
-- Adding agent-toolkit to a project that already has source code
+- Adding zai-agent-toolkit to a project that already has source code
 - Onboarding onto a project that was developed without standards
 - After a git deadlock recovery that requires re-establishing standards
 

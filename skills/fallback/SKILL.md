@@ -171,8 +171,8 @@ class OpenRouterProvider extends Provider {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${this.apiKey}`,
-        'HTTP-Referer': 'https://github.com/Sts8987/agent-toolkit',
-        'X-Title': 'Agent Toolkit'
+        'HTTP-Referer': 'https://github.com/Sts8987/zai-agent-toolkit',
+        'X-Title': 'Z.ai Agent Toolkit'
       },
       body: JSON.stringify({
         model: options.model || this.models[0],
@@ -494,7 +494,7 @@ setInterval(() => {
 | `.env.example` | Required environment variables |
 | `worklog.md` | Provider switch logs |
 
-## Integration with Agent Toolkit
+## Integration with Z.ai Agent Toolkit
 
 This skill works with:
 - `api-retry` - for retry logic within providers

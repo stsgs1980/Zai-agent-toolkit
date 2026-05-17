@@ -276,7 +276,7 @@ function logCircuitBreakerTrip(state, duration) {
 | `src/lib/chat-zai-wrapper.ts` | chat.z.ai specific wrapper |
 | `worklog.md` | Log retry attempts and circuit breaker events |
 
-## Integration with Agent Toolkit
+## Integration with Z.ai Agent Toolkit
 
 This skill works with:
 - `health-check` - to verify API availability before retrying

@@ -1,22 +1,22 @@
 <p align="center">
-  <img src="assets/logo-banner.png" alt="Agent Toolkit" width="800">
+  <img src="assets/logo-banner.png" alt="Z.ai Agent Toolkit" width="800">
 </p>
 
-# Agent Toolkit
+# Z.ai Agent Toolkit
 
-[![Version: 1.9.1](https://img.shields.io/badge/Version-1.9.1-blue.svg)]()
+[![Version: 1.9.2](https://img.shields.io/badge/Version-1.9.2-blue.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status: Pre-release](https://img.shields.io/badge/Status-Pre--release-orange.svg)]()
 
 **Standards + Skills + Rules** for AI-driven development
 
-> Toolkit version: **v1.9.1** | Language: **English**
+> Toolkit version: **v1.9.2** | Language: **English**
 
 ---
 
 ## What Is This
 
-Agent Toolkit is a self-contained set of governance documents, operational templates, and behavioral instructions that ensure AI agents produce consistent, clean, and reproducible code and documentation across projects.
+Z.ai Agent Toolkit is a self-contained set of governance documents, operational templates, and behavioral instructions that ensure AI agents produce consistent, clean, and reproducible code and documentation across projects.
 
 It solves three problems:
 
@@ -28,19 +28,19 @@ It solves three problems:
 
 ## Important: Read-Only Usage
 
-> Agent Toolkit is intended for read-only use as a reference.
+> Z.ai Agent Toolkit is intended for read-only use as a reference.
 
 When cloning into your project, **add to `.gitignore`**:
 
 ```gitignore
-# Agent Toolkit — read-only reference
-agent-toolkit/
+# Z.ai Agent Toolkit — read-only reference
+zai-agent-toolkit/
 ```
 
 ### Why this matters:
 
 1. **Toolkit is a reference**, not part of your code
-2. **Agents should not commit changes** to agent-toolkit
+2. **Agents should not commit changes** to zai-agent-toolkit
 3. **Avoid conflicts** when updating the toolkit
 
 ---
@@ -51,14 +51,14 @@ agent-toolkit/
 
 ```bash
 # Clone the toolkit
-git clone https://github.com/stsgs1980/agent-toolkit.git
+git clone https://github.com/stsgs1980/Zai-agent-toolkit.git
 
 # Copy English standards and templates to your project
-cp -r agent-toolkit/standards/*.md your-project/standards/
-cp -r agent-toolkit/templates/          your-project/templates/
-cp -r agent-toolkit/instructions/       your-project/instructions/
-cp agent-toolkit/AGENT_RULES.md         your-project/
-cp agent-toolkit/PROJECT_CONFIG.md      your-project/
+cp -r zai-agent-toolkit/standards/*.md your-project/standards/
+cp -r zai-agent-toolkit/templates/          your-project/templates/
+cp -r zai-agent-toolkit/instructions/       your-project/instructions/
+cp zai-agent-toolkit/AGENT_RULES.md         your-project/
+cp zai-agent-toolkit/PROJECT_CONFIG.md      your-project/
 
 # Edit PROJECT_CONFIG.md for your stack
 ```
@@ -66,8 +66,8 @@ cp agent-toolkit/PROJECT_CONFIG.md      your-project/
 ### Option B: Standards Only
 
 ```bash
-git clone https://github.com/stsgs1980/agent-toolkit.git
-cp agent-toolkit/standards/*.md your-project/standards/
+git clone https://github.com/stsgs1980/Zai-agent-toolkit.git
+cp zai-agent-toolkit/standards/*.md your-project/standards/
 ```
 
 ### Option C: Single Document
@@ -109,7 +109,7 @@ Full details: see `standards/IMPLEMENTATION_ORDER.md`
 ## Repository Structure
 
 ```text
-agent-toolkit/
+zai-agent-toolkit/
   AGENT_RULES.md              Behavioral rules for AI agents
   PROJECT_CONFIG.md           Project-specific settings (stack, server, paths)
   README.md                   This file
@@ -235,7 +235,7 @@ These are deployed into a project. They SUBMIT to Group B standards.
 
 | Component | ID | Version |
 |-----------|----|---------|
-| **Toolkit** | -- | **v1.9.1** |
+| **Toolkit** | -- | **v1.9.2** |
 | MARKDOWN_STANDARD | STD-DOC-002 | v2.1.5 |
 | UNICODE_POLICY | STD-DOC-003 | v2.1.3 |
 | README_TEMPLATE | STD-DOC-004 | v2.1 |
@@ -308,7 +308,8 @@ This toolkit is provided as-is for use with AI-driven development workflows.
 
 | Version | Changes |
 |---------|---------|
-| **v1.9.1** | Added Read-Only Usage rule (Section 0) to AGENT_RULES.md; agents must never commit changes to agent-toolkit after cloning
+| **v1.9.2** | Renamed repository to Zai-agent-toolkit; updated all internal references
+| **v1.9.1** | Added Read-Only Usage rule (Section 0) to AGENT_RULES.md; agents must never commit changes to zai-agent-toolkit after cloning
 | **v1.9.0** | Added z-ai-web-dev-sdk skill for AI SDK integration; updated ZAI_INTEGRATION_STANDARD to v1.1 with SDK usage rules; added Z.ai SDK Integration section to AGENT_RULES |
 | **v1.8.3** | Unified file naming: removed language suffixes and versions from filenames; updated all workflows; added deadlock prevention rules to GITHUB_STANDARD |
 | **v1.8.2** | Split into two repositories: agent-toolkit (EN) + agent-toolkit-ru (RU); removed emoji from all standards |

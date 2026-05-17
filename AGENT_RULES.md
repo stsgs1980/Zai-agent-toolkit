@@ -1,6 +1,6 @@
 # Agent Rules
 
-> Toolkit version: **v1.9.1**
+> Toolkit version: **v1.9.2**
 >
 > Mandatory rules for AI agents working with this toolkit.
 > Read before starting work on any project.
@@ -9,13 +9,13 @@
 
 ## 0. Read-Only Usage
 
-> **CRITICAL**: Agent Toolkit is a reference, not part of your project code.
+> **CRITICAL**: Z.ai Agent Toolkit is a reference, not part of your project code.
 
-When cloned into a project, agent-toolkit must be treated as read-only:
+When cloned into a project, zai-agent-toolkit must be treated as read-only:
 
-1. **NEVER commit changes to agent-toolkit/**
-2. **NEVER modify files inside agent-toolkit/**
-3. **Add to .gitignore**: `agent-toolkit/`
+1. **NEVER commit changes to zai-agent-toolkit/**
+2. **NEVER modify files inside zai-agent-toolkit/**
+3. **Add to .gitignore**: `zai-agent-toolkit/`
 
 If the toolkit needs updates, clone a fresh copy from the repository.
 

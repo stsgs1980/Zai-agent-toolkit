@@ -583,4 +583,4 @@ Document skipped E2E with a comment in the test configuration:
 
 ---
 
-*Standard STD-TEST-001 v1.0 — Part of agent-toolkit*
+*Standard STD-TEST-001 v1.0 — Part of zai-agent-toolkit*

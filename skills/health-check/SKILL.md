@@ -420,7 +420,7 @@ function logAlert(alert) {
 | `src/lib/chat-zai-health.ts` | chat.z.ai specific checks |
 | `worklog.md` | Health check logs and alerts |
 
-## Integration with Agent Toolkit
+## Integration with Z.ai Agent Toolkit
 
 This skill works with:
 - `api-retry` - to retry failed requests

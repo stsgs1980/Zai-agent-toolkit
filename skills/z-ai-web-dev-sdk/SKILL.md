@@ -769,7 +769,7 @@ src/
 
 ---
 
-## Integration with Agent Toolkit
+## Integration with Z.ai Agent Toolkit
 
 When implementing in a project:
 1. Place this skill file in `skills/z-ai-web-dev-sdk/`

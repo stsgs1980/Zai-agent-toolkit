@@ -254,7 +254,7 @@ Badges are graphical indicators of project metadata (version, build status, lice
 ### 7.3. Typical Badges for npm Package
 
 ```markdown
-[![npm version](https://img.shields.io/npm/v/agent-toolkit.svg)](https://www.npmjs.com/package/agent-toolkit)
+[![npm version](https://img.shields.io/npm/v/zai-agent-toolkit.svg)](https://www.npmjs.com/package/zai-agent-toolkit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ```
 

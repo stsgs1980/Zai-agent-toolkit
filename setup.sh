@@ -1,6 +1,6 @@
 #!/bin/bash
 # Agent Toolkit Setup Script
-# Run this script to set up agent-toolkit in any Next.js project.
+# Run this script to set up zai-agent-toolkit in any Next.js project.
 # Usage: bash setup.sh [ghp_YOUR_PAT_HERE]
 #        or: bash <(curl -L URL) [ghp_YOUR_PAT_HERE]
 
@@ -8,9 +8,9 @@ set -e
 
 # === Configuration ===
 GITHUB_USER="stsgs1980"
-REPO="agent-toolkit"
+REPO="zai-agent-toolkit"
 TOOLKIT_VERSION="v1.5.0"
-TMP_DIR="/tmp/agent-toolkit-setup"
+TMP_DIR="/tmp/zai-agent-toolkit-setup"
 
 # === Functions ===
 info()  { echo "[INFO]  $1"; }
@@ -32,7 +32,7 @@ else
 fi
 
 # === Clone toolkit ===
-info "Cloning agent-toolkit $TOOLKIT_VERSION ($AUTH_TYPE)..."
+info "Cloning zai-agent-toolkit $TOOLKIT_VERSION ($AUTH_TYPE)..."
 rm -rf "$TMP_DIR"
 
 if [ -n "$AUTH" ]; then
@@ -129,6 +129,6 @@ echo ""
 echo "Next steps:"
 echo "  1. Edit PROJECT_CONFIG.md -- set your stack, server, paths"
 echo "  2. Add AGENT_RULES.md content to your agent's instructions"
-echo "  3. git add -A && git commit -m 'setup: add agent-toolkit $TOOLKIT_VERSION'"
+echo "  3. git add -A && git commit -m 'setup: add zai-agent-toolkit $TOOLKIT_VERSION'"
 echo "  4. On next chat, agent will auto-onboard"
 echo ""

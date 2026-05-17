@@ -934,4 +934,4 @@ Is this project in Z.ai sandbox (prototype/MVP)?
 
 ---
 
-*Standard STD-SEC-001 v1.0 — Part of agent-toolkit*
+*Standard STD-SEC-001 v1.0 — Part of zai-agent-toolkit*
