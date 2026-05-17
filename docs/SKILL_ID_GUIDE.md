@@ -120,7 +120,7 @@ trigger: keyword1, keyword2
 | ID | Skill | Created |
 |----|-------|---------|
 | ZAI-STS-001 | prompt-engineering_sts | 2026-05 |
-| ZAI-STS-002 | (available) | - |
+| ZAI-STS-002 | sync-toolkit_sts | 2026-05 |
 | ZAI-STS-003 | (available) | - |
 
 ### Naming Convention
@@ -131,6 +131,18 @@ trigger: keyword1, keyword2
 | ID | `ZAI-STS-XXX` | `ZAI-STS-001` |
 
 **Why STS?** Your signature/initials - instantly identifies your skills.
+
+---
+
+## Quick Sync Commands
+
+| You Say | What Happens |
+|---------|--------------|
+| "sync toolkit" | Push to GitHub + instruction for Windows |
+| "obnovit" | Same as above |
+| "sync" | Same as above |
+
+**On Windows:** Run `sync-toolkit` in PowerShell
 
 ---
 

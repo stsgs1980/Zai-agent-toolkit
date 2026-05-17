@@ -154,7 +154,7 @@ ZCode Desktop has its own built-in skills. They do NOT have `ZAI-` prefix:
 | ID | Skill Name | Version |
 |----|------------|---------|
 | ZAI-STS-001 | prompt-engineering_sts | 1.1 |
-| ZAI-STS-002 | (available) | - |
+| ZAI-STS-002 | sync-toolkit_sts | 1.0 |
 | ZAI-STS-003 | (available) | - |
 
 ---
