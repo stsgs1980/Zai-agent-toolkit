@@ -1,6 +1,6 @@
 # Agent Rules
 
-> Toolkit version: **v1.9.4**
+> Toolkit version: **v1.9.5**
 >
 > Mandatory rules for AI agents working with this toolkit.
 > Read before starting work on any project.
@@ -151,25 +151,27 @@ See `instructions/writing-plans.md` for full details.
 
 ## 7. Skills to Use
 
-| Skill | When to Use |
-|-------|-------------|
-| `session-resume` | Start of every new session, after context loss, after "continue" |
-| `session-handoff` | Creating handoff documents, context preservation, session transfers |
-| `git-checkpoint` | Every 15-20 min during active work, before risky operations |
-| `git-safe-ops` | Before any git push/pull/rebase/merge with remote |
-| `commit-work` | Creating high-quality conventional commits with change analysis |
-| `sanitize-validate` | User input, form data, API requests, file uploads, security |
-| `api-retry` | Making HTTP requests to external APIs, encountering 502/503/504 errors |
-| `health-check` | Checking availability of chat.z.ai, monitoring API response times |
-| `fallback` | chat.z.ai is unavailable, need alternative providers |
-| `dev-watchdog` | Starting, restarting, or checking dev server |
-| `z-ai-web-dev-sdk` | Chat, image gen, web search via z-ai-web-dev-sdk |
-| `doc-gen` | Generating PDF, DOCX, XLSX documents following toolkit standards |
-| `requirements-clarity` | Clarifying vague requirements, generating PRD through dialogue |
-| `mermaid-diagrams` | Creating flowcharts, sequence diagrams, ERDs with Mermaid |
-| `c4-architecture` | C4 architecture diagrams with Mermaid |
-| `qa-test-planner` | Comprehensive QA test planning |
-| `database-schema-designer` | Designing robust database schemas |
+| ID | Skill | When to Use |
+|----|-------|-------------|
+| ZAI-SESSION-002 | `session-resume` | Start of every new session, after context loss, after "continue" |
+| ZAI-SESSION-001 | `session-handoff` | Creating handoff documents, context preservation, session transfers |
+| ZAI-GIT-002 | `git-checkpoint` | Every 15-20 min during active work, before risky operations |
+| ZAI-GIT-001 | `git-safe-ops` | Before any git push/pull/rebase/merge with remote |
+| ZAI-GIT-003 | `commit-work` | Creating high-quality conventional commits with change analysis |
+| ZAI-QA-002 | `sanitize-validate` | User input, form data, API requests, file uploads, security |
+| ZAI-SDK-002 | `api-retry` | Making HTTP requests to external APIs, encountering 502/503/504 errors |
+| ZAI-SDK-004 | `health-check` | Checking availability of chat.z.ai, monitoring API response times |
+| ZAI-SDK-003 | `fallback` | chat.z.ai is unavailable, need alternative providers |
+| ZAI-DEV-001 | `dev-watchdog` | Starting, restarting, or checking dev server |
+| ZAI-DEV-003 | `project-clone` | Cloning repositories with user confirmation |
+| ZAI-SDK-001 | `z-ai-web-dev-sdk` | Chat, image gen, web search via z-ai-web-dev-sdk |
+| ZAI-DOC-001 | `doc-gen` | Generating PDF, DOCX, XLSX documents following toolkit standards |
+| ZAI-REQ-001 | `requirements-clarity` | Clarifying vague requirements, generating PRD through dialogue |
+| ZAI-ARCH-002 | `mermaid-diagrams` | Creating flowcharts, sequence diagrams, ERDs with Mermaid |
+| ZAI-ARCH-001 | `c4-architecture` | C4 architecture diagrams with Mermaid |
+| ZAI-QA-001 | `qa-test-planner` | Comprehensive QA test planning |
+| ZAI-ARCH-003 | `database-schema-designer` | Designing robust database schemas |
+| ZAI-META-001 | `skill-id-system` | Creating new skills, understanding skill IDs |
 
 ## 8. Instructions to Follow
 

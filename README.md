@@ -4,13 +4,13 @@
 
 # Z.ai Agent Toolkit
 
-[![Version: 1.9.4](https://img.shields.io/badge/Version-1.9.4-blue.svg)]()
+[![Version: 1.9.5](https://img.shields.io/badge/Version-1.9.5-blue.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status: Pre-release](https://img.shields.io/badge/Status-Pre--release-orange.svg)]()
 
 **Standards + Skills + Rules** for AI-driven development
 
-> Toolkit version: **v1.9.4** | Language: **English**
+> Toolkit version: **v1.9.5** | Language: **English**
 
 ---
 
@@ -247,7 +247,7 @@ These are deployed into a project. They SUBMIT to Group B standards.
 
 | Component | ID | Version |
 |-----------|----|---------|
-| **Toolkit** | -- | **v1.9.4** |
+| **Toolkit** | -- | **v1.9.5** |
 | MARKDOWN_STANDARD | STD-DOC-002 | v2.1.5 |
 | UNICODE_POLICY | STD-DOC-003 | v2.1.3 |
 | README_TEMPLATE | STD-DOC-004 | v2.1 |
@@ -320,6 +320,7 @@ This toolkit is provided as-is for use with AI-driven development workflows.
 
 | Version | Changes |
 |---------|---------|
+| **v1.9.5** | Added Skill ID System (ZAI-XXX-NNN); added project-clone skill for safe repository cloning; updated all skill references with IDs |
 | **v1.9.4** | Removed emoji from all skills (UNICODE_POLICY compliance); added INSTALL.md for Vercel/ZCode Desktop setup; upgraded CI to Node.js 24 |
 | **v1.9.3** | Added 7 new skills from softaworks/agent-toolkit: session-handoff, requirements-clarity, commit-work, mermaid-diagrams, c4-architecture, qa-test-planner, database-schema-designer
 | **v1.9.2** | Renamed repository to Zai-agent-toolkit; updated all internal references
