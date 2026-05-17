@@ -1,18 +1,36 @@
 # Auto-save session to memory
 # ZCode ADE Hook
 #
-# Usage: Call this script when a session ends to save summary to memory
-# Example: ./auto-save-session.ps1 -SessionId "abc123" -Summary "Completed feature X"
+# Usage:
+#   ./auto-save-session.ps1 -Summary "Description of what was done"
+#   ./auto-save-session.ps1 -Summary "Fixed memory CLI bug" -Tags "bugfix,memory"
 
 param(
-    [string]$SessionId = "unknown",
-    [string]$Summary = "Session completed"
+    [Parameter(Mandatory=$true)]
+    [string]$Summary,
+    
+    [string]$Tags = "",
+    [string]$Project = ""
 )
 
 $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$content = "Session $SessionId completed at $timestamp. Summary: $Summary"
+$sessionId = "session_$timestamp"
+
+# Build content
+$content = $Summary
+
+# Build metadata
+$metadata = "type=session"
+if ($Tags) { $metadata += ",tags=$Tags" }
+if ($Project) { $metadata += ",project=$Project" }
 
 # Store in memory
-python "$env:USERPROFILE\.zcode\tools\memory_cli.py" store session "$content"
+$result = & python "$env:USERPROFILE\.zcode\tools\memory_cli.py" store session "$content" --metadata $metadata 2>&1
 
-Write-Host "Session saved to memory"
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "Session saved: $sessionId" -ForegroundColor Green
+    Write-Host "Summary: $Summary" -ForegroundColor Cyan
+} else {
+    Write-Host "Error saving session: $result" -ForegroundColor Red
+    exit 1
+}
