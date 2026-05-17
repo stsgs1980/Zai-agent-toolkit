@@ -109,22 +109,22 @@ SMOKE-006: User can logout
 
 ```
 Authentication & Authorization
-├─ Login/Logout
-├─ Password reset
-├─ Session management
-└─ Permissions
+ Login/Logout
+ Password reset
+ Session management
+ Permissions
 
 Payment Processing
-├─ Checkout flow
-├─ Payment methods
-├─ Refunds
-└─ Receipt generation
+ Checkout flow
+ Payment methods
+ Refunds
+ Receipt generation
 
 User Management
-├─ Profile updates
-├─ Preferences
-├─ Account settings
-└─ Data export
+ Profile updates
+ Preferences
+ Account settings
+ Data export
 ```
 
 ---
@@ -292,7 +292,7 @@ User Management
 
 ## Recommendation
 
-**Status:** ⚠️ CONDITIONAL GO
+**Status:** [WARN] CONDITIONAL GO
 - Fix BUG-234 (payment) before release
 - BUG-235 acceptable with documented workaround
 - Retest after fixes
@@ -316,7 +316,7 @@ User Management
 
 ## Common Pitfalls
 
-**❌ Don't:**
+**[FAIL] Don't:**
 - Run same tests without updating
 - Skip regression "to save time"
 - Ignore failures in low-priority tests
@@ -324,7 +324,7 @@ User Management
 - Forget to update test data
 - Run regression once and forget
 
-**✅ Do:**
+**[OK] Do:**
 - Maintain suite regularly
 - Run regression consistently
 - Investigate all failures

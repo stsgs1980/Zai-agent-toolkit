@@ -60,10 +60,10 @@ Design (Figma):
 - Font: 16px Medium #FFFFFF
 
 Implementation:
-- Size: 120x40px ✓
-- Background: #0052CC ✗ (wrong shade)
-- Border-radius: 8px ✓
-- Font: 16px Regular #FFFFFF ✗ (wrong weight)
+- Size: 120x40px 
+- Background: #0052CC  (wrong shade)
+- Border-radius: 8px 
+- Font: 16px Regular #FFFFFF  (wrong weight)
 
 Status: FAIL
 Bugs: BUG-234, BUG-235
@@ -260,9 +260,9 @@ Bugs: BUG-234, BUG-235
 - Padding: 12px 24px
 
 **Actual (in implementation):**
-- Button background: #0052CC ❌
-- Font weight: 400 (Regular) ❌
-- Padding: 12px 24px ✓
+- Button background: #0052CC [FAIL]
+- Font weight: 400 (Regular) [FAIL]
+- Padding: 12px 24px 
 
 ## Screenshots
 
@@ -296,20 +296,20 @@ Users see inconsistent branding. Button appears less prominent than designed.
 ## Best Practices
 
 **DO:**
-- ✅ Always reference specific Figma URLs
-- ✅ Test all component states
-- ✅ Check responsive breakpoints
-- ✅ Document exact values (not "close enough")
-- ✅ Screenshot both design and implementation
-- ✅ Test in multiple browsers
+- [OK] Always reference specific Figma URLs
+- [OK] Test all component states
+- [OK] Check responsive breakpoints
+- [OK] Document exact values (not "close enough")
+- [OK] Screenshot both design and implementation
+- [OK] Test in multiple browsers
 
 **DON'T:**
-- ❌ Assume "it looks right"
-- ❌ Skip hover/active states
-- ❌ Ignore small color differences
-- ❌ Test only on one screen size
-- ❌ Forget to check typography
-- ❌ Miss spacing issues
+- [FAIL] Assume "it looks right"
+- [FAIL] Skip hover/active states
+- [FAIL] Ignore small color differences
+- [FAIL] Test only on one screen size
+- [FAIL] Forget to check typography
+- [FAIL] Miss spacing issues
 
 ---
 

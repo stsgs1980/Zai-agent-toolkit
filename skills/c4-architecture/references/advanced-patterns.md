@@ -477,17 +477,17 @@ Organize C4 diagrams with ADRs:
 
 ```
 docs/
-├── architecture/
-│   ├── c4-context.md
-│   ├── c4-containers.md
-│   ├── c4-components-order-api.md
-│   ├── c4-deployment-production.md
-│   └── c4-dynamic-auth-flow.md
-└── decisions/
-    ├── 001-api-gateway-selection.md
-    ├── 002-database-selection.md
-    ├── 003-event-driven-architecture.md
-    └── template.md
+ architecture/
+    c4-context.md
+    c4-containers.md
+    c4-components-order-api.md
+    c4-deployment-production.md
+    c4-dynamic-auth-flow.md
+ decisions/
+     001-api-gateway-selection.md
+     002-database-selection.md
+     003-event-driven-architecture.md
+     template.md
 ```
 
 ## System Landscape Diagram

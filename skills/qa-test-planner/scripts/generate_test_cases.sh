@@ -14,9 +14,9 @@ MAGENTA='\033[0;35m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-echo -e "${BLUE}╔══════════════════════════════════════════════════╗${NC}"
-echo -e "${BLUE}║       Manual Test Case Generator                 ║${NC}"
-echo -e "${BLUE}╚══════════════════════════════════════════════════╝${NC}"
+echo -e "${BLUE}${NC}"
+echo -e "${BLUE}       Manual Test Case Generator                 ${NC}"
+echo -e "${BLUE}${NC}"
 echo ""
 
 # Helper functions
@@ -42,7 +42,7 @@ prompt_input() {
 }
 
 # Step 1: Basic Info
-echo -e "${MAGENTA}━━━ Step 1: Test Case Basics ━━━${NC}"
+echo -e "${MAGENTA} Step 1: Test Case Basics ${NC}"
 echo ""
 
 prompt_input "Test Case ID (e.g., TC-LOGIN-001):" TC_ID true
@@ -92,7 +92,7 @@ prompt_input "Estimated test time (minutes):" EST_TIME false
 
 # Step 2: Objective and Description
 echo ""
-echo -e "${MAGENTA}━━━ Step 2: Test Objective ━━━${NC}"
+echo -e "${MAGENTA} Step 2: Test Objective ${NC}"
 echo ""
 
 prompt_input "What are you testing? (objective):" OBJECTIVE true
@@ -100,7 +100,7 @@ prompt_input "Why is this test important?" WHY_IMPORTANT false
 
 # Step 3: Preconditions
 echo ""
-echo -e "${MAGENTA}━━━ Step 3: Preconditions ━━━${NC}"
+echo -e "${MAGENTA} Step 3: Preconditions ${NC}"
 echo ""
 
 echo "Enter preconditions (one per line, press Enter twice when done):"
@@ -115,7 +115,7 @@ done
 
 # Step 4: Test Steps
 echo ""
-echo -e "${MAGENTA}━━━ Step 4: Test Steps ━━━${NC}"
+echo -e "${MAGENTA} Step 4: Test Steps ${NC}"
 echo ""
 
 echo "Enter test steps (format: action | expected result)"
@@ -141,7 +141,7 @@ done
 
 # Step 5: Test Data
 echo ""
-echo -e "${MAGENTA}━━━ Step 5: Test Data ━━━${NC}"
+echo -e "${MAGENTA} Step 5: Test Data ${NC}"
 echo ""
 
 prompt_input "Test data required (e.g., user credentials, sample data):" TEST_DATA false
@@ -149,7 +149,7 @@ prompt_input "Test data required (e.g., user credentials, sample data):" TEST_DA
 # Step 6: Figma Design (if UI test)
 echo ""
 if [ "$TEST_TYPE" = "UI/Visual" ]; then
-    echo -e "${MAGENTA}━━━ Step 6: Figma Design Validation ━━━${NC}"
+    echo -e "${MAGENTA} Step 6: Figma Design Validation ${NC}"
     echo ""
     
     prompt_input "Figma design URL (if applicable):" FIGMA_URL false
@@ -158,7 +158,7 @@ fi
 
 # Step 7: Edge Cases
 echo ""
-echo -e "${MAGENTA}━━━ Step 7: Additional Info ━━━${NC}"
+echo -e "${MAGENTA} Step 7: Additional Info ${NC}"
 echo ""
 
 prompt_input "Edge cases or variations to consider:" EDGE_CASES false
@@ -286,7 +286,7 @@ ${NOTES}
 
 EOF
 
-echo -e "${GREEN}✅ Test case generated successfully!${NC}"
+echo -e "${GREEN}[OK] Test case generated successfully!${NC}"
 echo ""
 echo -e "File location: ${BLUE}$OUTPUT_FILE${NC}"
 echo ""

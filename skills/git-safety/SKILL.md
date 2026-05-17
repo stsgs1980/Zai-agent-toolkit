@@ -332,19 +332,19 @@ After a git deadlock, another agent might clone the repository **inside** the br
 ```
 WRONG (nested project - NOTHING WORKS):
 /home/z/my-project/                          ← old broken project (git deadlock)
-  ├── .git/                                  ← BLOCKED rebase
-  ├── src/
-  ├── package.json
-  └── Z.Code-Guide-Coding-Tool-Helper/       ← clone INSIDE old project!
-       ├── .git/                             ← clean git
-       ├── src/
-       └── package.json
+   .git/                                  ← BLOCKED rebase
+   src/
+   package.json
+   Z.Code-Guide-Coding-Tool-Helper/       ← clone INSIDE old project!
+        .git/                             ← clean git
+        src/
+        package.json
 
 CORRECT (clean replacement):
 /home/z/my-project/                          ← clean clone (replacement)
-  ├── .git/                                  ← clean git
-  ├── src/
-  └── package.json
+   .git/                                  ← clean git
+   src/
+   package.json
 ```
 
 **Why nested projects fail:**

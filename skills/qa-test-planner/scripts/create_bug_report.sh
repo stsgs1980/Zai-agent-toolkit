@@ -14,9 +14,9 @@ MAGENTA='\033[0;35m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-echo -e "${RED}╔══════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║           Bug Report Generator                   ║${NC}"
-echo -e "${RED}╚══════════════════════════════════════════════════╝${NC}"
+echo -e "${RED}${NC}"
+echo -e "${RED}           Bug Report Generator                   ${NC}"
+echo -e "${RED}${NC}"
 echo ""
 
 prompt_input() {
@@ -86,7 +86,7 @@ esac
 
 # Environment
 echo ""
-echo -e "${MAGENTA}━━━ Environment Details ━━━${NC}"
+echo -e "${MAGENTA} Environment Details ${NC}"
 echo ""
 
 prompt_input "Operating System (e.g., Windows 11, macOS 14):" OS true
@@ -97,14 +97,14 @@ prompt_input "URL or page where bug occurs:" URL false
 
 # Bug Description
 echo ""
-echo -e "${MAGENTA}━━━ Bug Description ━━━${NC}"
+echo -e "${MAGENTA} Bug Description ${NC}"
 echo ""
 
 prompt_input "Brief description of the issue:" DESCRIPTION true
 
 # Reproduction Steps
 echo ""
-echo -e "${MAGENTA}━━━ Steps to Reproduce ━━━${NC}"
+echo -e "${MAGENTA} Steps to Reproduce ${NC}"
 echo ""
 
 echo "Enter reproduction steps (one per line, press Enter twice when done):"
@@ -126,7 +126,7 @@ prompt_input "Actual behavior:" ACTUAL true
 
 # Additional Info
 echo ""
-echo -e "${MAGENTA}━━━ Additional Information ━━━${NC}"
+echo -e "${MAGENTA} Additional Information ${NC}"
 echo ""
 
 prompt_input "Console errors (paste if any):" CONSOLE_ERRORS false
@@ -259,11 +259,11 @@ ${FIRST_NOTICED:+**First Noticed:** ${FIRST_NOTICED}}
 
 EOF
 
-echo -e "${GREEN}✅ Bug report generated successfully!${NC}"
+echo -e "${GREEN}[OK] Bug report generated successfully!${NC}"
 echo ""
 echo -e "File location: ${BLUE}$OUTPUT_FILE${NC}"
 echo ""
-echo -e "${RED}⚠️  IMPORTANT NEXT STEPS:${NC}"
+echo -e "${RED}[WARN]  IMPORTANT NEXT STEPS:${NC}"
 echo "1. Attach screenshots/screen recordings"
 echo "2. Add console errors if available"
 echo "3. Verify reproduction steps work"

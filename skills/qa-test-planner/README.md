@@ -298,16 +298,16 @@ Get button specifications from Figma design [URL]
 
 ```
 qa-test-planner/
-├── README.md                          # This file
-├── SKILL.md                           # Main skill definition and templates
-├── references/
-│   ├── test_case_templates.md        # Test case formats
-│   ├── bug_report_templates.md       # Bug documentation templates
-│   ├── regression_testing.md         # Regression suite strategies
-│   └── figma_validation.md           # Design validation workflows
-└── scripts/
-    ├── generate_test_cases.sh        # Interactive test case generator
-    └── create_bug_report.sh          # Interactive bug report creator
+ README.md                          # This file
+ SKILL.md                           # Main skill definition and templates
+ references/
+    test_case_templates.md        # Test case formats
+    bug_report_templates.md       # Bug documentation templates
+    regression_testing.md         # Regression suite strategies
+    figma_validation.md           # Design validation workflows
+ scripts/
+     generate_test_cases.sh        # Interactive test case generator
+     create_bug_report.sh          # Interactive bug report creator
 ```
 
 ## Output Formats
