@@ -3,3 +3,4 @@ node_modules/
 .env
 *.db
 tmp/
+.session-log-state.json

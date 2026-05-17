@@ -2,8 +2,9 @@
 
 > Last Updated: 2026-05-17
 > Sessions Logged: 1
+> Auto-Capture: ENABLED (every 15 min, after commits, on problems/decisions)
 
-This document accumulates knowledge from AI sessions for future reference.
+This document is **automatically updated** by the session-log skill. No manual action required.
 
 ---
 

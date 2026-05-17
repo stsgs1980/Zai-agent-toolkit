@@ -1,142 +1,184 @@
 ---
 name: session-log
 id: ZAI-SESSION-002
+version: 1.1
 description: >
-  Capture session knowledge: problems solved, decisions made, best practices discovered.
-  Use when: (1) user says "create session log", "log this", "save knowledge",
-  (2) significant work completed, (3) before session ends, (4) problem solved,
-  (5) user says "what did we do", "summarize session".
-  Creates entries in KNOWLEDGE_BASE.md for future reference and best practices.
+  AUTOMATIC session knowledge capture. Creates snapshots without user action.
+  Triggers: every 15 min, after every commit, after 5+ file changes, on problem solved,
+  on decision made. User can also manually trigger: "create session log", "log this".
+  Builds KNOWLEDGE_BASE.md automatically for future reference and best practices.
 ---
 
-# Session Log
+# Session Log (Auto)
 
 > ID: ZAI-SESSION-002
-> Version: 1.0
+> Version: 1.1
 
-Capture knowledge from AI sessions for future reference. Prevents knowledge loss
-when context resets and builds a searchable knowledge base over time.
+**AUTOMATIC** knowledge capture from AI sessions. No need to remember to log -
+the system creates snapshots automatically at key moments.
 
-## Triggers
+## Automatic Triggers (No User Action Required)
 
-| Trigger | Action |
-|---------|--------|
-| `"create session log"` | Generate full session report |
-| `"log this"` | Add quick entry to knowledge base |
-| `"save knowledge"` | Create structured entry |
-| `"what did we do"` | Summarize and optionally save |
-| Before handoff | Auto-include session log |
-| End of session | Prompt to save if substantial work |
+| Trigger | Frequency | Action |
+|---------|-----------|--------|
+| **Time-based** | Every 15 minutes | Auto-snapshot |
+| **Commit** | After every `git commit` | Log commit details |
+| **Files changed** | After 5+ file modifications | Auto-snapshot |
+| **Problem solved** | When error fixed | Log problem + solution |
+| **Decision made** | When choice explained | Log decision + rationale |
+| **Push** | After every `git push` | Log delivery milestone |
+| **Handoff** | Before session handoff | Full session capture |
 
-## Workflow
+## How It Works
 
-### Step 1: Detect Scope
+### State Tracking
 
-What type of log entry?
+The skill tracks session state in `.session-log-state.json`:
 
-| Type | When | Template |
-|------|------|----------|
-| Full Session | End of significant work | Session Template |
-| Problem Solved | Bug fix, issue resolved | Problem Template |
-| Decision Made | Architectural choices | Decision Template |
-| Best Practice | Pattern discovered | Practice Template |
-| Quick Note | Something to remember | Note Template |
-
-### Step 2: Gather Information
-
-Scan the conversation for:
-
-1. **Files changed** - What was created/modified?
-2. **Problems encountered** - What went wrong?
-3. **Solutions applied** - How was it fixed?
-4. **Decisions made** - Why this approach?
-5. **Open issues** - What's still pending?
-6. **Patterns discovered** - Reusable approaches?
-
-### Step 3: Generate Entry
-
-Use the appropriate template from `references/templates.md`.
-
-### Step 4: Append to Knowledge Base
-
-Add the entry to `docs/KNOWLEDGE_BASE.md`:
-
-```markdown
-## [DATE] - [SESSION TITLE]
-
-### Summary
-Brief description of what was accomplished.
-
-### Problems Solved
-| Problem | Solution |
-|---------|----------|
-| X not working | Did Y |
-
-### Decisions Made
-- Chose X over Y because Z
-
-### Best Practices
-- Always do X when Y
-
-### Open Issues
-- Z still needs attention
-
-### Files Changed
-- `path/to/file.ts` - description
+```json
+{
+  "session_id": "web-c28243c7...",
+  "last_snapshot": "2026-05-17T09:30:00Z",
+  "files_changed_since_snapshot": 3,
+  "commits_since_snapshot": 1,
+  "problems_solved": [],
+  "decisions_made": []
+}
 ```
 
-### Step 5: Confirm
+### Auto-Snapshot Logic
 
-Report to user:
-- Entry created in KNOWLEDGE_BASE.md
-- Summary of captured knowledge
-- Any open issues flagged
+```
+IF time_since_last_snapshot > 15 min
+   OR files_changed >= 5
+   OR commit_just_happened
+   OR problem_just_solved
+   OR decision_just_made
+THEN
+   create_mini_snapshot()
+   append_to(KNOWLEDGE_BASE.md)
+   reset_counters()
+```
 
-## Quick Commands
+### Snapshot Types
+
+| Type | When | Content |
+|------|------|---------|
+| Mini | Auto (time/files) | Timestamp + current work summary |
+| Commit | After commit | Commit message + files changed |
+| Problem | After fix | Problem + solution + prevention |
+| Decision | After choice | Decision + rationale + alternatives |
+| Full | Manual/handoff | Complete session report |
+
+## Automatic Capture Examples
+
+### After Commit (Auto)
+
+```markdown
+### [09:45] Commit: feat(skills): add session-log
+
+**Files**: 3 changed
+**Summary**: Created session-log skill with auto triggers
+**Key Changes**: SKILL.md, templates.md, KNOWLEDGE_BASE.md
+```
+
+### After Problem Solved (Auto)
+
+```markdown
+### [09:42] Problem Solved: CI Trailing Whitespace
+
+**Problem**: Toolkit Validation failing - trailing whitespace
+**Solution**: Fixed `sync-toolkit_sts/SKILL.md` - removed trailing spaces
+**Prevention**: Run `grep -rn ' $'` before commits
+```
+
+### Time-based Mini Snapshot (Auto)
+
+```markdown
+### [09:30] Snapshot
+
+**Work in Progress**: Creating session-log skill
+**Files Modified**: 2 (SKILL.md, templates.md)
+**Status**: 60% complete - need to add auto-trigger logic
+```
+
+## Manual Triggers (Optional)
 
 | User Says | Action |
 |-----------|--------|
-| `"log this: <note>"` | Add quick note |
+| `"create session log"` | Full session capture NOW |
+| `"log this: <note>"` | Add specific note |
 | `"log problem: <desc>"` | Add problem entry |
 | `"log decision: <desc>"` | Add decision entry |
-| `"create session log"` | Full session capture |
-| `"show knowledge base"` | Display KNOWLEDGE_BASE.md |
-
-## Templates
-
-See `references/templates.md` for all entry templates.
+| `"show knowledge base"` | Display current KNOWLEDGE_BASE.md |
+| `"pause auto log"` | Temporarily stop auto-capture |
+| `"resume auto log"` | Resume auto-capture |
 
 ## Knowledge Base Structure
 
 ```markdown
 # Knowledge Base
 
-## Sessions
-(Chronological session logs)
+> Auto-generated by session-log skill
 
-## Best Practices
-(Accumulated patterns)
+## Today: [DATE]
 
-## Common Problems
-(Frequent issues and solutions)
+### [TIME] Snapshot (Auto)
+...
 
-## Decisions Archive
-(Important architectural choices)
+### [TIME] Problem Solved (Auto)
+...
+
+### [TIME] Decision (Auto)
+...
+
+---
+
+## Best Practices (Accumulated)
+...
+
+## Common Problems (Accumulated)
+...
 ```
 
-## Integration
+## Implementation for Agent
 
-This skill works with:
-- `session-handoff` - Include session log in handoff
-- `commit-work` - Reference session in commits
-- `git-checkpoint` - Tag significant discoveries
+The agent should automatically:
+
+1. **After each git commit**:
+   - Read `.session-log-state.json`
+   - Update `commits_since_snapshot`
+   - Create commit snapshot in KNOWLEDGE_BASE.md
+
+2. **Every 15 minutes** (check on each user message):
+   - Compare current time vs `last_snapshot`
+   - If > 15 min, create mini snapshot
+
+3. **After 5+ file changes**:
+   - Track file modifications
+   - Create snapshot when threshold reached
+
+4. **When detecting problem solved**:
+   - Pattern: "fixed", "resolved", "solved", "error -> working"
+   - Create problem-solution entry
+
+5. **When detecting decision made**:
+   - Pattern: "chose X because", "decided to", "we'll use X"
+   - Create decision entry
 
 ## File Locations
 
 | File | Purpose |
 |------|---------|
-| `docs/KNOWLEDGE_BASE.md` | Main knowledge storage |
-| `docs/session-logs/YYYY-MM-DD-*.md` | Individual session logs (optional) |
+| `docs/KNOWLEDGE_BASE.md` | Main knowledge storage (committed to git) |
+| `.session-log-state.json` | Session state tracking (gitignored) |
+
+## Integration
+
+- **git-checkpoint**: After checkpoint, create snapshot
+- **session-handoff**: Include full KNOWLEDGE_BASE.md in handoff
+- **commit-work**: Auto-log after successful commit
+- **worklog.md**: Cross-reference entries
 
 ---
 
