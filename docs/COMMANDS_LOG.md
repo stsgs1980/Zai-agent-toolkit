@@ -121,26 +121,35 @@ git log --oneline -10
 
 ---
 
-## 6. Полезные алиасы (Windows PowerShell)
+## 6. Настройка команд Windows (один раз)
+
+### Автоматическая настройка
+
+```powershell
+# Запустить один раз в PowerShell:
+cd C:\Users\stsgr\.zcode\Zai-agent-toolkit
+.\scripts\setup-sync-command.ps1
+
+# Перезапустить PowerShell
+```
+
+После этого команды заработают везде:
+
+| Команда | Действие |
+|---------|----------|
+| `sync-toolkit` | Обновить toolkit из GitHub |
+| `goto-toolkit` | Перейти в папку toolkit |
+| `list-skills` | Показать все skills |
+
+### Ручная настройка (если нужно)
 
 Добавить в PowerShell profile (`notepad $PROFILE`):
 
 ```powershell
-# Синхронизация toolkit
 function sync-toolkit {
-    cd C:\Users\stsgr\.zcode\Zai-agent-toolkit
+    Set-Location C:\Users\stsgr\.zcode\Zai-agent-toolkit
     git pull
-    Write-Host "Toolkit обновлен!" -ForegroundColor Green
-}
-
-# Открыть toolkit
-function goto-toolkit {
-    cd C:\Users\stsgr\.zcode\Zai-agent-toolkit
-}
-
-# Посмотреть skills
-function list-skills {
-    Get-ChildItem C:\Users\stsgr\.zcode\Zai-agent-toolkit\skills -Directory
+    Write-Host "Toolkit updated!" -ForegroundColor Green
 }
 ```
 
