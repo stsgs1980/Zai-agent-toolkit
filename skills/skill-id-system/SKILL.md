@@ -83,79 +83,44 @@ ZCode Desktop has its own built-in skills. They do NOT have `ZAI-` prefix:
 
 ## 5. Skill ID Registry
 
-### 5.1. Git Operations (GIT)
+### 5.1. Skills with Assigned IDs
 
-| ID | Skill Name | Version |
-|----|------------|---------|
-| ZAI-GIT-001 | git-safe-ops | 1.0 |
-| ZAI-GIT-002 | git-checkpoint | 1.0 |
-| ZAI-GIT-003 | commit-work | 1.0 |
+| ID | Skill Name | Version | Status |
+|----|------------|---------|--------|
+| ZAI-META-001 | skill-id-system | 1.0 | Active |
+| ZAI-META-002 | skill-creator | 1.0 | Active |
+| ZAI-DEV-002 | anti-monolith | 1.0 | Active |
+| ZAI-STS-001 | prompt-engineering_sts | 1.1 | Active |
+| ZAI-STS-002 | sync-toolkit_sts | 1.0 | Active |
+| ZAI-STS-003 | (available) | - | - |
 
-### 5.2. SDK Integration (SDK)
+### 5.2. Skills Pending ID Assignment
 
-| ID | Skill Name | Version |
-|----|------------|---------|
-| ZAI-SDK-001 | z-ai-web-dev-sdk | 1.0 |
-| ZAI-SDK-002 | api-retry | 1.0 |
-| ZAI-SDK-003 | fallback | 1.0 |
-| ZAI-SDK-004 | health-check | 1.0 |
+These skills exist in toolkit but do not have IDs assigned yet:
 
-### 5.3. Architecture (ARCH)
+| Skill Name | Suggested Domain |
+|------------|------------------|
+| git-safe-ops | GIT |
+| git-checkpoint | GIT |
+| commit-work | GIT |
+| git-safety | GIT |
+| z-ai-web-dev-sdk | SDK |
+| api-retry | SDK |
+| fallback | SDK |
+| health-check | HEALTH |
+| c4-architecture | ARCH |
+| mermaid-diagrams | ARCH |
+| database-schema-designer | ARCH |
+| qa-test-planner | QA |
+| sanitize-validate | SEC |
+| session-handoff | SESSION |
+| session-resume | SESSION |
+| requirements-clarity | REQ |
+| doc-gen | DOC |
+| dev-watchdog | DEV |
+| project-clone | DEV |
 
-| ID | Skill Name | Version |
-|----|------------|---------|
-| ZAI-ARCH-001 | c4-architecture | 1.0 |
-| ZAI-ARCH-002 | mermaid-diagrams | 1.0 |
-| ZAI-ARCH-003 | database-schema-designer | 1.0 |
-
-### 5.4. Quality Assurance (QA)
-
-| ID | Skill Name | Version |
-|----|------------|---------|
-| ZAI-QA-001 | qa-test-planner | 1.0 |
-| ZAI-QA-002 | sanitize-validate | 1.0 |
-
-### 5.5. Session Management (SESSION)
-
-| ID | Skill Name | Version |
-|----|------------|---------|
-| ZAI-SESSION-001 | session-handoff | 1.0 |
-| ZAI-SESSION-002 | session-resume | 1.0 |
-
-### 5.6. Requirements (REQ)
-
-| ID | Skill Name | Version |
-|----|------------|---------|
-| ZAI-REQ-001 | requirements-clarity | 1.0 |
-
-### 5.7. Documentation (DOC)
-
-| ID | Skill Name | Version |
-|----|------------|---------|
-| ZAI-DOC-001 | doc-gen | 1.0 |
-
-### 5.8. Development (DEV)
-
-| ID | Skill Name | Version |
-|----|------------|---------|
-| ZAI-DEV-001 | dev-watchdog | 1.0 |
-| ZAI-DEV-002 | anti-monolith | 1.0 |
-| ZAI-DEV-003 | project-clone | 1.0 |
-
-### 5.9. Meta (META)
-
-| ID | Skill Name | Version |
-|----|------------|---------|
-| ZAI-META-001 | skill-id-system | 1.0 |
-| ZAI-META-002 | skill-creator | 1.0 |
-
-### 5.10. User-Created (STS)
-
-| ID | Skill Name | Version |
-|----|------------|---------|
-| ZAI-STS-001 | prompt-engineering_sts | 1.1 |
-| ZAI-STS-002 | sync-toolkit_sts | 1.0 |
-| ZAI-STS-003 | (available) | - |
+**Note:** IDs will be assigned when updating these skills.
 
 ---
 

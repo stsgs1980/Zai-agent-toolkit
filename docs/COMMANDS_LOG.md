@@ -181,12 +181,27 @@ function sync-toolkit {
 
 ## 9. Реестр назначенных ID
 
+### Skills с ID (назначены)
+
 | ID | Skill | Описание |
 |----|-------|----------|
 | ZAI-META-001 | skill-id-system | Система ID для skills |
 | ZAI-META-002 | skill-creator | Создание и оптимизация skills |
-| ZAI-STS-001 | prompt-engineering_sts | Prompt engineering техники |
 | ZAI-DEV-002 | anti-monolith | Модульная архитектура React/Next.js |
+| ZAI-STS-001 | prompt-engineering_sts | Prompt engineering техники |
+| ZAI-STS-002 | sync-toolkit_sts | Синхронизация toolkit |
+
+### Skills без ID (ожидают назначения)
+
+- git-safe-ops, git-checkpoint, commit-work, git-safety
+- z-ai-web-dev-sdk, api-retry, fallback, health-check
+- c4-architecture, mermaid-diagrams, database-schema-designer
+- qa-test-planner, sanitize-validate
+- session-handoff, session-resume
+- requirements-clarity, doc-gen
+- dev-watchdog, project-clone
+
+**Примечание:** ID будут назначены при обновлении skills.
 
 ---
 
