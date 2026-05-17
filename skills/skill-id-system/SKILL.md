@@ -195,4 +195,4 @@ The skill-creator will:
 
 ---
 
-Built with: Next.js 16 + TypeScript + Tailwind CSS
+Built with: Z.ai Agent Toolkit

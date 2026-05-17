@@ -137,7 +137,7 @@ Activate this skill when:
 
 ---
 
-Built with: Next.js 16 + TypeScript + Tailwind CSS
+Built with: Z.ai Agent Toolkit
 ```
 
 ### Step 4: Update Registry
@@ -288,4 +288,4 @@ Skills created in Z.ai sandbox are NOT automatically synced to your local machin
 
 ---
 
-Built with: Next.js 16 + TypeScript + Tailwind CSS
+Built with: Z.ai Agent Toolkit
