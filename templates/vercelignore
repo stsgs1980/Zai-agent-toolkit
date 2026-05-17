@@ -1,0 +1,109 @@
+# Vercel Ignore Template
+# Copy to your project root as .vercelignore
+# These files will NOT be deployed to Vercel
+
+# ===========================================
+# AI Agent Files (local development only)
+# ===========================================
+.agent/
+.zcode/
+agent-ctx/
+worklog.md
+TASK_TEMPLATE.md
+zai-agent-toolkit/
+.agent-toolkit/
+
+# AI tool configs (not needed in production)
+.cursorrules
+.claude/
+.cursor/
+
+# ===========================================
+# Environment & Secrets
+# ===========================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+*.pem
+*.key
+secrets/
+
+# ===========================================
+# Development Files
+# ===========================================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# ===========================================
+# IDE & Editor
+# ===========================================
+.idea/
+.vscode/
+*.sublime-*
+.fleet/
+
+# ===========================================
+# Testing (optional - uncomment if not needed)
+# ===========================================
+# __tests__/
+# *.test.ts
+# *.test.js
+# *.spec.ts
+# *.spec.js
+# coverage/
+# .nyc_output/
+
+# ===========================================
+# Documentation (optional - uncomment if not needed)
+# ===========================================
+# docs/
+# CHANGELOG.md
+# CONTRIBUTING.md
+# LICENSE
+
+# ===========================================
+# Development Scripts
+# ===========================================
+keep-alive.sh
+watchdog.sh
+generate-*.js
+scripts/dev-*.sh
+
+# ===========================================
+# Database Files (use managed DB in production)
+# ===========================================
+*.db
+*.sqlite
+*.sqlite3
+db/*.db
+prisma/*.db
+
+# ===========================================
+# Build Artifacts (usually not needed)
+# ===========================================
+.next/cache/
+node_modules/.cache/
+.turbo/
+.eslintcache
+
+# ===========================================
+# Large Assets (use CDN instead)
+# ===========================================
+# public/videos/
+# public/large-files/
+# download/  # If not user-facing downloads
+
+# ===========================================
+# CI/CD Configs (Vercel has its own)
+# ===========================================
+# .github/workflows/  # Keep if using GitHub Actions
+# .gitlab-ci.yml
+# .travis.yml

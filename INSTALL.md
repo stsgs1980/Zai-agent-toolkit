@@ -35,7 +35,55 @@ cd ~/.zcode/Zai-agent-toolkit && git pull origin main
 
 ## For Vercel / Production
 
-### Important: Do NOT commit toolkit
+### Files That Should NOT Deploy to Vercel
+
+Create `.vercelignore` in your project root:
+
+```gitignore
+# AI Agent Files (local development only)
+.agent/
+.zcode/
+agent-ctx/
+worklog.md
+TASK_TEMPLATE.md
+zai-agent-toolkit/
+
+# Environment & Secrets
+.env
+.env.local
+*.pem
+*.key
+
+# Database (use managed DB in production)
+*.db
+*.sqlite
+
+# Development Scripts
+keep-alive.sh
+watchdog.sh
+generate-*.js
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
+```
+
+### Why These Files Are Excluded
+
+| File/Folder | Reason |
+|-------------|--------|
+| `.agent/`, `.zcode/` | AI tool configs, not needed in production |
+| `agent-ctx/` | Session context, not deployable |
+| `worklog.md` | Agent journal, irrelevant in production |
+| `zai-agent-toolkit/` | Documentation, 478+ MB, not code |
+| `*.db`, `*.sqlite` | Local database, use Vercel Postgres/Neon |
+| `keep-alive.sh` | Dev server keepalive, not needed |
+| `*.log` | Log files, use proper logging service |
+
+### Do NOT commit toolkit
 
 Add to your project's `.gitignore`:
 
