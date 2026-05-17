@@ -5,6 +5,16 @@
 
 ---
 
+## 0. Unified Architecture (PlantUML)
+
+**Единая диаграмма всей архитектуры и процессов:**
+
+![Skills Architecture](./diagrams/00-skills-architecture.png)
+
+> Source: `diagrams/skills-architecture.puml` — редактируемый PlantUML файл
+
+---
+
 ## 1. Skill Selection Flow
 
 Как агент выбирает и вызывает skills в зависимости от типа задачи.

@@ -1,0 +1,194 @@
+@startuml skills-architecture
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName DejaVu Sans
+skinparam ArrowColor #64748B
+skinparam ArrowThickness 1.5
+
+title Skills Architecture & Process Flows\nZ.ai Agent Toolkit v1.1
+
+' ============================================
+' SECTION 1: ENVIRONMENTS
+' ============================================
+
+rectangle "**WINDOWS**\nC:\\Users\\stsgr\\.zcode\\" as WIN #E9EEF3 {
+    rectangle "ZCode Client" as ZCODE #4C6EF5/white
+    rectangle "skills/" as WIN_SKILLS #F0FDF4
+    rectangle "instructions/" as WIN_INST #F0FDF4
+    rectangle "standards/" as WIN_STD #F0FDF4
+    rectangle "**Zai-agent-toolkit/**" as WIN_TK #10B981/white {
+        rectangle "skills/" as WIN_TK_SK
+        rectangle "instructions/" as WIN_TK_IN
+        rectangle "standards/" as WIN_TK_ST
+    }
+}
+
+WIN_SKILLS ..> WIN_TK_SK : <<symlink>>
+WIN_INST ..> WIN_TK_IN : <<symlink>>
+WIN_STD ..> WIN_TK_ST : <<symlink>>
+
+rectangle "**GITHUB**\ngithub.com/stsgs1980/" as GH_BOX #24292E/white {
+    cloud "Zai-agent-toolkit" as GH #3AAFA9/white
+}
+
+rectangle "**Z.ai SANDBOX**\n/home/z/my-project/" as SBX #EFF6FF {
+    rectangle "skills/" as SYS_SKILLS #3AAFA9/white
+    note right of SYS_SKILLS
+        Z.ai System Skills
+        (50+ skills, auto-updated)
+        ---
+        ASR, LLM, TTS, VLM
+        git-safety, session-handoff
+        health-check, api-retry
+        fallback, doc-gen, charts
+    end note
+    
+    rectangle "**Zai-agent-toolkit/**" as SBX_TK #10B981/white {
+        rectangle "skills/" as TK_SKILLS
+        note right of TK_SKILLS
+            Custom Skills (15)
+            ---
+            commit-work (DEV-004)
+            session-log (SESSION-002)
+            skill-creator (META-002)
+            ---
+            Personal _sts (6)
+        end note
+    }
+}
+
+' ============================================
+' SYNC FLOWS
+' ============================================
+
+WIN_TK --> GH : git push
+GH --> WIN_TK : git pull\n<<sync-toolkit>>
+
+SBX_TK --> GH : git push
+GH --> SBX_TK : git pull
+
+' ============================================
+' SKILL INVOCATION
+' ============================================
+
+rectangle "**AGENT**" as AGENT #8B5CF6/white
+
+SYS_SKILLS -down-> AGENT : auto invoke
+TK_SKILLS -down-> AGENT : toolkit invoke
+WIN_TK_SK -down-> AGENT : via symlink
+
+' ============================================
+' PROCESS FLOWS
+' ============================================
+
+rectangle "**PROCESS FLOWS**" as FLOWS #FFF7ED {
+
+    rectangle "**1. Task Classification**" as P1 #FEF3C7 {
+        usecase "User Query" as UQ
+        usecase "Type 1:\nDocument" as T1
+        usecase "Type 2:\nChart" as T2
+        usecase "Type 3:\nWeb App" as T3
+        usecase "Type 4:\nData" as T4
+        UQ --> T1
+        UQ --> T2
+        UQ --> T3
+        UQ --> T4
+    }
+
+    rectangle "**2. Skill Lookup**" as P2 #FEF3C7 {
+        usecase "Check Toolkit" as CL
+        usecase "Use Toolkit" as UT
+        usecase "Check System" as CS
+        usecase "Use System" as US
+        usecase "Direct Impl" as DI
+        T1 --> CL
+        T2 --> CL
+        T3 --> CL
+        T4 --> CL
+        CL --> UT : found
+        CL --> CS : not found
+        CS --> US : found
+        CS --> DI : not found
+    }
+
+    rectangle "**3. Session Lifecycle**" as P3 #FEF3C7 {
+        usecase "New Session" as NS
+        usecase "session-resume" as SR
+        usecase "Check Git" as CG
+        usecase "Restart Dev" as RD
+        usecase "Work" as WK
+        usecase "session-log\n(15 min)" as SL
+        usecase "session-handoff\n(ctx > 80%)" as SH
+        NS --> SR
+        SR --> CG
+        CG --> RD
+        RD --> WK
+        WK --> SL
+        WK --> SH
+    }
+
+    rectangle "**4. Git Safety**" as P4 #FEF3C7 {
+        usecase "Git Op" as GO
+        usecase "Risky?" as RQ
+        usecase "git-safe-ops" as GSO
+        usecase "git-checkpoint" as GC
+        usecase "Backup+Execute" as BE
+        usecase "Create Tag" as CT
+        GO --> RQ
+        RQ --> GSO : yes
+        RQ --> GC : large
+        GSO --> BE
+        GC --> CT
+    }
+
+    rectangle "**5. Health & Retry**" as P5 #FEF3C7 {
+        usecase "API Call" as AC
+        usecase "health-check" as HC
+        usecase "OK?" as OK
+        usecase "Proceed" as PR
+        usecase "api-retry" as AR
+        usecase "fallback" as FB
+        usecase "Alt Provider" as AP
+        AC --> HC
+        HC --> OK
+        OK --> PR : yes
+        OK --> AR : 502/503
+        AR --> FB : max
+        FB --> AP
+    }
+}
+
+' ============================================
+' SKILL ID REFERENCE
+' ============================================
+
+legend right
+    |**Domain**|**ID Range**|**Examples**|
+    |META|ZAI-META-001+|skill-id-system, skill-creator|
+    |DEV|ZAI-DEV-001+|commit-work, project-clone|
+    |SESSION|ZAI-SESSION-001+|session-log, session-handoff|
+    |GIT|ZAI-GIT-001+|git-safe-ops, git-checkpoint|
+    |HEALTH|ZAI-HEALTH-001+|health-check, api-retry|
+    |STS|ZAI-STS-001+|Personal _sts skills|
+endlegend
+
+' ============================================
+' ANNOTATIONS
+' ============================================
+
+note top of WIN
+    Local Development
+    Symlinks point to toolkit
+end note
+
+note top of GH
+    Single Source of Truth
+    CI/CD Validation
+end note
+
+note top of SBX
+    Runtime Environment
+    System + Custom Skills
+end note
+
+@enduml
