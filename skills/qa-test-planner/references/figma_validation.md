@@ -60,9 +60,9 @@ Design (Figma):
 - Font: 16px Medium #FFFFFF
 
 Implementation:
-- Size: 120x40px 
+- Size: 120x40px
 - Background: #0052CC  (wrong shade)
-- Border-radius: 8px 
+- Border-radius: 8px
 - Font: 16px Regular #FFFFFF  (wrong weight)
 
 Status: FAIL
@@ -262,7 +262,7 @@ Bugs: BUG-234, BUG-235
 **Actual (in implementation):**
 - Button background: #0052CC [FAIL]
 - Font weight: 400 (Regular) [FAIL]
-- Padding: 12px 24px 
+- Padding: 12px 24px
 
 ## Screenshots
 

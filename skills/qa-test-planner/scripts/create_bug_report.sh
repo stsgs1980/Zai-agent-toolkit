@@ -23,11 +23,11 @@ prompt_input() {
     local prompt_text="$1"
     local var_name="$2"
     local required="$3"
-    
+
     while true; do
         echo -e "${CYAN}${prompt_text}${NC}"
         read -r input
-        
+
         if [ -n "$input" ]; then
             eval "$var_name=\"$input\""
             break

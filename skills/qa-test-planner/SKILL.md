@@ -57,26 +57,26 @@ A comprehensive skill for QA engineers to create test plans, generate manual tes
 
 ```
 Your Request
-    
-    
 
- 1. ANALYZE                                          
-    • Parse feature/requirement                      
-    • Identify test types needed                     
-    • Determine scope and priorities                 
 
- 2. GENERATE                                         
-    • Create structured deliverables                 
-    • Apply templates and best practices             
-    • Include edge cases and variations              
 
- 3. VALIDATE                                         
-    • Check completeness                             
-    • Verify traceability                            
-    • Ensure actionable steps                        
+ 1. ANALYZE
+    • Parse feature/requirement
+    • Identify test types needed
+    • Determine scope and priorities
 
-    
-    
+ 2. GENERATE
+    • Create structured deliverables
+    • Apply templates and best practices
+    • Include edge cases and variations
+
+ 3. VALIDATE
+    • Check completeness
+    • Verify traceability
+    • Ensure actionable steps
+
+
+
 QA Deliverable Ready
 ```
 
