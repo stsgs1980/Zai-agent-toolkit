@@ -1,6 +1,6 @@
 # Agent Rules
 
-> Toolkit version: **v1.9.3**
+> Toolkit version: **v1.9.4**
 >
 > Mandatory rules for AI agents working with this toolkit.
 > Read before starting work on any project.

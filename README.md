@@ -4,13 +4,13 @@
 
 # Z.ai Agent Toolkit
 
-[![Version: 1.9.3](https://img.shields.io/badge/Version-1.9.3-blue.svg)]()
+[![Version: 1.9.4](https://img.shields.io/badge/Version-1.9.4-blue.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status: Pre-release](https://img.shields.io/badge/Status-Pre--release-orange.svg)]()
 
 **Standards + Skills + Rules** for AI-driven development
 
-> Toolkit version: **v1.9.3** | Language: **English**
+> Toolkit version: **v1.9.4** | Language: **English**
 
 ---
 
@@ -42,28 +42,32 @@ zai-agent-toolkit/
 1. **Toolkit is a reference**, not part of your code
 2. **Agents should not commit changes** to zai-agent-toolkit
 3. **Avoid conflicts** when updating the toolkit
+4. **Vercel deployment fails** if toolkit is added as git submodule
 
 ---
 
 ## Quick Start
 
-### Option A: Full Toolkit (recommended)
+> **Full installation guide:** See [INSTALL.md](INSTALL.md) for ZCode Desktop, Vercel, and other platforms.
+
+### Option A: Global Install for ZCode Desktop (recommended)
 
 ```bash
-# Clone the toolkit
+# 1. Clone toolkit to global location
+mkdir -p ~/.zcode
+cd ~/.zcode
 git clone https://github.com/stsgs1980/Zai-agent-toolkit.git
 
-# Copy English standards and templates to your project
-cp -r zai-agent-toolkit/standards/*.md your-project/standards/
-cp -r zai-agent-toolkit/templates/          your-project/templates/
-cp -r zai-agent-toolkit/instructions/       your-project/instructions/
-cp zai-agent-toolkit/AGENT_RULES.md         your-project/
-cp zai-agent-toolkit/PROJECT_CONFIG.md      your-project/
+# 2. Create symlinks (ZCode Desktop reads from these paths)
+ln -s ~/.zcode/Zai-agent-toolkit/skills ~/.zcode/skills
+ln -s ~/.zcode/Zai-agent-toolkit/instructions ~/.zcode/instructions
+ln -s ~/.zcode/Zai-agent-toolkit/standards ~/.zcode/standards
 
-# Edit PROJECT_CONFIG.md for your stack
+# 3. Update
+cd ~/.zcode/Zai-agent-toolkit && git pull origin main
 ```
 
-### Option B: Standards Only
+### Option B: Copy to Project
 
 ```bash
 git clone https://github.com/stsgs1980/Zai-agent-toolkit.git
@@ -243,7 +247,7 @@ These are deployed into a project. They SUBMIT to Group B standards.
 
 | Component | ID | Version |
 |-----------|----|---------|
-| **Toolkit** | -- | **v1.9.3** |
+| **Toolkit** | -- | **v1.9.4** |
 | MARKDOWN_STANDARD | STD-DOC-002 | v2.1.5 |
 | UNICODE_POLICY | STD-DOC-003 | v2.1.3 |
 | README_TEMPLATE | STD-DOC-004 | v2.1 |
@@ -316,6 +320,7 @@ This toolkit is provided as-is for use with AI-driven development workflows.
 
 | Version | Changes |
 |---------|---------|
+| **v1.9.4** | Removed emoji from all skills (UNICODE_POLICY compliance); added INSTALL.md for Vercel/ZCode Desktop setup; upgraded CI to Node.js 24 |
 | **v1.9.3** | Added 7 new skills from softaworks/agent-toolkit: session-handoff, requirements-clarity, commit-work, mermaid-diagrams, c4-architecture, qa-test-planner, database-schema-designer
 | **v1.9.2** | Renamed repository to Zai-agent-toolkit; updated all internal references
 | **v1.9.1** | Added Read-Only Usage rule (Section 0) to AGENT_RULES.md; agents must never commit changes to zai-agent-toolkit after cloning
