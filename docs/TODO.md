@@ -81,13 +81,14 @@ update-all-toolkits
 | dev-watchdog | DEV | Pending |
 | project-clone | DEV | Pending |
 
-### Skills пользователя (не найдены в toolkit)
+### Skills пользователя (созданы в toolkit)
 
-| Skill | Статус |
-|-------|--------|
-| prompt-engineering | Создан как prompt-engineering_sts |
-| performance-code-generator | Не найден |
-| frontend-styling-expert | Не найден |
+| Skill | ID | Статус |
+|-------|-----|--------|
+| prompt-engineering_sts | ZAI-STS-001 | Active |
+| sync-toolkit_sts | ZAI-STS-002 | Active |
+| performance-code-generator_sts | ZAI-STS-003 | Active |
+| frontend-styling-expert_sts | ZAI-STS-004 | Active |
 
 ---
 

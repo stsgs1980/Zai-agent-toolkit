@@ -2,14 +2,14 @@
 name: skill-creator
 description: Create new skills with automatic ID assignment for Z.ai Agent Toolkit. Use when users want to create a skill from scratch, modify existing skills, or need a new skill for their workflow. Automatically assigns ZAI-XXX-NNN IDs and updates registry.
 id: ZAI-META-002
-version: 1.0
+version: 1.1
 trigger: create skill, new skill, skill creator, make skill, skill for
 ---
 
-# Skill: Skill Creator v1.0
+# Skill: Skill Creator v1.1
 
 > ID: ZAI-META-002
-> Version: 1.0
+> Version: 1.1
 > Last Updated: 2026-05
 
 Create new skills for Z.ai Agent Toolkit with automatic ID assignment.
@@ -183,6 +183,85 @@ trigger: weekly report, progress report, status report
 ```
 
 5. **Update registry:** Add to USER section in skill-id-system
+
+---
+
+## Trigger Guidelines
+
+### What Are Triggers?
+
+Triggers are keywords and phrases that activate the skill. They appear in two places:
+
+1. **`description` field** - Full sentences with context (loaded always)
+2. **`trigger` field** - Comma-separated keywords (quick matching)
+
+### Trigger Sources
+
+Identify triggers from:
+
+| Source | Example |
+|--------|---------|
+| User's explicit request | "create a prompt" -> `prompt` |
+| Synonyms | "improve", "optimize", "enhance" |
+| Domain terms | "Big O", "SIMD", "cache miss" |
+| Common misspellings | "promprt" (for prompt) |
+| Multiple languages | "obnovit" (Russian for "update") |
+
+### Trigger Quality Rules
+
+**GOOD triggers:**
+- Specific: `cache miss` not just `cache`
+- Action-oriented: `optimize code` not just `optimize`
+- Domain terms: `Big O`, `SIMD`, `lock-free`
+
+**BAD triggers:**
+- Too generic: `code`, `help`, `fix`
+- Ambiguous: `fast` (fast what?)
+- Overlapping: `git` (too broad, use `git checkpoint`, `git safe`)
+
+### Description as Extended Trigger
+
+The `description` field is your PRIMARY trigger. AI matches user requests against it.
+
+**Pattern:**
+```
+description: "Use this skill when user asks for X, mentions Y, or needs Z.
+Also activate on: 'keyword1', 'keyword2', 'phrase example'."
+```
+
+**Example from performance-code-generator_sts:**
+```yaml
+description: "Generate high-performance code with optimization for algorithmic
+complexity, cache locality, memory allocations, and parallelism. Use this skill
+when the user asks for performant code, to optimize existing code, improve program
+speed, reduce memory consumption, or mentions Big O, cache hits, SIMD, lock-free
+structures, object pooling, arena allocator, vectorization, profiling. Also
+activate on: 'slow code', 'optimization', 'performance', 'high performance',
+'low latency', 'throughput', 'cache miss', 'allocation', 'memory leak',
+'bottleneck', 'profiling', 'hot path'."
+```
+
+### Trigger Field Format
+
+The `trigger` field is comma-separated keywords:
+
+```yaml
+trigger: keyword1, keyword2, phrase example, domain-term
+```
+
+**Keep it concise** - 5-15 keywords maximum.
+
+### Hot Commands
+
+Hot commands are short phrases user can type to quickly invoke a skill:
+
+| Skill | Hot Commands |
+|-------|--------------|
+| prompt-engineering_sts | "score prompt", "improve prompt", "prompt review" |
+| performance-code-generator_sts | "optimize", "performance", "slow code" |
+| sync-toolkit_sts | "sync toolkit", "obnovit" |
+
+**Document hot commands in the skill's "When to Use" section.**
 
 ---
 

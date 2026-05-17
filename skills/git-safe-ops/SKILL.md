@@ -1,6 +1,7 @@
 ---
 name: git-safe-ops
 version: 1.0
+id: ZAI-GIT-001
 description: >
   Safe git operations with automatic backups and conflict recovery.
   CRITICAL: Use this skill BEFORE any git rebase, merge, pull, or reset operation

@@ -1,6 +1,7 @@
 ---
 name: git-checkpoint
 version: 1.0
+id: ZAI-GIT-002
 description: >
   Systematic git checkpoints during work. Use this skill to create WIP commits,
   recovery tags, and rollback points. Invoke when: (1) 15-20 min of work passed,

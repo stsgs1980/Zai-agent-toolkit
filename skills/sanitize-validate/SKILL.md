@@ -9,6 +9,8 @@ description: >
   input cleaning, data validation, form security, or OWASP-related topics. Even if
   the user just says "secure this endpoint" or "check my form handler" or "sanitize
   this field" -- trigger this skill. The core principle: never trust external data.
+id: ZAI-SEC-001
+trigger: sanitize, validate, XSS, SQL injection, CSRF, OWASP, input validation, form security, secure endpoint
 ---
 
 # Sanitize & Validate -- Input Security

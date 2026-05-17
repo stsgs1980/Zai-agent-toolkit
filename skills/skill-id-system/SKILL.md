@@ -88,11 +88,16 @@ ZCode Desktop has its own built-in skills. They do NOT have `ZAI-` prefix:
 | ID | Skill Name | Version | Status |
 |----|------------|---------|--------|
 | ZAI-META-001 | skill-id-system | 1.0 | Active |
-| ZAI-META-002 | skill-creator | 1.0 | Active |
+| ZAI-META-002 | skill-creator | 1.1 | Active |
+| ZAI-SEC-001 | sanitize-validate | 1.0 | Active |
 | ZAI-DEV-002 | anti-monolith | 1.0 | Active |
+| ZAI-DEV-003 | project-clone | 1.0 | Active |
 | ZAI-STS-001 | prompt-engineering_sts | 1.1 | Active |
 | ZAI-STS-002 | sync-toolkit_sts | 1.0 | Active |
-| ZAI-STS-003 | (available) | - | - |
+| ZAI-STS-003 | performance-code-generator_sts | 1.0 | Active |
+| ZAI-STS-004 | frontend-styling-expert_sts | 1.0 | Active |
+| ZAI-STS-005 | phi-layout_sts | 3.0 | Active |
+| ZAI-STS-006 | (available) | - | - |
 
 ### 5.2. Skills Pending ID Assignment
 
@@ -112,13 +117,11 @@ These skills exist in toolkit but do not have IDs assigned yet:
 | mermaid-diagrams | ARCH |
 | database-schema-designer | ARCH |
 | qa-test-planner | QA |
-| sanitize-validate | SEC |
 | session-handoff | SESSION |
 | session-resume | SESSION |
 | requirements-clarity | REQ |
 | doc-gen | DOC |
 | dev-watchdog | DEV |
-| project-clone | DEV |
 
 **Note:** IDs will be assigned when updating these skills.
 

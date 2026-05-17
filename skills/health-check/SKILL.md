@@ -1,6 +1,7 @@
 ---
 name: health-check
 version: 1.0
+id: ZAI-HEALTH-001
 description: >
   Health monitoring for external APIs and services with proactive failure detection.
   Use this skill when: (1) checking availability of chat.z.ai before making requests,
