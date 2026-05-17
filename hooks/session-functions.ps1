@@ -68,8 +68,8 @@ function List-Memory {
 }
 
 # Aliases
-Set-Alias -Name ss -Value Save-Session
-Set-Alias -Name gm -Value Get-Memory
-Set-Alias -Name lm -Value List-Memory
+Set-Alias -Name ss -Value Save-Session -Force
+Set-Alias -Name qm -Value Get-Memory -Force   # Query Memory (gm is reserved)
+Set-Alias -Name lm -Value List-Memory -Force
 
-Write-Host "Memory functions loaded: Save-Session (ss), Get-Memory (gm), List-Memory (lm)" -ForegroundColor DarkGray
+Write-Host "Memory functions loaded: Save-Session (ss), Get-Memory (qm), List-Memory (lm)" -ForegroundColor DarkGray
