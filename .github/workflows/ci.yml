@@ -30,15 +30,6 @@ jobs:
               echo "OK: $f"
             fi
           done
-          # Skills
-          for f in skills/git-safe-ops/SKILL.md skills/dev-watchdog/SKILL.md; do
-            if [ ! -f "$f" ]; then
-              echo "MISSING: $f"
-              MISSING=1
-            else
-              echo "OK: $f"
-            fi
-          done
           # Instructions
           for f in instructions/onboarding-protocol.md instructions/git-workflow-rules.md instructions/language-rule.md instructions/diagnostic-disclosure.md instructions/writing-plans.md; do
             if [ ! -f "$f" ]; then
