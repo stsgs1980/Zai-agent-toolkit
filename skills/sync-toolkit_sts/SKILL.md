@@ -2,7 +2,7 @@
 name: sync-toolkit_sts
 description: >
   Sync Z.ai Agent Toolkit between server and Windows. Use when user says:
-  "sync toolkit", "update toolkit", "obnovit skills", "sync locally", 
+  "sync toolkit", "update toolkit", "obnovit skills", "sync locally",
   "push to windows", "obnovi lokalno", "sinkhroniziruy", "sync".
   Triggers: sync toolkit, update toolkit, obnovit, lokalno, sinkhronizatsiya.
 id: ZAI-STS-002
@@ -24,7 +24,7 @@ Sync toolkit between Z.ai server and Windows PC.
 
 Activate when user says:
 - "sync toolkit"
-- "update toolkit" 
+- "update toolkit"
 - "obnovit skills"
 - "sync locally"
 - "push to windows"
