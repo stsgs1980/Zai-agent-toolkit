@@ -108,4 +108,47 @@ Validation script показывает 39 issues.
 
 ---
 
-*Документ создан 2026-05-17*
+## 4. Memory System (IN PROGRESS)
+
+### Создано
+
+| Компонент | ID | Статус |
+|-----------|-----|--------|
+| memory-store | ZAI-MEM-001 | Done |
+| memory-query | ZAI-MEM-002 | Done |
+| memory-delete | ZAI-MEM-003 | Done |
+| memory-export | ZAI-MEM-004 | Done |
+| folder-indexer | ZAI-FS-001 | Done |
+| memory_cli.py | - | Done |
+| folder_indexer.py | - | Done |
+
+### Pending
+
+| # | Задача | Статус |
+|---|--------|--------|
+| 1 | Индексировать реальные папки с документами | Pending |
+| 2 | Наполнить memory знаниями через ADE | Pending |
+| 3 | Web-интерфейс для просмотра памяти | Pending |
+| 4 | Интеграция с проектами в ZCodeProject | Pending |
+| 5 | Переименовать projects/ в project-index/ | Pending |
+
+### Архитектура
+
+```
+C:\Users\stsgr\.zcode\
+├── memory\
+│   ├── chromadb\          <- Векторная база
+│   ├── project-index\     <- Каталог проектов
+│   ├── sessions\          <- Логи сессий
+│   └── knowledge\         <- Knowledge base
+├── tools\
+│   ├── memory_cli.py
+│   └── folder_indexer.py
+├── skills\                <- Symlink к toolkit
+├── hooks\
+└── Zai-agent-toolkit\
+```
+
+---
+
+*Dokument sozdan 2026-05-17*
