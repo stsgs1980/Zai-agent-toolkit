@@ -6,17 +6,98 @@ Z.ai Agent Toolkit is a **local reference** for AI agents (ZCode Desktop, Claude
 
 ---
 
-## Quick Install
+## Windows Installation (Step by Step)
 
-### For ZCode Desktop 2.0
+### Prerequisites
+
+- ZCode Desktop installed (https://zcode.z.ai/)
+- Git installed (https://git-scm.com/download/win)
+- Developer Mode enabled in Windows
+
+### Step 1: Enable Developer Mode
+
+1. Press `Win + I` to open Windows Settings
+2. Go to: `Update & Security` > `For developers`
+3. Turn ON: `Developer Mode`
+
+### Step 2: Open PowerShell
+
+Press `Win + R`, type `powershell`, press Enter.
+
+### Step 3: Navigate to ZCode folder
+
+```powershell
+cd $env:USERPROFILE\.zcode
+```
+
+### Step 4: Clone the toolkit
+
+```powershell
+git clone https://github.com/stsgs1980/Zai-agent-toolkit.git
+```
+
+Wait for download to complete.
+
+### Step 5: Create symlinks
+
+```powershell
+New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.zcode\skills" -Target "$env:USERPROFILE\.zcode\Zai-agent-toolkit\skills"
+```
+
+```powershell
+New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.zcode\instructions" -Target "$env:USERPROFILE\.zcode\Zai-agent-toolkit\instructions"
+```
+
+```powershell
+New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.zcode\standards" -Target "$env:USERPROFILE\.zcode\Zai-agent-toolkit\standards"
+```
+
+### Step 6: Verify
+
+```powershell
+dir $env:USERPROFILE\.zcode
+```
+
+You should see:
+- `l---- skills -> ...Zai-agent-toolkit\skills`
+- `l---- instructions -> ...Zai-agent-toolkit\instructions`
+- `l---- standards -> ...Zai-agent-toolkit\standards`
+
+### Step 7: Restart ZCode Desktop
+
+Close and reopen ZCode Desktop application.
+
+---
+
+## How to Update (Windows)
+
+### Option A: Easy Way - Use Update Script
+
+1. Open PowerShell
+2. Run:
+
+```powershell
+& "$env:USERPROFILE\.zcode\Zai-agent-toolkit\scripts\update-toolkit.ps1"
+```
+
+### Option B: Manual Way
+
+```powershell
+cd $env:USERPROFILE\.zcode\Zai-agent-toolkit
+git pull origin main
+```
+
+---
+
+## Mac / Linux Installation
 
 ```bash
-# 1. Clone toolkit to a global location
+# 1. Clone toolkit
 mkdir -p ~/.zcode
 cd ~/.zcode
 git clone https://github.com/stsgs1980/Zai-agent-toolkit.git
 
-# 2. Create symlinks (ZCode Desktop reads from these paths)
+# 2. Create symlinks
 ln -s ~/.zcode/Zai-agent-toolkit/skills ~/.zcode/skills
 ln -s ~/.zcode/Zai-agent-toolkit/instructions ~/.zcode/instructions
 ln -s ~/.zcode/Zai-agent-toolkit/standards ~/.zcode/standards
@@ -25,11 +106,29 @@ ln -s ~/.zcode/Zai-agent-toolkit/standards ~/.zcode/standards
 ls -la ~/.zcode/skills
 ```
 
-### Update
+### Update (Mac / Linux)
 
 ```bash
 cd ~/.zcode/Zai-agent-toolkit && git pull origin main
 ```
+
+---
+
+## Why This Setup is Safe
+
+### ZCode Desktop Updates Are Safe
+
+ZCode Desktop only manages these folders:
+- `agent/` - agent configs
+- `cli/` - CLI settings
+- `v2/` - app version data
+
+ZCode does NOT create or modify:
+- `skills/`
+- `instructions/`
+- `standards/`
+
+**Your symlinks are safe and will not be overwritten by ZCode updates.**
 
 ---
 
@@ -78,7 +177,7 @@ generate-*.js
 | `.agent/`, `.zcode/` | AI tool configs, not needed in production |
 | `agent-ctx/` | Session context, not deployable |
 | `worklog.md` | Agent journal, irrelevant in production |
-| `zai-agent-toolkit/` | Documentation, 478+ MB, not code |
+| `zai-agent-toolkit/` | Documentation, not code |
 | `*.db`, `*.sqlite` | Local database, use Vercel Postgres/Neon |
 | `keep-alive.sh` | Dev server keepalive, not needed |
 | `*.log` | Log files, use proper logging service |
@@ -92,13 +191,6 @@ Add to your project's `.gitignore`:
 zai-agent-toolkit/
 .agent-toolkit/
 ```
-
-### Why?
-
-1. Toolkit is **documentation and standards** — not executable code
-2. Vercel does not need these files
-3. Including toolkit bloats your repository (478+ MB)
-4. Git submodules cause Vercel deployment failures
 
 ### If you accidentally added as submodule
 
@@ -114,62 +206,50 @@ echo "zai-agent-toolkit/" >> .gitignore
 
 ---
 
-## For Other AI Tools
-
-### Claude Desktop
-
-Add to `claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "agent-toolkit": {
-      "command": "npx",
-      "args": ["-y", "@anthropic-ai/mcp-server-filesystem", "/path/to/Zai-agent-toolkit"]
-    }
-  }
-}
-```
-
-### Cursor / VS Code
-
-Copy `AGENT_RULES.md` content to your `.cursorrules` or `.vscode/settings.json`.
-
----
-
 ## Directory Structure After Install
 
 ```
 ~/.zcode/
+  agent/                 ← ZCode managed (safe)
+  cli/                   ← ZCode managed (safe)
+  v2/                    ← ZCode managed (safe)
   Zai-agent-toolkit/     ← Git repository (git pull here)
     skills/
     instructions/
     standards/
-    AGENT_RULES.md
+    scripts/
+      update-toolkit.ps1 ← Windows update script
+      update-toolkit.bat ← Windows update script (alternative)
+    VERSION
 
-  skills → ./Zai-agent-toolkit/skills        ← Symlink
-  instructions → ./Zai-agent-toolkit/instructions  ← Symlink
-  standards → ./Zai-agent-toolkit/standards  ← Symlink
+  skills → ./Zai-agent-toolkit/skills        ← Symlink (safe)
+  instructions → ./Zai-agent-toolkit/instructions  ← Symlink (safe)
+  standards → ./Zai-agent-toolkit/standards  ← Symlink (safe)
 ```
 
 ---
 
 ## Troubleshooting
 
-### Symlinks not working on Windows
+### "A parameter cannot be found that matches parameter name 'la'"
 
-Use Administrator PowerShell:
-
+You are using PowerShell, not bash. Use:
 ```powershell
-# Enable Developer Mode first (Settings > Update & Security > Developers)
-New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.zcode\skills" -Target "$env:USERPROFILE\.zcode\Zai-agent-toolkit\skills"
+dir $env:USERPROFILE\.zcode
 ```
+instead of `ls -la ~/.zcode/`
 
-### ZCode Desktop not seeing skills
+### Symlinks show "l----" but ZCode does not see skills
 
-1. Check paths: `ls -la ~/.zcode/skills`
-2. Restart ZCode Desktop
-3. Check ZCode settings for custom skill paths
+1. Restart ZCode Desktop
+2. Check ZCode settings for custom skill paths
+3. Make sure Developer Mode is ON
+
+### "New-Item: Administrator privilege required"
+
+Run PowerShell as Administrator:
+1. Right-click PowerShell icon
+2. Select "Run as administrator"
 
 ### Vercel build fails with "submodule not found"
 
