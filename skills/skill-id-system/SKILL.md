@@ -63,7 +63,7 @@ ZAI-<DOMAIN>-<NUMBER>
 | `DEV` | Development | Dev server, watchdog |
 | `HEALTH` | Health Monitoring | API health, fallback, retry |
 | `META` | Meta-skills | This document, skill creation |
-| `USER` | User-Created | Skills created by user |
+| `STS` | User-Created (STS) | Skills created by STS |
 
 ---
 
@@ -140,20 +140,22 @@ ZCode Desktop has its own built-in skills. They do NOT have `ZAI-` prefix:
 |----|------------|---------|
 | ZAI-DEV-001 | dev-watchdog | 1.0 |
 | ZAI-DEV-002 | anti-monolith | 1.0 |
+| ZAI-DEV-003 | project-clone | 1.0 |
 
 ### 5.9. Meta (META)
 
 | ID | Skill Name | Version |
 |----|------------|---------|
 | ZAI-META-001 | skill-id-system | 1.0 |
+| ZAI-META-002 | skill-creator | 1.0 |
 
-### 5.10. User-Created (USER)
+### 5.10. User-Created (STS)
 
 | ID | Skill Name | Version |
 |----|------------|---------|
-| ZAI-USER-001 | (available) | - |
-| ZAI-USER-002 | (available) | - |
-| ZAI-USER-003 | (available) | - |
+| ZAI-STS-001 | prompt-engineering_sts | 1.1 |
+| ZAI-STS-002 | (available) | - |
+| ZAI-STS-003 | (available) | - |
 
 ---
 
@@ -176,20 +178,55 @@ trigger: keyword1, keyword2
 
 ---
 
-## 7. User-Created Skills (ZAI-USER-XXX)
+## 7. User-Created Skills (ZAI-STS-XXX)
 
-Skills created by the user should use `ZAI-USER-XXX` IDs.
+Skills created by STS use `ZAI-STS-XXX` IDs.
 
-This clearly distinguishes user skills from toolkit skills.
+This clearly distinguishes your skills from toolkit skills.
+
+### 7.1. Naming Convention for User Skills
+
+**IMPORTANT:** All user-created skills MUST have `_sts` suffix in folder name.
+
+| Type | Format | Example |
+|------|--------|---------|
+| Folder name | `<skill-name>_sts` | `prompt-engineering_sts` |
+| ID | `ZAI-STS-XXX` | `ZAI-STS-001` |
+
+**Why `_sts` suffix and `STS` domain?**
+- STS is your signature/initials
+- Instantly identifies the skill as yours
+- Prevents conflicts with Z.ai built-in skills and other users
+- Easy to find your own skills in the list
+
+### 7.2. Creating User Skills
+
+Use `skill-creator` (ZAI-META-002) to create new skills.
+
+The skill-creator will:
+1. Guide you through skill creation
+2. Assign appropriate ID (ZAI-STS-XXX for your skills)
+3. Add `_sts` suffix to folder name
+4. Update this registry automatically
 
 ---
 
-## 8. Checklist for New Skill
+## 8. Related Skills
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-META-002 | skill-creator | Create new skills with ID assignment |
+| ZAI-META-001 | skill-id-system | This document - ID registry |
+
+---
+
+## 9. Checklist for New Skill
 
 - [ ] Skill has assigned ID from registry
 - [ ] YAML frontmatter includes `id` field
 - [ ] Header matches format (Section 6)
 - [ ] Registry updated (Section 5)
+- [ ] Used skill-creator (ZAI-META-002) for creation
 
 ---
 

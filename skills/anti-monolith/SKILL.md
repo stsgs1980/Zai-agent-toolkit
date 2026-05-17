@@ -1,6 +1,5 @@
 ---
 name: anti-monolith
-version: 1.0
 description: >
   Anti-monolith standard for React/Next.js projects. Enforces modular component architecture,
   file size limits, single-responsibility components, custom hook extraction, data-layer separation,
@@ -11,9 +10,18 @@ description: >
   "extract component", "file too big", "too many useState", "dynamic import", "code splitting",
   or any situation where a React/Next.js file is growing beyond manageable size.
   Also use proactively when scaffolding new projects to ensure the architecture is modular from the start.
+id: ZAI-DEV-002
+version: 1.0
+trigger: monolith, too long, refactor, component library, modular, split, extract component
 ---
 
-# Anti-Monolith Standard for React/Next.js
+# Skill: Anti-Monolith Standard v1.0
+
+> ID: ZAI-DEV-002
+> Version: 1.0
+> Last Updated: 2026-05
+
+Anti-monolith standard for React/Next.js projects.
 
 ## Why this matters
 

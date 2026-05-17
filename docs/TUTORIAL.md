@@ -1,0 +1,679 @@
+# Z.ai Agent Toolkit: Complete Tutorial
+
+A comprehensive guide for using and extending the toolkit.
+
+---
+
+## Table of Contents
+
+1. [What is Z.ai Agent Toolkit](#1-what-is-zai-agent-toolkit)
+2. [Installation on Windows](#2-installation-on-windows)
+3. [How Skills Work](#3-how-skills-work)
+4. [Skill ID System](#4-skill-id-system)
+5. [Creating Your Own Skills](#5-creating-your-own-skills)
+6. [Synchronization](#6-synchronization)
+7. [Best Practices](#7-best-practices)
+8. [Troubleshooting](#8-troubleshooting)
+
+---
+
+## 1. What is Z.ai Agent Toolkit
+
+### Purpose
+
+Z.ai Agent Toolkit is a collection of reusable skills for AI agents. These skills help the AI:
+
+- Work with git safely
+- Generate documents (PDF, DOCX, PPT)
+- Create architecture diagrams
+- Manage sessions and context
+- And much more
+
+### Why Use It
+
+| Without Toolkit | With Toolkit |
+|-----------------|--------------|
+| AI forgets context between sessions | session-handoff preserves context |
+| Git mistakes cause problems | git-safety prevents disasters |
+| No standardized document output | doc-gen ensures quality |
+| Inconsistent code architecture | anti-monolith enforces modularity |
+
+### Architecture
+
+```
+Z.ai Sandbox                    Your Windows PC
++------------------+           +------------------+
+| /home/z/         |           | C:\Users\stsgr\  |
+|   my-project/    |           |   .zcode\        |
+|     Zai-agent-   |<--sync--->|     Zai-agent-   |
+|     toolkit/     |   Git     |     toolkit\     |
++------------------+           +------------------+
+        |                              |
+        v                              v
+   AI reads skills              ZCode Desktop reads
+                                skills via symlink
+```
+
+---
+
+## 2. Installation on Windows
+
+### Prerequisites
+
+- Windows 10/11
+- PowerShell (built-in)
+- Git installed
+- ZCode Desktop installed
+
+### Step-by-Step Installation
+
+#### Step 1: Open PowerShell
+
+Press `Win + X`, select "Windows PowerShell" or "Terminal".
+
+#### Step 2: Navigate to ZCode Directory
+
+```powershell
+cd C:\Users\stsgr\.zcode
+```
+
+If the directory does not exist:
+
+```powershell
+mkdir C:\Users\stsgr\.zcode
+cd C:\Users\stsgr\.zcode
+```
+
+#### Step 3: Clone Toolkit
+
+```powershell
+git clone https://github.com/stsgs1980/Zai-agent-toolkit.git
+```
+
+#### Step 4: Create Symlinks
+
+ZCode Desktop expects skills in `~/.zcode/skills/`. Create symbolic links:
+
+```powershell
+# Remove existing directories if they exist (backup first!)
+# Then create symlinks:
+
+New-Item -ItemType SymbolicLink -Path "skills" -Target "Zai-agent-toolkit\skills"
+New-Item -ItemType SymbolicLink -Path "instructions" -Target "Zai-agent-toolkit\instructions"
+New-Item -ItemType SymbolicLink -Path "standards" -Target "Zai-agent-toolkit\standards"
+```
+
+#### Step 5: Verify Installation
+
+```powershell
+ls skills
+```
+
+You should see skill folders like:
+- git-safe-ops
+- session-handoff
+- skill-creator
+- etc.
+
+### Update Script
+
+Create `update-toolkit.ps1` in `C:\Users\stsgr\.zcode\`:
+
+```powershell
+# update-toolkit.ps1
+# Run this script to update Z.ai Agent Toolkit
+
+Write-Host "Updating Z.ai Agent Toolkit..." -ForegroundColor Green
+
+# Navigate to toolkit
+Set-Location "$env:USERPROFILE\.zcode\Zai-agent-toolkit"
+
+# Fetch and pull changes
+git fetch origin
+git pull origin main
+
+Write-Host "Update complete!" -ForegroundColor Green
+Write-Host "Current version: $(Get-Content VERSION)" -ForegroundColor Cyan
+```
+
+To run:
+
+```powershell
+cd C:\Users\stsgr\.zcode
+.\update-toolkit.ps1
+```
+
+---
+
+## 3. How Skills Work
+
+### What is a Skill
+
+A skill is a set of instructions that the AI agent can load when needed. Think of it as a "plugin" or "module" that extends AI capabilities.
+
+### Skill Structure
+
+```
+skill-name/
+├── SKILL.md           # Main file (required)
+├── references/        # Additional docs (optional)
+│   └── guide.md
+├── scripts/           # Helper scripts (optional)
+│   └── helper.py
+└── assets/            # Templates, icons (optional)
+    └── template.md
+```
+
+### SKILL.md Anatomy
+
+```markdown
+---
+name: skill-name
+description: When to use this skill and what it does
+id: ZAI-XXX-NNN
+version: 1.0
+trigger: keyword1, keyword2, keyword3
+---
+
+# Skill: Skill Name v1.0
+
+> ID: ZAI-XXX-NNN
+> Version: 1.0
+> Last Updated: 2026-05
+
+<Main instructions here>
+
+---
+
+## When to Use
+
+Activate this skill when:
+- User says "keyword1"
+- Context matches "keyword2"
+
+---
+
+## Instructions
+
+<Step-by-step guide>
+
+---
+
+## Checklist
+
+- [ ] Step 1
+- [ ] Step 2
+```
+
+### How Skills Load
+
+Skills use a three-level loading system:
+
+| Level | Content | When Loaded |
+|-------|---------|-------------|
+| 1 | Name + Description | Always (in every conversation) |
+| 2 | SKILL.md body | When skill triggers (AI decides) |
+| 3 | references/, scripts/ | When explicitly needed |
+
+This means:
+- AI always knows skill exists (from description)
+- AI only loads full instructions when needed
+- Large files (scripts, references) load only when used
+
+---
+
+## 4. Skill ID System
+
+### Why IDs Matter
+
+Without IDs, it's hard to:
+- Distinguish your skills from built-in ZCode skills
+- Reference skills in conversations
+- Track versions and updates
+
+With IDs:
+- "Use ZAI-GIT-001 for safe git operations" - clear reference
+- ZAI-USER-001 - clearly your skill, not built-in
+
+### ID Format
+
+```
+ZAI-<DOMAIN>-<NUMBER>
+```
+
+| Part | Meaning |
+|------|---------|
+| ZAI | Z.ai Agent Toolkit prefix |
+| DOMAIN | Category (GIT, SDK, USER, etc.) |
+| NUMBER | Sequential (001, 002, 003...) |
+
+### Domain Reference
+
+| Domain | For Skills About |
+|--------|------------------|
+| GIT | Git operations (clone, commit, checkpoint, safety) |
+| SDK | API integration (z-ai-web-dev-sdk, retry, fallback) |
+| ARCH | Architecture (C4, Mermaid, database design) |
+| QA | Quality assurance (testing, validation) |
+| SEC | Security (sanitization, input validation) |
+| SESSION | Session management (handoff, resume) |
+| REQ | Requirements (clarity, PRD) |
+| DOC | Documents (PDF, DOCX, PPT generation) |
+| DEV | Development (dev server, project setup) |
+| HEALTH | Health monitoring (API health, retry logic) |
+| META | Toolkit itself (ID system, skill creator) |
+| USER | Your custom skills |
+
+### Current Registry
+
+#### Git Operations (GIT)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-GIT-001 | git-safe-ops | Safe git operations with deadlock prevention |
+| ZAI-GIT-002 | git-checkpoint | Create WIP commits and recovery tags |
+| ZAI-GIT-003 | commit-work | Structured commit workflow |
+
+#### SDK Integration (SDK)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-SDK-001 | z-ai-web-dev-sdk | Z.ai SDK for chat, images, search |
+| ZAI-SDK-002 | api-retry | Retry logic with exponential backoff |
+| ZAI-SDK-003 | fallback | Fallback provider strategy |
+| ZAI-SDK-004 | health-check | API health monitoring |
+
+#### Architecture (ARCH)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-ARCH-001 | c4-architecture | C4 model architecture diagrams |
+| ZAI-ARCH-002 | mermaid-diagrams | Mermaid diagram generation |
+| ZAI-ARCH-003 | database-schema-designer | Database schema design |
+
+#### Quality Assurance (QA)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-QA-001 | qa-test-planner | Test planning and bug reports |
+| ZAI-QA-002 | sanitize-validate | Input sanitization and validation |
+
+#### Session Management (SESSION)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-SESSION-001 | session-handoff | Context handoff between sessions |
+| ZAI-SESSION-002 | session-resume | Resume work after session restart |
+
+#### Requirements (REQ)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-REQ-001 | requirements-clarity | Requirements analysis |
+
+#### Documentation (DOC)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-DOC-001 | doc-gen | Professional document generation |
+
+#### Development (DEV)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-DEV-001 | dev-watchdog | Dev server keepalive |
+| ZAI-DEV-002 | anti-monolith | Modular React/Next.js architecture |
+| ZAI-DEV-003 | project-clone | Smart project cloning with dialogs |
+
+#### Meta (META)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-META-001 | skill-id-system | This ID system |
+| ZAI-META-002 | skill-creator | Create new skills with auto-ID |
+
+#### User-Created (USER)
+
+| ID | Skill | Created |
+|----|-------|---------|
+| ZAI-USER-001 | (available) | - |
+| ZAI-USER-002 | (available) | - |
+| ZAI-USER-003 | (available) | - |
+
+---
+
+## 5. Creating Your Own Skills
+
+### Method 1: Ask AI (Recommended)
+
+Just say to the AI:
+
+```
+Create a skill for <purpose>
+```
+
+Example:
+
+```
+Create a skill for generating weekly progress reports from git commits
+```
+
+The AI will:
+1. Use skill-creator (ZAI-META-002)
+2. Ask clarifying questions
+3. Assign a ZAI-USER-XXX ID
+4. Create the SKILL.md file
+5. Update the registry
+
+### Method 2: Manual Creation
+
+#### Step 1: Determine Domain
+
+For user-created skills, always use `USER` domain.
+
+#### Step 2: Get Next ID
+
+Check the registry in `skills/skill-id-system/SKILL.md`:
+
+```
+ZAI-USER-001: available
+ZAI-USER-002: available
+...
+```
+
+Use the first available.
+
+#### Step 3: Create Directory
+
+```powershell
+cd C:\Users\stsgr\.zcode\Zai-agent-toolkit\skills
+mkdir my-skill-name
+```
+
+#### Step 4: Create SKILL.md
+
+Create `my-skill-name/SKILL.md`:
+
+```markdown
+---
+name: my-skill-name
+description: What this skill does and when to trigger
+id: ZAI-USER-001
+version: 1.0
+trigger: keyword1, keyword2
+---
+
+# Skill: My Skill Name v1.0
+
+> ID: ZAI-USER-001
+> Version: 1.0
+> Last Updated: 2026-05
+
+Description of what this skill does.
+
+---
+
+## When to Use
+
+Activate this skill when:
+- User says "keyword1"
+- User mentions "keyword2"
+
+---
+
+## Instructions
+
+### Step 1: Do Something
+
+<Instructions here>
+
+### Step 2: Do Another Thing
+
+<More instructions>
+
+---
+
+## Checklist
+
+- [ ] Completed step 1
+- [ ] Completed step 2
+
+---
+
+Built with: Next.js 16 + TypeScript + Tailwind CSS
+```
+
+#### Step 5: Update Registry
+
+Edit `skills/skill-id-system/SKILL.md`:
+
+```markdown
+### 5.10. User-Created (USER)
+
+| ID | Skill Name | Version |
+|----|------------|---------|
+| ZAI-USER-001 | my-skill-name | 1.0 |
+```
+
+#### Step 6: Commit and Push
+
+```powershell
+cd C:\Users\stsgr\.zcode\Zai-agent-toolkit
+git add .
+git commit -m "Add skill: my-skill-name (ZAI-USER-001)"
+git push
+```
+
+---
+
+## 6. Synchronization
+
+### The Sync Problem
+
+Skills created on Z.ai server are NOT automatically on your Windows.
+
+```
+Z.ai Server                GitHub                Your Windows
++----------+              +-------+              +------------+
+| skills/  | --push----->| repo  |----pull----->| skills/    |
++----------+              +-------+              +------------+
+     ^                                                   |
+     |                                                   |
+     +------------------NOT AUTOMATIC--------------------+
+```
+
+### Sync Workflow
+
+#### From Z.ai Server to Windows
+
+1. On Z.ai (after creating skill):
+   ```bash
+   cd /home/z/my-project/Zai-agent-toolkit
+   git add .
+   git commit -m "Add new skill"
+   git push
+   ```
+
+2. On Windows:
+   ```powershell
+   cd C:\Users\stsgr\.zcode
+   .\update-toolkit.ps1
+   # OR manually:
+   cd Zai-agent-toolkit
+   git pull
+   ```
+
+#### From Windows to Z.ai Server
+
+1. On Windows:
+   ```powershell
+   cd C:\Users\stsgr\.zcode\Zai-agent-toolkit
+   git add .
+   git commit -m "Update skill"
+   git push
+   ```
+
+2. On Z.ai server:
+   ```bash
+   cd /home/z/my-project/Zai-agent-toolkit
+   git pull
+   ```
+
+### Best Practice
+
+Always sync before starting work:
+
+```
+On Z.ai:     git pull before creating skills
+On Windows:  update-toolkit.ps1 before using ZCode Desktop
+```
+
+---
+
+## 7. Best Practices
+
+### Skill Design
+
+| Good | Bad |
+|------|-----|
+| Clear trigger keywords | Vague "use when needed" |
+| Step-by-step instructions | Wall of text |
+| Checklist for verification | No way to verify |
+| Under 500 lines | 2000+ lines |
+
+### Naming Conventions
+
+```
+Good:    weekly-report-generator
+Bad:     skill1, myskill, new_skill
+
+Good:    ZAI-USER-001
+Bad:     skill-1, user_skill_1
+```
+
+### Version Control
+
+Update version when:
+- Adding new features: 1.0 -> 1.1
+- Breaking changes: 1.0 -> 2.0
+- Bug fixes: 1.0.1 -> 1.0.2
+
+### Documentation
+
+Every skill should have:
+- Clear description
+- When to use section
+- Step-by-step instructions
+- Checklist
+
+---
+
+## 8. Troubleshooting
+
+### Skill Not Triggering
+
+**Symptom:** AI ignores your skill.
+
+**Causes:**
+1. Trigger keywords not matching
+2. Description too vague
+3. Skill not in correct directory
+
+**Solutions:**
+1. Add more trigger keywords
+2. Make description more specific
+3. Check symlink is correct:
+   ```powershell
+   ls C:\Users\stsgr\.zcode\skills
+   # Should show Zai-agent-toolkit\skills contents
+   ```
+
+### Symlink Broken
+
+**Symptom:** Skills folder is empty or wrong.
+
+**Solution:**
+```powershell
+# Remove broken symlink
+Remove-Item C:\Users\stsgr\.zcode\skills
+
+# Recreate
+New-Item -ItemType SymbolicLink -Path "C:\Users\stsgr\.zcode\skills" -Target "C:\Users\stsgr\.zcode\Zai-agent-toolkit\skills"
+```
+
+### Git Conflicts
+
+**Symptom:** `git pull` shows conflicts.
+
+**Solution:**
+```powershell
+# Stash your changes
+git stash
+
+# Pull updates
+git pull
+
+# Reapply your changes
+git stash pop
+```
+
+### ZCode Desktop Not Seeing Skills
+
+**Symptom:** ZCode Desktop doesn't recognize your skills.
+
+**Check:**
+1. Symlink exists: `ls C:\Users\stsgr\.zcode\skills`
+2. SKILL.md exists in skill folder
+3. SKILL.md has valid YAML frontmatter
+
+---
+
+## Quick Reference Card
+
+### Essential Commands
+
+```powershell
+# Update toolkit
+cd C:\Users\stsgr\.zcode
+.\update-toolkit.ps1
+
+# Create skill manually
+cd Zai-agent-toolkit\skills
+mkdir my-skill
+# Create SKILL.md...
+
+# Commit and push
+git add .
+git commit -m "Add skill"
+git push
+```
+
+### ID Assignment
+
+```
+Your skills: ZAI-USER-001, ZAI-USER-002, ...
+Toolkit skills: ZAI-GIT-xxx, ZAI-SDK-xxx, ...
+```
+
+### File Locations
+
+| What | Where |
+|------|-------|
+| Toolkit | `C:\Users\stsgr\.zcode\Zai-agent-toolkit\` |
+| Skills | `Zai-agent-toolkit\skills\` |
+| ID Registry | `skills\skill-id-system\SKILL.md` |
+| This Guide | `docs\TUTORIAL.md` |
+
+---
+
+## Summary
+
+1. **Install** once via git clone + symlinks
+2. **Update** with `update-toolkit.ps1`
+3. **Create skills** by asking AI or manually
+4. **Use IDs** (ZAI-USER-xxx) for your skills
+5. **Sync** via git push/pull
+
+---
+
+Built with: Z.ai Agent Toolkit
