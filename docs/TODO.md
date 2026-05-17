@@ -374,6 +374,34 @@ C:\Users\stsgr\.zcode\
 
 Можно либо перевести всё на один язык, либо явно промаркировать mixed-статус.
 
+### 6.3 anti-monolith — фантомный скилл
+
+`skills/anti-monolith/` — не существует, но упоминается в 11 файлах toolkit'а.
+
+#### Где упоминается
+
+| Файл | Статус | Что делать |
+|------|--------|-----------|
+| `AGENT_RULES.md` 8.2 (System Skills) | Ок — это sandbox built-in | Не трогать |
+| `standards/skill-id-registry.md` | `ZAI-DEV-002 \| Planned` | Оставить как Planned, но пометить "system only" |
+| `skills/skill-id-system/SKILL.md` | `ZAI-DEV-002 \| anti-monolith \| 1.0 \| Active` | Поменять статус на Planned |
+| `skills/zai-ui-composer_sts/SKILL.md` | Complementary reference | Поменять на "system skill (Z.ai sandbox)" |
+| `standards/FRONTEND_STANDARD.md` | Changelog: merged anti-monolith patterns | Ок — это история |
+| `standards/IMPLEMENTATION_ORDER.md` | "Use anti-monolith skill" | Заменить на ссылку на FRONTEND_STANDARD |
+| `docs/SKILL_ID_GUIDE.md` | Как существующий | Поменять на "system skill (Z.ai sandbox)" |
+| `docs/TUTORIAL.md` | Дважды как существующий | Поменять на "system skill (Z.ai sandbox)" |
+| `docs/COMMANDS_LOG.md` | ZAI-DEV-002 как existing | Поменять статус |
+| `CHANGELOG.md` | v1.5.0 добавлен | Ок — это история |
+
+#### Анализ
+
+| Аспект | Оценка |
+|--------|--------|
+| Концепция (декомпозиция монолитов) | Полезна |
+| Нужен ли отдельный SKILL.md в toolkit | Нет — всё покрыто FRONTEND_STANDARD.md (150-line limit, FSD-слои, разделение ответственности) |
+| Оставить ID ZAI-DEV-002 | Да, зарезервировать как Planned |
+| Сколько файлов править | 6 (skill-id-registry, skill-id-system, zai-ui-composer, IMPLEMENTATION_ORDER, SKILL_ID_GUIDE, TUTORIAL, COMMANDS_LOG) |
+
 ---
 
 ## 7. Итого по приоритетам
@@ -385,6 +413,7 @@ C:\Users\stsgr\.zcode\
 | P1 | Обновить URL с `Zai-agent-toolkit` на `_v` | удаление старого репо |
 | P2 | Решить судьбу `extract_severity_levels()` | — |
 | P2 | Переписать план submodule под `_v` | P1 (URL) |
+| P2 | Почистить 7 файлов с упоминаниями anti-monolith (плановый статус или system-only) | — |
 | P3 | Реализовать графовый слой в memory_cli.py | — |
 | P3 | Индексация реальных папок + наполнение memory | графовый слой опционально |
 | P3 | Web-интерфейс для памяти | графовый слой |
