@@ -22,6 +22,28 @@ from typing import Optional, List, Dict, Any
 # Default memory path
 DEFAULT_MEMORY_PATH = Path.home() / ".zcode" / "memory" / "chromadb"
 
+
+def parse_metadata(metadata_str: Optional[str]) -> Optional[Dict[str, str]]:
+    """Parse metadata from JSON or key=value format."""
+    if not metadata_str:
+        return None
+
+    # Try JSON first
+    try:
+        return json.loads(metadata_str)
+    except json.JSONDecodeError:
+        pass
+
+    # Try key=value format (comma separated)
+    result = {}
+    for pair in metadata_str.split(","):
+        pair = pair.strip()
+        if "=" in pair:
+            key, value = pair.split("=", 1)
+            result[key.strip()] = value.strip()
+
+    return result if result else None
+
 # Entry types
 ENTRY_TYPES = ["session", "knowledge", "pattern", "project", "template"]
 
@@ -229,7 +251,8 @@ def main():
 Examples:
     python memory_cli.py init
     python memory_cli.py store session "Working on React hooks refactoring"
-    python memory_cli.py store knowledge "Use useCallback for memoizing functions" --metadata '{"category": "react"}'
+    python memory_cli.py store knowledge "Use useCallback for memoizing functions" --metadata category=react
+    python memory_cli.py store knowledge "Project info" --metadata "project=zai,version=1.0"
     python memory_cli.py query "react hooks"
     python memory_cli.py list session
     python memory_cli.py delete session_20240101_120000
@@ -272,7 +295,7 @@ Examples:
     if args.command == "init":
         init_db()
     elif args.command == "store":
-        metadata = json.loads(args.metadata) if args.metadata else None
+        metadata = parse_metadata(args.metadata)
         store_entry(args.type, args.content, metadata)
     elif args.command == "query":
         query_entries(args.query, args.type, args.limit)
