@@ -272,6 +272,90 @@ flowchart TB
 
 ---
 
+## 7. Full Sync Architecture (Windows + GitHub + Sandbox)
+
+Полная архитектура синхронизации между Windows, GitHub и Z.ai Sandbox.
+
+![Full Sync Architecture](./diagrams/07-full-sync-architecture.png)
+
+```mermaid
+flowchart TB
+    subgraph Windows["WINDOWS (C:\\Users\\stsgr\\.zcode\\)"]
+        A[ZCode Client]
+        B[skills/]
+        C[instructions/]
+        D[standards/]
+
+        B -.->|symlink| E
+        C -.->|symlink| F
+        D -.->|symlink| G
+
+        subgraph LocalToolkit["Zai-agent-toolkit/"]
+            E[skills/]
+            F[instructions/]
+            G[standards/]
+        end
+    end
+
+    subgraph GitHub["GITHUB"]
+        H[github.com/stsgs1980/<br>Zai-agent-toolkit]
+    end
+
+    subgraph Sandbox["Z.ai SANDBOX (/home/z/my-project/)"]
+        I[System Skills/]
+        J[Zai-agent-toolkit/<br>submodule]
+    end
+
+    %% Sync flows
+    LocalToolkit -->|"git push"| H
+    H -->|"git pull"| LocalToolkit
+
+    J -->|"git push"| H
+    H -->|"git pull"| J
+
+    I -.->|"auto by Z.ai"| K[Agent invokes]
+    E -.->|"via symlink"| K
+
+    %% Labels
+    L[sync-toolkit_sts<br>ZAI-STS-002]
+    L -.->|orchestrates| LocalToolkit
+    L -.->|orchestrates| J
+```
+
+### Windows Directory Structure
+
+```
+C:\Users\stsgr\.zcode\
+├── agent/
+├── cli/
+├── v2/
+├── skills/ ────────────────→ Zai-agent-toolkit\skills\ (symlink)
+├── instructions/ ──────────→ Zai-agent-toolkit\instructions\ (symlink)
+├── standards/ ─────────────→ Zai-agent-toolkit\standards\ (symlink)
+└── Zai-agent-toolkit/
+    ├── skills/
+    ├── instructions/
+    ├── standards/
+    └── sync-toolkit.ps1
+```
+
+### Sync Workflow
+
+| Direction | Command | Location |
+|-----------|---------|----------|
+| Sandbox → GitHub | `git push` | `/home/z/my-project/Zai-agent-toolkit/` |
+| GitHub → Windows | `git pull` or `sync-toolkit` | `C:\Users\stsgr\.zcode\Zai-agent-toolkit\` |
+| Windows → GitHub | `git push` | `C:\Users\stsgr\.zcode\Zai-agent-toolkit\` |
+| GitHub → Sandbox | `git pull` | `/home/z/my-project/Zai-agent-toolkit/` |
+
+### sync-toolkit_sts (ZAI-STS-002)
+
+Personal skill for orchestrating sync between all three locations.
+
+**Triggers:** "sync toolkit", "update toolkit", "obnovit", "lokalno"
+
+---
+
 ## Directory Structure Reference
 
 ```
