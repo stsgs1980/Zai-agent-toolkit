@@ -417,6 +417,11 @@ C:\Users\stsgr\.zcode\
 | P3 | Реализовать графовый слой в memory_cli.py | — |
 | P3 | Индексация реальных папок + наполнение memory | графовый слой опционально |
 | P3 | Web-интерфейс для памяти | графовый слой |
+| P3 | Создать `docs/AGENT_ARCHITECTURE.md` | [x] Done |
+| P3 | Создать `agents/` директорию + AGENT.md для 5 агентов | AGENT_ARCHITECTURE.md |
+| P3 | Обновить `opencode.json` — добавить `agents.paths` | agents/ |
+| P3 | Доработать `templates/TASK_TEMPLATE.md` — chain-шаблоны | — |
+| P3 | Доработать `AGENT_RULES.md` — Section про sub-agents | — |
 | P4 | Смесь языков в docs/TODO.md, SKILL_PROCESSES.md | — |
 
 ---
