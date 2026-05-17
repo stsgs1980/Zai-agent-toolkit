@@ -1,5 +1,6 @@
 ---
 name: skill-id-system
+compatibility: both
 description: ID system for Z.ai Agent Toolkit skills
 id: ZAI-META-001
 version: 1.0
@@ -135,6 +136,7 @@ name: skill-name
 description: Short description
 id: ZAI-XXX-NNN
 version: 1.0
+compatibility: both
 trigger: keyword1, keyword2
 ---
 
@@ -143,6 +145,19 @@ trigger: keyword1, keyword2
 > ID: ZAI-<DOMAIN>-<NUMBER>
 > Version: <Version>
 ```
+
+### Compatibility Values
+
+| Value | Meaning |
+|-------|---------|
+| `both` | Works in both Z.ai Sandbox and ZCode ADE |
+| `sandbox` | Only works in Z.ai Sandbox (requires z-ai-web-dev-sdk) |
+| `ade` | Only works in ZCode ADE |
+
+**How to determine:**
+- Does the skill require `z-ai-web-dev-sdk`? → `sandbox`
+- Does the skill use Z.ai-specific tokens/UI? → `sandbox`
+- Otherwise → `both`
 
 ---
 

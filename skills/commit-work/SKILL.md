@@ -2,6 +2,7 @@
 name: commit-work
 id: ZAI-DEV-004
 version: 1.0
+compatibility: both
 description: "Create high-quality git commits: review/stage intended changes, split into logical commits, and write clear commit messages (including Conventional Commits). Use when the user asks to commit, craft a commit message, stage changes, or split work into multiple commits."
 ---
 

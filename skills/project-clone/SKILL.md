@@ -1,5 +1,6 @@
 ---
 name: project-clone
+compatibility: sandbox
 description: Smart project cloning with user confirmation
 id: ZAI-DEV-003
 version: 1.0

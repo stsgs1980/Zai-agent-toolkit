@@ -2,6 +2,7 @@
 name: session-log
 id: ZAI-SESSION-002
 version: 1.1
+compatibility: both
 description: >
   AUTOMATIC session knowledge capture. Creates snapshots without user action.
   Triggers: every 15 min, after every commit, after 5+ file changes, on problem solved,

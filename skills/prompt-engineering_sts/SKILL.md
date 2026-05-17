@@ -1,5 +1,6 @@
 ---
 name: prompt-engineering_sts
+compatibility: both
 description: >
   Score, analyze, improve, and architect AI prompts using a 6-dimension evaluation framework,
   20 prompting techniques, 11 structured frameworks, 5-layer system prompt architect, and

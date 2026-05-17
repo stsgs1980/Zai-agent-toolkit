@@ -1,5 +1,6 @@
 ---
 name: skill-creator
+compatibility: both
 description: Create new skills with automatic ID assignment for Z.ai Agent Toolkit. Use when users want to create a skill from scratch, modify existing skills, or need a new skill for their workflow. Automatically assigns ZAI-XXX-NNN IDs and updates registry.
 id: ZAI-META-002
 version: 1.1

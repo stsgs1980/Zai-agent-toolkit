@@ -1,6 +1,7 @@
 ---
 name: frontend-styling-expert_sts
 version: 1.0
+compatibility: both
 description: "CSS, styling, responsive design, accessibility, and UI/UX polish specialist. Use this skill when you need help with CSS, styling frameworks, responsive design, UI/UX implementation, animations, layout systems, or any visual/presentational aspects of web development. Examples: responsive navigation menus, button hover effects, centering layouts, accessibility improvements, cross-browser fixes, mobile optimization, Tailwind CSS utilities, CSS Grid and Flexbox layouts, animation choreography, design system implementation, visual polish, dark mode theming. Make sure to use this skill whenever the user mentions CSS, styling, responsive, accessibility, animation, hover effects, layout, positioning, spacing, typography rendering, or wants to improve the visual quality of any web element."
 id: ZAI-STS-004
 author: STS

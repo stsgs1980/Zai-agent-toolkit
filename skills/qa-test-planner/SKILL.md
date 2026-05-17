@@ -2,6 +2,7 @@
 name: qa-test-planner
 id: ZAI-QA-001
 version: 1.0
+compatibility: both
 description: Generate comprehensive test plans, manual test cases, regression test suites, and bug reports for QA engineers. Includes Figma MCP integration for design validation.
 trigger: explicit
 ---

@@ -1,6 +1,7 @@
 ---
 name: zai-ui-composer_sts
 version: 1.1.2
+compatibility: sandbox
 description: >
   Compose, score, and architect production UI using zai-ui-kit token system.
   Handles WHAT goes into a layout: skins, effects, components, scoring.

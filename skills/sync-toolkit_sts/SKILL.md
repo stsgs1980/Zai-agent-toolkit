@@ -1,5 +1,6 @@
 ---
 name: sync-toolkit_sts
+compatibility: sandbox
 description: >
   Sync Z.ai Agent Toolkit between server and Windows. Use when user says:
   "sync toolkit", "update toolkit", "obnovit skills", "sync locally",

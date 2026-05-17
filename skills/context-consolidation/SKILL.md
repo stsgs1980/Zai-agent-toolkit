@@ -2,6 +2,7 @@
 name: context-consolidation
 id: ZAI-SESSION-003
 version: 1.0
+compatibility: both
 description: >
   Context and memory management for long-running agent sessions. Use when the
   conversation context is getting long, memory is running low, or the agent needs
