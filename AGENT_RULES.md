@@ -1,6 +1,6 @@
 # Agent Rules
 
-> Toolkit version: **v1.9.2**
+> Toolkit version: **v1.9.3**
 >
 > Mandatory rules for AI agents working with this toolkit.
 > Read before starting work on any project.
@@ -154,8 +154,10 @@ See `instructions/writing-plans.md` for full details.
 | Skill | When to Use |
 |-------|-------------|
 | `session-resume` | Start of every new session, after context loss, after "continue" |
+| `session-handoff` | Creating handoff documents, context preservation, session transfers |
 | `git-checkpoint` | Every 15-20 min during active work, before risky operations |
 | `git-safe-ops` | Before any git push/pull/rebase/merge with remote |
+| `commit-work` | Creating high-quality conventional commits with change analysis |
 | `sanitize-validate` | User input, form data, API requests, file uploads, security |
 | `api-retry` | Making HTTP requests to external APIs, encountering 502/503/504 errors |
 | `health-check` | Checking availability of chat.z.ai, monitoring API response times |
@@ -163,6 +165,11 @@ See `instructions/writing-plans.md` for full details.
 | `dev-watchdog` | Starting, restarting, or checking dev server |
 | `z-ai-web-dev-sdk` | Chat, image gen, web search via z-ai-web-dev-sdk |
 | `doc-gen` | Generating PDF, DOCX, XLSX documents following toolkit standards |
+| `requirements-clarity` | Clarifying vague requirements, generating PRD through dialogue |
+| `mermaid-diagrams` | Creating flowcharts, sequence diagrams, ERDs with Mermaid |
+| `c4-architecture` | C4 architecture diagrams with Mermaid |
+| `qa-test-planner` | Comprehensive QA test planning |
+| `database-schema-designer` | Designing robust database schemas |
 
 ## 8. Instructions to Follow
 

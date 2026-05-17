@@ -4,13 +4,13 @@
 
 # Z.ai Agent Toolkit
 
-[![Version: 1.9.2](https://img.shields.io/badge/Version-1.9.2-blue.svg)]()
+[![Version: 1.9.3](https://img.shields.io/badge/Version-1.9.3-blue.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status: Pre-release](https://img.shields.io/badge/Status-Pre--release-orange.svg)]()
 
 **Standards + Skills + Rules** for AI-driven development
 
-> Toolkit version: **v1.9.2** | Language: **English**
+> Toolkit version: **v1.9.3** | Language: **English**
 
 ---
 
@@ -156,6 +156,14 @@ zai-agent-toolkit/
     api-retry/                API retry with backoff
     anti-monolith/            React/Next.js architecture enforcement
     z-ai-web-dev-sdk/         Z.ai SDK integration (chat, image gen, web search)
+    session-handoff/          Session context handoff documents
+    session-resume/           Resume after context loss
+    requirements-clarity/     Clarify requirements before coding
+    commit-work/              High-quality conventional commits
+    mermaid-diagrams/         Software diagrams with Mermaid
+    c4-architecture/          C4 architecture diagrams
+    qa-test-planner/          QA test planning
+    database-schema-designer/ Database schema design
 ```
 
 ---
@@ -235,7 +243,7 @@ These are deployed into a project. They SUBMIT to Group B standards.
 
 | Component | ID | Version |
 |-----------|----|---------|
-| **Toolkit** | -- | **v1.9.2** |
+| **Toolkit** | -- | **v1.9.3** |
 | MARKDOWN_STANDARD | STD-DOC-002 | v2.1.5 |
 | UNICODE_POLICY | STD-DOC-003 | v2.1.3 |
 | README_TEMPLATE | STD-DOC-004 | v2.1 |
@@ -308,6 +316,7 @@ This toolkit is provided as-is for use with AI-driven development workflows.
 
 | Version | Changes |
 |---------|---------|
+| **v1.9.3** | Added 7 new skills from softaworks/agent-toolkit: session-handoff, requirements-clarity, commit-work, mermaid-diagrams, c4-architecture, qa-test-planner, database-schema-designer
 | **v1.9.2** | Renamed repository to Zai-agent-toolkit; updated all internal references
 | **v1.9.1** | Added Read-Only Usage rule (Section 0) to AGENT_RULES.md; agents must never commit changes to zai-agent-toolkit after cloning
 | **v1.9.0** | Added z-ai-web-dev-sdk skill for AI SDK integration; updated ZAI_INTEGRATION_STANDARD to v1.1 with SDK usage rules; added Z.ai SDK Integration section to AGENT_RULES |
