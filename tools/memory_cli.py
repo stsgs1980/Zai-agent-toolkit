@@ -9,6 +9,7 @@ Usage:
     python memory_cli.py query <query>           # Semantic search
     python memory_cli.py list <type>             # List entries
     python memory_cli.py delete <id>             # Delete entry
+    python memory_cli.py export <type>           # Export entries to JSON
 """
 
 import argparse
@@ -17,7 +18,7 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Optional, Dict
 
 # Default memory path
 DEFAULT_MEMORY_PATH = Path.home() / ".zcode" / "memory" / "chromadb"
@@ -161,7 +162,7 @@ def query_entries(query: str, entry_type: Optional[str] = None, limit: int = 5):
                 )
                 if result["ids"] and result["ids"][0]:
                     results.append((et, result))
-            except Exception:
+            except (ValueError, KeyError, RuntimeError):
                 continue
     
     # Print results
@@ -237,10 +238,42 @@ def delete_entry(entry_id: str, entry_type: Optional[str] = None):
                     collection.delete(ids=[entry_id])
                     print(f"Deleted: {entry_id} from {et}")
                     return
-            except Exception:
+            except (ValueError, KeyError, RuntimeError):
                 continue
         
         print(f"Entry not found: {entry_id}")
+
+
+def export_entries(entry_type: str, output: Optional[str] = None):
+    """Export entries to JSON file."""
+    if entry_type not in ENTRY_TYPES:
+        print(f"ERROR: Invalid type. Valid types: {ENTRY_TYPES}")
+        sys.exit(1)
+
+    client = get_client()
+    collection = client.get_collection(name=entry_type)
+    result = collection.get()
+
+    data = []
+    for i, doc_id in enumerate(result["ids"]):
+        metadata = result["metadatas"][i] if result["metadatas"] else {}
+        document = result["documents"][i] if result["documents"] else ""
+        data.append({
+            "id": doc_id,
+            "content": document,
+            "metadata": metadata
+        })
+
+    export = {"type": entry_type, "count": len(data), "entries": data}
+
+    if output:
+        output_path = Path(output)
+        output_path.write_text(json.dumps(export, indent=2, ensure_ascii=False))
+        print(f"Exported {len(data)} entries to {output}")
+    else:
+        print(json.dumps(export, indent=2, ensure_ascii=False))
+
+    return data
 
 
 def main():
@@ -285,6 +318,11 @@ Examples:
     delete_parser = subparsers.add_parser("delete", help="Delete an entry")
     delete_parser.add_argument("id", help="Entry ID")
     delete_parser.add_argument("--type", "-t", choices=ENTRY_TYPES, help="Entry type")
+
+    # Export command
+    export_parser = subparsers.add_parser("export", help="Export entries to JSON")
+    export_parser.add_argument("type", choices=ENTRY_TYPES, help="Entry type")
+    export_parser.add_argument("--output", "-o", help="Output file path")
     
     args = parser.parse_args()
     
@@ -303,6 +341,8 @@ Examples:
         list_entries(args.type, args.limit)
     elif args.command == "delete":
         delete_entry(args.id, args.type)
+    elif args.command == "export":
+        export_entries(args.type, args.output)
 
 
 if __name__ == "__main__":

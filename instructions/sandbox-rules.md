@@ -114,3 +114,6 @@ Report current state to user:
 | `bun run dev` dies fast | Bun wrapper instability | Use `npx next dev` instead |
 | `localhost` fails in curl | IPv6 resolution in sandbox | Use `127.0.0.1` instead |
 | Server dies after ~5 min | Sandbox process timeout | Watchdog cron every 5 min |
+
+---
+Built with: Python + PowerShell + Markdown

@@ -19,7 +19,7 @@ architecture-beta
 
 Group related services together:
 
-```
+```text
 group {groupId}({icon})[{title}] (in {parentId})?
 ```
 
@@ -33,7 +33,7 @@ architecture-beta
 
 Declare services (nodes):
 
-```
+```text
 service {serviceId}({icon})[{title}] (in {parentId})?
 ```
 
@@ -48,7 +48,7 @@ architecture-beta
 
 Connect services with edges:
 
-```
+```text
 {serviceId}{{group}}?:{T|B|L|R} {<}?--{>}? {T|B|L|R}:{serviceId}{{group}}?
 ```
 
@@ -70,7 +70,7 @@ architecture-beta
 
 Create 4-way splits:
 
-```
+```text
 junction {junctionId} (in {parentId})?
 ```
 

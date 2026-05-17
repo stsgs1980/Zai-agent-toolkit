@@ -13,7 +13,7 @@ Always. Everywhere. On any machine. Without exceptions.
 
 ## Levels
 
-```
+```text
 L1 -- Environment     Files, paths, dependencies, environment
 L2 -- Code           Source code, DB, API, security
 L3 -- Delivery       CI, Docker, build, deploy
@@ -119,7 +119,7 @@ catch (error) {
 
 **Clean repository formula:**
 
-```
+```text
 clone + install + dev = works
 ```
 
@@ -127,7 +127,7 @@ Everything violating this formula is a bug.
 
 ---
 
-### Rule 3. Deduplication-First
+### Rule 1. Deduplication-First
 
 All create endpoints **MUST** check for existing record before creating.
 
@@ -137,135 +137,23 @@ All create endpoints **MUST** check for existing record before creating.
 
 **If found** -- return existing record (HTTP 200), don't create duplicate.
 
-**Applies to all entities:** Category, Tag, Term, Document (by title)
+### Rule 2. Auto-Backup Policy
 
----
+### Rule 3. SQLite Safety (connection_limit=1)
 
-### Rule 4. Auto-Backup Policy
+### Rule 4. Database Migration Rules for Z.ai Sandbox
 
-Every write mutation (POST, PATCH, DELETE) calls `autoBackup()`.
+### Rule 5. AI Prompt Language Standard
 
-- Location: `db/backups/custom_YYYY-MM-DD_HH-MM.db`
-- Kept: last 10 backups, old ones deleted automatically
-- Backup error **never** interrupts main operation
+### Rule 6. Counter Synchronization
 
-**Where:** `src/lib/backup.ts` -- `autoBackup()`
+### Rule 7. Safe Delete Policy
 
----
+### Rule 8. localStorage Persistence
 
-### Rule 5. SQLite Safety (connection_limit=1)
+### Rule 9. JSON-Only AI Responses
 
-PrismaClient uses `connection_limit=1&pool_timeout=0` to avoid P2025 errors (database locked).
-
-**Where:** `src/lib/db.ts` -- `datasourceUrl: file:${dbPath}?connection_limit=1&pool_timeout=0`
-
----
-
-### Rule 6. Database Migration Rules for Z.ai Sandbox
-
-Database migrations in Z.ai sandbox require special handling due to process mortality and shared filesystem constraints.
-
-**Use `prisma db push` for development (NOT `prisma migrate`):**
-
-```typescript
-// CORRECT for sandbox development
-bunx prisma db push        // Schema-first: pushes schema to DB directly
-bunx prisma generate       // Regenerates Prisma Client
-
-// PROHIBITED in sandbox for development
-bunx prisma migrate dev    // Creates migration files, can leave DB in partial state
-bunx prisma migrate deploy // Production only
-```
-
-**Why `db push` over `migrate` in sandbox:**
-
-| Aspect | `db push` | `migrate dev` |
-|--------|-----------|---------------|
-| Creates migration files | No | Yes |
-| Can be run repeatedly | Yes (idempotent) | No (creates new migration each time) |
-| Risk of partial state | Low | High (if interrupted) |
-| Suitable for prototype | Yes | No |
-| Suitable for production | No | Yes |
-
-**Recovery from failed migration:**
-
-```bash
-# If prisma migrate dev was interrupted and DB is in partial state:
-rm -f prisma/dev.db prisma/dev.db-journal
-bunx prisma db push
-bunx prisma generate
-```
-
-**Migration workflow for production:**
-
-```bash
-# Create migration (NOT in sandbox)
-bunx prisma migrate dev --name description_of_change
-
-# Apply migrations (in production/CI)
-bunx prisma migrate deploy
-```
-
-**Schema change checklist:**
-
-- [ ] Update `prisma/schema.prisma`
-- [ ] Run `bunx prisma db push` (sandbox) or `bunx prisma migrate dev --name <desc>` (production)
-- [ ] Run `bunx prisma generate`
-- [ ] Verify: `bunx prisma studio` or API test
-- [ ] Commit `schema.prisma` and `prisma/migrations/` (if using migrate)
-
----
-
-### Rule 7. AI Prompt Language Standard
-
-All AI system prompts are written **in Russian** (except instruction extraction prompt -- in English per No-Unicode Policy).
-
-| Task | Temperature |
-|------|-------------|
-| Instruction / term extraction / semantic search | 0.1--0.2 (maximum determinism) |
-| Document / note / category analysis | 0.3 (balance of creativity and accuracy) |
-
-**Response format:** all AI endpoints require `ONLY valid JSON, without markdown formatting`.
-
----
-
-### Rule 8. Counter Synchronization
-
-All counters in sidebar synchronized with real DB state + localStorage.
-
-- `fetchGlobalCounters()` called on init and after each mutation
-- Instructions counter = `(BUILTIN_COUNT - hiddenTemplates) + dbInstructionsTotal`
-- Documents counter = `data.allTotal` (from API)
-- Notes counter = `notesData.length` (from API)
-- Terms counter = `data.total` (from API)
-- On delete -- immediate `refreshAll()`
-
----
-
-### Rule 9. Safe Delete Policy
-
-Deleting any entity requires **explicit confirmation** via AlertDialog. All 7 entities. Without exceptions.
-
----
-
-### Rule 10. localStorage Persistence
-
-Data not stored in DB is saved to localStorage with keys `wiki-codex:*`:
-
-- `wiki-codex:hidden-templates` -- array of hidden built-in instructions IDs
-- `wiki-codex:sidebar-collapsed` -- sidebar state
-- `wiki-codex:theme` -- selected theme
-
----
-
-### Rule 11. JSON-Only AI Responses
-
-All AI endpoints use **parsing protection**: strip markdown fences, regex extract JSON.
-If JSON not recognized -- fallback value, error not propagated up.
-
----
-
-### Rule 12. Push Policy
+### Rule 10. Push Policy
 
 **Push after every significant change** -- don't accumulate half-finished work in local branch.
 
@@ -281,7 +169,7 @@ If JSON not recognized -- fallback value, error not propagated up.
 
 **Formula:**
 
-```
+```text
 work -> commit -> push -> peace of mind
 ```
 
@@ -296,3 +184,6 @@ work -> commit -> push -> peace of mind
 | Category | Sidebar | Trash2 button (hover) + AlertDialog confirmation |
 | Tag | Sidebar | X button (hover) + AlertDialog confirmation |
 | Term | Dictionary | Trash2 button (hover) + AlertDialog, bulk select + delete |
+
+---
+Built with: Next.js 16 + TypeScript + Tailwind CSS

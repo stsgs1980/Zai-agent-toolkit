@@ -34,19 +34,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Architecture
 
-```
+```text
 C:\Users\stsgr\.zcode\
-├── memory\
-│   ├── chromadb\          <- Vector database
-│   ├── project-index\     <- Project metadata
-│   ├── sessions\          <- Session logs
-│   └── knowledge\         <- Knowledge base
-├── tools\
-│   ├── memory_cli.py
-│   └── folder_indexer.py
-├── skills\                <- Symlink to toolkit
-├── hooks\
-└── Zai-agent-toolkit\
++-- memory\
+|   +-- chromadb\          <- Vector database
+|   +-- project-index\     <- Project metadata
+|   +-- sessions\          <- Session logs
+|   +-- knowledge\         <- Knowledge base
++-- tools\
+|   +-- memory_cli.py
+|   +-- folder_indexer.py
++-- skills\                <- Symlink to toolkit
++-- hooks\
++-- Zai-agent-toolkit\
 ```
 
 ### Skills Summary
@@ -77,20 +77,139 @@ C:\Users\stsgr\.zcode\
 
 ---
 
-## Template for new entries
-
-```markdown
-## [YYYY-MM-DD] - Release Name
-
-### Added
-- New features
+## [1.9.4] - 2026-05-16
 
 ### Changed
-- Changes to existing features
+- Removed emoji from all skills (UNICODE_POLICY compliance)
+- Added INSTALL.md for Vercel/ZCode Desktop setup
+- Upgraded CI to Node.js 24
 
-### Fixed
-- Bug fixes
+## [1.9.3] - 2026-05-15
 
-### Removed
-- Removed features
-```
+### Added
+- 7 new skills: session-handoff, requirements-clarity, commit-work, mermaid-diagrams, c4-architecture, qa-test-planner, database-schema-designer
+
+## [1.9.2] - 2026-05-14
+
+### Changed
+- Renamed repository to Zai-agent-toolkit
+- Updated all internal references
+
+## [1.9.1] - 2026-05-13
+
+### Added
+- Read-Only Usage rule (Section 0) to AGENT_RULES.md
+- Agents must never commit changes to zai-agent-toolkit after cloning
+
+## [1.9.0] - 2026-05-12
+
+### Added
+- z-ai-web-dev-sdk skill for AI SDK integration
+- ZAI_INTEGRATION_STANDARD to v1.1 with SDK usage rules
+- Z.ai SDK Integration section to AGENT_RULES
+
+## [1.8.3] - 2026-05-11
+
+### Changed
+- Unified file naming: removed language suffixes and versions from filenames
+- Updated all workflows
+- Added deadlock prevention rules to GITHUB_STANDARD
+
+## [1.8.2] - 2026-05-10
+
+### Changed
+- Split into two repositories: agent-toolkit (EN) + agent-toolkit-ru (RU)
+- Removed emoji from all standards
+
+## [1.8.1] - 2026-05-09
+
+### Added
+- Full Russian localization: all 13 standards now have EN/RU versions (26 total files)
+- Complete parity between languages
+- Unified naming convention: all files renamed to NAME_STANDARD_XX_vX.X.md format
+
+## [1.7.0] - 2026-05-08
+
+### Added
+- Full English localization: IMPLEMENTATION_ORDER_EN, STANDARD_ID_SYSTEM_EN, CODE_EXAMPLES_GUIDE_EN
+- Updated all registries
+
+## [1.6.0] - 2026-05-07
+
+### Added
+- 3 critical standards: TESTING_STANDARD, ERROR_HANDLING_STANDARD, SECURITY_STANDARD
+
+## [1.5.3] - 2026-05-06
+
+### Added
+- sanitize-validate skill for input security (XSS, SQL injection, CSRF, validation, sanitization)
+
+## [1.5.2] - 2026-05-05
+
+### Changed
+- GITHUB_STANDARD v1.1: Checkpoint System (WIP, Recovery Tags)
+- git-checkpoint skill for systematic versioning
+
+## [1.5.1] - 2026-05-04
+
+### Changed
+- MARKDOWN_STANDARD v2.1.5: added Badges section with shields.io rules
+- Version sync across docs
+
+## [1.5.0] - 2026-05-03
+
+### Added
+- 4 new standards (Code Examples, Frontend, GitHub, WCAG)
+- Standard ID System
+- anti-monolith skill
+
+## [1.4.2] - 2026-05-02
+
+### Changed
+- Re-added assets (logo, banner, favicon) as real PNG
+- Banner in README header
+
+## [1.4.1] - 2026-05-01
+
+### Added
+- Readiness Checklist section to README
+
+## [1.4.0] - 2026-04-30
+
+### Changed
+- Unified toolkit: AGENT_RULES rewritten, PROJECT_CONFIG.md added
+- README overhauled
+- No-Unicode levels synced [C]+[W]+[I]
+- REPRODUCIBILITY classified as Group B
+
+## [1.3.0] - 2026-04-29
+
+### Added
+- Logos (assets/), worklog system
+- Implementation Order (6-step sequence)
+- Parameterized stack signature
+- AI-chat in No-Unicode Policy
+- `(ref)` exception for code blocks
+
+## [1.2.1] - 2026-04-28
+
+### Changed
+- Updated standards to v2.1 (typographics allowed in text, EN standard added)
+
+## [1.2.0] - 2026-04-27
+
+### Added
+- writing-plans instruction (plan before code for tasks > 3 steps)
+
+## [1.1.0] - 2026-04-26
+
+### Added
+- Development workflows (feature, bug-fix, refactor) + E2E templates
+
+## [1.0.0] - 2026-04-25
+
+### Added
+- Initial release from Web-Aesthetic-Showcase project
+
+---
+Built with: Python + PowerShell + Markdown

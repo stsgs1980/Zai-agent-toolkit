@@ -34,7 +34,7 @@ This forces clear thinking, prevents rework, and creates a traceable record.
 
 Write the plan at the top of your work session in `worklog.md`:
 
-```
+```yaml
 ---
 Task ID: <id>
 Agent: <agent name>
@@ -68,7 +68,7 @@ A good plan answers:
 
 For tasks with 10+ steps, present the plan to the user before starting:
 
-```
+```text
 Plan for: [task name]
 1. ...
 2. ...

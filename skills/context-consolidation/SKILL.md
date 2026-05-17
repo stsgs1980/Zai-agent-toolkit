@@ -11,7 +11,7 @@ description: >
 trigger: context, memory, consolidate, summarize, compress, token limit, long conversation
 ---
 
-# Context Consolidation
+# Skill: Context Consolidation v1.0
 
 > ID: ZAI-SESSION-003
 > Version: 1.0
@@ -81,7 +81,7 @@ All context items are classified into four priority tiers. Consolidation always 
 
 ### Step 1: Assess Context Size
 
-```
+```text
 1. Estimate current token usage (rough approximation)
 2. Identify if approaching limits:
    - Below 50%: No action needed
@@ -92,7 +92,7 @@ All context items are classified into four priority tiers. Consolidation always 
 
 ### Step 2: Categorize Items
 
-```
+```text
 1. Scan the conversation history
 2. Assign each item to a priority tier
 3. Mark Tier 4 items for discard
@@ -102,7 +102,7 @@ All context items are classified into four priority tiers. Consolidation always 
 
 ### Step 3: Execute Consolidation
 
-```
+```text
 1. Create a "Context Summary" section:
    - Current objective (1-2 sentences)
    - Active files and their states

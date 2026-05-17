@@ -54,7 +54,7 @@ Automatically identifies when to split commits by:
 ### Conventional Commits Format
 
 All commits follow the standard:
-```
+```text
 type(scope): short summary
 
 Detailed body explaining what changed and why.

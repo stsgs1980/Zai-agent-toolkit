@@ -4,9 +4,16 @@ id: ZAI-DEV-004
 version: 1.0
 compatibility: both
 description: "Create high-quality git commits: review/stage intended changes, split into logical commits, and write clear commit messages (including Conventional Commits). Use when the user asks to commit, craft a commit message, stage changes, or split work into multiple commits."
+trigger: commit, create commit, conventional commit, stage changes, write commit message
 ---
 
-# Commit work
+
+# Skill: Commit Work v1.0
+
+
+> ID: ZAI-DEV-004
+> Version: 1.0
+> Last Updated: 2026-05
 
 ## Goal
 Make commits that are easy to review and safe to ship:
@@ -56,3 +63,6 @@ Provide:
 - the final commit message(s)
 - a short summary per commit (what/why)
 - the commands used to stage/review (at minimum: `git diff --cached`, plus any tests run)
+
+---
+Built with: Z.ai Agent Toolkit

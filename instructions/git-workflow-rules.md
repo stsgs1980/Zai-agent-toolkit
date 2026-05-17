@@ -85,7 +85,7 @@ The sandbox preserves files across sessions even when processes die.
 Before every `git commit`, run `git diff --staged` (or `git diff` if not yet staged)
 to verify that ONLY the requested changes are being committed.
 
-```
+```bash
 1. Make changes to requested files only
 2. Stage only those files: git add <specific-files>
 3. Review: git diff --staged
@@ -108,3 +108,6 @@ temporary files, or auto-generated content. The diff check is a safety gate.
 | Environment blocked by conflict | Force unlock from /tmp | Try `git rebase --continue` |
 | Unsure if code is lost | Check 5 diagnostic paths | Tell user "permanently lost" |
 | Before commit | `git diff --staged` review | Blind `git add . && git commit` |
+
+---
+Built with: Python + PowerShell + Markdown

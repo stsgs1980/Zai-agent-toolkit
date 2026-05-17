@@ -208,7 +208,7 @@ echo "zai-agent-toolkit/" >> .gitignore
 
 ## Directory Structure After Install
 
-```
+```bash
 ~/.zcode/
   agent/                 ← ZCode managed (safe)
   cli/                   ← ZCode managed (safe)
@@ -222,9 +222,9 @@ echo "zai-agent-toolkit/" >> .gitignore
       update-toolkit.bat ← Windows update script (alternative)
     VERSION
 
-  skills → ./Zai-agent-toolkit/skills        ← Symlink (safe)
-  instructions → ./Zai-agent-toolkit/instructions  ← Symlink (safe)
-  standards → ./Zai-agent-toolkit/standards  ← Symlink (safe)
+  skills -> ./Zai-agent-toolkit/skills        ← Symlink (safe)
+  instructions -> ./Zai-agent-toolkit/instructions  ← Symlink (safe)
+  standards -> ./Zai-agent-toolkit/standards  ← Symlink (safe)
 ```
 
 ---
@@ -275,3 +275,6 @@ git add .gitignore && git commit -m "fix: remove toolkit submodule"
 | ZCode Desktop | Reads from `~/.zcode/skills` | N/A |
 
 **Toolkit is for local AI agent use only. It never goes to production.**
+
+---
+Built with: Python + PowerShell + Markdown

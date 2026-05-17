@@ -185,7 +185,7 @@ If the exact programming language or format is not supported by the renderer or 
 
 ```text
 Correct:      ```text
-Incorrect:    ```
+Incorrect:    ```text
 ```
 
 **Rules:**
@@ -264,7 +264,7 @@ If CI is not configured, use static badges:
 
 ```markdown
 [![Status: Draft](https://img.shields.io/badge/Status-Draft-yellow.svg)]()
-[![Version: 1.5.0](https://img.shields.io/badge/Version-1.5.0-blue.svg)]()
+[![Version: 1.9.5](https://img.shields.io/badge/Version-1.9.5-blue.svg)]()
 ```
 
 When CI is configured, replace with dynamic ones.

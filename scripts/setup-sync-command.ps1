@@ -6,17 +6,17 @@ $functionCode = @'
 
 # === Zai-agent-toolkit sync command ===
 function sync-toolkit {
-    Set-Location C:\Users\stsgr\.zcode\Zai-agent-toolkit
+    Set-Location $env:USERPROFILE\.zcode\Zai-agent-toolkit
     git pull
     Write-Host "Toolkit updated!" -ForegroundColor Green
 }
 
 function goto-toolkit {
-    Set-Location C:\Users\stsgr\.zcode\Zai-agent-toolkit
+    Set-Location $env:USERPROFILE\.zcode\Zai-agent-toolkit
 }
 
 function list-skills {
-    Get-ChildItem C:\Users\stsgr\.zcode\Zai-agent-toolkit\skills -Directory | Select-Object Name
+    Get-ChildItem $env:USERPROFILE\.zcode\Zai-agent-toolkit\skills -Directory | Select-Object Name
 }
 # === End toolkit commands ===
 

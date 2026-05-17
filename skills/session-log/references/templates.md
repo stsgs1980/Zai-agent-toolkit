@@ -46,7 +46,7 @@
 ```bash
 # [Purpose]
 [command]
-```
+```text
 
 ### Next Steps
 
@@ -70,7 +70,7 @@
 **Code**:
 ```[language]
 // Fix implementation
-```
+```text
 
 **Prevention**: [How to avoid in future]
 
@@ -120,7 +120,7 @@
 **Example**:
 ```[language]
 // Code example
-```
+```text
 
 **When to Apply**:
 - [Condition 1]

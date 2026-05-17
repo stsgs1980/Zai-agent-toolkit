@@ -4,9 +4,16 @@ id: ZAI-FS-001
 version: 1.0
 compatibility: both
 description: "Create and manage folder indexes for easy navigation. Scans directories and creates _index.json with file descriptions, tags, and categories. Use when you need to organize and search through large collections of files."
+trigger: index folder, scan directory, folder index, list files, organize files
 ---
 
-# Folder Indexer Skill
+
+# Skill: Folder Indexer v1.0
+
+
+> ID: ZAI-FS-001
+> Version: 1.0
+> Last Updated: 2026-05
 
 Create searchable indexes for any folder with thousands of files.
 
@@ -133,3 +140,6 @@ Then run `update` to add new files while keeping your descriptions.
 
 - memory-store (ZAI-MEM-001): Store folder index in memory
 - memory-query (ZAI-MEM-002): Search across indexes
+
+---
+Built with: Z.ai Agent Toolkit

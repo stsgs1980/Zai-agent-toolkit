@@ -223,7 +223,7 @@ When building: start with Identity, add Context, set Constraints (number them, u
 
 ## 7. Decision Tree
 
-```
+```text
 User request
   |
   +-- "Improve my prompt" -> Score (Section 1) -> Identify weak dimensions -> Apply technique (Section 4) -> Re-score
@@ -315,7 +315,7 @@ Use these when the user needs to think through a problem, not when they just nee
 ## Response Format
 
 ### Scoring:
-```
+```text
 ## Prompt Score: [Grade] ([numeric]/100)
 
 | Dimension | Score | Grade | Feedback |
@@ -334,7 +334,7 @@ Use these when the user needs to think through a problem, not when they just nee
 ```
 
 ### Improvement:
-```
+```text
 ## Before: Grade [X] (XX/100) -> After: Grade [Y] (YY/100)
 
 ### Improved Prompt:
@@ -348,7 +348,7 @@ Use these when the user needs to think through a problem, not when they just nee
 ```
 
 ### System Prompt:
-```
+```text
 ## System Prompt (5-Layer Architecture)
 
 ### Layer 1: Identity
@@ -370,7 +370,7 @@ Use these when the user needs to think through a problem, not when they just nee
 ```
 
 ### Comparison:
-```
+```text
 ## Prompt Comparison
 
 | | Prompt A | Prompt B | Delta |

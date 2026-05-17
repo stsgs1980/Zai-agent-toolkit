@@ -4,9 +4,16 @@ id: ZAI-MEM-002
 version: 1.0
 compatibility: both
 description: "Search the ZCode memory system using semantic search. Use when you need to find relevant sessions, knowledge, patterns, or templates from previous work."
+trigger: query memory, search memory, find in memory, recall, remember
 ---
 
-# Memory Query Skill
+
+# Skill: Memory Query v1.0
+
+
+> ID: ZAI-MEM-002
+> Version: 1.0
+> Last Updated: 2026-05
 
 Search the ZCode memory system using semantic search.
 
@@ -59,7 +66,7 @@ python ~/.zcode/tools/memory_cli.py query "error handling" --limit 10
 
 ## Output
 
-```
+```text
 Search results for: 'react hooks optimization'
 ==================================================
 
@@ -104,3 +111,6 @@ Lower distance = better match:
 
 - memory-store (ZAI-MEM-001): Store new entries
 - context-consolidation (ZAI-WF-002): Consolidate session context
+
+---
+Built with: Z.ai Agent Toolkit

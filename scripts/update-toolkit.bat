@@ -10,6 +10,12 @@ echo   Z.ai Agent Toolkit Updater
 echo ================================================
 echo.
 
+if not exist "%USERPROFILE%\.zcode\Zai-agent-toolkit" (
+    echo [ERROR] Toolkit not found at %USERPROFILE%\.zcode\Zai-agent-toolkit
+    echo Please install first: git clone https://github.com/stsgs1980/Zai-agent-toolkit.git
+    pause
+    exit /b 1
+)
 cd /d "%USERPROFILE%\.zcode\Zai-agent-toolkit"
 
 echo Current version:

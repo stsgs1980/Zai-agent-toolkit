@@ -31,7 +31,7 @@ jobs:
             fi
           done
           # Instructions
-          for f in instructions/onboarding-protocol.md instructions/git-workflow-rules.md instructions/language-rule.md instructions/diagnostic-disclosure.md instructions/writing-plans.md; do
+          for f in instructions/onboarding-protocol.md instructions/git-workflow-rules.md instructions/language-rule.md instructions/diagnostic-disclosure.md instructions/writing-plans.md instructions/sandbox-rules.md instructions/zai-sdk-guidelines.md; do
             if [ ! -f "$f" ]; then
               echo "MISSING: $f"
               MISSING=1
@@ -40,7 +40,7 @@ jobs:
             fi
           done
           # Standards (no language suffixes, no versions)
-          for f in standards/MARKDOWN_STANDARD.md standards/UNICODE_POLICY.md standards/README_TEMPLATE.md standards/REPRODUCIBILITY-STANDARD.md standards/IMPLEMENTATION_ORDER.md standards/STANDARD_ID_SYSTEM.md standards/CODE_EXAMPLES_GUIDE.md standards/FRONTEND_STANDARD.md standards/GITHUB_STANDARD.md standards/WCAG_2.1_AA_STANDARD.md standards/TESTING_STANDARD.md standards/ERROR_HANDLING_STANDARD.md standards/SECURITY_STANDARD.md; do
+          for f in standards/MARKDOWN_STANDARD.md standards/UNICODE_POLICY.md standards/README_TEMPLATE.md standards/REPRODUCIBILITY-STANDARD.md standards/IMPLEMENTATION_ORDER.md standards/STANDARD_ID_SYSTEM.md standards/CODE_EXAMPLES_GUIDE.md standards/FRONTEND_STANDARD.md standards/GITHUB_STANDARD.md standards/WCAG_2.1_AA_STANDARD.md standards/TESTING_STANDARD.md standards/ERROR_HANDLING_STANDARD.md standards/SECURITY_STANDARD.md standards/ZAI_INTEGRATION_STANDARD.md; do
             if [ ! -f "$f" ]; then
               echo "MISSING: $f"
               MISSING=1

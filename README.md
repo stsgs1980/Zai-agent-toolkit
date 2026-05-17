@@ -149,25 +149,31 @@ zai-agent-toolkit/
     language-rule.md          Always match user's language
     diagnostic-disclosure.md  Never assert data loss without verification
     writing-plans.md          Plan before you code
+    sandbox-rules.md          Sandbox environment behaviors
+    zai-sdk-guidelines.md     Z.ai SDK development rules
 
   skills/                     Automated agent skills
-    git-safe-ops/             Safe git push/pull/rebase
-    git-checkpoint/           Systematic checkpoints during work
-    sanitize-validate/        Input sanitization, validation, security
-    dev-watchdog/             Dev server management
-    health-check/             System health diagnostics
-    fallback/                 Graceful degradation
-    api-retry/                API retry with backoff
-    anti-monolith/            React/Next.js architecture enforcement
-    z-ai-web-dev-sdk/         Z.ai SDK integration (chat, image gen, web search)
-    session-handoff/          Session context handoff documents
-    session-resume/           Resume after context loss
-    requirements-clarity/     Clarify requirements before coding
     commit-work/              High-quality conventional commits
-    mermaid-diagrams/         Software diagrams with Mermaid
-    c4-architecture/          C4 architecture diagrams
-    qa-test-planner/          QA test planning
+    context-consolidation/    Context and memory management
     database-schema-designer/ Database schema design
+    folder-indexer/           File and folder navigation
+    frontend-styling-expert_sts/ CSS and styling specialist
+    memory-delete/            Delete memory entries
+    memory-export/            Export memory to JSON
+    memory-query/             Semantic memory search
+    memory-store/             Store knowledge in ChromaDB
+    mermaid-diagrams/         Software diagrams with Mermaid
+    performance-code-generator_sts/ High-performance code generation
+    phi-layout_sts/           Proportional CSS Grid layouts
+    project-clone/            Smart project cloning
+    prompt-engineering_sts/   Prompt scoring and architecture
+    qa-test-planner/          QA test planning
+    requirements-clarity/     Clarify requirements before coding
+    session-log/              Session knowledge capture
+    skill-creator/            Create new skills
+    skill-id-system/          Skill ID assignment system
+    sync-toolkit_sts/         Toolkit sync between server and Windows
+    zai-ui-composer_sts/      Production UI composition
 ```
 
 ---
@@ -183,7 +189,7 @@ These define rules. They are read and accepted, not modified per project.
 | STD-DOC-002 | `MARKDOWN_STANDARD.md` | [W] | README, project documentation |
 | STD-DOC-003 | `UNICODE_POLICY.md` | [C]+[W]+[I] | UI code [C], AI-chat + docs [W], prototypes [I] |
 | STD-DOC-004 | `README_TEMPLATE.md` | [W] | Mandatory README structure |
-| STD-DOC-006 | `CODE_EXAMPLES_GUIDE.md` | [W] | Code examples in documentation |
+| STD-DOC-005 | `CODE_EXAMPLES_GUIDE.md` | [W] | Code examples in documentation |
 | STD-ENV-001 | `REPRODUCIBILITY-STANDARD.md` | [C] | Environment, paths, DB |
 | STD-ENV-002 | `ZAI_INTEGRATION_STANDARD.md` | [C] | Z.ai sandbox integration |
 | STD-ARCH-001 | `IMPLEMENTATION_ORDER.md` | [W] | 6-step implementation sequence |
@@ -251,13 +257,13 @@ These are deployed into a project. They SUBMIT to Group B standards.
 | MARKDOWN_STANDARD | STD-DOC-002 | v2.1.5 |
 | UNICODE_POLICY | STD-DOC-003 | v2.1.3 |
 | README_TEMPLATE | STD-DOC-004 | v2.1 |
-| CODE_EXAMPLES_GUIDE | STD-DOC-006 | v1.0 |
+| CODE_EXAMPLES_GUIDE | STD-DOC-005 | v1.0 |
 | REPRODUCIBILITY-STANDARD | STD-ENV-001 | v1.0 |
 | ZAI_INTEGRATION_STANDARD | STD-ENV-002 | v1.1 |
 | IMPLEMENTATION_ORDER | STD-ARCH-001 | v2.1 |
 | STANDARD_ID_SYSTEM | STD-META-001 | v1.0 |
 | FRONTEND_STANDARD | STD-FE-001 | v1.3 |
-| GITHUB_STANDARD | STD-GIT-001 | v1.2 |
+| GITHUB_STANDARD | STD-GIT-001 | v1.5 |
 | WCAG_2.1_AA_STANDARD | STD-A11Y-001 | v1.0 |
 | TESTING_STANDARD | STD-TEST-001 | v1.0 |
 | ERROR_HANDLING_STANDARD | STD-ERR-001 | v1.0 |
@@ -318,33 +324,8 @@ This toolkit is provided as-is for use with AI-driven development workflows.
 
 ## Changelog
 
-| Version | Changes |
-|---------|---------|
-| **v1.9.5** | Added Skill ID System (ZAI-XXX-NNN); added project-clone skill for safe repository cloning; updated all skill references with IDs |
-| **v1.9.4** | Removed emoji from all skills (UNICODE_POLICY compliance); added INSTALL.md for Vercel/ZCode Desktop setup; upgraded CI to Node.js 24 |
-| **v1.9.3** | Added 7 new skills from softaworks/agent-toolkit: session-handoff, requirements-clarity, commit-work, mermaid-diagrams, c4-architecture, qa-test-planner, database-schema-designer
-| **v1.9.2** | Renamed repository to Zai-agent-toolkit; updated all internal references
-| **v1.9.1** | Added Read-Only Usage rule (Section 0) to AGENT_RULES.md; agents must never commit changes to zai-agent-toolkit after cloning
-| **v1.9.0** | Added z-ai-web-dev-sdk skill for AI SDK integration; updated ZAI_INTEGRATION_STANDARD to v1.1 with SDK usage rules; added Z.ai SDK Integration section to AGENT_RULES |
-| **v1.8.3** | Unified file naming: removed language suffixes and versions from filenames; updated all workflows; added deadlock prevention rules to GITHUB_STANDARD |
-| **v1.8.2** | Split into two repositories: agent-toolkit (EN) + agent-toolkit-ru (RU); removed emoji from all standards |
-| **v1.8.1** | Full Russian localization: all 13 standards now have EN/RU versions (26 total files); complete parity between languages |
-| **v1.8.1** | Unified naming convention: all files renamed to NAME_STANDARD_XX_vX.X.md format; all references updated |
-| **v1.7.0** | Full English localization: IMPLEMENTATION_ORDER_EN, STANDARD_ID_SYSTEM_EN, CODE_EXAMPLES_GUIDE_EN; updated all registries |
-| **v1.6.0** | Added 3 critical standards: TESTING_STANDARD, ERROR_HANDLING_STANDARD, SECURITY_STANDARD |
-| **v1.5.3** | Added sanitize-validate skill for input security (XSS, SQL injection, CSRF, validation, sanitization) |
-| **v1.5.2** | GITHUB_STANDARD v1.1: Checkpoint System (WIP, Recovery Tags); git-checkpoint skill for systematic versioning |
-| **v1.5.1** | MARKDOWN_STANDARD v2.1.5: added Badges section with shields.io rules; version sync across docs |
-| **v1.5.0** | Added 4 new standards (Code Examples, Frontend, GitHub, WCAG), Standard ID System, anti-monolith skill |
-| **v1.4.2** | Re-added assets (logo, banner, favicon) as real PNG; banner in README header |
-| **v1.4.1** | Added Readiness Checklist section to README |
-| **v1.4.0** | Unified toolkit: AGENT_RULES rewritten, PROJECT_CONFIG.md added, README overhauled, No-Unicode levels synced [C]+[W]+[I], REPRODUCIBILITY classified as Group B |
-| v1.3.0 | Added logos (assets/), worklog system, Implementation Order (6-step sequence), parameterized stack signature, AI-chat in No-Unicode Policy, `(ref)` exception for code blocks |
-| v1.2.1 | Updated standards to v2.1 (typographics allowed in text, EN standard added) |
-| v1.2.0 | Added writing-plans instruction (plan before code for tasks > 3 steps) |
-| v1.1.0 | Added development workflows (feature, bug-fix, refactor) + E2E templates |
-| v1.0.0 | Initial release from Web-Aesthetic-Showcase project |
+See [CHANGELOG.md](CHANGELOG.md) for full version history.
 
 ---
 
-Built with: Next.js 16 + TypeScript + Tailwind CSS
+Built with: Python + PowerShell + Markdown

@@ -88,12 +88,12 @@ The 100-point scoring system evaluates:
 ### Example 1: Vague Feature Request
 
 **User Input:**
-```
+```text
 I need a login feature for my app.
 ```
 
 **Skill Response:**
-```
+```text
 I understand your requirement. Let me help you refine this specification.
 
 Current Clarity Score: 25/100
@@ -124,10 +124,10 @@ Let me systematically clarify these points...
 ### Example 2: After Clarification Round
 
 **After User Response:**
-```
+```text
 Thank you for the additional information!
 
-Clarity Score Update: 25/100 → 65/100
+Clarity Score Update: 25/100 -> 65/100
 
 New Clarified Content:
 - Authentication: Email/password with optional Google OAuth
@@ -155,7 +155,7 @@ Let me continue with the next round of questions...
 ### Example 3: Final PRD Generation
 
 **When Clarity Score ≥ 90:**
-```
+```text
 Perfect! I will now generate the complete PRD document...
 
 [Generates PRD at ./docs/prds/user-authentication-v1.0-prd.md]
@@ -206,7 +206,7 @@ Each phase includes specific tasks, deliverables, and time estimates.
 ## Output Location
 
 PRDs are saved to:
-```
+```text
 ./docs/prds/{feature-name}-v{version}-prd.md
 ```
 

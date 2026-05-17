@@ -4,9 +4,16 @@ id: ZAI-MEM-003
 version: 1.0
 compatibility: both
 description: "Delete entries from ZCode memory system. Use when you need to remove outdated or incorrect entries from the knowledge base."
+trigger: delete memory, remove from memory, forget, clear memory
 ---
 
-# Memory Delete Skill
+
+# Skill: Memory Delete v1.0
+
+
+> ID: ZAI-MEM-003
+> Version: 1.0
+> Last Updated: 2026-05
 
 Delete entries from the ZCode memory system (ChromaDB).
 
@@ -50,3 +57,6 @@ Deletion is permanent. Use with caution.
 - memory-store (ZAI-MEM-001): Store entries
 - memory-query (ZAI-MEM-002): Search entries
 - memory-export (ZAI-MEM-004): Export entries
+
+---
+Built with: Z.ai Agent Toolkit

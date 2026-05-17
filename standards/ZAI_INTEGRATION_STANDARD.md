@@ -3,7 +3,7 @@
 > ID: STD-ENV-002
 > Version: 1.1
 > Level: **[C] Critical**
-> Related: REPRODUCIBILITY-STANDARD (STD-ENV-001), SANDBAX_RULES
+> Related: REPRODUCIBILITY-STANDARD (STD-ENV-001), sandbox-rules.md (instructions/)
 
 ---
 

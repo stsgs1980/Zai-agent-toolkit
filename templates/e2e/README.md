@@ -48,7 +48,7 @@ bunx playwright test --reporter=list
 
 ## Test Structure
 
-```
+```text
 e2e/
   home.spec.ts            - Main page tests
   playwright.config.ts    - Playwright configuration
@@ -58,7 +58,7 @@ e2e/
 
 Each spec file follows this structure:
 
-```
+```text
 1. Basic page load tests     - Always active
 2. Navigation tests          - Uncomment when project has nav
 3. Form tests                - Uncomment when project has forms

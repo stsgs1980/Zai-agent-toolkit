@@ -29,8 +29,9 @@ Write-Host ""
 Write-Host "Checking for updates..." -ForegroundColor Yellow
 git fetch origin
 
-$status = git status --porcelain -b
-if ($status -match "up to date") {
+$local = git rev-parse HEAD
+$remote = git rev-parse origin/main 2>$null
+if ($local -eq $remote) {
     Write-Host "[OK] Already up to date!" -ForegroundColor Green
     Write-Host ""
     pause

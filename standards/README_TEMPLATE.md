@@ -3,7 +3,7 @@
 > ID: STD-DOC-004
 > Version: 2.1
 > Level: **[W] Warning**
-> Related: Markdown Standard (STD-DOC-001, STD-DOC-002)
+> Related: Markdown Standard (STD-DOC-002)
 
 This template defines the mandatory structure for all project README files.
 

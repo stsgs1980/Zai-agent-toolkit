@@ -1,9 +1,9 @@
-# Testing Standard v1.0
+# Standard: Testing v1.0 (EN)
 
-**Standard ID:** STD-TEST-001
-**Version:** 1.0
-**Status:** Active
-**Applies to:** All projects with code
+> ID: STD-TEST-001
+> Version: 1.0
+> Level: **[C] Critical**
+> Last Updated: 2025-01
 
 ---
 
@@ -11,16 +11,16 @@
 
 ### 1.1 Layer Distribution
 
-```
-        ╱╲
-       ╱  ╲        E2E Tests (10%)
-      ╱    ╲       - Critical user flows
-     ╱──────╲      - Full system integration
-    ╱        ╲
-   ╱──────────╲    Integration Tests (20%)
-  ╱            ╲   - API endpoints
- ╱              ╲  - Database operations
-╱────────────────╲ - External services
+```text
+        /\
+       /  \        E2E Tests (10%)
+      /    \       - Critical user flows
+     /------\      - Full system integration
+    /        \
+   /----------\    Integration Tests (20%)
+  /            \   - API endpoints
+ /              \  - Database operations
+/----------------\ - External services
 
   Unit Tests (70%)
   - Pure functions
@@ -88,7 +88,7 @@ describe('calculateDiscount', () => {
 
 ### 2.3 Naming Convention
 
-```
+```text
 <unit>_<scenario>_<expectedResult>
 
 Examples:
@@ -220,16 +220,16 @@ describe('PaymentService', () => {
 
 ### 4.1 Critical Flows (Must Test)
 
-```
-┌─────────────────────────────────────────┐
-│           E2E Test Scenarios            │
-├─────────────────────────────────────────┤
-│ 1. User Registration → Login → Logout   │
-│ 2. Product Browse → Cart → Checkout     │
-│ 3. Search → Filter → Results            │
-│ 4. Profile Update → Save → Verify       │
-│ 5. Error States → Recovery              │
-└─────────────────────────────────────────┘
+```text
++-----------------------------------------+
+|           E2E Test Scenarios            |
++-----------------------------------------+
+| 1. User Registration -> Login -> Logout   |
+| 2. Product Browse -> Cart -> Checkout     |
+| 3. Search -> Filter -> Results            |
+| 4. Profile Update -> Save -> Verify       |
+| 5. Error States -> Recovery              |
++-----------------------------------------+
 ```
 
 ### 4.2 Playwright Example
@@ -469,22 +469,22 @@ export default function () {
 
 ### Frontend
 
-```
-├── Vitest / Jest        # Unit tests
-├── React Testing Library # Component tests
-├── Playwright / Cypress  # E2E tests
-├── MSW                   # API mocking
-└── @faker-js/faker       # Test data
+```text
++-- Vitest / Jest        # Unit tests
++-- React Testing Library # Component tests
++-- Playwright / Cypress  # E2E tests
++-- MSW                   # API mocking
++-- @faker-js/faker       # Test data
 ```
 
 ### Backend
 
-```
-├── Vitest / Jest        # Unit tests
-├── Supertest            # API tests
-├── Playwright           # E2E tests
-├── Nock / MSW           # External API mocking
-└── K6 / Artillery       # Load tests
+```text
++-- Vitest / Jest        # Unit tests
++-- Supertest            # API tests
++-- Playwright           # E2E tests
++-- Nock / MSW           # External API mocking
++-- K6 / Artillery       # Load tests
 ```
 
 ---
@@ -583,4 +583,4 @@ Document skipped E2E with a comment in the test configuration:
 
 ---
 
-*Standard STD-TEST-001 v1.0 — Part of zai-agent-toolkit*
+Built with: Z.ai Agent Toolkit

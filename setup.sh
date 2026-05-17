@@ -1,15 +1,17 @@
 #!/bin/bash
 # Agent Toolkit Setup Script
 # Run this script to set up zai-agent-toolkit in any Next.js project.
-# Usage: bash setup.sh [ghp_YOUR_PAT_HERE]
-#        or: bash <(curl -L URL) [ghp_YOUR_PAT_HERE]
+# Usage: export GITHUB_PAT=ghp_YOUR_PAT_HERE && bash setup.sh
+#        or: bash setup.sh [ghp_YOUR_PAT_HERE]
+# NOTE: Using env var GITHUB_PAT is more secure than CLI argument.
+#       CLI argument may leak via process list and shell history.
 
 set -e
 
 # === Configuration ===
 GITHUB_USER="stsgs1980"
 REPO="zai-agent-toolkit"
-TOOLKIT_VERSION="v1.5.0"
+TOOLKIT_VERSION="v1.9.5"
 TMP_DIR="/tmp/zai-agent-toolkit-setup"
 
 # === Functions ===
@@ -23,9 +25,12 @@ command -v git >/dev/null 2>&1 || fail "git is not installed"
 command -v curl >/dev/null 2>&1 || fail "curl is not installed"
 
 # === Determine auth method ===
-if [ -n "$1" ] && echo "$1" | grep -q "^ghp_"; then
+if [ -n "$GITHUB_PAT" ]; then
+  AUTH="$GITHUB_PAT"
+  AUTH_TYPE="PAT (env)"
+elif [ -n "$1" ] && echo "$1" | grep -q "^ghp_"; then
   AUTH="$1"
-  AUTH_TYPE="PAT"
+  AUTH_TYPE="PAT (arg)"
 else
   AUTH=""
   AUTH_TYPE="public"

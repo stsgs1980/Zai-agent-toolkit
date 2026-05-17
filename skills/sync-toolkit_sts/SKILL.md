@@ -67,7 +67,7 @@ git push
 
 After push, tell user:
 
-```
+```bash
 [OK] Pushed to GitHub
 
 On Windows run:

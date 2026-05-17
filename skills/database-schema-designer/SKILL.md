@@ -5,9 +5,16 @@ version: 1.0
 compatibility: both
 description: Design robust, scalable database schemas for SQL and NoSQL databases. Provides normalization guidelines, indexing strategies, migration patterns, constraint design, and performance optimization. Ensures data integrity, query performance, and maintainable data models.
 license: MIT
+trigger: database, schema, table, SQL, NoSQL, normalize, index, migration, foreign key, primary key
 ---
 
-# Database Schema Designer
+
+# Skill: Database Schema Designer v1.0
+
+
+> ID: ZAI-DEV-005
+> Version: 1.0
+> Last Updated: 2026-05
 
 Design production-ready database schemas with best practices built-in.
 
@@ -17,7 +24,7 @@ Design production-ready database schemas with best practices built-in.
 
 Just describe your data model:
 
-```
+```text
 design a schema for an e-commerce platform with users, products, orders
 ```
 
@@ -64,7 +71,7 @@ CREATE TABLE orders (
 
 | Term | Definition |
 |------|------------|
-| **Normalization** | Organizing data to reduce redundancy (1NF → 2NF → 3NF) |
+| **Normalization** | Organizing data to reduce redundancy (1NF -> 2NF -> 3NF) |
 | **3NF** | Third Normal Form - no transitive dependencies between columns |
 | **OLTP** | Online Transaction Processing - write-heavy, needs normalization |
 | **OLAP** | Online Analytical Processing - read-heavy, benefits from denormalization |
@@ -90,7 +97,7 @@ CREATE TABLE orders (
 
 ## Process Overview
 
-```
+```text
 Your Data Requirements
     |
     v
@@ -142,7 +149,7 @@ Production-Ready Schema
 | `migration for {change}` | Schema evolution | Create reversible migration |
 | `review schema` | Code review | Audit existing schema |
 
-**Workflow:** Start with `design schema` → iterate with `normalize` → optimize with `add indexes` → evolve with `migration`
+**Workflow:** Start with `design schema` -> iterate with `normalize` -> optimize with `add indexes` -> evolve with `migration`
 
 ---
 
@@ -688,3 +695,6 @@ results = db.query("""
 2. **Advanced Patterns:** Time-series, event sourcing, CQRS, multi-tenancy
 3. **ORM Integration:** TypeORM, Prisma, SQLAlchemy patterns
 4. **Monitoring:** Query performance tracking, slow query alerts
+
+---
+Built with: Z.ai Agent Toolkit

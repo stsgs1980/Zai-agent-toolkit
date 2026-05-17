@@ -1,9 +1,9 @@
-# Error Handling Standard v1.0
+# Standard: Error Handling v1.0 (EN)
 
-**Standard ID:** STD-ERR-001
-**Version:** 1.0
-**Status:** Active
-**Applies to:** All projects with code
+> ID: STD-ERR-001
+> Version: 1.0
+> Level: **[C] Critical**
+> Last Updated: 2025-01
 
 ---
 
@@ -11,32 +11,32 @@
 
 ### 1.1 Error Types Hierarchy
 
-```
+```text
 Error
-├── ApplicationError (Base for all app errors)
-│   ├── ValidationError
-│   │   ├── SchemaValidationError
-│   │   └── BusinessRuleViolationError
-│   ├── AuthenticationError
-│   │   ├── InvalidCredentialsError
-│   │   ├── TokenExpiredError
-│   │   └── SessionExpiredError
-│   ├── AuthorizationError
-│   │   ├── PermissionDeniedError
-│   │   └── RoleNotFoundError
-│   ├── NotFoundError
-│   │   ├── ResourceNotFoundError
-│   │   └── RouteNotFoundError
-│   ├── ConflictError
-│   │   ├── DuplicateEntryError
-│   │   └── VersionMismatchError
-│   ├── RateLimitError
-│   ├── ExternalServiceError
-│   │   ├── DatabaseError
-│   │   ├── CacheError
-│   │   └── ThirdPartyAPIError
-│   └── InternalError
-└── SystemError (Unexpected, non-recoverable)
++-- ApplicationError (Base for all app errors)
+|   +-- ValidationError
+|   |   +-- SchemaValidationError
+|   |   +-- BusinessRuleViolationError
+|   +-- AuthenticationError
+|   |   +-- InvalidCredentialsError
+|   |   +-- TokenExpiredError
+|   |   +-- SessionExpiredError
+|   +-- AuthorizationError
+|   |   +-- PermissionDeniedError
+|   |   +-- RoleNotFoundError
+|   +-- NotFoundError
+|   |   +-- ResourceNotFoundError
+|   |   +-- RouteNotFoundError
+|   +-- ConflictError
+|   |   +-- DuplicateEntryError
+|   |   +-- VersionMismatchError
+|   +-- RateLimitError
+|   +-- ExternalServiceError
+|   |   +-- DatabaseError
+|   |   +-- CacheError
+|   |   +-- ThirdPartyAPIError
+|   +-- InternalError
++-- SystemError (Unexpected, non-recoverable)
 ```
 
 ### 1.2 Error Categories
@@ -834,4 +834,4 @@ groups:
 
 ---
 
-*Standard STD-ERR-001 v1.0 — Part of zai-agent-toolkit*
+Built with: Z.ai Agent Toolkit

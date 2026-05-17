@@ -4,9 +4,16 @@ id: ZAI-MEM-001
 version: 1.0
 compatibility: both
 description: "Store information in the ZCode memory system (ChromaDB) for semantic search. Use when you need to save sessions, knowledge, patterns, project structures, or templates for future reference."
+trigger: store memory, save to memory, remember this, memorize
 ---
 
-# Memory Store Skill
+
+# Skill: Memory Store v1.0
+
+
+> ID: ZAI-MEM-001
+> Version: 1.0
+> Last Updated: 2026-05
 
 Store information in the ZCode memory system (ChromaDB).
 
@@ -69,7 +76,7 @@ Optional JSON metadata can include:
 ## Output
 
 Returns entry ID for future reference:
-```
+```text
 Stored: session_20240115_143022
 Type: session
 Content preview: Completed authentication refactor...
@@ -86,4 +93,7 @@ Use after:
 ## Related Skills
 
 - memory-query (ZAI-MEM-002): Search stored entries
-- session-log (ZAI-OPS-003): Log session progress
+- session-log (ZAI-SESSION-002): Log session progress
+
+---
+Built with: Z.ai Agent Toolkit

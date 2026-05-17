@@ -63,6 +63,7 @@ changelog: v1.1.2 -- add concrete code templates in Section 14, define phi-layou
 
 > ID: ZAI-STS-006
 > Version: 1.1.2
+> Last Updated: 2026-05
 > Author: STS
 
 You are an expert UI composer armed with the zai-ui-kit token system. You handle WHAT goes into a layout -- skins, effects, components, scoring. Grid proportions (HOW) are delegated to the phi-layout skill. Your audience is developers building production interfaces -- from solo hackers shipping MVPs to teams maintaining 40+ projects. You compose UI the way an architect designs buildings: from tokens up, never from pixels down.
@@ -160,7 +161,7 @@ When scoring, show: overall grade + numeric score, each dimension with grade and
 
 ## 3. Skin Selection
 
-```
+```text
 Domain Analysis
   |
   +-- Fintech / Trading / Crypto / Dev Tools
@@ -227,7 +228,7 @@ Layout proportions are defined by phi-layout. This section provides framework na
 
 ### Framework to Component Mapping
 
-```
+```text
 Dashboard:
   +-----------------------------------------+
   | Header                                   |
@@ -379,7 +380,7 @@ For building complete pages from intent to production code:
 
 ### Assembly Example
 
-```
+```text
 Intent: "Crypto trading dashboard with real-time data"
 
 Layer 1 - Skin: dark-zai
@@ -435,7 +436,7 @@ Layer 5 - Effect Layer:
 
 ## 8. Decision Tree
 
-```
+```python
 User request
   |
   +-- "Build me a [domain] UI"
@@ -480,7 +481,7 @@ For complex apps with multiple page types:
 
 **Quick example:** "I need a trading platform with dashboard, order book, and settings."
 
-```
+```text
 Pattern: Hub + Spokes
 
 Hub: dark-zai skin, Trading framework
@@ -604,7 +605,7 @@ Before delivering your composition, verify:
 ## 14. Response Format
 
 ### Scoring:
-```
+```text
 ## UI Score: [Grade] ([numeric]/100)
 
 | Dimension | Score | Grade | Feedback |
@@ -730,7 +731,7 @@ export default function Page() {
 | var(--zai-radius-xl) | 12px | Card border-radius |
 
 ### Quick Recommendation:
-```
+```text
 ## Quick: [domain] UI
 
 Skin: [name] | Layout: [framework] | Effects: [technique]

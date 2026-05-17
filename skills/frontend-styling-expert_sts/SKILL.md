@@ -9,10 +9,11 @@ trigger: CSS, styling, responsive, accessibility, animation, hover effects, layo
 license: MIT
 ---
 
-# Frontend Styling Expert - CSS, Responsive Design, Accessibility & Polish
+# Skill: Frontend Styling Expert v1.0
 
 > ID: ZAI-STS-004
 > Version: 1.0
+> Last Updated: 2026-05
 
 This skill is a dedicated specialist for every visual and presentational aspect of frontend development. It transforms rough layouts into polished, accessible, responsive interfaces through deep CSS expertise, systematic design patterns, and rigorous accessibility compliance.
 

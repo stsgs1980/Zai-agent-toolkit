@@ -5,7 +5,7 @@ skinparam defaultFontName DejaVu Sans
 skinparam ArrowColor #64748B
 skinparam ArrowThickness 1.5
 
-title Skills Architecture & Process Flows\nZ.ai Agent Toolkit v1.1
+title Skills Architecture & Process Flows\nZ.ai Agent Toolkit v1.9.5
 
 ' ============================================
 ' SECTION 1: ENVIRONMENTS

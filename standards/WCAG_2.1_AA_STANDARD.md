@@ -3,7 +3,7 @@
 > ID: STD-A11Y-001
 > Version: 1.0
 > Level: **[C] Critical**
-> Reference: https://www.w3.org/TR/WCAG21/
+> Related: https://www.w3.org/TR/WCAG21/
 
 ---
 

@@ -4,15 +4,15 @@
 > Version: 1.3
 > Level: **[C] Critical**
 > Last Updated: 2025-01
-> Related: anti-monolith skill (skills/anti-monolith/SKILL.md)
+> Related: WCAG 2.1 AA (STD-A11Y-001), GitHub Standard (STD-GIT-001)
 
 ## 1. Scope
 This standard is mandatory for the development of all User Interfaces built on the **React ecosystem**.
 
 **Coverage:**
-*   **Frameworks:** Next.js (App Router / Pages Router), Remix, Vite, Pure React.
-*   **Language:** TypeScript (Strict Mode).
-*   **Runtimes & Tools:** The rules are agnostic to package managers (npm, yarn, pnpm, bun) and runtimes (Node.js, Bun), provided they support the target framework.
+-   **Frameworks:** Next.js (App Router / Pages Router), Remix, Vite, Pure React.
+-   **Language:** TypeScript (Strict Mode).
+-   **Runtimes & Tools:** The rules are agnostic to package managers (npm, yarn, pnpm, bun) and runtimes (Node.js, Bun), provided they support the target framework.
 
 ---
 
@@ -90,12 +90,12 @@ function Dashboard() {
 **Principle:** Strict separation between Smart (Container) and Dumb (Presentational) components.
 
 **Prohibitions:**
-*   Direct API calls (`fetch`, `axios`, `trpc`) inside Client Components are PROHIBITED.
-*   Direct access to global stores (Zustand, Redux, Context) in leaf UI components is discouraged.
+-   Direct API calls (`fetch`, `axios`, `trpc`) inside Client Components are PROHIBITED.
+-   Direct access to global stores (Zustand, Redux, Context) in leaf UI components is discouraged.
 
 **Next.js Implementation:**
-*   Server Components: Data fetching is permitted and recommended.
-*   Client Components: Data arrives via props or custom hooks.
+-   Server Components: Data fetching is permitted and recommended.
+-   Client Components: Data arrives via props or custom hooks.
 
 **Recommended: TanStack Query**
 

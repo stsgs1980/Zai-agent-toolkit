@@ -26,12 +26,14 @@ Define rules. Not modified when starting a new project — only read and accepte
 | STD-TEST-001 | TESTING_STANDARD.md | [C] | Unit, integration, E2E testing |
 | STD-ERR-001 | ERROR_HANDLING_STANDARD.md | [C] | Error types, logging, recovery |
 | STD-SEC-001 | SECURITY_STANDARD.md | [C] | OWASP, secrets, authentication |
-| STD-DOC-001 | MARKDOWN_STANDARD.md | [W] | README, project documentation |
+| STD-DOC-001 | MARKDOWN_STANDARD.md (RU) | [W] | [DEPRECATED] Use STD-DOC-002 |
+| STD-DOC-002 | MARKDOWN_STANDARD.md | [W] | README, project documentation |
 | STD-DOC-003 | UNICODE_POLICY.md | [C]+[W]+[I] | UI, production code, AI-chat |
 | STD-DOC-004 | README_TEMPLATE.md | - | README.md structure |
 | STD-DOC-005 | CODE_EXAMPLES_GUIDE.md | [W] | Code examples in documentation |
 | STD-ARCH-001 | IMPLEMENTATION_ORDER.md | [W] | Implementation sequence |
 | STD-META-001 | STANDARD_ID_SYSTEM.md | [W] | Standard ID system |
+| STD-ENV-002 | ZAI_INTEGRATION_STANDARD.md | [C] | Z.ai sandbox integration |
 
 ### Group A: Operational System (worklog)
 

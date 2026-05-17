@@ -25,7 +25,7 @@ Guide for validating UI implementation against Figma designs using Figma MCP.
 ### Step 1: Get Design Specifications
 
 **Using Figma MCP:**
-```
+```python
 "Get the specifications for the primary button from Figma file at [URL]"
 
 Response includes:
@@ -50,7 +50,7 @@ Response includes:
 ### Step 3: Document Discrepancies
 
 **Create test case or bug:**
-```
+```text
 TC-UI-001: Primary Button Visual Validation
 
 Design (Figma):
@@ -82,7 +82,7 @@ Bugs: BUG-234, BUG-235
 - [ ] Container max-width
 
 **Example Query:**
-```
+```python
 "Extract spacing values for the card component from Figma"
 ```
 
@@ -96,7 +96,7 @@ Bugs: BUG-234, BUG-235
 - [ ] Text alignment
 
 **Example Query:**
-```
+```python
 "Get typography specifications for all heading levels from Figma design system"
 ```
 
@@ -109,7 +109,7 @@ Bugs: BUG-234, BUG-235
 - [ ] Opacity values
 
 **Example Query:**
-```
+```text
 "List all color tokens used in the navigation component"
 ```
 
@@ -122,7 +122,7 @@ Bugs: BUG-234, BUG-235
 - [ ] Card components
 
 **Example Query:**
-```
+```text
 "Compare the implemented dropdown menu with Figma design at [URL]"
 ```
 
@@ -214,28 +214,28 @@ Bugs: BUG-234, BUG-235
 ## Figma MCP Queries
 
 ### Component Specifications
-```
+```python
 "Get complete specifications for the [component name] from Figma at [URL]"
 "Extract all button variants from the design system"
 "List typography styles defined in Figma"
 ```
 
 ### Color System
-```
+```text
 "Show me all color tokens in the Figma design system"
 "What colors are used in the navigation bar design?"
 "Get the exact hex values for primary, secondary, and accent colors"
 ```
 
 ### Spacing & Layout
-```
+```python
 "What are the padding values for the card component?"
 "Extract grid specifications from the page layout"
 "Get spacing tokens (8px, 16px, 24px, etc.)"
 ```
 
 ### Responsive Breakpoints
-```
+```text
 "What are the defined breakpoints in this Figma design?"
 "Show mobile vs desktop layout differences for [component]"
 ```

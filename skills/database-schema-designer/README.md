@@ -91,7 +91,7 @@ The skill follows a four-phase process:
 
 ### Basic Schema Design
 
-```
+```text
 design a schema for an e-commerce platform with users, products, orders
 ```
 

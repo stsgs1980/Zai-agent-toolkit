@@ -34,7 +34,7 @@ Read `skill-id-system` (ZAI-META-001) for full ID system details.
 
 ### ID Format
 
-```
+```text
 ZAI-<DOMAIN>-<NUMBER>
 ```
 
@@ -225,7 +225,7 @@ Identify triggers from:
 The `description` field is your PRIMARY trigger. AI matches user requests against it.
 
 **Pattern:**
-```
+```text
 description: "Use this skill when user asks for X, mentions Y, or needs Z.
 Also activate on: 'keyword1', 'keyword2', 'phrase example'."
 ```
@@ -291,17 +291,17 @@ Skills load in three levels:
 
 ## File Structure
 
-```
+```text
 skill-name/
-├── SKILL.md (required)
-│   ├── YAML frontmatter (name, description, id, version, trigger)
-│   └── Markdown instructions
-├── references/ (optional)
-│   └── detailed-docs.md
-├── scripts/ (optional)
-│   └── helper-script.py
-└── assets/ (optional)
-    └── templates/
++-- SKILL.md (required)
+|   +-- YAML frontmatter (name, description, id, version, trigger)
+|   +-- Markdown instructions
++-- references/ (optional)
+|   +-- detailed-docs.md
++-- scripts/ (optional)
+|   +-- helper-script.py
++-- assets/ (optional)
+    +-- templates/
 ```
 
 ---
@@ -327,12 +327,12 @@ ZCode Desktop has its own built-in skills without ZAI- prefix:
 Skills are stored in the Z.ai Agent Toolkit repository, not in individual projects.
 
 **Default location on Z.ai server:**
-```
+```text
 /home/z/my-project/Zai-agent-toolkit/skills/
 ```
 
 **Your local location (Windows):**
-```
+```text
 C:\Users\stsgr\.zcode\Zai-agent-toolkit\skills\
 ```
 

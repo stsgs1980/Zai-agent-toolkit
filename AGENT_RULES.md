@@ -37,7 +37,7 @@ you MUST complete the onboarding protocol before starting any work:
 See `instructions/onboarding-protocol.md` for full details.
 NEVER start coding or modifying files before completing Steps 1-3.
 
-## 1. Language Rule
+## 2. Language Rule
 
 Always respond in the user's language. If the user writes in Russian, respond in Russian. If in English, respond in English. Never switch languages without explicit request.
 
@@ -45,9 +45,9 @@ Always respond in the user's language. If the user writes in Russian, respond in
 - Chat messages, explanations, worklog - match user's language
 - Before each response verify: "Am I writing in the same language as the user?"
 
-## 2. Git Workflow Rules
+## 3. Git Workflow Rules
 
-### 2.1 Backup Before Rewrite
+### 3.1 Backup Before Rewrite
 
 Before any git operation that rewrites history (rebase, merge, pull, reset --hard):
 
@@ -55,7 +55,7 @@ Before any git operation that rewrites history (rebase, merge, pull, reset --har
 2. `cp -r src/ /tmp/src-backup/`
 3. `git log --oneline -20 > /tmp/git-log-backup.txt`
 
-### 2.2 Force Push Over Rebase
+### 3.2 Force Push Over Rebase
 
 When `git push` is rejected (diverged branches):
 
@@ -63,7 +63,7 @@ When `git push` is rejected (diverged branches):
 - `git push --force origin main` - AVOID (overrides remote without safety check)
 - `git pull --rebase` - FORBIDDEN (blocks sandbox environment on conflict)
 
-### 2.3 Never Pull After Remote URL Change
+### 3.3 Never Pull After Remote URL Change
 
 After `git remote set-url origin <url>`:
 
@@ -71,7 +71,7 @@ After `git remote set-url origin <url>`:
 - `git push --force origin main` - AVOID (no safety check)
 - `git pull` - FORBIDDEN (creates unnecessary conflicts)
 
-### 2.4 No Panic Diagnostics
+### 3.4 No Panic Diagnostics
 
 Before telling the user data is lost, check ALL 5 paths:
 
@@ -83,11 +83,11 @@ Before telling the user data is lost, check ALL 5 paths:
 
 NEVER say "permanently lost" until all 5 checks are exhausted.
 
-### 2.5 Log Everything
+### 3.5 Log Everything
 
 After every git operation, log to `worklog.md`: operation, hash before/after, result.
 
-## 3. Project Environment
+## 4. Project Environment
 
 Project-specific settings are defined in **`PROJECT_CONFIG.md`**.
 If that file exists, it contains:
@@ -100,7 +100,7 @@ If that file exists, it contains:
 If `PROJECT_CONFIG.md` does not exist, the agent MUST ask the user
 for the stack and project structure before proceeding.
 
-## 4. Code Standards
+## 5. Code Standards
 
 This toolkit enforces the following standards. All files referenced below
 are in the `standards/` directory.
@@ -121,12 +121,12 @@ are in the `standards/` directory.
 | STD-ERR-001 | Error Handling | [C] | ApplicationError hierarchy; structured logging; circuit breaker | `standards/ERROR_HANDLING_STANDARD.md` |
 | STD-SEC-001 | Security Standard | [C] | OWASP Top 10; secrets management; RBAC; Zod validation | `standards/SECURITY_STANDARD.md` |
 
-### 4.1 Implementation Order
+### 5.1 Implementation Order
 
 Standards must be applied in a specific order.
 See `standards/IMPLEMENTATION_ORDER.md` for the full 6-step sequence.
 
-## 5. Diagnostic Disclosure
+## 6. Diagnostic Disclosure
 
 Severity ladder for communicating problems:
 
@@ -139,7 +139,7 @@ Severity ladder for communicating problems:
 
 Never jump to the last row without passing through all previous rows.
 
-## 6. Planning Rule
+## 7. Planning Rule
 
 For tasks that require more than 3 steps, write a plan in `worklog.md` BEFORE writing code.
 
@@ -149,31 +149,57 @@ For tasks that require more than 3 steps, write a plan in `worklog.md` BEFORE wr
 
 See `instructions/writing-plans.md` for full details.
 
-## 7. Skills to Use
+## 8. Skills to Use
+
+### 8.1 Toolkit Skills (installed in skills/)
 
 | ID | Skill | When to Use |
 |----|-------|-------------|
-| ZAI-SESSION-002 | `session-resume` | Start of every new session, after context loss, after "continue" |
-| ZAI-SESSION-001 | `session-handoff` | Creating handoff documents, context preservation, session transfers |
-| ZAI-GIT-002 | `git-checkpoint` | Every 15-20 min during active work, before risky operations |
-| ZAI-GIT-001 | `git-safe-ops` | Before any git push/pull/rebase/merge with remote |
-| ZAI-GIT-003 | `commit-work` | Creating high-quality conventional commits with change analysis |
-| ZAI-QA-002 | `sanitize-validate` | User input, form data, API requests, file uploads, security |
-| ZAI-SDK-002 | `api-retry` | Making HTTP requests to external APIs, encountering 502/503/504 errors |
-| ZAI-SDK-004 | `health-check` | Checking availability of chat.z.ai, monitoring API response times |
-| ZAI-SDK-003 | `fallback` | chat.z.ai is unavailable, need alternative providers |
-| ZAI-DEV-001 | `dev-watchdog` | Starting, restarting, or checking dev server |
+| ZAI-META-001 | `skill-id-system` | Creating new skills, understanding skill IDs |
+| ZAI-META-002 | `skill-creator` | Full skill creation workflow with automatic ID assignment |
 | ZAI-DEV-003 | `project-clone` | Cloning repositories with user confirmation |
-| ZAI-SDK-001 | `z-ai-web-dev-sdk` | Chat, image gen, web search via z-ai-web-dev-sdk |
-| ZAI-DOC-001 | `doc-gen` | Generating PDF, DOCX, XLSX documents following toolkit standards |
+| ZAI-DEV-004 | `commit-work` | Creating high-quality conventional commits with change analysis |
+| ZAI-DEV-005 | `database-schema-designer` | Designing robust database schemas |
 | ZAI-REQ-001 | `requirements-clarity` | Clarifying vague requirements, generating PRD through dialogue |
 | ZAI-ARCH-002 | `mermaid-diagrams` | Creating flowcharts, sequence diagrams, ERDs with Mermaid |
-| ZAI-ARCH-001 | `c4-architecture` | C4 architecture diagrams with Mermaid |
 | ZAI-QA-001 | `qa-test-planner` | Comprehensive QA test planning |
-| ZAI-ARCH-003 | `database-schema-designer` | Designing robust database schemas |
-| ZAI-META-001 | `skill-id-system` | Creating new skills, understanding skill IDs |
+| ZAI-MEM-001 | `memory-store` | Storing sessions, knowledge, patterns in ChromaDB |
+| ZAI-MEM-002 | `memory-query` | Semantic search across stored memory entries |
+| ZAI-MEM-003 | `memory-delete` | Deleting entries from ChromaDB |
+| ZAI-MEM-004 | `memory-export` | Exporting memory entries to JSON |
+| ZAI-FS-001 | `folder-indexer` | Scanning directories and creating searchable indexes |
+| ZAI-SESSION-002 | `session-log` | Automatic session knowledge capture and snapshots |
+| ZAI-SESSION-003 | `context-consolidation` | Managing long-running session context compression |
+| ZAI-STS-001 | `prompt-engineering_sts` | Expert prompt engineering with scoring frameworks |
+| ZAI-STS-002 | `sync-toolkit_sts` | Syncing toolkit between Z.ai sandbox and Windows PC |
+| ZAI-STS-003 | `performance-code-generator_sts` | High-performance code generation with optimization |
+| ZAI-STS-004 | `frontend-styling-expert_sts` | CSS/styling specialist for responsive design |
+| ZAI-STS-005 | `phi-layout_sts` | Proportional CSS Grid layouts using golden ratio |
+| ZAI-STS-006 | `zai-ui-composer_sts` | Production UI composition with zai-ui-kit tokens |
 
-## 8. Instructions to Follow
+### 8.2 System Skills (Z.ai sandbox only)
+
+| ID | Skill | When to Use |
+|----|-------|-------------|
+| - | `fullstack-dev` | Next.js 16 development |
+| - | `visual-design-foundations` | Design tokens, typography |
+| - | `phi-layout` | Grid layouts (sandbox system version) |
+| - | `zai-ui-composer` | UI composition (sandbox system version) |
+| - | `session-resume` | Start of every new session, after context loss |
+| - | `session-handoff` | Creating handoff documents, context preservation |
+| - | `git-checkpoint` | Every 15-20 min during active work, before risky operations |
+| - | `git-safe-ops` | Before any git push/pull/rebase/merge with remote |
+| - | `sanitize-validate` | User input, form data, API requests, security |
+| - | `api-retry` | Making HTTP requests to external APIs |
+| - | `health-check` | Checking availability of chat.z.ai |
+| - | `fallback` | chat.z.ai is unavailable, need alternative providers |
+| - | `dev-watchdog` | Starting, restarting, or checking dev server |
+| - | `z-ai-web-dev-sdk` | Chat, image gen, web search via z-ai-web-dev-sdk |
+| - | `doc-gen` | Generating PDF, DOCX, XLSX documents |
+| - | `c4-architecture` | C4 architecture diagrams with Mermaid |
+| - | `anti-monolith` | Enforcing modular architecture |
+
+## 9. Instructions to Follow
 
 | Instruction | File |
 |-------------|------|
@@ -183,8 +209,9 @@ See `instructions/writing-plans.md` for full details.
 | Diagnostic Disclosure | `instructions/diagnostic-disclosure.md` |
 | Writing Plans | `instructions/writing-plans.md` |
 | Sandbox Rules | `instructions/sandbox-rules.md` |
+| Z.ai SDK Guidelines | `instructions/zai-sdk-guidelines.md` |
 
-## Z.ai SDK Integration
+## 10. Z.ai SDK Integration
 
 When building features that use AI capabilities:
 1. Use `z-ai-web-dev-sdk` skill for all AI model interactions
@@ -193,7 +220,7 @@ When building features that use AI capabilities:
 4. Follow `health-check` skill for availability monitoring
 5. Follow `fallback` skill for provider failover
 
-## 9. Document Classification
+## 11. Document Classification
 
 This toolkit organizes files into two groups:
 
@@ -236,7 +263,7 @@ Deploy AFTER Group B. These SUBMIT to Group B standards.
 | `PROJECT_CONFIG.md` | Project-specific settings (stack, paths, server) |
 | `instructions/*.md` | Detailed behavioral instructions |
 
-## 10. Sandbox Z.ai
+## 12. Sandbox Z.ai
 
 Sandbox environment has specific constraints that affect all operations:
 
@@ -257,7 +284,7 @@ Sandbox environment has specific constraints that affect all operations:
   ```
   This must be done from a NEW chat session (the old one is blocked).
 
-## 11. Project in Sandbox
+## 13. Project in Sandbox
 
 The project MUST reside in `/home/z/my-project/`:
 
@@ -267,7 +294,7 @@ The project MUST reside in `/home/z/my-project/`:
 - All relative paths in configs must resolve from this directory
 - Dev server logs go to `/tmp/zdev.log`
 
-## 12. Dev Server Startup
+## 14. Dev Server Startup
 
 Starting the dev server requires specific handling in sandbox:
 
@@ -296,4 +323,4 @@ Key rules:
 
 ---
 
-Built with: Next.js 16 + TypeScript + Tailwind CSS
+Built with: Python + PowerShell + Markdown

@@ -11,7 +11,7 @@ Checks:
 6. Instruction references in AGENT_RULES point to existing instructions
 
 Usage:
-    python validate_compatibility.py [--toolkit-dir PATH]
+    python validate_compatibility.py [PATH]
 """
 
 import os
@@ -146,38 +146,44 @@ def check_stack_signature(toolkit_dir):
             rel_path = md_file.relative_to(toolkit_dir)
             signatures[str(rel_path)] = matches[-1].strip()
 
+    # Primary toolkit stack
+    primary_stack = "Python + PowerShell + Markdown"
+    root_files = {"AGENT_RULES.md", "CHANGELOG.md", "INSTALL.md", "PROJECT_CONFIG.md", "README.md"}
+
     unique_signatures = set(signatures.values())
     if len(unique_signatures) > 1:
-        issues.append("  Multiple different stack signatures found:")
         for path, sig in signatures.items():
-            issues.append(f"    {path}: {sig}")
+            p = Path(path)
+            if p.name in root_files and sig != primary_stack:
+                issues.append(f"  Root file '{path}' has '{sig}' instead of '{primary_stack}'")
+            elif p.name not in root_files:
+                pass  # Non-root files may have document-specific stack signatures
 
-    return issues
 
 
 def check_skill_references(toolkit_dir):
-    """Check 5: Skills referenced in AGENT_RULES exist."""
+    """Check 5: Skills referenced in AGENT_RULES Section 8.1 exist in skills/."""
     issues = []
     agent_rules = read_file(toolkit_dir / "AGENT_RULES.md")
     skills_dir = toolkit_dir / "skills"
 
-    # Find skill references in AGENT_RULES
-    skill_pattern = r'`([a-z-]+)/?`'
-    referenced_skills = set(re.findall(skill_pattern, agent_rules))
+    # Only check Section 8.1 (Toolkit Skills) — system skills in 8.2 are Z.ai sandbox built-ins
+    sec81_match = re.search(r'### 8\.1 Toolkit Skills(.*?)(?:###|$)', agent_rules, re.DOTALL)
+    if not sec81_match:
+        return issues
+    sec81_text = sec81_match.group(1)
 
-    # Known non-skill references to exclude
-    exclude = {'node_modules', 'src', 'prisma', 'components', 'standards', 'templates',
-               'instructions', 'agent-toolkit', 'download', 'db', 'backup'}
+    # Extract skill names from backtick-quoted entries in table
+    skill_pattern = r'`([\w-]+(?:_sts)?)`'
+    referenced_skills = set(re.findall(skill_pattern, sec81_text))
 
     existing_skills = set()
     if skills_dir.is_dir():
         existing_skills = {d.name for d in skills_dir.iterdir() if d.is_dir()}
 
-    for skill in referenced_skills - exclude:
+    for skill in referenced_skills:
         if skill not in existing_skills:
-            # Only report if it looks like a skill name (contains hyphens, typical pattern)
-            if '-' in skill and len(skill) > 5:
-                issues.append(f"  Skill '{skill}' referenced in AGENT_RULES but not found in skills/")
+            issues.append(f"  Skill '{skill}' in Section 8.1 not found in skills/")
 
     return issues
 

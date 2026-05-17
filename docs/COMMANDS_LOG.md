@@ -39,8 +39,8 @@ git push origin main
 ```bash
 # Шаблон структуры
 skills/
-└── my-skill_sts/           # _sts - подпись пользователя
-    └── SKILL.md            # ID: ZAI-STS-XXX
++-- my-skill_sts/           # _sts - подпись пользователя
+    +-- SKILL.md            # ID: ZAI-STS-XXX
 ```
 
 ### Назначение ID skill
@@ -65,14 +65,14 @@ skills/
 
 ### Windows
 
-```
+```text
 C:\Users\stsgr\.zcode\Zai-agent-toolkit\     # Репозиторий toolkit
 C:\Users\stsgr\.zcode\skills\                 # Symbolic link -> toolkit/skills
 ```
 
 ### Linux (Z.ai)
 
-```
+```text
 /home/z/my-project/Zai-agent-toolkit/         # Toolkit (клон репозитория)
 /home/z/my-project/skills/                    # Skills в sandbox
 ```
@@ -191,18 +191,9 @@ function sync-toolkit {
 | ZAI-STS-001 | prompt-engineering_sts | Prompt engineering техники |
 | ZAI-STS-002 | sync-toolkit_sts | Синхронизация toolkit |
 
-### Skills без ID (ожидают назначения)
-
-- git-safe-ops, git-checkpoint, commit-work, git-safety
-- z-ai-web-dev-sdk, api-retry, fallback, health-check
-- c4-architecture, mermaid-diagrams, database-schema-designer
-- qa-test-planner, sanitize-validate
-- session-handoff, session-resume
-- requirements-clarity, doc-gen
-- dev-watchdog, project-clone
-
-**Примечание:** ID будут назначены при обновлении skills.
-
 ---
 
 *Журнал ведётся с 2026-05-17. Добавляйте новые команды по мере работы.*
+
+---
+Built with: Python + PowerShell + Markdown

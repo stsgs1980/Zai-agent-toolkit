@@ -8,10 +8,11 @@ author: STS
 trigger: phi layout, golden ratio, Fibonacci, bento, masonry, zeitgeist, asymmetric, timeline, sacred geometry, golden grid, Linear-style, Vercel-style, container query
 ---
 
-# Phi Layout - Proportional CSS Grid Compositions
+# Skill: Phi Layout v3.0
 
 > ID: ZAI-STS-005
 > Version: 3.0
+> Last Updated: 2026-05
 
 Phi Layout builds proportional CSS Grid compositions using phi (approximately 1.618) and the Fibonacci sequence. While standard grids default to equal-width columns, this skill creates layouts with deliberate proportional relationships - the same ratios found in nature, architecture, and art. The result is compositions where visual weight is distributed intentionally, guiding the eye along designed focal paths rather than arbitrary divisions.
 
@@ -57,7 +58,7 @@ When applying this skill, follow this structured workflow:
 
 Analyze the user's request to determine the appropriate layout pattern from the 18 available:
 
-```
+```text
 User request                    -> Pattern
 ---------------------------------------------------------
 "two columns, golden ratio"     -> 01 Golden Split

@@ -24,7 +24,7 @@ The ID system solves the following tasks:
 
 ## 2. ID Format
 
-```
+```text
 STD-<DOMAIN>-<NUMBER>
 ```
 
@@ -72,7 +72,7 @@ STD-<DOMAIN>-<NUMBER>
 
 | ID | Document | Version | Level |
 |----|----------|---------|-------|
-| STD-GIT-001 | GitHub Standard | 1.1 | [C] Critical |
+| STD-GIT-001 | GitHub Standard | 1.5 | [C] Critical |
 
 ### 4.3. Accessibility (A11Y)
 
@@ -84,7 +84,7 @@ STD-<DOMAIN>-<NUMBER>
 
 | ID | Document | Version | Level |
 |----|----------|---------|-------|
-| STD-DOC-001 | Markdown Standard (RU) | 2.1.5 | [W] Warning |
+| STD-DOC-001 | Markdown Standard (RU) | 2.1.5 | [W] Warning | [DEPRECATED] |
 | STD-DOC-002 | Markdown Standard (EN) | 2.1.5 | [W] Warning |
 | STD-DOC-003 | No-Unicode Policy | 2.1.3 | [C]+[W]+[I] |
 | STD-DOC-004 | README Template | - | - |
@@ -101,6 +101,7 @@ STD-<DOMAIN>-<NUMBER>
 | ID | Document | Version | Level |
 |----|----------|---------|-------|
 | STD-ENV-001 | Reproducibility Standard | 1.0 | [C] Critical |
+| STD-ENV-002 | Z.ai Integration Standard | 1.1 | [C] Critical |
 
 ### 4.7. Testing (TEST)
 
@@ -147,7 +148,7 @@ STD-<DOMAIN>-<NUMBER>
 ### 5.3. Numbering Rules
 
 - Numbers go sequentially: 001, 002, 003...
-- Gaps are not allowed (no STD-DOC-006 if no STD-DOC-005)
+- Gaps are not allowed (no STD-DOC-XXX if no STD-DOC-005)
 - Deleted standard: ID marked as `[DEPRECATED]` in registry, number not reassigned
 
 ---
@@ -202,7 +203,7 @@ Apply STD-FE-001 limits for component size.
 
 ### 7.4. In Discussions
 
-```
+```text
 @user: This is a violation of STD-A11Y-001 Section 2.1 (Keyboard Navigation)
 ```
 

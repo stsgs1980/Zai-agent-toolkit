@@ -3,14 +3,14 @@
 > Project-specific settings for the current project.
 > This file is NOT part of the toolkit standards -- it is created per project.
 >
-> Toolkit version: v1.5.0
+> Toolkit version: v1.9.5
 
 ---
 
 ## Stack Signature
 
-```
-Built with: Next.js 16 + TypeScript + Tailwind CSS
+```text
+Built with: Python + PowerShell + Markdown
 ```
 
 > Format defined by: `MARKDOWN_STANDARD v2.1`

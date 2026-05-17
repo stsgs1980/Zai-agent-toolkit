@@ -4,9 +4,16 @@ id: ZAI-MEM-004
 version: 1.0
 compatibility: both
 description: "Export entries from ZCode memory system to JSON. Use when you need to backup memory or transfer knowledge between systems."
+trigger: export memory, backup memory, download memory, save memory to file
 ---
 
-# Memory Export Skill
+
+# Skill: Memory Export v1.0
+
+
+> ID: ZAI-MEM-004
+> Version: 1.0
+> Last Updated: 2026-05
 
 Export entries from the ZCode memory system (ChromaDB) to JSON.
 
@@ -73,3 +80,6 @@ python ~/.zcode/tools/memory_cli.py export
 - memory-store (ZAI-MEM-001): Store entries
 - memory-query (ZAI-MEM-002): Search entries
 - memory-delete (ZAI-MEM-003): Delete entries
+
+---
+Built with: Z.ai Agent Toolkit

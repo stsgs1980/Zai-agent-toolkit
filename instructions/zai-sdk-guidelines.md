@@ -50,3 +50,6 @@ z-ai-web-dev-sdk is a backend-only dependency. Never import or use it in client-
 - Hardcoding API keys or tokens
 - Making SDK calls in useEffect hooks
 - Storing base64 image data in state (use file system or object URLs)
+
+---
+Built with: Python + PowerShell + Markdown

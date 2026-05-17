@@ -11,7 +11,7 @@ The Skill ID System helps you:
 
 ## ID Format
 
-```
+```text
 ZAI-<DOMAIN>-<NUMBER>
 ```
 
@@ -47,13 +47,13 @@ ZAI-<DOMAIN>-<NUMBER>
 ### Option 1: Ask AI Agent
 
 Just say:
-```
+```text
 Create a skill for <your purpose>
 ```
 
 The AI agent will:
 1. Use `skill-creator` (ZAI-META-002)
-2. Assign a `ZAI-USER-XXX` ID automatically
+2. Assign a `ZAI-STS-XXX` ID automatically
 3. Update the registry
 
 ### Option 2: Manual Creation
@@ -65,14 +65,14 @@ The AI agent will:
 ---
 name: your-skill-name
 description: What this skill does and when to use it
-id: ZAI-USER-001
+id: ZAI-STS-007
 version: 1.0
 trigger: keyword1, keyword2
 ---
 
 # Skill: Your Skill Name v1.0
 
-> ID: ZAI-USER-001
+> ID: ZAI-STS-007
 > Version: 1.0
 > Last Updated: 2026-05
 
@@ -151,7 +151,7 @@ trigger: keyword1, keyword2
 ### How to use a skill by ID
 
 Just tell the AI:
-```
+```text
 Use ZAI-GIT-001 for safe git operations
 ```
 
@@ -182,7 +182,7 @@ Check `skills/skill-id-system/SKILL.md` for full registry.
 Skills created on Z.ai server are NOT automatically synced to your Windows.
 
 **Workflow:**
-```
+```bash
 Z.ai server:    git push  -->  GitHub  -->  git pull / update-toolkit.ps1  :Your Windows
 ```
 

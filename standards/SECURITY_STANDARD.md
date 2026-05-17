@@ -1,9 +1,9 @@
-# Security Standard v1.0
+# Standard: Security v1.0 (EN)
 
-**Standard ID:** STD-SEC-001
-**Version:** 1.0
-**Status:** Active
-**Applies to:** All projects handling user data, authentication, or external APIs
+> ID: STD-SEC-001
+> Version: 1.0
+> Level: **[C] Critical**
+> Last Updated: 2025-01
 
 ---
 
@@ -801,12 +801,12 @@ const securityConfig = {
 
 ### 11.1 Response Phases
 
-```
-1. DETECT → Identify the incident
-2. CONTAIN → Limit the damage
-3. ERADICATE → Remove the threat
-4. RECOVER → Restore services
-5. LEARN → Post-mortem and improve
+```text
+1. DETECT -> Identify the incident
+2. CONTAIN -> Limit the damage
+3. ERADICATE -> Remove the threat
+4. RECOVER -> Restore services
+5. LEARN -> Post-mortem and improve
 ```
 
 ### 11.2 Immediate Actions
@@ -870,7 +870,7 @@ These sections apply when the project handles real user data, is deployed to pro
 
 ### 13.3. Decision Matrix
 
-```
+```text
 Is this project in Z.ai sandbox (prototype/MVP)?
   |
   +-- YES --> Apply Core only
@@ -924,7 +924,7 @@ Is this project in Z.ai sandbox (prototype/MVP)?
 
 ---
 
-## 15. References
+## 12. References
 
 - OWASP Top 10: https://owasp.org/Top10/
 - OWASP Cheat Sheet Series: https://cheatsheetseries.owasp.org/
@@ -934,4 +934,4 @@ Is this project in Z.ai sandbox (prototype/MVP)?
 
 ---
 
-*Standard STD-SEC-001 v1.0 — Part of zai-agent-toolkit*
+Built with: Z.ai Agent Toolkit

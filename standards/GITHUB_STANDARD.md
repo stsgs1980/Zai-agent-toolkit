@@ -1,9 +1,9 @@
-# Standard: GitHub v1.0
+# Standard: GitHub v1.5 (EN)
 
 > ID: STD-GIT-001
 > Version: 1.5
 > Level: **[C] Critical**
-> Reference: https://www.conventionalcommits.org/
+> Related: https://www.conventionalcommits.org/
 
 ---
 
@@ -13,7 +13,7 @@
 
 All commit messages MUST follow [Conventional Commits v1.0](https://www.conventionalcommits.org/):
 
-```
+```text
 <type>(<scope>): <description>
 
 [optional body]
@@ -40,7 +40,7 @@ All commit messages MUST follow [Conventional Commits v1.0](https://www.conventi
 
 Scope = layer or package affected:
 
-```
+```text
 tokens, ui, sections, features, hooks, providers, cli, eslint-plugin,
 browser, create-app, theme, layout, a11y, docs, standards
 ```
@@ -76,7 +76,7 @@ feat(ui): This component does X and Y and Z...  # too long
 
 ### 2.1 Format
 
-```
+```text
 <type>/<ticket>-<short-description>
 ```
 
@@ -180,7 +180,7 @@ Push after every significant change. Do not accumulate half-finished work locall
 
 **Formula:**
 
-```
+```text
 work -> commit -> push -> peace of mind
 ```
 
@@ -235,7 +235,7 @@ git push --force-with-lease origin main
 
 **Tag naming convention:**
 
-```
+```text
 checkpoint-<task-id>-before-<operation>
 checkpoint-<task-id>-after-<operation>  (optional, for verification)
 ```
@@ -256,7 +256,7 @@ checkpoint-<task-id>-after-<operation>  (optional, for verification)
 
 All releases MUST follow [SemVer 2.0](https://semver.org/):
 
-```
+```text
 MAJOR.MINOR.PATCH
 ```
 
@@ -452,7 +452,7 @@ Sandbox performs automatic `git pull` / `git merge` on session restart. If local
 Merge conflict blocks `git status` (exit code != 0). Infrastructure uses `git status` as pre-check before executing ANY tool (Bash, Read, Write, Edit, Glob, Grep, etc.). Result: **complete deadlock** — no tool can execute, including tools to fix the conflict itself.
 
 **Vicious cycle:**
-```
+```bash
 git status -> merge conflict -> exit code != 0
 -> tool pre-check fails -> tool blocked
 -> cannot fix merge -> git status still fails
@@ -505,7 +505,7 @@ If `git status` shows uncommitted changes — session MUST NOT interrupt without
 
 #### Rule 4: One Task = One Commit + Push
 
-```
+```bash
 Task -> code -> test -> git add -> git commit -> git push -> next task
 ```
 
@@ -556,7 +556,7 @@ git reset origin/main
 
 ### 10.8 AI Agent Checklist (mandatory before each stage)
 
-```
+```bash
 [ ] Code written/changed
 [ ] git add -A
 [ ] git commit -m "description"
@@ -753,7 +753,7 @@ git push origin main
 
 #### 10.9.8 Network Failure Prevention Checklist
 
-```
+```bash
 [ ] Git timeouts configured
 [ ] No `.lock` files present before starting work
 [ ] Clean working tree (git status) before network operations
@@ -776,7 +776,7 @@ Z.ai sandbox infrastructure uses a **pre-command hook** that intercepts ALL shel
 4. Even `echo`, `ls`, `rm` are blocked when git is in conflict state
 
 **This creates absolute deadlock:**
-```
+```bash
 git conflict -> middleware blocks all commands
 -> cannot run recovery commands
 -> cannot fix conflict
@@ -845,7 +845,7 @@ git diff --stat
 
 When `git log HEAD..origin/main` shows remote has commits:
 
-```
+```bash
 REMOTE AHEAD?
     |
     v
@@ -1057,22 +1057,22 @@ After a git deadlock, another agent might clone the repository **inside** the br
 
 #### 10.11.1 The Nested Project Trap
 
-```
+```text
 WRONG (nested project - NOTHING WORKS):
 /home/z/my-project/                          ← old broken project (git deadlock)
-  ├── .git/                                  ← BLOCKED rebase
-  ├── src/
-  ├── package.json
-  └── Z.Code-Guide-Coding-Tool-Helper/       ← clone INSIDE old project!
-       ├── .git/                             ← clean git
-       ├── src/
-       └── package.json
+  +-- .git/                                  ← BLOCKED rebase
+  +-- src/
+  +-- package.json
+  +-- Z.Code-Guide-Coding-Tool-Helper/       ← clone INSIDE old project!
+       +-- .git/                             ← clean git
+       +-- src/
+       +-- package.json
 
 CORRECT (clean replacement):
 /home/z/my-project/                          ← clean clone (replacement)
-  ├── .git/                                  ← clean git
-  ├── src/
-  └── package.json
+  +-- .git/                                  ← clean git
+  +-- src/
+  +-- package.json
 ```
 
 **Why nested projects fail:**
@@ -1137,7 +1137,7 @@ git clone https://github.com/user/repo.git /home/z/my-project
 
 #### 10.11.4 Cleanup Checklist After Deadlock Recovery
 
-```
+```text
 [ ] Old directory completely removed (rm -rf)
 [ ] Clone command specifies target path explicitly
 [ ] No nested project structure exists

@@ -447,7 +447,7 @@ When you take someone else's code for an educational document:
 ```python
 import requests
 response = requests.get('https://api.github.com')
-```
+```text
 ```
 
 ---
@@ -485,7 +485,7 @@ In Markdown this is not always supported, but the principle: **code block should
 Format the following example correctly:
 
 **Original (bad):**
-```
+```python
 $ python
 >>> def foo(x,y):
 ...     return x+y
@@ -574,3 +574,6 @@ print(result)  # 8
 - Checklist for documentation code review
 
 **File is fully ready to use.** Save as `code-examples-guide.md`.
+
+---
+Built with: Z.ai Agent Toolkit

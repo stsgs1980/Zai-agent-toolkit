@@ -1,0 +1,2 @@
+# Python dependencies for Zai-agent-toolkit tools
+chromadb>=0.4.0

@@ -32,7 +32,7 @@ Skill IDs solve the following problems:
 
 ## 2. ID Format
 
-```
+```text
 ZAI-<DOMAIN>-<NUMBER>
 ```
 
@@ -155,9 +155,9 @@ trigger: keyword1, keyword2
 | `ade` | Only works in ZCode ADE |
 
 **How to determine:**
-- Does the skill require `z-ai-web-dev-sdk`? → `sandbox`
-- Does the skill use Z.ai-specific tokens/UI? → `sandbox`
-- Otherwise → `both`
+- Does the skill require `z-ai-web-dev-sdk`? -> `sandbox`
+- Does the skill use Z.ai-specific tokens/UI? -> `sandbox`
+- Otherwise -> `both`
 
 ---
 

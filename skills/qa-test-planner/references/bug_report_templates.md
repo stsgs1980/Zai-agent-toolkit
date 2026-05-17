@@ -79,12 +79,12 @@ Standard templates for clear, reproducible, actionable bug documentation.
 **Console Errors:**
 ```
 [Paste any console errors here]
-```
+```text
 
 **Network Errors:**
 ```
 [Paste any failed requests here]
-```
+```yaml
 
 ---
 
@@ -339,12 +339,12 @@ For application crashes and unhandled errors.
 **Error Message:**
 ```
 [Exact error message]
-```
+```text
 
 **Stack Trace:**
 ```
 [Full stack trace]
-```
+```text
 
 ## Reproduction
 
@@ -363,7 +363,7 @@ For application crashes and unhandled errors.
 ## Logs
 ```
 [Relevant log entries before crash]
-```
+```text
 
 ## Impact
 - User data lost: [Yes/No]

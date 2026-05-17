@@ -40,7 +40,7 @@ Z.ai Agent Toolkit is a collection of reusable skills for AI agents. These skill
 
 ### Architecture
 
-```
+```text
 Z.ai Sandbox                    Your Windows PC
 +------------------+           +------------------+
 | /home/z/         |           | C:\Users\stsgr\  |
@@ -153,15 +153,15 @@ A skill is a set of instructions that the AI agent can load when needed. Think o
 
 ### Skill Structure
 
-```
+```text
 skill-name/
-├── SKILL.md           # Main file (required)
-├── references/        # Additional docs (optional)
-│   └── guide.md
-├── scripts/           # Helper scripts (optional)
-│   └── helper.py
-└── assets/            # Templates, icons (optional)
-    └── template.md
++-- SKILL.md           # Main file (required)
++-- references/        # Additional docs (optional)
+|   +-- guide.md
++-- scripts/           # Helper scripts (optional)
+|   +-- helper.py
++-- assets/            # Templates, icons (optional)
+    +-- template.md
 ```
 
 ### SKILL.md Anatomy
@@ -237,7 +237,7 @@ With IDs:
 
 ### ID Format
 
-```
+```text
 ZAI-<DOMAIN>-<NUMBER>
 ```
 
@@ -303,7 +303,7 @@ ZAI-<DOMAIN>-<NUMBER>
 | ID | Skill | Purpose |
 |----|-------|---------|
 | ZAI-SESSION-001 | session-handoff | Context handoff between sessions |
-| ZAI-SESSION-002 | session-resume | Resume work after session restart |
+| ZAI-SESSION-002 | session-log | Automatic session knowledge capture |
 
 #### Requirements (REQ)
 
@@ -348,13 +348,13 @@ ZAI-<DOMAIN>-<NUMBER>
 
 Just say to the AI:
 
-```
+```text
 Create a skill for <purpose>
 ```
 
 Example:
 
-```
+```bash
 Create a skill for generating weekly progress reports from git commits
 ```
 
@@ -375,7 +375,7 @@ For user-created skills, always use `USER` domain.
 
 Check the registry in `skills/skill-id-system/SKILL.md`:
 
-```
+```text
 ZAI-USER-001: available
 ZAI-USER-002: available
 ...
@@ -472,7 +472,7 @@ git push
 
 Skills created on Z.ai server are NOT automatically on your Windows.
 
-```
+```text
 Z.ai Server                GitHub                Your Windows
 +----------+              +-------+              +------------+
 | skills/  | --push----->| repo  |----pull----->| skills/    |
@@ -523,7 +523,7 @@ Z.ai Server                GitHub                Your Windows
 
 Always sync before starting work:
 
-```
+```bash
 On Z.ai:     git pull before creating skills
 On Windows:  update-toolkit.ps1 before using ZCode Desktop
 ```
@@ -543,7 +543,7 @@ On Windows:  update-toolkit.ps1 before using ZCode Desktop
 
 ### Naming Conventions
 
-```
+```text
 Good:    weekly-report-generator
 Bad:     skill1, myskill, new_skill
 
@@ -650,7 +650,7 @@ git push
 
 ### ID Assignment
 
-```
+```text
 Your skills: ZAI-USER-001, ZAI-USER-002, ...
 Toolkit skills: ZAI-GIT-xxx, ZAI-SDK-xxx, ...
 ```

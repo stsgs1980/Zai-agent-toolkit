@@ -32,7 +32,7 @@ Comprehensive guide to regression testing strategies and execution.
 - Build stability
 
 **Example Smoke Suite:**
-```
+```text
 SMOKE-001: User can login
 SMOKE-002: User can navigate to main features
 SMOKE-003: Critical API endpoints respond
@@ -107,7 +107,7 @@ SMOKE-006: User can logout
 
 ### Step 3: Group by Feature Area
 
-```
+```text
 Authentication & Authorization
  Login/Logout
  Password reset
@@ -188,8 +188,8 @@ User Management
 ### Test Execution Order
 
 **1. Smoke first**
-- If smoke fails → stop, fix build
-- If smoke passes → proceed to full regression
+- If smoke fails -> stop, fix build
+- If smoke passes -> proceed to full regression
 
 **2. P0 tests next**
 - Critical functionality

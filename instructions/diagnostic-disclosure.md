@@ -104,3 +104,6 @@ Never jump to the last row without passing through all previous rows.
 > may still contain the commits. Can you try starting from the same session?"
 
 The second approach is honest, transparent, and gives the user actionable options.
+
+---
+Built with: Python + PowerShell + Markdown

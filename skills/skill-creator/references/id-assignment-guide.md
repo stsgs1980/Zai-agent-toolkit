@@ -8,7 +8,7 @@ This reference provides detailed guidance on assigning IDs to new skills.
 
 ### ID Format
 
-```
+```text
 ZAI-<DOMAIN>-<NUMBER>
 ```
 

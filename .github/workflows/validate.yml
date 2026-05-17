@@ -1,5 +1,7 @@
 name: Toolkit Validation
 
+# NOTE: This workflow overlaps with ci.yml. Consider merging into ci.yml.
+
 on:
   push:
     branches:
@@ -30,6 +32,8 @@ jobs:
             instructions/language-rule.md \
             instructions/diagnostic-disclosure.md \
             instructions/writing-plans.md \
+            instructions/sandbox-rules.md \
+            instructions/zai-sdk-guidelines.md \
             standards/README_TEMPLATE.md \
             standards/UNICODE_POLICY.md \
             standards/MARKDOWN_STANDARD.md \

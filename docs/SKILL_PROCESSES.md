@@ -334,29 +334,29 @@ flowchart TB
 
 ### Windows Directory Structure
 
-```
+```text
 C:\Users\stsgr\.zcode\
-├── agent/
-├── cli/
-├── v2/
-├── skills/ ────────────────→ Zai-agent-toolkit\skills\ (symlink)
-├── instructions/ ──────────→ Zai-agent-toolkit\instructions\ (symlink)
-├── standards/ ─────────────→ Zai-agent-toolkit\standards\ (symlink)
-└── Zai-agent-toolkit/
-    ├── skills/
-    ├── instructions/
-    ├── standards/
-    └── sync-toolkit.ps1
++-- agent/
++-- cli/
++-- v2/
++-- skills/ -----------------> Zai-agent-toolkit\skills\ (symlink)
++-- instructions/ -----------> Zai-agent-toolkit\instructions\ (symlink)
++-- standards/ --------------> Zai-agent-toolkit\standards\ (symlink)
++-- Zai-agent-toolkit/
+    +-- skills/
+    +-- instructions/
+    +-- standards/
+    +-- sync-toolkit.ps1
 ```
 
 ### Sync Workflow
 
 | Direction | Command | Location |
 |-----------|---------|----------|
-| Sandbox → GitHub | `git push` | `/home/z/my-project/Zai-agent-toolkit/` |
-| GitHub → Windows | `git pull` or `sync-toolkit` | `C:\Users\stsgr\.zcode\Zai-agent-toolkit\` |
-| Windows → GitHub | `git push` | `C:\Users\stsgr\.zcode\Zai-agent-toolkit\` |
-| GitHub → Sandbox | `git pull` | `/home/z/my-project/Zai-agent-toolkit/` |
+| Sandbox -> GitHub | `git push` | `/home/z/my-project/Zai-agent-toolkit/` |
+| GitHub -> Windows | `git pull` or `sync-toolkit` | `C:\Users\stsgr\.zcode\Zai-agent-toolkit\` |
+| Windows -> GitHub | `git push` | `C:\Users\stsgr\.zcode\Zai-agent-toolkit\` |
+| GitHub -> Sandbox | `git pull` | `/home/z/my-project/Zai-agent-toolkit/` |
 
 ### sync-toolkit_sts (ZAI-STS-002)
 
@@ -368,21 +368,19 @@ Personal skill for orchestrating sync between all three locations.
 
 ## Directory Structure Reference
 
-```
+```text
 /home/z/my-project/
-├── skills/                    # Z.ai System Skills (auto-updated)
-│   ├── ASR/
-│   ├── LLM/
-│   ├── git-safety/
-│   ├── session-handoff/
-│   └── ... (50+ skills)
-│
-└── Zai-agent-toolkit/
-    └── skills/                # Custom Skills (persistent)
-        ├── commit-work/        # ZAI-DEV-004
-        ├── session-log/        # ZAI-SESSION-002
-        ├── skill-creator/      # ZAI-META-002
-        └── *_sts/              # Personal skills
++-- skills/                    # Z.ai System Skills (auto-updated)
+|   +-- ASR/
+|   +-- LLM/
+|   +-- ... (50+ skills)
+|
++-- Zai-agent-toolkit/
+    +-- skills/                # Custom Skills (persistent)
+        +-- commit-work/        # ZAI-DEV-004
+        +-- session-log/        # ZAI-SESSION-002
+        +-- skill-creator/      # ZAI-META-002
+        +-- *_sts/              # Personal skills
 ```
 
 ---
@@ -392,12 +390,15 @@ Personal skill for orchestrating sync between all three locations.
 | Domain | ID Range | Examples |
 |--------|----------|----------|
 | META | ZAI-META-001+ | skill-id-system, skill-creator |
-| DEV | ZAI-DEV-001+ | anti-monolith, project-clone, commit-work |
-| SEC | ZAI-SEC-001+ | sanitize-validate |
-| GIT | ZAI-GIT-001+ | git-safe-ops, git-checkpoint |
-| HEALTH | ZAI-HEALTH-001+ | health-check, api-retry, fallback |
-| SESSION | ZAI-SESSION-001+ | session-handoff, session-log |
+| DEV | ZAI-DEV-001+ | project-clone, commit-work, database-schema-designer |
+| SEC | ZAI-SEC-001+ | (planned) |
+| GIT | ZAI-GIT-001+ | (planned) |
+| HEALTH | ZAI-HEALTH-001+ | (planned) |
+| SESSION | ZAI-SESSION-001+ | session-log, context-consolidation |
 | QA | ZAI-QA-001+ | qa-test-planner |
 | REQ | ZAI-REQ-001+ | requirements-clarity |
 | ARCH | ZAI-ARCH-001+ | mermaid-diagrams |
 | STS | ZAI-STS-001+ | Personal skills (_sts suffix) |
+
+---
+Built with: Python + PowerShell + Markdown

@@ -7,7 +7,12 @@ description: Generate comprehensive test plans, manual test cases, regression te
 trigger: explicit
 ---
 
-# QA Test Planner
+# Skill: QA Test Planner v1.0
+
+
+> ID: ZAI-QA-001
+> Version: 1.0
+> Last Updated: 2026-05
 
 A comprehensive skill for QA engineers to create test plans, generate manual test cases, build regression test suites, validate designs against Figma, and document bugs effectively.
 
@@ -18,27 +23,27 @@ A comprehensive skill for QA engineers to create test plans, generate manual tes
 ## Quick Start
 
 **Create a test plan:**
-```
+```text
 "Create a test plan for the user authentication feature"
 ```
 
 **Generate test cases:**
-```
+```text
 "Generate manual test cases for the checkout flow"
 ```
 
 **Build regression suite:**
-```
+```text
 "Build a regression test suite for the payment module"
 ```
 
 **Validate against Figma:**
-```
+```text
 "Compare the login page against the Figma design at [URL]"
 ```
 
 **Create bug report:**
-```
+```text
 "Create a bug report for the form validation issue"
 ```
 
@@ -58,25 +63,25 @@ A comprehensive skill for QA engineers to create test plans, generate manual tes
 
 ## How It Works
 
-```
+```text
 Your Request
 
 
 
  1. ANALYZE
-    • Parse feature/requirement
-    • Identify test types needed
-    • Determine scope and priorities
+    * Parse feature/requirement
+    * Identify test types needed
+    * Determine scope and priorities
 
  2. GENERATE
-    • Create structured deliverables
-    • Apply templates and best practices
-    • Include edge cases and variations
+    * Create structured deliverables
+    * Apply templates and best practices
+    * Include edge cases and variations
 
  3. VALIDATE
-    • Check completeness
-    • Verify traceability
-    • Ensure actionable steps
+    * Check completeness
+    * Verify traceability
+    * Ensure actionable steps
 
 
 
@@ -397,7 +402,7 @@ QA Deliverable Ready
 **Process:**
 
 1. **Get Design Specs from Figma**
-```
+```text
 "Get the button specifications from Figma file [URL]"
 
 Response includes:
@@ -410,7 +415,7 @@ Response includes:
 ```
 
 2. **Compare Implementation**
-```
+```text
 TC: Primary Button Visual Validation
 1. Inspect primary button in browser dev tools
 2. Compare against Figma specs:
@@ -422,7 +427,7 @@ TC: Primary Button Visual Validation
 ```
 
 3. **Create Bug if Mismatch**
-```
+```text
 BUG: Primary button color doesn't match design
 Severity: Medium
 Expected (Figma): #0066FF
@@ -443,7 +448,7 @@ Figma link: [specific component]
 | Responsive | Breakpoint behavior | DevTools device mode |
 
 ### Example Queries
-```
+```text
 "Get button specifications from Figma design [URL]"
 "Compare navigation menu implementation against Figma design"
 "Extract spacing values for dashboard layout from Figma"
@@ -758,3 +763,6 @@ Verify navigation menu works correctly on mobile devices
 **"Testing shows the presence, not the absence of bugs." - Edsger Dijkstra**
 
 **"Quality is not an act, it is a habit." - Aristotle**
+
+---
+Built with: Z.ai Agent Toolkit

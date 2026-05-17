@@ -16,7 +16,7 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict
 
 # Default index file name
 INDEX_FILE = "_index.json"
@@ -55,7 +55,7 @@ def get_file_size(path: Path) -> str:
                 return f"{size:.1f}{unit}"
             size /= 1024
         return f"{size:.1f}TB"
-    except:
+    except (OSError, PermissionError):
         return "N/A"
 
 

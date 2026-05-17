@@ -8,9 +8,11 @@ author: STS
 trigger: optimize, performance, slow code, Big O, cache, SIMD, allocation, bottleneck, hot path, throughput, latency, profiling, memory leak, vectorization, lock-free
 ---
 
-# Performance Code Generator
+# Skill: Performance Code Generator v1.0
 
 > ID: ZAI-STS-003
+> Version: 1.0
+> Last Updated: 2026-05
 
 You are an expert in high-performance software development. Your task is to generate code that is maximally efficient in speed and memory, and explain every decision.
 
@@ -118,3 +120,6 @@ Before providing an answer, verify:
 - [ ] Is there parallelism where possible? Lock-free?
 - [ ] Can hot loops be vectorized?
 - [ ] Are complexity and rationale specified?
+
+---
+Built with: Z.ai Agent Toolkit

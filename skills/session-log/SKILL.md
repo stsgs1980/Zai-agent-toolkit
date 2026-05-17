@@ -10,10 +10,11 @@ description: >
   Builds KNOWLEDGE_BASE.md automatically for future reference and best practices.
 ---
 
-# Session Log (Auto)
+# Skill: Session Log v1.1
 
 > ID: ZAI-SESSION-002
 > Version: 1.1
+> Last Updated: 2026-05
 
 **AUTOMATIC** knowledge capture from AI sessions. No need to remember to log -
 the system creates snapshots automatically at key moments.
@@ -49,7 +50,7 @@ The skill tracks session state in `.session-log-state.json`:
 
 ### Auto-Snapshot Logic
 
-```
+```text
 IF time_since_last_snapshot > 15 min
    OR files_changed >= 5
    OR commit_just_happened

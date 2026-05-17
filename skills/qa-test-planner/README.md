@@ -22,7 +22,7 @@ Use the QA Test Planner skill when you need to:
 
 This skill uses **explicit triggering** - it must be called by name:
 
-```
+```text
 /qa-test-planner
 qa-test-planner
 use the skill qa-test-planner
@@ -97,7 +97,7 @@ Generates structured bug reports with:
 ### Example 1: Create Test Plan
 
 **Input:**
-```
+```text
 /qa-test-planner
 Create a test plan for the user authentication feature
 ```
@@ -115,7 +115,7 @@ A complete test plan document including:
 ### Example 2: Generate Test Cases
 
 **Input:**
-```
+```text
 /qa-test-planner
 Generate 5 manual test cases for the checkout flow
 ```
@@ -133,7 +133,7 @@ Each includes preconditions, step-by-step instructions, expected results, test d
 ### Example 3: Build Regression Suite
 
 **Input:**
-```
+```text
 /qa-test-planner
 Build a smoke test suite for the payment module
 ```
@@ -148,7 +148,7 @@ A prioritized smoke test suite (15-30 min execution) with:
 ### Example 4: Validate Against Figma
 
 **Input:**
-```
+```text
 /qa-test-planner
 Compare the login page against the Figma design at [Figma URL]
 ```
@@ -166,7 +166,7 @@ Plus test cases to verify each element and document discrepancies.
 ### Example 5: Create Bug Report
 
 **Input:**
-```
+```text
 /qa-test-planner
 Create a bug report for: Form validation doesn't prevent submission when email field is empty
 ```
@@ -259,7 +259,7 @@ When Figma MCP is configured, the skill can:
 4. Create bug reports with Figma links for UI discrepancies
 
 **Example Query:**
-```
+```python
 Get button specifications from Figma design [URL]
 ```
 
@@ -296,7 +296,7 @@ Get button specifications from Figma design [URL]
 
 ## Skill Structure
 
-```
+```text
 qa-test-planner/
  README.md                          # This file
  SKILL.md                           # Main skill definition and templates

@@ -32,7 +32,7 @@ Before ANY clone operation, ask the user:
 
 ### Question 1: Purpose
 
-```
+```text
 What is the purpose of cloning this repository?
 
 1. Continue work on existing project
@@ -43,7 +43,7 @@ What is the purpose of cloning this repository?
 
 ### Question 2: Destination
 
-```
+```text
 Where should I clone this repository?
 
 Current working directory: /home/z/my-project/
@@ -57,7 +57,7 @@ Recommended: Always clone to /home/z/my-project/ for Z.ai sandbox compatibility.
 
 ### Question 3: Directory Name
 
-```
+```text
 What directory name should I use?
 
 Repository suggests: <repo-name>
@@ -73,7 +73,7 @@ Options:
 
 ### Step 1: Confirm with User
 
-```
+```text
 CLONE CONFIRMATION
 ==================
 Repository: <url>
@@ -127,7 +127,7 @@ Based on purpose:
 
 In Z.ai sandbox, ALWAYS clone to:
 
-```
+```text
 /home/z/my-project/
 ```
 
@@ -174,7 +174,7 @@ git clone <url> <directory>
 
 ## Template Response
 
-```
+```text
 I will clone this repository. Please confirm:
 
 Repository: <URL>

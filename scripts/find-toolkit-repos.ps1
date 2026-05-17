@@ -18,14 +18,16 @@ foreach ($repo in $repos) {
         
         foreach ($item in $contents) {
             if ($item.type -eq "dir") {
+                $matched = $false
                 foreach ($toolkitName in $toolkitNames) {
-                    if ($item.name -like "*$toolkitName*" -or $item.name -like "*agent-toolkit*") {
+                    if (-not $matched -and $item.name -like "*$toolkitName*") {
                         $foundRepos += [PSCustomObject]@{
                             Repo = $repo
                             Path = $item.path
                             Type = "copy"
                         }
                         Write-Host "  FOUND: $($item.path)" -ForegroundColor Green
+                        $matched = $true
                     }
                 }
             }

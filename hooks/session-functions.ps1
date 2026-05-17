@@ -41,9 +41,9 @@ function Get-Memory {
     )
     
     if ($Type) {
-        & python "$env:USERPROFILE\.zcode\tools\memory_cli.py" query $Query --type $Type --limit $Limit
+        & python "$env:USERPROFILE\.zcode\Zai-agent-toolkit\tools\memory_cli.py" query $Query --type $Type --limit $Limit
     } else {
-        & python "$env:USERPROFILE\.zcode\tools\memory_cli.py" query $Query --limit $Limit
+        & python "$env:USERPROFILE\.zcode\Zai-agent-toolkit\tools\memory_cli.py" query $Query --limit $Limit
     }
 }
 
@@ -64,7 +64,7 @@ function List-Memory {
         [int]$Limit = 10
     )
     
-    & python "$env:USERPROFILE\.zcode\tools\memory_cli.py" list $Type --limit $Limit
+    & python "$env:USERPROFILE\.zcode\Zai-agent-toolkit\tools\memory_cli.py" list $Type --limit $Limit
 }
 
 # Aliases

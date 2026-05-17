@@ -43,3 +43,6 @@
 At the start of each response, verify: "Am I writing in the same language as the user's last message?"
 
 If you catch yourself writing in the wrong language, stop and rewrite in the correct language before sending.
+
+---
+Built with: Python + PowerShell + Markdown

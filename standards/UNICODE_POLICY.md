@@ -3,7 +3,7 @@
 > ID: STD-DOC-003
 > Version: 2.1.3
 > Level: **[C] Critical** + **[W] Warning** + **[I] Info**
-> Related: Markdown Standard (STD-DOC-001, STD-DOC-002)
+> Related: Markdown Standard (STD-DOC-002)
 
 Standard for character, icon, and graphics usage. Design System / Engineering Governance level.
 

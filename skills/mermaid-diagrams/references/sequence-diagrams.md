@@ -358,7 +358,7 @@ sequenceDiagram
 
 ## Best Practices
 
-1. **Order participants logically** - Typically: User → Frontend → Backend → Database
+1. **Order participants logically** - Typically: User -> Frontend -> Backend -> Database
 2. **Use activations** - Shows when components are actively processing
 3. **Group related logic** - Use alt/opt/par to organize conditional flows
 4. **Add descriptive notes** - Explain complex logic or important details

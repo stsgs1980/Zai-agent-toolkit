@@ -125,21 +125,24 @@ Validation script показывает 39 issues.
 
 ### Архитектура
 
-```
+```text
 C:\Users\stsgr\.zcode\
-├── memory\
-│   ├── chromadb\          <- Векторная база
-│   ├── project-index\     <- Каталог проектов
-│   ├── sessions\          <- Логи сессий
-│   └── knowledge\         <- Knowledge base
-├── tools\
-│   ├── memory_cli.py
-│   └── folder_indexer.py
-├── skills\                <- Symlink к toolkit
-├── hooks\
-└── Zai-agent-toolkit\
++-- memory\
+|   +-- chromadb\          <- Векторная база
+|   +-- project-index\     <- Каталог проектов
+|   +-- sessions\          <- Логи сессий
+|   +-- knowledge\         <- Knowledge base
++-- tools\
+|   +-- memory_cli.py
+|   +-- folder_indexer.py
++-- skills\                <- Symlink к toolkit
++-- hooks\
++-- Zai-agent-toolkit\
 ```
 
 ---
 
 *Dokument sozdan 2026-05-17*
+
+---
+Built with: Python + PowerShell + Markdown
