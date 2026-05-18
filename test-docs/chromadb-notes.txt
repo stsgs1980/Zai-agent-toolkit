@@ -1,0 +1,33 @@
+ChromaDB Quick Reference
+
+ChromaDB - Vector database for storing and querying embeddings, used as memory backend for AI agents
+
+Embedding - Numerical representation of text in high-dimensional space, enables semantic search
+
+Collection - Named container in ChromaDB that holds documents with their embeddings and metadata
+
+Getting Started with ChromaDB
+
+1. Install: pip install chromadb
+2. Create client: import chromadb; client = chromadb.Client()
+3. Create collection: col = client.get_or_create_collection("knowledge")
+4. Add documents: col.add(ids=["id1"], documents=["text"], metadatas=[{"type": "knowledge"}])
+5. Query: results = col.query(query_texts=["search"], n_results=5)
+
+CLI Commands
+
+python memory_cli.py init                    # Initialize database
+python memory_cli.py store knowledge "text"  # Store a knowledge entry
+python memory_cli.py query "search terms"    # Semantic search
+python memory_cli.py list knowledge          # List all knowledge entries
+python memory_cli.py export knowledge        # Export as JSON
+python memory_cli.py graph stats             # Show graph statistics
+python memory_cli.py graph viz --format html # Generate visualization
+
+Graph Layer
+
+The graph layer uses NetworkX to create relationships between memory entries.
+Edge types: same_session, imports, depends_on, parent_dir, defines_term
+
+Key Pattern: Always export as JSON for reliable parsing in API routes.
+The list command output format can change between versions, but export always returns stable JSON.

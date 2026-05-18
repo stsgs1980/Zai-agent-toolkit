@@ -687,6 +687,34 @@ class PlainTextParser:
 
         return sorted(tags)
 
+    def extract_api_endpoints(self) -> List[Dict]:
+        """Extract REST API endpoints from plain text (same logic as MarkdownParser)."""
+        endpoints = []
+        seen = set()
+        api_pattern = re.compile(
+            r'((?:GET|POST|PUT|DELETE|PATCH)\s+/[a-zA-Z][a-zA-Z0-9_/.-]*(?:\{[^}]+\})*[^\s]*)',
+            re.IGNORECASE
+        )
+        for line in self.lines:
+            for match in api_pattern.finditer(line):
+                ep = match.group(1).strip()
+                if len(ep) > 5 and ep not in seen:
+                    seen.add(ep)
+                    method = ep.split()[0].upper()
+                    path = ep.split()[1] if len(ep.split()) > 1 else ep
+                    endpoints.append({
+                        "endpoint": ep,
+                        "method": method,
+                        "path": path,
+                        "source_section": "",
+                    })
+        return endpoints
+
+    def extract_api_functions(self) -> List[Dict]:
+        """Extract function signatures from plain text (limited support)."""
+        # Plain text doesn't typically contain structured function signatures
+        return []
+
 
 def detect_parser(content: str, source: str = "") -> object:
     """
