@@ -196,16 +196,45 @@ if (Test-Path $schemaPath) {
         # Add relation fields to MemoryEntry
         $schemaContent = Get-Content -Path $schemaPath -Raw
 
-        # Find the MemoryEntry model and add fields before the closing brace
-        $pattern = '(?s)(model MemoryEntry \{.*?)(\})'
-        if ($schemaContent -match $pattern) {
-            $before = $Matches[1]
-            $relationFields = "`n`n  // Graph layer relations`n  fromEdges MemoryEdge[] @relation(""FromEdges"")`n  toEdges   MemoryEdge[] @relation(""ToEdges"")`n"
-            $newContent = $schemaContent -replace [regex]::Escape($before + $Matches[2]), ($before + $relationFields + $Matches[2])
+        # Find the MemoryEntry model and add fields before the LAST closing brace
+        # NOTE: We use line-by-line parsing to avoid regex matching '}' inside @default("{}")
+        $lines = $schemaContent -split "`n"
+        $inModel = $false
+        $braceDepth = 0
+        $insertIndex = -1
+
+        for ($i = 0; $i -lt $lines.Count; $i++) {
+            if ($lines[$i] -match '^\s*model MemoryEntry\s*\{') {
+                $inModel = $true
+                $braceDepth = 1
+                continue
+            }
+            if ($inModel) {
+                # Count braces (but skip those inside quoted strings)
+                $noStrings = $lines[$i] -replace '"[^"]*"', ''  # remove quoted strings
+                $opens = ($noStrings | Select-String -Pattern '\{' -AllMatches).Matches.Count
+                $closes = ($noStrings | Select-String -Pattern '\}' -AllMatches).Matches.Count
+                $braceDepth += $opens - $closes
+                if ($braceDepth -le 0) {
+                    $insertIndex = $i
+                    break
+                }
+            }
+        }
+
+        if ($insertIndex -ge 0) {
+            $relationLines = @(
+                "",
+                "  // Graph layer relations",
+                "  fromEdges MemoryEdge[] @relation(\"FromEdges\")",
+                "  toEdges   MemoryEdge[] @relation(\"ToEdges\")"
+            )
+            $newLines = $lines[0..($insertIndex-1)] + $relationLines + $lines[$insertIndex..($lines.Count-1)]
+            $newContent = $newLines -join "`n"
             Set-Content -Path $schemaPath -Value $newContent -NoNewline
             Write-Host "  Added graph relations to MemoryEntry" -ForegroundColor Green
         } else {
-            Write-Host "  WARN: Could not find MemoryEntry model" -ForegroundColor Yellow
+            Write-Host "  WARN: Could not find MemoryEntry model closing brace" -ForegroundColor Yellow
             Write-Host "  Please add fromEdges/toEdges manually" -ForegroundColor Yellow
         }
     }
