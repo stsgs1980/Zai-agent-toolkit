@@ -112,8 +112,9 @@ export async function GET(request: NextRequest) {
       }
 
       const { stderr } = await execFileAsync("python", args, {
-        timeout: 30000, // 30 second timeout
+        timeout: 30000,
         windowsHide: true,
+        env: { ...process.env, PYTHONIOENCODING: "utf-8" },
       });
 
       if (stderr && !stderr.includes("WARNING")) {
