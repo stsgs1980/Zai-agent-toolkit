@@ -43,9 +43,9 @@ ZAI-<DOMAIN>-<NUMBER>
 | `<NUMBER>` | Sequential number (3 digits) |
 
 **Examples:**
-- `ZAI-GIT-001` - git-safe-ops skill
-- `ZAI-SDK-001` - z-ai-web-dev-sdk skill
-- `ZAI-ARCH-001` - c4-architecture skill
+- `ZAI-MEM-001` - memory-store skill
+- `ZAI-ARCH-002` - mermaid-diagrams skill
+- `ZAI-STS-001` - prompt-engineering_sts skill
 
 ---
 
@@ -53,18 +53,20 @@ ZAI-<DOMAIN>-<NUMBER>
 
 | Domain | Expansion | Scope |
 |--------|-----------|-------|
-| `GIT` | Git Operations | Safe git, checkpoints, commits |
-| `SDK` | SDK Integration | z-ai-web-dev-sdk, API calls |
+| `MEM` | Memory | Store, query, delete, export memory records |
+| `FS` | File System | Folder indexing, file scanning |
+| `SESSION` | Session Management | Handoff, resume, context, logging |
+| `DEV` | Development | Project clone, commit, schema design, watchdog |
 | `ARCH` | Architecture | C4 diagrams, mermaid, DB design |
 | `QA` | Quality Assurance | Test planning, validation |
-| `SEC` | Security | Sanitization, validation |
-| `SESSION` | Session Management | Handoff, resume, context |
 | `REQ` | Requirements | Clarity, PRD generation |
-| `DOC` | Documentation | PDF, DOCX, PPT generation |
-| `DEV` | Development | Dev server, watchdog |
-| `HEALTH` | Health Monitoring | API health, fallback, retry |
 | `META` | Meta-skills | This document, skill creation |
 | `STS` | User-Created (STS) | Skills created by STS |
+| `GIT` | Git Operations | (reserved) Safe git, checkpoints |
+| `SDK` | SDK Integration | (reserved) z-ai-web-dev-sdk, API calls |
+| `SEC` | Security | (reserved) Sanitization, validation |
+| `DOC` | Documentation | (reserved) PDF, DOCX, PPT generation |
+| `HEALTH` | Health Monitoring | (reserved) API health, fallback, retry |
 
 ---
 
@@ -84,47 +86,73 @@ ZCode Desktop has its own built-in skills. They do NOT have `ZAI-` prefix:
 
 ## 5. Skill ID Registry
 
-### 5.1. Skills with Assigned IDs
+### 5.1. Memory (MEM)
+
+| ID | Skill Name | Version | Status |
+|----|------------|---------|--------|
+| ZAI-MEM-001 | memory-store | 1.0 | Active |
+| ZAI-MEM-002 | memory-query | 1.0 | Active |
+| ZAI-MEM-003 | memory-delete | 1.0 | Active |
+| ZAI-MEM-004 | memory-export | 1.0 | Active |
+
+### 5.2. File System (FS)
+
+| ID | Skill Name | Version | Status |
+|----|------------|---------|--------|
+| ZAI-FS-001 | folder-indexer | 1.0 | Active |
+
+### 5.3. Session Management (SESSION)
+
+| ID | Skill Name | Version | Status |
+|----|------------|---------|--------|
+| ZAI-SESSION-002 | session-log | 1.1 | Active |
+| ZAI-SESSION-003 | context-consolidation | 1.0 | Active |
+
+### 5.4. Development (DEV)
+
+| ID | Skill Name | Version | Status |
+|----|------------|---------|--------|
+| ZAI-DEV-002 | anti-monolith | 1.0 | Planned (system skill, no folder) |
+| ZAI-DEV-003 | project-clone | 1.0 | Active |
+| ZAI-DEV-004 | commit-work | 1.0 | Active |
+| ZAI-DEV-005 | database-schema-designer | 1.0 | Active |
+
+### 5.5. Architecture (ARCH)
+
+| ID | Skill Name | Version | Status |
+|----|------------|---------|--------|
+| ZAI-ARCH-002 | mermaid-diagrams | 1.0 | Active |
+
+### 5.6. Quality Assurance (QA)
+
+| ID | Skill Name | Version | Status |
+|----|------------|---------|--------|
+| ZAI-QA-001 | qa-test-planner | 1.0 | Active |
+
+### 5.7. Requirements (REQ)
+
+| ID | Skill Name | Version | Status |
+|----|------------|---------|--------|
+| ZAI-REQ-001 | requirements-clarity | 1.0 | Active |
+
+### 5.8. Meta-skills (META)
 
 | ID | Skill Name | Version | Status |
 |----|------------|---------|--------|
 | ZAI-META-001 | skill-id-system | 1.0 | Active |
 | ZAI-META-002 | skill-creator | 1.1 | Active |
-| ZAI-SEC-001 | sanitize-validate | 1.0 | Active |
-| ZAI-DEV-002 | anti-monolith | 1.0 | Planned (system skill) |
-| ZAI-DEV-003 | project-clone | 1.0 | Active |
+
+### 5.9. User-Created (STS)
+
+| ID | Skill Name | Version | Status |
+|----|------------|---------|--------|
 | ZAI-STS-001 | prompt-engineering_sts | 1.1 | Active |
 | ZAI-STS-002 | sync-toolkit_sts | 1.0 | Active |
 | ZAI-STS-003 | performance-code-generator_sts | 1.0 | Active |
 | ZAI-STS-004 | frontend-styling-expert_sts | 1.0 | Active |
 | ZAI-STS-005 | phi-layout_sts | 3.0 | Active |
-| ZAI-STS-006 | (available) | - | - |
-
-### 5.2. Skills Pending ID Assignment
-
-These skills exist in toolkit but do not have IDs assigned yet:
-
-| Skill Name | Suggested Domain |
-|------------|------------------|
-| git-safe-ops | GIT |
-| git-checkpoint | GIT |
-| commit-work | GIT |
-| git-safety | GIT |
-| z-ai-web-dev-sdk | SDK |
-| api-retry | SDK |
-| fallback | SDK |
-| health-check | HEALTH |
-| c4-architecture | ARCH |
-| mermaid-diagrams | ARCH |
-| database-schema-designer | ARCH |
-| qa-test-planner | QA |
-| session-handoff | SESSION |
-| session-resume | SESSION |
-| requirements-clarity | REQ |
-| doc-gen | DOC |
-| dev-watchdog | DEV |
-
-**Note:** IDs will be assigned when updating these skills.
+| ZAI-STS-006 | zai-ui-composer_sts | 1.0 | Active |
+| ZAI-STS-007 | (available) | - | - |
 
 ---
 

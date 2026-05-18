@@ -18,18 +18,20 @@ Choose the domain that BEST fits the skill's primary purpose:
 
 | Domain | When to Use |
 |--------|-------------|
-| `GIT` | Git operations: clone, commit, branch, checkpoint, safety |
-| `SDK` | API integration: z-ai-web-dev-sdk, external APIs, retry logic |
+| `MEM` | Memory operations: store, query, delete, export records |
+| `FS` | File system: folder indexing, file scanning |
+| `SESSION` | Session management: handoff, resume, context, logging |
+| `DEV` | Development: project clone, commit, schema design |
 | `ARCH` | Architecture: diagrams, C4, mermaid, database schemas |
 | `QA` | Testing: test plans, validation, quality checks |
-| `SEC` | Security: input validation, sanitization, OWASP |
-| `SESSION` | Context: handoff, resume, state management |
 | `REQ` | Requirements: PRD, clarity, specifications |
-| `DOC` | Documents: PDF, DOCX, PPT, reports |
-| `DEV` | Development: dev server, file watching, project setup |
-| `HEALTH` | Monitoring: API health, fallback, circuit breaker |
 | `META` | Meta-skills: skill creation, ID system, toolkit itself |
-| `USER` | User-created: any skill created by the user |
+| `STS` | User-created: any skill created by STS (with `_sts` suffix) |
+| `GIT` | (reserved) Git operations: clone, branch, checkpoint |
+| `SDK` | (reserved) API integration: z-ai-web-dev-sdk |
+| `SEC` | (reserved) Security: input validation, sanitization |
+| `DOC` | (reserved) Documents: PDF, DOCX, PPT generation |
+| `HEALTH` | (reserved) Monitoring: API health, fallback, circuit breaker |
 
 ---
 
@@ -38,39 +40,50 @@ Choose the domain that BEST fits the skill's primary purpose:
 ### Finding Next Number
 
 1. Open skill-id-system (ZAI-META-001)
-2. Find the domain section (e.g., "5.1. Git Operations (GIT)")
+2. Find the domain section (e.g., "5.1. Memory (MEM)")
 3. Find the highest number in that domain
 4. Add 1 for the new skill
 
 ### Example
 
-Current GIT skills:
-- ZAI-GIT-001: git-safe-ops
-- ZAI-GIT-002: git-checkpoint
-- ZAI-GIT-003: commit-work
+Current MEM skills:
+- ZAI-MEM-001: memory-store
+- ZAI-MEM-002: memory-query
+- ZAI-MEM-003: memory-delete
+- ZAI-MEM-004: memory-export
 
-Next GIT skill: ZAI-GIT-004
+Next MEM skill: ZAI-MEM-005
 
 ---
 
-## User-Created Skills
+## User-Created Skills (STS Domain)
 
-**IMPORTANT:** Skills created by the user should ALWAYS use `ZAI-USER-XXX`.
+**IMPORTANT:** Skills created by the user (STS) should ALWAYS use `ZAI-STS-XXX`.
 
 This distinguishes them from toolkit skills and prevents conflicts.
 
-### User ID Registry
+### Naming Convention
 
-| ID | Skill Name | Created |
-|----|------------|---------|
-| ZAI-USER-001 | (available) | - |
-| ZAI-USER-002 | (available) | - |
-| ZAI-USER-003 | (available) | - |
+- Folder name MUST have `_sts` suffix: `my-skill_sts/`
+- ID uses `STS` domain: `ZAI-STS-XXX`
 
-When a user creates a skill:
-1. Find first available ZAI-USER-XXX
+### Current STS Registry
+
+| ID | Skill Name | Status |
+|----|------------|--------|
+| ZAI-STS-001 | prompt-engineering_sts | Active |
+| ZAI-STS-002 | sync-toolkit_sts | Active |
+| ZAI-STS-003 | performance-code-generator_sts | Active |
+| ZAI-STS-004 | frontend-styling-expert_sts | Active |
+| ZAI-STS-005 | phi-layout_sts | Active |
+| ZAI-STS-006 | zai-ui-composer_sts | Active |
+| ZAI-STS-007 | (available) | - |
+
+When creating a user skill:
+1. Find first available ZAI-STS-XXX
 2. Assign to new skill
-3. Update registry with skill name and date
+3. Add `_sts` suffix to folder name
+4. Update registry with skill name
 
 ---
 
@@ -80,7 +93,7 @@ When a user creates a skill:
 
 If a skill could fit multiple domains:
 1. Choose the PRIMARY function
-2. If equal, prefer: GIT > SDK > ARCH > QA > SEC > SESSION > REQ > DOC > DEV > HEALTH > META > USER
+2. If equal, prefer: MEM > FS > SESSION > DEV > ARCH > QA > REQ > META > STS > GIT > SDK > SEC > DOC > HEALTH
 
 ### What if number is taken?
 
@@ -97,7 +110,7 @@ After creating a skill with an ID:
 3. Add entry in format:
 
 ```markdown
-| ZAI-XXX-NNN | skill-name | 1.0 |
+| ZAI-XXX-NNN | skill-name | 1.0 | Active |
 ```
 
 4. Commit changes
@@ -117,7 +130,7 @@ After creating a skill with an ID:
 
 **Decision:** QA
 
-**ID:** ZAI-QA-003 (after ZAI-QA-002 sanitize-validate)
+**ID:** ZAI-QA-002 (next after ZAI-QA-001 qa-test-planner)
 
 ### Example 2: User's Custom Report Generator
 
@@ -125,23 +138,23 @@ After creating a skill with an ID:
 
 **Domain analysis:**
 - Could be DOC (documentation)
-- Could be USER (user-created)
+- Could be STS (user-created)
 
-**Decision:** USER (user-created takes priority for custom skills)
+**Decision:** STS (user-created takes priority for custom skills)
 
-**ID:** ZAI-USER-001
+**ID:** ZAI-STS-007, folder: `weekly-report_sts/`
 
-### Example 3: Git Hook Manager
+### Example 3: Memory Backup Skill
 
-**Skill purpose:** Manage git hooks for pre-commit checks
+**Skill purpose:** Backup memory database to file
 
 **Domain analysis:**
-- Could be GIT (git operations)
-- Could be QA (quality checks)
+- Could be MEM (memory operations)
+- Could be FS (file system)
 
-**Decision:** GIT (primary function is git)
+**Decision:** MEM (primary function is memory)
 
-**ID:** ZAI-GIT-004 (next available)
+**ID:** ZAI-MEM-005 (next available)
 
 ---
 

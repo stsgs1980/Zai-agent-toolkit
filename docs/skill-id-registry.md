@@ -99,6 +99,7 @@
 | ZAI-STS-004 | frontend-styling-expert_sts | 1.0 | STS | Active | both |
 | ZAI-STS-005 | phi-layout_sts | 3.0 | STS | Active | both |
 | ZAI-STS-006 | zai-ui-composer_sts | 1.1.2 | STS | Active | sandbox |
+| ZAI-STS-007 | (available) | - | - | - | - |
 
 ---
 
@@ -138,7 +139,7 @@ Next available IDs by domain:
 
 ---
 
-Last Updated: 2026-05-17
+Last Updated: 2026-05-18
 
 ---
 Built with: Z.ai Agent Toolkit

@@ -53,7 +53,7 @@ ZAI-<DOMAIN>-<NUMBER>
 | `DEV` | Development (dev server, watchdog) |
 | `HEALTH` | Health monitoring (API health, retry) |
 | `META` | Meta-skills (this skill, ID system) |
-| `USER` | User-created skills |
+| `STS` | User-created skills |
 
 ---
 
@@ -86,7 +86,7 @@ Ask the user:
 
 **For user-created skills:**
 - Always use `ZAI-STS-XXX` domain (STS = your signature)
-- Start from ZAI-STS-001, increment for each new skill
+- Current range: ZAI-STS-001 through ZAI-STS-006 assigned, next is ZAI-STS-007
 - **IMPORTANT:** Add `_sts` suffix to folder name
 
 | Type | Format | Example |
@@ -161,9 +161,8 @@ After creating the skill, update the registry in skill-id-system (ZAI-META-001):
 **Workflow:**
 
 1. **Determine domain:** DOC (documentation)
-2. **Check registry:** ZAI-DOC-001 is doc-gen, so next is ZAI-DOC-002
-   - But user-created, so use ZAI-STS-001
-3. **Assign ID:** ZAI-STS-001
+2. **Check registry:** Next available STS is ZAI-STS-007
+3. **Assign ID:** ZAI-STS-007
 4. **Create folder with _sts suffix:** `weekly-report_sts/`
 5. **Write skill:**
 
@@ -171,19 +170,19 @@ After creating the skill, update the registry in skill-id-system (ZAI-META-001):
 ---
 name: weekly-report_sts
 description: Generate weekly progress reports from git commits and task tracking
-id: ZAI-STS-001
+id: ZAI-STS-007
 version: 1.0
 trigger: weekly report, progress report, status report
 ---
 
 # Skill: Weekly Report v1.0
 
-> ID: ZAI-STS-001
+> ID: ZAI-STS-007
 > Version: 1.0
 ...
 ```
 
-5. **Update registry:** Add to USER section in skill-id-system
+6. **Update registry:** Add to STS section in skill-id-system
 
 ---
 
