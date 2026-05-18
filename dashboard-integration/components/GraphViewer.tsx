@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { fetchGraph, type GraphEdge, type GraphStats } from "@/lib/graph-client";
 
-// ── Neon color palette (matches graph_engine.py + cyberpunk accent) ─
+// ── Neon color palette ──────────────────────────────────────
 
 const EDGE_COLORS: Record<string, string> = {
   parent_dir: "#64748b",
@@ -68,7 +68,7 @@ function getNodeGlow(id: string): string {
   return NODE_GLOW[classifyNode(id)] || "#93c5fd";
 }
 
-// ── Node detail panel — floating overlay, neon style ───────
+// ── Node detail panel ──────────────────────────────────────
 
 interface NodeDetailProps {
   nodeId: string;
@@ -94,7 +94,6 @@ function NodeDetail({ nodeId, edges, onClose, onOpen }: NodeDetailProps) {
         boxShadow: `0 0 30px ${color}15, 0 8px 32px #00000080, inset 0 1px 0 ${color}15`,
       }}
     >
-      {/* Header with gradient underline */}
       <div className="relative px-3 py-2.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
@@ -102,9 +101,7 @@ function NodeDetail({ nodeId, edges, onClose, onOpen }: NodeDetailProps) {
               className="inline-block w-2 h-2 rounded-full shrink-0"
               style={{ backgroundColor: color, boxShadow: `0 0 6px ${glow}` }}
             />
-            <span className="text-sm font-mono text-zinc-100 truncate">
-              {nodeId}
-            </span>
+            <span className="text-sm font-mono text-zinc-100 truncate">{nodeId}</span>
           </div>
           <div className="flex items-center gap-1 ml-2">
             {onOpen && (
@@ -120,39 +117,23 @@ function NodeDetail({ nodeId, edges, onClose, onOpen }: NodeDetailProps) {
                 Open
               </button>
             )}
-            <button
-              onClick={onClose}
-              className="text-zinc-500 hover:text-white text-sm leading-none transition-colors cursor-pointer"
-            >
-              x
-            </button>
+            <button onClick={onClose} className="text-zinc-500 hover:text-white text-sm leading-none transition-colors cursor-pointer">x</button>
           </div>
         </div>
-        <div
-          className="absolute bottom-0 left-0 right-0 h-px"
-          style={{ background: `linear-gradient(90deg, ${color}66, transparent)` }}
-        />
+        <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: `linear-gradient(90deg, ${color}66, transparent)` }} />
       </div>
 
-      {/* Body */}
       <div className="p-3 text-xs space-y-3">
-        {/* Group badge */}
         <div className="flex items-center gap-2">
           <span className="text-zinc-500">Type</span>
           <span
             className="px-2 py-0.5 rounded-full text-[10px] font-medium"
-            style={{
-              backgroundColor: `${color}15`,
-              color: glow,
-              border: `1px solid ${color}33`,
-              boxShadow: `0 0 8px ${color}11`,
-            }}
+            style={{ backgroundColor: `${color}15`, color: glow, border: `1px solid ${color}33`, boxShadow: `0 0 8px ${color}11` }}
           >
             {group}
           </span>
         </div>
 
-        {/* Connection counts */}
         <div className="flex gap-3">
           <div className="flex items-center gap-1.5">
             <svg className="w-3 h-3 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -170,72 +151,34 @@ function NodeDetail({ nodeId, edges, onClose, onOpen }: NodeDetailProps) {
           </div>
         </div>
 
-        {/* Incoming edges */}
         {incoming.length > 0 && (
           <div>
             <div className="text-zinc-600 mb-1.5 uppercase tracking-wider text-[10px]">Incoming</div>
             <div className="space-y-1">
               {incoming.slice(0, 5).map((e, i) => (
                 <div key={i} className="flex items-center gap-1.5 ml-1 group/edge">
-                  <span
-                    className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
-                    style={{
-                      backgroundColor: EDGE_COLORS[e.type] || "#60a5fa",
-                      boxShadow: `0 0 4px ${EDGE_GLOW[e.type] || "#93c5fd"}66`,
-                    }}
-                  />
-                  <span className="text-zinc-400 truncate max-w-[55%] group-hover/edge:text-zinc-200 transition-colors">
-                    {e.from}
-                  </span>
-                  <span
-                    className="px-1.5 py-0 rounded-full text-[9px]"
-                    style={{
-                      backgroundColor: `${EDGE_COLORS[e.type]}15`,
-                      color: EDGE_GLOW[e.type],
-                    }}
-                  >
-                    {e.type}
-                  </span>
+                  <span className="inline-block w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: EDGE_COLORS[e.type] || "#60a5fa", boxShadow: `0 0 4px ${EDGE_GLOW[e.type] || "#93c5fd"}66` }} />
+                  <span className="text-zinc-400 truncate max-w-[55%] group-hover/edge:text-zinc-200 transition-colors">{e.from}</span>
+                  <span className="px-1.5 py-0 rounded-full text-[9px]" style={{ backgroundColor: `${EDGE_COLORS[e.type]}15`, color: EDGE_GLOW[e.type] }}>{e.type}</span>
                 </div>
               ))}
-              {incoming.length > 5 && (
-                <div className="text-zinc-600 ml-1">+{incoming.length - 5} more</div>
-              )}
+              {incoming.length > 5 && <div className="text-zinc-600 ml-1">+{incoming.length - 5} more</div>}
             </div>
           </div>
         )}
 
-        {/* Outgoing edges */}
         {outgoing.length > 0 && (
           <div>
             <div className="text-zinc-600 mb-1.5 uppercase tracking-wider text-[10px]">Outgoing</div>
             <div className="space-y-1">
               {outgoing.slice(0, 5).map((e, i) => (
                 <div key={i} className="flex items-center gap-1.5 ml-1 group/edge">
-                  <span
-                    className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
-                    style={{
-                      backgroundColor: EDGE_COLORS[e.type] || "#60a5fa",
-                      boxShadow: `0 0 4px ${EDGE_GLOW[e.type] || "#93c5fd"}66`,
-                    }}
-                  />
-                  <span className="text-zinc-400 truncate max-w-[55%] group-hover/edge:text-zinc-200 transition-colors">
-                    {e.to}
-                  </span>
-                  <span
-                    className="px-1.5 py-0 rounded-full text-[9px]"
-                    style={{
-                      backgroundColor: `${EDGE_COLORS[e.type]}15`,
-                      color: EDGE_GLOW[e.type],
-                    }}
-                  >
-                    {e.type}
-                  </span>
+                  <span className="inline-block w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: EDGE_COLORS[e.type] || "#60a5fa", boxShadow: `0 0 4px ${EDGE_GLOW[e.type] || "#93c5fd"}66` }} />
+                  <span className="text-zinc-400 truncate max-w-[55%] group-hover/edge:text-zinc-200 transition-colors">{e.to}</span>
+                  <span className="px-1.5 py-0 rounded-full text-[9px]" style={{ backgroundColor: `${EDGE_COLORS[e.type]}15`, color: EDGE_GLOW[e.type] }}>{e.type}</span>
                 </div>
               ))}
-              {outgoing.length > 5 && (
-                <div className="text-zinc-600 ml-1">+{outgoing.length - 5} more</div>
-              )}
+              {outgoing.length > 5 && <div className="text-zinc-600 ml-1">+{outgoing.length - 5} more</div>}
             </div>
           </div>
         )}
@@ -244,7 +187,7 @@ function NodeDetail({ nodeId, edges, onClose, onOpen }: NodeDetailProps) {
   );
 }
 
-// ── Edge filter — pill toggles (overlaid on canvas) ────────
+// ── Edge filter ─────────────────────────────────────────────
 
 interface EdgeFilterProps {
   edgeTypes: string[];
@@ -254,16 +197,10 @@ interface EdgeFilterProps {
 
 function EdgeFilter({ edgeTypes, activeTypes, onToggle }: EdgeFilterProps) {
   if (edgeTypes.length === 0) return null;
-
   return (
     <div
       className="flex flex-wrap gap-1.5 items-center rounded-lg px-3 py-2"
-      style={{
-        background: "#0f172acc",
-        backdropFilter: "blur(8px)",
-        border: "1px solid #1e293b55",
-        boxShadow: "0 4px 12px #00000040",
-      }}
+      style={{ background: "#0f172acc", backdropFilter: "blur(8px)", border: "1px solid #1e293b55", boxShadow: "0 4px 12px #00000040" }}
     >
       <span className="text-[10px] text-zinc-600 uppercase tracking-wider mr-1">Filter</span>
       {edgeTypes.map((type) => {
@@ -282,13 +219,7 @@ function EdgeFilter({ edgeTypes, activeTypes, onToggle }: EdgeFilterProps) {
               boxShadow: active ? `0 0 12px ${color}15` : "none",
             }}
           >
-            <span
-              className="inline-block w-1.5 h-1.5 rounded-full transition-all duration-200"
-              style={{
-                backgroundColor: active ? color : "#374151",
-                boxShadow: active ? `0 0 6px ${glow}88` : "none",
-              }}
-            />
+            <span className="inline-block w-1.5 h-1.5 rounded-full transition-all duration-200" style={{ backgroundColor: active ? color : "#374151", boxShadow: active ? `0 0 6px ${glow}88` : "none" }} />
             {type}
           </button>
         );
@@ -297,32 +228,40 @@ function EdgeFilter({ edgeTypes, activeTypes, onToggle }: EdgeFilterProps) {
   );
 }
 
-// ── Draw subtle grid background ────────────────────────────
+// ── Draw subtle grid ────────────────────────────────────────
 
 function drawGrid(ctx: CanvasRenderingContext2D, w: number, h: number) {
   const gridSize = 40;
   ctx.strokeStyle = "#ffffff06";
   ctx.lineWidth = 1;
-  for (let x = gridSize; x < w; x += gridSize) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, h);
-    ctx.stroke();
-  }
-  for (let y = gridSize; y < h; y += gridSize) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(w, y);
-    ctx.stroke();
-  }
-  // Center crosshair
+  for (let x = gridSize; x < w; x += gridSize) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+  for (let y = gridSize; y < h; y += gridSize) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
   ctx.strokeStyle = "#ffffff0a";
   ctx.beginPath();
-  ctx.moveTo(w / 2, 0);
-  ctx.lineTo(w / 2, h);
-  ctx.moveTo(0, h / 2);
-  ctx.lineTo(w, h / 2);
+  ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h);
+  ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2);
   ctx.stroke();
+}
+
+// ── Data types for simulation ───────────────────────────────
+
+interface SimNode {
+  id: string;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  color: string;
+  glow: string;
+  degree: number;
+}
+
+interface SimEdge {
+  source: string;
+  target: string;
+  type: string;
+  color: string;
+  glow: string;
 }
 
 // ── Main GraphViewer component ─────────────────────────────
@@ -343,14 +282,39 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
   const [activeTypes, setActiveTypes] = useState<Set<string>>(new Set());
   const [allEdgeTypes, setAllEdgeTypes] = useState<string[]>([]);
 
-  // ── Zoom & pan (refs to avoid re-triggering canvas effect) ──
+  // ── Stable refs for render-on-demand ──
+  const selectedNodeRef = useRef<string | null>(null);
+  const hoveredNodeRef = useRef<string | null>(null);
+  const onNodeClickRef = useRef(onNodeClick);
+
+  // Keep refs in sync with state
+  useEffect(() => { selectedNodeRef.current = selectedNode; }, [selectedNode]);
+  useEffect(() => { hoveredNodeRef.current = hoveredNode; }, [hoveredNode]);
+  useEffect(() => { onNodeClickRef.current = onNodeClick; }, [onNodeClick]);
+
+  // ── Zoom & pan ──
   const zoomRef = useRef(1);
   const panRef = useRef({ x: 0, y: 0 });
-  const drawRef = useRef<(() => void) | null>(null);
   const [zoomDisplay, setZoomDisplay] = useState(100);
 
-  // ── Fetch data ─────────────────────────────────────────
+  // ── Stable simulation data (survives re-renders) ──
+  const simDataRef = useRef<{
+    nodes: SimNode[];
+    edges: SimEdge[];
+    nodeMap: Map<string, SimNode>;
+    width: number;
+    height: number;
+  } | null>(null);
 
+  // ── Draw function ref ──
+  const drawFnRef = useRef<(() => void) | null>(null);
+
+  // ── Request redraw from React side ──
+  const requestRedraw = useCallback(() => {
+    drawFnRef.current?.();
+  }, []);
+
+  // ── Fetch data ──
   useEffect(() => {
     async function load() {
       try {
@@ -359,7 +323,6 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
         const data = await fetchGraph();
         setEdges(data.edges);
         setStats(data.stats);
-
         const types = Object.keys(data.stats.edgeTypes);
         setAllEdgeTypes(types);
         setActiveTypes(new Set(types));
@@ -372,47 +335,41 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
     load();
   }, []);
 
-  // ── Toggle edge type filter ────────────────────────────
-
+  // ── Toggle edge type filter ──
   const handleToggleType = useCallback((type: string) => {
     setActiveTypes((prev) => {
       const next = new Set(prev);
-      if (next.has(type)) {
-        next.delete(type);
-      } else {
-        next.add(type);
-      }
+      if (next.has(type)) next.delete(type); else next.add(type);
       return next;
     });
   }, []);
 
-  // ── Filtered edges ─────────────────────────────────────
-
+  // ── Filtered edges ──
   const filteredEdges = edges.filter((e) => activeTypes.has(e.type));
 
-  // ── Zoom controls ──────────────────────────────────────
-
+  // ── Zoom controls ──
   const handleZoomIn = useCallback(() => {
     zoomRef.current = Math.min(5, zoomRef.current * 1.25);
     setZoomDisplay(Math.round(zoomRef.current * 100));
-    drawRef.current?.();
-  }, []);
+    requestRedraw();
+  }, [requestRedraw]);
 
   const handleZoomOut = useCallback(() => {
     zoomRef.current = Math.max(0.1, zoomRef.current / 1.25);
     setZoomDisplay(Math.round(zoomRef.current * 100));
-    drawRef.current?.();
-  }, []);
+    requestRedraw();
+  }, [requestRedraw]);
 
   const handleZoomReset = useCallback(() => {
     zoomRef.current = 1;
     panRef.current = { x: 0, y: 0 };
     setZoomDisplay(100);
-    drawRef.current?.();
-  }, []);
+    requestRedraw();
+  }, [requestRedraw]);
 
-  // ── Force-directed layout + canvas rendering ───────────
-
+  // ═══════════════════════════════════════════════════════════
+  // EFFECT 1: Run force simulation ONCE per filteredEdges change
+  // ═══════════════════════════════════════════════════════════
   useEffect(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
@@ -424,44 +381,26 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
     const rect = container.getBoundingClientRect();
     const width = rect.width || 800;
     const height = rect.height || 600;
+
+    // HiDPI
     canvas.width = width * window.devicePixelRatio;
     canvas.height = height * window.devicePixelRatio;
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
-    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
 
-    // Build nodes from edges
-    interface SimNode {
-      id: string;
-      x: number;
-      y: number;
-      vx: number;
-      vy: number;
-      color: string;
-      glow: string;
-      degree: number;
-    }
-
-    interface SimEdge {
-      source: string;
-      target: string;
-      type: string;
-      color: string;
-      glow: string;
-    }
-
-    const nodeMap = new Map<string, SimNode>();
     const centerX = width / 2;
     const centerY = height / 2;
 
+    // Build nodes
+    const nodeMap = new Map<string, SimNode>();
     for (const edge of filteredEdges) {
       if (!nodeMap.has(edge.from)) {
         nodeMap.set(edge.from, {
           id: edge.from,
           x: centerX + (Math.random() - 0.5) * width * 0.6,
           y: centerY + (Math.random() - 0.5) * height * 0.6,
-          vx: 0,
-          vy: 0,
+          vx: 0, vy: 0,
           color: getNodeColor(edge.from),
           glow: getNodeGlow(edge.from),
           degree: 0,
@@ -472,8 +411,7 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
           id: edge.to,
           x: centerX + (Math.random() - 0.5) * width * 0.6,
           y: centerY + (Math.random() - 0.5) * height * 0.6,
-          vx: 0,
-          vy: 0,
+          vx: 0, vy: 0,
           color: getNodeColor(edge.to),
           glow: getNodeGlow(edge.to),
           degree: 0,
@@ -492,16 +430,15 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
       glow: EDGE_GLOW[e.type] || "#93c5fd",
     }));
 
-    // Force simulation
+    // Force simulation constants
     const REPULSION = 900;
     const ATTRACTION = 0.004;
     const DAMPING = 0.85;
-    const MAX_ITERATIONS = 200;
-    let iteration = 0;
+    const MAX_ITERATIONS = 250;
 
-    function simulate() {
-      if (iteration >= MAX_ITERATIONS) return;
-
+    // Run simulation synchronously (no animation — instant layout)
+    for (let iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
+      // Repulsion
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
           const dx = nodes[j].x - nodes[i].x;
@@ -510,13 +447,11 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
           const force = REPULSION / (dist * dist);
           const fx = (dx / dist) * force;
           const fy = (dy / dist) * force;
-          nodes[i].vx -= fx;
-          nodes[i].vy -= fy;
-          nodes[j].vx += fx;
-          nodes[j].vy += fy;
+          nodes[i].vx -= fx; nodes[i].vy -= fy;
+          nodes[j].vx += fx; nodes[j].vy += fy;
         }
       }
-
+      // Attraction
       for (const edge of simEdges) {
         const source = nodeMap.get(edge.source);
         const target = nodeMap.get(edge.target);
@@ -527,17 +462,15 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
         const force = dist * ATTRACTION;
         const fx = (dx / dist) * force;
         const fy = (dy / dist) * force;
-        source.vx += fx;
-        source.vy += fy;
-        target.vx -= fx;
-        target.vy -= fy;
+        source.vx += fx; source.vy += fy;
+        target.vx -= fx; target.vy -= fy;
       }
-
+      // Center gravity
       for (const node of nodes) {
         node.vx += (centerX - node.x) * 0.001;
         node.vy += (centerY - node.y) * 0.001;
       }
-
+      // Apply velocity
       for (const node of nodes) {
         node.vx *= DAMPING;
         node.vy *= DAMPING;
@@ -547,69 +480,44 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
         node.x = Math.max(margin, Math.min(width - margin, node.x));
         node.y = Math.max(margin, Math.min(height - margin, node.y));
       }
-      iteration++;
     }
 
-    // ── Hit testing helper: screen coords → world coords ──
-    function screenToWorld(sx: number, sy: number): { wx: number; wy: number } {
-      const zoom = zoomRef.current;
-      const pan = panRef.current;
-      return {
-        wx: (sx - pan.x) / zoom,
-        wy: (sy - pan.y) / zoom,
-      };
-    }
+    // Store stable simulation data
+    simDataRef.current = { nodes, edges: simEdges, nodeMap, width, height };
 
-    // ── Find node at world position ──
-    function findNodeAt(wx: number, wy: number, tolerance: number): typeof nodes[0] | null {
-      let closest: typeof nodes[0] | null = null;
-      let closestDist = Infinity;
-      for (const node of nodes) {
-        const dx = node.x - wx;
-        const dy = node.y - wy;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const radius = Math.max(4, Math.min(14, 4 + node.degree * 1.2));
-        if (dist < radius + tolerance && dist < closestDist) {
-          closest = node;
-          closestDist = dist;
-        }
-      }
-      return closest;
-    }
-
+    // ── DRAW function (uses refs, no deps on React state) ──
     function draw() {
-      if (!ctx) return;
+      const sd = simDataRef.current;
+      if (!sd || !ctx) return;
+      const { nodes: n, edges: se, width: w, height: h } = sd;
 
       const zoom = zoomRef.current;
       const pan = panRef.current;
+      const selId = selectedNodeRef.current;
+      const hovId = hoveredNodeRef.current;
 
-      // Dark gradient background (always full canvas)
-      const bg = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.max(width, height) * 0.7);
+      // Background
+      const bg = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.7);
       bg.addColorStop(0, "#0f172a");
       bg.addColorStop(1, "#020617");
       ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, width, height);
+      ctx.fillRect(0, 0, w, h);
 
-      // Subtle grid (screen-space, unaffected by zoom)
-      drawGrid(ctx, width, height);
+      drawGrid(ctx, w, h);
 
-      // Apply zoom & pan transform
       ctx.save();
       ctx.translate(pan.x, pan.y);
       ctx.scale(zoom, zoom);
 
-      // Draw edges with glow
-      for (const edge of simEdges) {
-        const source = nodeMap.get(edge.source);
-        const target = nodeMap.get(edge.target);
+      // Edges
+      for (const edge of se) {
+        const source = sd.nodeMap.get(edge.source);
+        const target = sd.nodeMap.get(edge.target);
         if (!source || !target) continue;
 
-        const isHighlighted =
-          selectedNode === edge.source || selectedNode === edge.target ||
-          hoveredNode === edge.source || hoveredNode === edge.target;
+        const isHL = selId === edge.source || selId === edge.target || hovId === edge.source || hovId === edge.target;
 
-        // Edge glow (wider, semi-transparent)
-        if (isHighlighted) {
+        if (isHL) {
           ctx.beginPath();
           ctx.strokeStyle = edge.glow + "44";
           ctx.lineWidth = 4 / zoom;
@@ -618,10 +526,9 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
           ctx.stroke();
         }
 
-        // Edge line
         ctx.beginPath();
-        ctx.strokeStyle = isHighlighted ? edge.color + "cc" : edge.color + "55";
-        ctx.lineWidth = isHighlighted ? 1.5 / zoom : 0.8 / zoom;
+        ctx.strokeStyle = isHL ? edge.color + "cc" : edge.color + "55";
+        ctx.lineWidth = isHL ? 1.5 / zoom : 0.8 / zoom;
         ctx.moveTo(source.x, source.y);
         ctx.lineTo(target.x, target.y);
         ctx.stroke();
@@ -630,189 +537,174 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
         const dx = target.x - source.x;
         const dy = target.y - source.y;
         const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-        const arrowSize = isHighlighted ? 8 : 6;
-        const arrowX = target.x - (dx / dist) * 14;
-        const arrowY = target.y - (dy / dist) * 14;
-
+        const aSize = isHL ? 8 : 6;
+        const ax = target.x - (dx / dist) * 14;
+        const ay = target.y - (dy / dist) * 14;
         ctx.beginPath();
         ctx.fillStyle = edge.color + "77";
-        ctx.moveTo(arrowX + (dx / dist) * arrowSize, arrowY + (dy / dist) * arrowSize);
-        ctx.lineTo(arrowX + (-dy / dist) * (arrowSize * 0.45), arrowY + (dx / dist) * (arrowSize * 0.45));
-        ctx.lineTo(arrowX + (dy / dist) * (arrowSize * 0.45), arrowY + (-dx / dist) * (arrowSize * 0.45));
+        ctx.moveTo(ax + (dx / dist) * aSize, ay + (dy / dist) * aSize);
+        ctx.lineTo(ax + (-dy / dist) * (aSize * 0.45), ay + (dx / dist) * (aSize * 0.45));
+        ctx.lineTo(ax + (dy / dist) * (aSize * 0.45), ay + (-dx / dist) * (aSize * 0.45));
         ctx.closePath();
         ctx.fill();
       }
 
-      // Draw nodes
-      for (const node of nodes) {
+      // Nodes
+      for (const node of n) {
         const radius = Math.max(4, Math.min(14, 4 + node.degree * 1.2));
-        const isSelected = selectedNode === node.id;
-        const isHovered = hoveredNode === node.id;
+        const isSel = selId === node.id;
+        const isHov = hovId === node.id;
 
-        // Outer glow ring
-        if (isSelected || isHovered) {
-          const glowRadius = radius + 12;
-          const gradient = ctx.createRadialGradient(node.x, node.y, radius, node.x, node.y, glowRadius);
-          gradient.addColorStop(0, node.glow + "44");
-          gradient.addColorStop(1, node.glow + "00");
+        if (isSel || isHov) {
+          const gr = ctx.createRadialGradient(node.x, node.y, radius, node.x, node.y, radius + 12);
+          gr.addColorStop(0, node.glow + "44");
+          gr.addColorStop(1, node.glow + "00");
           ctx.beginPath();
-          ctx.arc(node.x, node.y, glowRadius, 0, Math.PI * 2);
-          ctx.fillStyle = gradient;
+          ctx.arc(node.x, node.y, radius + 12, 0, Math.PI * 2);
+          ctx.fillStyle = gr;
           ctx.fill();
         }
 
-        // Subtle ambient glow for all nodes
-        const ambientGlow = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, radius + 4);
-        ambientGlow.addColorStop(0, node.color + "33");
-        ambientGlow.addColorStop(1, node.color + "00");
+        const ambGlow = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, radius + 4);
+        ambGlow.addColorStop(0, node.color + "33");
+        ambGlow.addColorStop(1, node.color + "00");
         ctx.beginPath();
         ctx.arc(node.x, node.y, radius + 4, 0, Math.PI * 2);
-        ctx.fillStyle = ambientGlow;
+        ctx.fillStyle = ambGlow;
         ctx.fill();
 
-        // Node body with gradient fill
-        const bodyGrad = ctx.createRadialGradient(
-          node.x - radius * 0.3, node.y - radius * 0.3, 0,
-          node.x, node.y, radius
-        );
-        bodyGrad.addColorStop(0, node.glow);
-        bodyGrad.addColorStop(1, node.color);
+        const bodyG = ctx.createRadialGradient(node.x - radius * 0.3, node.y - radius * 0.3, 0, node.x, node.y, radius);
+        bodyG.addColorStop(0, node.glow);
+        bodyG.addColorStop(1, node.color);
         ctx.beginPath();
         ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = bodyGrad;
+        ctx.fillStyle = bodyG;
         ctx.fill();
-
-        // Border
-        ctx.strokeStyle = isSelected ? "#ffffffbb" : isHovered ? node.glow + "aa" : node.color + "55";
-        ctx.lineWidth = (isSelected ? 2 : 1) / zoom;
+        ctx.strokeStyle = isSel ? "#ffffffbb" : isHov ? node.glow + "aa" : node.color + "55";
+        ctx.lineWidth = (isSel ? 2 : 1) / zoom;
         ctx.stroke();
 
-        // Label (only show when zoomed in enough or always for important nodes)
-        const showLabel = node.degree >= 2 || nodes.length < 30 || isSelected || isHovered || zoom > 1.5;
+        const showLabel = node.degree >= 2 || n.length < 30 || isSel || isHov || zoom > 1.5;
         if (showLabel) {
-          const fontSize = (isSelected || isHovered ? 11 : 9) / Math.max(zoom, 0.6);
-          ctx.font = `${fontSize}px monospace`;
-          ctx.fillStyle = isSelected || isHovered ? "#f1f5f9" : "#94a3b8";
+          const fs = (isSel || isHov ? 11 : 9) / Math.max(zoom, 0.6);
+          ctx.font = `${fs}px monospace`;
+          ctx.fillStyle = isSel || isHov ? "#f1f5f9" : "#94a3b8";
           ctx.textAlign = "center";
           const label = node.id.length > 22 ? node.id.slice(0, 20) + ".." : node.id;
           ctx.fillText(label, node.x, node.y + radius + 16 / zoom);
         }
       }
 
-      // Legend — drawn in screen space (outside transform)
       ctx.restore();
 
-      const usedTypes = new Set(simEdges.map((e) => e.type));
+      // Legend (screen space)
+      const usedTypes = new Set(se.map((e) => e.type));
       const legendTypes = Array.from(usedTypes);
       if (legendTypes.length > 0) {
-        const legendX = width - 150;
-        const legendY0 = 12;
-        const legendH = legendTypes.length * 18 + 12;
-
-        // Glass background
+        const lx = w - 150;
+        const ly0 = 12;
+        const lh = legendTypes.length * 18 + 12;
         ctx.fillStyle = "#0f172a99";
         ctx.beginPath();
-        ctx.roundRect(legendX - 8, legendY0 - 4, 150, legendH, 6);
+        ctx.roundRect(lx - 8, ly0 - 4, 150, lh, 6);
         ctx.fill();
         ctx.strokeStyle = "#ffffff0d";
         ctx.lineWidth = 1;
         ctx.stroke();
-
-        let ly = legendY0 + 8;
+        let ly = ly0 + 8;
         ctx.font = "10px monospace";
         for (const type of legendTypes) {
-          const color = EDGE_COLORS[type] || "#60a5fa";
-          const glow = EDGE_GLOW[type] || "#93c5fd";
-          // Colored dot with glow
-          ctx.beginPath();
-          ctx.arc(legendX + 4, ly - 3, 3, 0, Math.PI * 2);
-          ctx.fillStyle = color;
-          ctx.fill();
-          // Dot glow
-          ctx.beginPath();
-          ctx.arc(legendX + 4, ly - 3, 5, 0, Math.PI * 2);
-          ctx.fillStyle = glow + "33";
-          ctx.fill();
-          // Text
-          ctx.fillStyle = "#94a3b8";
-          ctx.textAlign = "left";
-          ctx.fillText(type, legendX + 14, ly);
+          const c = EDGE_COLORS[type] || "#60a5fa";
+          const g = EDGE_GLOW[type] || "#93c5fd";
+          ctx.beginPath(); ctx.arc(lx + 4, ly - 3, 3, 0, Math.PI * 2); ctx.fillStyle = c; ctx.fill();
+          ctx.beginPath(); ctx.arc(lx + 4, ly - 3, 5, 0, Math.PI * 2); ctx.fillStyle = g + "33"; ctx.fill();
+          ctx.fillStyle = "#94a3b8"; ctx.textAlign = "left"; ctx.fillText(type, lx + 14, ly);
           ly += 18;
         }
       }
     }
 
-    // Expose draw for zoom/pan controls
-    drawRef.current = draw;
+    // Expose draw
+    drawFnRef.current = draw;
 
-    // Run simulation
-    let animFrame: number;
+    // Initial draw
+    draw();
 
-    function loop() {
-      simulate();
-      draw();
-      if (iteration < MAX_ITERATIONS) {
-        animFrame = requestAnimationFrame(loop);
-      }
+    // ── Event handlers (use refs, not React state) ──
+
+    function screenToWorld(sx: number, sy: number) {
+      const z = zoomRef.current;
+      const p = panRef.current;
+      return { wx: (sx - p.x) / z, wy: (sy - p.y) / z };
     }
 
-    loop();
+    function findNodeAt(wx: number, wy: number, tol: number): SimNode | null {
+      const sd = simDataRef.current;
+      if (!sd) return null;
+      let closest: SimNode | null = null;
+      let closestDist = Infinity;
+      for (const node of sd.nodes) {
+        const dx = node.x - wx;
+        const dy = node.y - wy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const radius = Math.max(4, Math.min(14, 4 + node.degree * 1.2));
+        if (dist < radius + tol && dist < closestDist) {
+          closest = node;
+          closestDist = dist;
+        }
+      }
+      return closest;
+    }
 
-    // ── Mouse wheel zoom (centered on cursor) ──
+    let isPanning = false;
+    let panStartX = 0;
+    let panStartY = 0;
+    let didPan = false;
+
     function handleWheel(e: WheelEvent) {
       e.preventDefault();
       const canvasRect = canvas.getBoundingClientRect();
       const mx = e.clientX - canvasRect.left;
       const my = e.clientY - canvasRect.top;
-
       const oldZoom = zoomRef.current;
       const factor = e.deltaY > 0 ? 0.9 : 1.1;
       const newZoom = Math.max(0.1, Math.min(5, oldZoom * factor));
-
-      // Pan so point under cursor stays put
       panRef.current.x = mx - (mx - panRef.current.x) * (newZoom / oldZoom);
       panRef.current.y = my - (my - panRef.current.y) * (newZoom / oldZoom);
       zoomRef.current = newZoom;
-
       setZoomDisplay(Math.round(newZoom * 100));
       draw();
     }
 
-    // ── Panning state ──
-    let isPanning = false;
-    let panStartX = 0;
-    let panStartY = 0;
-
     function handleMouseDown(e: MouseEvent) {
-      // Middle button (1) or right button (2) or Ctrl+left (0)
       if (e.button === 1 || e.button === 2 || (e.button === 0 && e.ctrlKey)) {
         e.preventDefault();
         isPanning = true;
+        didPan = false;
         panStartX = e.clientX - panRef.current.x;
         panStartY = e.clientY - panRef.current.y;
         canvas.style.cursor = "grabbing";
       }
     }
 
-    function handleMouseMovePan(e: MouseEvent) {
+    function handleMouseMove(e: MouseEvent) {
       if (isPanning) {
         panRef.current.x = e.clientX - panStartX;
         panRef.current.y = e.clientY - panStartY;
+        didPan = true;
         draw();
         return;
       }
-
-      // Hover detection (only if not panning)
+      // Hover detection
       const canvasRect = canvas.getBoundingClientRect();
       const mx = e.clientX - canvasRect.left;
       const my = e.clientY - canvasRect.top;
       const { wx, wy } = screenToWorld(mx, my);
-
       const hit = findNodeAt(wx, wy, 6);
-      const newHovered = hit ? hit.id : null;
-      if (newHovered !== hoveredNode) {
-        setHoveredNode(newHovered);
-        if (iteration >= MAX_ITERATIONS) draw();
+      const newHov = hit ? hit.id : null;
+      if (newHov !== hoveredNodeRef.current) {
+        setHoveredNode(newHov); // triggers React re-render but draw() reads from ref
+        draw();
       }
     }
 
@@ -823,40 +715,33 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
       }
     }
 
-    // Click handler (uses transformed coordinates)
     function handleClick(e: MouseEvent) {
-      if (isPanning) return;
+      if (didPan) { didPan = false; return; }
       const canvasRect = canvas.getBoundingClientRect();
       const mx = e.clientX - canvasRect.left;
       const my = e.clientY - canvasRect.top;
       const { wx, wy } = screenToWorld(mx, my);
-
       const hit = findNodeAt(wx, wy, 8);
       setSelectedNode(hit ? hit.id : null);
-      if (iteration >= MAX_ITERATIONS) draw();
+      draw();
     }
 
-    // Double-click handler — open document
     function handleDblClick(e: MouseEvent) {
       const canvasRect = canvas.getBoundingClientRect();
       const mx = e.clientX - canvasRect.left;
       const my = e.clientY - canvasRect.top;
       const { wx, wy } = screenToWorld(mx, my);
-
       const hit = findNodeAt(wx, wy, 8);
       if (hit) {
-        onNodeClick?.(hit.id);
+        onNodeClickRef.current?.(hit.id);
       }
     }
 
-    // Prevent context menu on right-click (for pan)
-    function handleContextMenu(e: MouseEvent) {
-      e.preventDefault();
-    }
+    function handleContextMenu(e: MouseEvent) { e.preventDefault(); }
 
     canvas.addEventListener("wheel", handleWheel, { passive: false });
     canvas.addEventListener("mousedown", handleMouseDown);
-    canvas.addEventListener("mousemove", handleMouseMovePan);
+    canvas.addEventListener("mousemove", handleMouseMove);
     canvas.addEventListener("mouseup", handleMouseUp);
     canvas.addEventListener("mouseleave", handleMouseUp);
     canvas.addEventListener("click", handleClick);
@@ -864,32 +749,28 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
     canvas.addEventListener("contextmenu", handleContextMenu);
 
     return () => {
-      cancelAnimationFrame(animFrame);
       canvas.removeEventListener("wheel", handleWheel);
       canvas.removeEventListener("mousedown", handleMouseDown);
-      canvas.removeEventListener("mousemove", handleMouseMovePan);
+      canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("mouseup", handleMouseUp);
       canvas.removeEventListener("mouseleave", handleMouseUp);
       canvas.removeEventListener("click", handleClick);
       canvas.removeEventListener("dblclick", handleDblClick);
       canvas.removeEventListener("contextmenu", handleContextMenu);
-      drawRef.current = null;
+      drawFnRef.current = null;
     };
-  }, [filteredEdges, selectedNode, hoveredNode, onNodeClick]);
+  }, [filteredEdges]); // ← ONLY re-run when filtered edges change!
 
-  // ── Loading / error / empty states ────────────────────
+  // ── Redraw on hover/select/zoom changes (no re-simulation!) ──
+  useEffect(() => {
+    requestRedraw();
+  }, [selectedNode, hoveredNode, zoomDisplay, requestRedraw]);
+
+  // ── Loading / error / empty states ──
 
   if (loading) {
     return (
-      <div
-        className="rounded-lg flex items-center justify-center"
-        style={{
-          background: "linear-gradient(135deg, #0f172a, #020617)",
-          minHeight: "70vh",
-          border: "1px solid #1e293b",
-          boxShadow: "0 0 30px #0f172a, 0 0 60px #1e293b33",
-        }}
-      >
+      <div className="rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #0f172a, #020617)", minHeight: "70vh", border: "1px solid #1e293b", boxShadow: "0 0 30px #0f172a, 0 0 60px #1e293b33" }}>
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
           <p className="text-zinc-500 text-sm animate-pulse">Loading graph...</p>
@@ -900,15 +781,7 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
 
   if (error) {
     return (
-      <div
-        className="rounded-lg flex items-center justify-center"
-        style={{
-          background: "linear-gradient(135deg, #0f172a, #020617)",
-          minHeight: "70vh",
-          border: "1px solid #1e293b",
-          boxShadow: "0 0 30px #0f172a, 0 0 60px #1e293b33",
-        }}
-      >
+      <div className="rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #0f172a, #020617)", minHeight: "70vh", border: "1px solid #1e293b", boxShadow: "0 0 30px #0f172a, 0 0 60px #1e293b33" }}>
         <div className="flex flex-col items-center gap-2">
           <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
             <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -923,152 +796,71 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
 
   if (edges.length === 0) {
     return (
-      <div
-        className="rounded-lg flex flex-col items-center justify-center gap-4"
-        style={{
-          background: "linear-gradient(135deg, #0f172a, #020617)",
-          minHeight: "70vh",
-          border: "1px solid #1e293b",
-          boxShadow: "0 0 30px #0f172a, 0 0 60px #1e293b33",
-        }}
-      >
+      <div className="rounded-lg flex flex-col items-center justify-center gap-4" style={{ background: "linear-gradient(135deg, #0f172a, #020617)", minHeight: "70vh", border: "1px solid #1e293b", boxShadow: "0 0 30px #0f172a, 0 0 60px #1e293b33" }}>
         <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center">
           <svg className="w-6 h-6 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
           </svg>
         </div>
         <p className="text-zinc-500">No graph edges yet</p>
-        <code className="text-[10px] text-zinc-600 bg-zinc-900 px-3 py-1 rounded">
-          python memory_cli.py graph add-edge --from X --to Y --type same_session
-        </code>
+        <code className="text-[10px] text-zinc-600 bg-zinc-900 px-3 py-1 rounded">python memory_cli.py graph add-edge --from X --to Y --type same_session</code>
       </div>
     );
   }
 
   return (
-    <div
-      className="relative rounded-lg overflow-hidden"
-      style={{
-        border: "1px solid #1e293b",
-        boxShadow: "0 0 30px #0f172a, 0 0 60px #1e293b33",
-        minHeight: "70vh",
-      }}
-    >
-      {/* Full-width canvas container */}
+    <div className="relative rounded-lg overflow-hidden" style={{ border: "1px solid #1e293b", boxShadow: "0 0 30px #0f172a, 0 0 60px #1e293b33", minHeight: "70vh" }}>
       <div ref={containerRef} style={{ minHeight: "70vh" }}>
-        <canvas
-          ref={canvasRef}
-          className="block"
-          style={{ cursor: "pointer" }}
-        />
+        <canvas ref={canvasRef} className="block" style={{ cursor: "pointer" }} />
       </div>
 
-      {/* ── Overlay: Edge filter pills (top-left) ── */}
+      {/* Edge filter pills */}
       <div className="absolute top-3 left-3 z-10">
-        <EdgeFilter
-          edgeTypes={allEdgeTypes}
-          activeTypes={activeTypes}
-          onToggle={handleToggleType}
-        />
+        <EdgeFilter edgeTypes={allEdgeTypes} activeTypes={activeTypes} onToggle={handleToggleType} />
       </div>
 
-      {/* ── Overlay: Node detail (top-right, floating) ── */}
+      {/* Node detail */}
       {selectedNode && (
         <div className="absolute top-3 right-3 z-10">
-          <NodeDetail
-            nodeId={selectedNode}
-            edges={filteredEdges}
-            onClose={() => setSelectedNode(null)}
-            onOpen={onNodeClick}
-          />
+          <NodeDetail nodeId={selectedNode} edges={filteredEdges} onClose={() => setSelectedNode(null)} onOpen={onNodeClick} />
         </div>
       )}
 
-      {/* ── Overlay: Zoom controls (right side, center) ── */}
+      {/* Zoom controls */}
       <div className="absolute right-3 top-1/2 -translate-y-1/2 z-10 flex flex-col items-center gap-1">
-        <div
-          className="flex flex-col items-center rounded-lg overflow-hidden"
-          style={{
-            background: "#0f172acc",
-            backdropFilter: "blur(8px)",
-            border: "1px solid #1e293b55",
-            boxShadow: "0 4px 12px #00000040",
-          }}
-        >
-          <button
-            onClick={handleZoomIn}
-            className="w-9 h-9 flex items-center justify-center text-zinc-400 hover:text-sky-400 hover:bg-white/5 transition-all duration-200 cursor-pointer"
-            title="Zoom in"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
+        <div className="flex flex-col items-center rounded-lg overflow-hidden" style={{ background: "#0f172acc", backdropFilter: "blur(8px)", border: "1px solid #1e293b55", boxShadow: "0 4px 12px #00000040" }}>
+          <button onClick={handleZoomIn} className="w-9 h-9 flex items-center justify-center text-zinc-400 hover:text-sky-400 hover:bg-white/5 transition-all duration-200 cursor-pointer" title="Zoom in">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
           </button>
-          <button
-            onClick={handleZoomReset}
-            className="w-9 h-7 flex items-center justify-center text-[10px] font-mono text-zinc-500 hover:text-zinc-300 hover:bg-white/5 transition-all duration-200 cursor-pointer border-y border-zinc-800/50"
-            title="Reset zoom & pan"
-          >
+          <button onClick={handleZoomReset} className="w-9 h-7 flex items-center justify-center text-[10px] font-mono text-zinc-500 hover:text-zinc-300 hover:bg-white/5 transition-all duration-200 cursor-pointer border-y border-zinc-800/50" title="Reset zoom & pan">
             {zoomDisplay}%
           </button>
-          <button
-            onClick={handleZoomOut}
-            className="w-9 h-9 flex items-center justify-center text-zinc-400 hover:text-sky-400 hover:bg-white/5 transition-all duration-200 cursor-pointer"
-            title="Zoom out"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-            </svg>
+          <button onClick={handleZoomOut} className="w-9 h-9 flex items-center justify-center text-zinc-400 hover:text-sky-400 hover:bg-white/5 transition-all duration-200 cursor-pointer" title="Zoom out">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" /></svg>
           </button>
         </div>
       </div>
 
-      {/* ── Overlay: Open in Pyvis button (bottom-right) ── */}
+      {/* Open in Pyvis */}
       <div className="absolute bottom-3 right-3 z-10">
         <button
           className="rounded-lg px-3 py-2 text-xs transition-all duration-200 flex items-center gap-2"
-          style={{
-            background: "#0f172acc",
-            backdropFilter: "blur(8px)",
-            border: "1px solid #1e293b55",
-            color: "#64748b",
-            boxShadow: "0 4px 12px #00000040",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "#334155";
-            e.currentTarget.style.color = "#94a3b8";
-            e.currentTarget.style.boxShadow = "0 4px 15px #1e293b55, 0 0 15px #1e293b44";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "#1e293b55";
-            e.currentTarget.style.color = "#64748b";
-            e.currentTarget.style.boxShadow = "0 4px 12px #00000040";
-          }}
+          style={{ background: "#0f172acc", backdropFilter: "blur(8px)", border: "1px solid #1e293b55", color: "#64748b", boxShadow: "0 4px 12px #00000040" }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#334155"; e.currentTarget.style.color = "#94a3b8"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#1e293b55"; e.currentTarget.style.color = "#64748b"; }}
           onClick={() => window.open("/api/memory/graph/vis", "_blank")}
         >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-          </svg>
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
           Open in Pyvis
         </button>
       </div>
 
-      {/* ── Overlay: Hint when no node selected (bottom-left) ── */}
+      {/* Hint */}
       {!selectedNode && (
         <div className="absolute bottom-3 left-3 z-10">
-          <div
-            className="flex items-center gap-2 rounded-lg px-3 py-2"
-            style={{
-              background: "#0f172acc",
-              backdropFilter: "blur(8px)",
-              border: "1px solid #1e293b44",
-              boxShadow: "0 4px 12px #00000040",
-            }}
-          >
-            <svg className="w-3.5 h-3.5 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
-            </svg>
-            <span className="text-zinc-600 text-xs">Click inspect · Dbl-click open · Scroll zoom · Right-drag pan</span>
+          <div className="flex items-center gap-2 rounded-lg px-3 py-2" style={{ background: "#0f172acc", backdropFilter: "blur(8px)", border: "1px solid #1e293b44", boxShadow: "0 4px 12px #00000040" }}>
+            <svg className="w-3.5 h-3.5 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" /></svg>
+            <span className="text-zinc-600 text-xs">Scroll zoom · Right-drag pan · Click inspect · Dbl-click open</span>
           </div>
         </div>
       )}
