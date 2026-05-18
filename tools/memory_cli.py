@@ -58,7 +58,7 @@ def parse_metadata(metadata_str: Optional[str]) -> Optional[Dict[str, str]]:
     return result if result else None
 
 # Entry types
-ENTRY_TYPES = ["session", "knowledge", "pattern", "project", "template"]
+ENTRY_TYPES = ["session", "knowledge", "pattern", "project", "template", "command"]
 
 
 def get_db_path() -> Path:

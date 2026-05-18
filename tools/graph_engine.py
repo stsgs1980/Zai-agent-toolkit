@@ -44,6 +44,10 @@ EDGE_TYPES = {
     "implements": "Implementation link (code -> requirement)",
     "modifies": "Commit changes file",
     "related_to": "Generic bidirectional relation",
+    "defines_term": "Document defines a term/concept",
+    "has_instruction": "Document contains an instruction/how-to",
+    "has_command": "Document references a command/CLI recipe",
+    "tagged_with": "Entry is tagged with a concept",
 }
 
 GRAPH_VERSION = 1
@@ -559,6 +563,10 @@ class GraphEngine:
         "implements": "#f39c12",
         "modifies": "#e67e22",
         "related_to": "#3498db",
+        "defines_term": "#9b59b6",
+        "has_instruction": "#2ecc71",
+        "has_command": "#e74c3c",
+        "tagged_with": "#1abc9c",
     }
 
     # Node group colors (by prefix pattern)
@@ -567,9 +575,11 @@ class GraphEngine:
         "task": {"color": "#27ae60", "shape": "square", "size": 20},
         "bug": {"color": "#c0392b", "shape": "triangle", "size": 20},
         "knowledge": {"color": "#8e44ad", "shape": "dot", "size": 18},
+        "command": {"color": "#e74c3c", "shape": "triangle", "size": 16},
         "commit": {"color": "#e67e22", "shape": "star", "size": 22},
         "src": {"color": "#16a085", "shape": "dot", "size": 14},
         "REQ": {"color": "#f39c12", "shape": "box", "size": 18},
+        "tag": {"color": "#1abc9c", "shape": "dot", "size": 10},
     }
 
     def _classify_node(self, node_id: str) -> str:
