@@ -1,4 +1,4 @@
-# Standard: Code Examples Guide v1.0 (EN)
+# Standard: Code Examples Guide v1.1 (EN)
 
 > ID: STD-DOC-005
 > Version: 1.1

@@ -1,4 +1,4 @@
-# Standard: Testing v1.0 (EN)
+# Standard: Testing v1.1 (EN)
 
 > ID: STD-TEST-001
 > Version: 1.1

@@ -1,4 +1,4 @@
-# Standard: WCAG 2.1 AA Accessibility v1.0
+# Standard: WCAG 2.1 AA Accessibility v1.1
 
 > ID: STD-A11Y-001
 > Version: 1.1

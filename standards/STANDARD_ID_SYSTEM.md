@@ -1,7 +1,7 @@
-# Standard: Standard ID System v1.0 (EN)
+# Standard: Standard ID System v1.1 (EN)
 
 > ID: STD-META-001
-> Version: 1.0
+> Version: 1.1
 > Level: **[W] Warning**
 > Last Updated: 2025-01
 
@@ -80,7 +80,7 @@ STD-<DOMAIN>-<NUMBER>
 
 | ID | Document | Version | Level |
 |----|----------|---------|-------|
-| STD-A11Y-001 | WCAG 2.1 AA Standard | 1.0 | [C] Critical |
+| STD-A11Y-001 | WCAG 2.1 AA Standard | 1.1 | [C] Critical |
 
 ### 4.4. Documentation (DOC)
 
@@ -90,13 +90,13 @@ STD-<DOMAIN>-<NUMBER>
 | STD-DOC-002 | Markdown Standard (EN) | 2.2.0 | [W] Warning |
 | STD-DOC-003 | No-Unicode Policy | 2.1.3 | [C]+[W]+[I] |
 | STD-DOC-004 | README Template | - | - |
-| STD-DOC-005 | Code Examples Guide | 1.0 | [W] Warning |
+| STD-DOC-005 | Code Examples Guide | 1.1 | [W] Warning |
 
 ### 4.5. Architecture (ARCH)
 
 | ID | Document | Version | Level |
 |----|----------|---------|-------|
-| STD-ARCH-001 | Implementation Order | 2.1 | [W] Warning |
+| STD-ARCH-001 | Implementation Order | 2.2 | [W] Warning |
 
 ### 4.6. Environment (ENV)
 

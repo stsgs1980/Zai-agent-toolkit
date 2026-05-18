@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2.0.1] - 2026-05-18
+
+### Fixed — Post-Validation Corrections
+
+Post-v2.0.0 validation revealed 5 version consistency issues and 1 documentation gap:
+
+- **STD-META-001** (Standard ID System): Title and header version `v1.0` -> `v1.1` (registry already had v1.1)
+- **STD-ARCH-001** (Implementation Order): Registry entry version `2.1` -> `2.2` (file header already said v2.2)
+- **STD-A11Y-001** (WCAG Standard): Title `v1.0` -> `v1.1` (header already said v1.1)
+- **STD-TEST-001** (Testing Standard): Title `v1.0` -> `v1.1` (header already said v1.1)
+- **STD-DOC-005** (Code Examples Guide): Title `v1.0` -> `v1.1` (header already said v1.1)
+- **K-15 phantom**: Corrected contradiction count from 15 to 14 in Unreleased changelog (K-15 was a cross-reference pattern, not a conflict)
+
+---
+
 ## [2.0.0] - 2026-05-18
 
 ### Major Restructuring: Architecture Refactoring
@@ -139,7 +154,7 @@ This release restructures the entire toolkit architecture based on a comprehensi
     - STD-ENV-002 version bumped to v1.1
     - STD-FE-001 version bumped to v1.5
     - STD-SEC-001 version bumped to v1.1
-  - 15 inter-standard contradictions identified (K-01 through K-15)
+  - 14 inter-standard contradictions identified and resolved (K-01 through K-14). Originally counted as 15, but K-15 was reclassified as non-contradictory upon deeper analysis (cross-reference pattern, not a conflict).
 
 ### Removed
 - Agent-Toolkit-ZCode repository (deprecated, merged into Zai-agent-toolkit)
