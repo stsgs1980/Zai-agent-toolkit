@@ -125,7 +125,17 @@ class MarkdownParser:
                     if in_table and cells[0] and cells[1]:
                         term = cells[0].strip("*` ")
                         definition = cells[1].strip()
-                        if term not in seen and len(term) < 50 and len(definition) > 3:
+                        # Filter out TypeScript type names and generic words
+                        _skip_terms = {
+                            "number", "string", "boolean", "class", "function",
+                            "object", "array", "void", "any", "null", "undefined",
+                            "true", "false", "yes", "no", "n/a", "-",
+                        }
+                        if (term not in seen
+                            and len(term) < 50
+                            and len(definition) > 3
+                            and term.lower() not in _skip_terms
+                            and not term.startswith("`")):
                             seen.add(term)
                             terms.append({"term": term, "definition": definition, "pattern": "table"})
                 in_table = True
@@ -293,9 +303,12 @@ class MarkdownParser:
             for match in re.finditer(pattern, self.content, re.IGNORECASE):
                 tags.add(match.group(1).lower().replace(".js", "js"))
 
-        # Short section headings as tags
+        # Short section headings as tags (strip special chars)
         for section in self.extract_sections():
             title = section["title"].strip()
+            title = re.sub(r'[`()]', '', title)
+            title = re.sub(r'^\d+\.\s*', '', title)
+            title = title.rstrip(":;.,!?").strip()
             words = title.split()
             if 1 <= len(words) <= 3 and title.isascii():
                 tags.add(title.lower().replace(" ", "-"))
@@ -422,6 +435,20 @@ class PlainTextParser:
         """
         terms = []
         seen = set()
+
+        # Pattern 0: Tab-separated "Term\tdefinition" (common in notes/spreadsheets)
+        for line in self.lines:
+            if '\t' in line:
+                parts = line.split('\t', 1)
+                if len(parts) == 2:
+                    term = parts[0].strip()
+                    definition = parts[1].strip()
+                    if (term not in seen
+                        and 1 <= len(term.split()) <= 5
+                        and len(definition) > 5
+                        and not term.lower().startswith(("the ", "this ", "that "))):
+                        seen.add(term)
+                        terms.append({"term": term, "definition": definition, "pattern": "tab_sep"})
 
         # Pattern 1: "Term - definition" or "Term — definition"
         for match in re.finditer(
@@ -576,11 +603,15 @@ class PlainTextParser:
             for match in re.finditer(pattern, self.content, re.IGNORECASE):
                 tags.add(match.group(1).lower().replace(".js", "js"))
 
-        # Section titles as tags (strip trailing punctuation)
+        # Section titles as tags (strip trailing punctuation and special chars)
         for section in self.extract_sections():
-            title = section["title"].strip().rstrip(":;.,!?")
+            title = section["title"].strip()
+            # Remove markdown backticks, parens, numbers prefix
+            title = re.sub(r'[`()]', '', title)
+            title = re.sub(r'^\d+\.\s*', '', title)
+            title = title.rstrip(":;.,!?").strip()
             words = title.split()
-            if 1 <= len(words) <= 3 and title.isascii() and title:
+            if 1 <= len(words) <= 3 and title.isascii() and title and len(title) > 1:
                 tags.add(title.lower().replace(" ", "-"))
 
         return sorted(tags)
