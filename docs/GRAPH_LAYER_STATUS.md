@@ -44,8 +44,8 @@
 | `api/memory/route.ts` | CRUD single memory |
 | `api/memory/backup/route.ts` | Backup |
 | `api/memory/import/route.ts` | Import |
-| `api/memory/related/route.ts` | Related entries (implementation TBD) |
-| `api/memory/semantic/route.ts` | Semantic search (implementation TBD) |
+| `api/memory/related/route.ts` | Related entries via ZAI LLM prompt (AI-based, NOT graph) |
+| `api/memory/semantic/route.ts` | Semantic search via ZAI LLM prompt (AI-based, NOT ChromaDB) |
 
 **Prisma Schema:**
 
@@ -87,6 +87,28 @@ model MemoryBackup {
 | NetworkX usage | Installed but never imported or called |
 | `MemoryEdge` model in Prisma | No edge/table schema in dashboard DB |
 | Graph visualization | No graph component in dashboard |
+
+### 1.6 Dashboard: "Poor Man's Graph" via LLM
+
+**CRITICAL FINDING:** The dashboard's `related` and `semantic` routes do NOT use structural graph or vector search. They send ALL entries as text to the ZAI LLM and ask it to rank similarity.
+
+| Route | Method | How it works | Problems |
+|-------|--------|-------------|----------|
+| `related/route.ts` | ZAI chat completions | Sends entry + 20 candidates to LLM, asks for JSON with scores | Slow, expensive, no persistent edges, limited to 20 candidates |
+| `semantic/route.ts` | ZAI chat completions | Sends query + 50 entries to LLM, asks for ranking | Slow, expensive, no caching, limited to 50 entries |
+| `db.ts` | Prisma + SQLite | Standard singleton client | No graph models, no edge table |
+
+**Why this is a problem:**
+- Every query = API call (costs tokens, 1-3 sec latency)
+- Cannot traverse chains (session -> task -> fix -> commit)
+- Relationships are NOT stored — recalculated every time
+- Scales poorly: 1000+ entries = oversized prompts
+- No structural edges (imports, parent_dir, depends_on)
+
+**What Graph Layer replaces/enhances:**
+- `related` route → query edges.json (instant, free, structural)
+- `semantic` route → ChromaDB vector search + graph traversal
+- LLM fallback → only for complex reasoning, not basic lookups
 
 ---
 
