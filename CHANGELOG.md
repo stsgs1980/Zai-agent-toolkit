@@ -45,6 +45,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - K-12: Unified Stack Signatures across all standards (replaced "Z.ai Agent Toolkit" with project default)
   - STD-ENV-002 (Z.ai Integration Standard): v1.0 -> v1.1
     - Updated section 3.1 to cross-reference STD-ENV-001 v1.1 path rules
+  - STD-DOC-002 (Markdown Standard): v2.1.5 -> v2.2.0
+    - Deduplication with STD-DOC-003: removed 7 duplicated elements (prohibited elements table, allowed characters, ASCII diagram whitelist, icon library, brand logos, sanitization regex, unconditionally allowed characters). Replaced with cross-references to STD-DOC-003 sections.
+    - Kept .md-specific rules: typographics scope, (ref) exception, SVG insertion in Markdown, badges, stack signature, formatting rules, text tags
   - STD-META-001 (Standard ID System): registry updated
     - STD-ENV-001 version bumped to v2.0
     - STD-ENV-002 version bumped to v1.1

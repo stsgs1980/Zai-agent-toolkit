@@ -85,7 +85,7 @@ STD-<DOMAIN>-<NUMBER>
 | ID | Document | Version | Level |
 |----|----------|---------|-------|
 | STD-DOC-001 | Markdown Standard (RU) | 2.1.5 | [W] Warning | [DEPRECATED] |
-| STD-DOC-002 | Markdown Standard (EN) | 2.1.5 | [W] Warning |
+| STD-DOC-002 | Markdown Standard (EN) | 2.2.0 | [W] Warning |
 | STD-DOC-003 | No-Unicode Policy | 2.1.3 | [C]+[W]+[I] |
 | STD-DOC-004 | README Template | - | - |
 | STD-DOC-005 | Code Examples Guide | 1.0 | [W] Warning |

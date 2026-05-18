@@ -1,9 +1,9 @@
-# Standard: Markdown Formatting v2.1 (EN)
+# Standard: Markdown Formatting v2.2 (EN)
 
 > ID: STD-DOC-002
-> Version: 2.1.5
+> Version: 2.2.0
 > Level: **[W] Warning**
-> Related: No-Unicode Policy v2.1 (STD-DOC-003)
+> Related: No-Unicode Policy v2.1 (STD-DOC-003) — character rules delegated to this standard
 
 ---
 
@@ -33,16 +33,18 @@ This standard establishes rules for Markdown documentation formatting to ensure 
 
 ## 3. Prohibited Elements
 
-The following elements are **prohibited** in Markdown files:
+Character prohibitions are defined in **No-Unicode Policy v2.1** (STD-DOC-003) sections 4-5. Level **[W] Warning** applies to documentation files.
 
-| Category | Examples | Note |
-| :--- | :--- | :--- |
-| **Emoji** | Any pictograms: emotions, objects, UI symbols | No exceptions |
-| **Unicode icons** | Statuses, actions, notifications | Use text tags |
-| **Table pseudographics** | Unicode box-drawing characters (ref) | Use MD syntax |
-| **Typographics in Code/Headings** | Em dash `—` (ref), degree `°` (ref), copyright `©` (ref) | Allowed in plain text, strictly prohibited here |
+**Summary (authoritative rules in STD-DOC-003):**
 
-**Prohibition scope (for Typographics):**
+| Category | Level | Note |
+|----------|-------|------|
+| Emoji | [C] | No exceptions |
+| Unicode icons | [C] | Use text tags |
+| Table pseudographics | [W] | Use Markdown syntax |
+| Typographics in headings/code | [W] | Allowed in plain text only (see scope below) |
+
+**Prohibition scope (for Typographics in .md files):**
 
 - Headings and subheadings
 - Tables (except reference tables - see below)
@@ -57,34 +59,14 @@ The following elements are **prohibited** in Markdown files:
 
 ### 4.1. Text Rules
 
-Allowed characters:
+Allowed character sets are defined in **STD-DOC-003 section 6.1**. For .md files at level [W]:
 
-| Category | Examples |
-|----------|----------|
-| **ASCII letters** | a-z, A-Z |
-| **Unicode letters** | Language-specific (Cyrillic, etc.) |
-| **Digits** | 0-9 |
-| **Basic punctuation** | . , ; : ! ? - _ ( ) [ ] { } |
-| **Typographic symbols (plain text only)** | `—` em dash (ref), `–` en dash (ref), `°` degree (ref), `©` copyright (ref), `±` plus-minus (ref) |
-| **Whitespace** | space, tab, newline |
+- All characters from the STD-DOC-003 basic set are allowed
+- **Typographic symbols** (em dash, en dash, degree, copyright, plus-minus) are allowed in **plain text only** — prohibited in headings, tables, code blocks, and file names (see Section 3)
 
-### 4.2. Whitelist for ASCII Diagrams
+### 4.2. ASCII Diagrams
 
-The following characters are **allowed** for technical diagrams in documentation:
-
-| Symbol | Usage |
-|--------|-------|
-| -> | right arrow |
-| <- | left arrow |
-| => | implication |
-| <= | reverse implication |
-| \| | vertical line |
-| + | line junction |
-| - | horizontal line |
-| v | down arrow |
-| ^ | up arrow |
-| > | pointer |
-| < | reverse pointer |
+The whitelist for technical diagrams in documentation is defined in **STD-DOC-003 section 6.2**. Level [I] applies within code blocks; level [W] applies in plain text documentation.
 
 ### 4.3. Markdown Syntax
 
@@ -206,12 +188,12 @@ Incorrect:    ```text
 
 ## 6. Visual Elements
 
-### 6.1. Basic Rule
+### 6.1. Visual Elements in Markdown
 
-Any visual symbol in documentation = **SVG only** or **text alternative**.
+Icon and graphic rules are defined in **STD-DOC-003 section 7**. For .md files:
 
-**SVG Insertion Rule:**
-To insert an SVG, use the standard Markdown image syntax. Raw `<svg>...</svg>` HTML tags are prohibited to prevent XSS and rendering issues.
+- Any visual symbol = **SVG only** or **text alternative** (STD-DOC-003 section 7.1)
+- SVG insertion uses standard Markdown image syntax. Raw `<svg>...</svg>` HTML tags are prohibited:
 
 ```markdown
 ![Icon description](./path/to/icon.svg)
@@ -219,18 +201,11 @@ To insert an SVG, use the standard Markdown image syntax. Raw `<svg>...</svg>` H
 
 ### 6.2. Icon Library
 
-**Lucide** — primary library for UI. Use text descriptions in documentation.
+See **STD-DOC-003 section 7.2** for icon library requirements. In documentation, use text descriptions instead of icons.
 
 ### 6.3. Brand Logos
 
-Use official SVG when mentioning technologies in UI:
-
-| Technology | Requirement |
-|------------|-------------|
-| Next.js | Official SVG logo |
-| TypeScript | Official SVG logo |
-| Tailwind CSS | Official SVG logo |
-| Prisma ORM | Official SVG logo |
+See **STD-DOC-003 section 7.4** for brand logo requirements. When mentioning technologies in documentation, use official SVG via Markdown image syntax.
 
 ---
 
@@ -382,18 +357,12 @@ PR **recommended for rejection** if it contains:
 }
 ```
 
-**Emoji removal (applied in CI):**
+**Sanitization patterns are defined in STD-DOC-003:**
 
-```javascript
-replace(/[\u{1F000}-\u{1FFFF}]|[\u{2600}-\u{27BF}]|[\u{FE00}-\u{FEFF}]|[\u{1F900}-\u{1F9FF}]|[\u{2702}-\u{27B0}]/gu, '')
-```
+- Emoji removal: **STD-DOC-003 section 8.2**
+- Final sanitization: **STD-DOC-003 section 8.3**
 
-**Final sanitization (preserves diagram whitelist):**
-
-```javascript
-// Note: 'v' is not explicitly listed as it is already included in the \x20-\x7E ASCII range
-replace(/[^\x20-\x7E\u0400-\u04FF\-\>\<\=\|\+\^]/g, '')
-```
+For .md files at level [W], typographic characters are preserved — use the [I] level pattern from STD-DOC-003.
 
 ---
 
@@ -401,12 +370,7 @@ replace(/[^\x20-\x7E\u0400-\u04FF\-\>\<\=\|\+\^]/g, '')
 
 ### 10.1. Unconditionally Allowed
 
-| Category | Examples |
-|----------|----------|
-| Letters | a-z, A-Z (plus language-specific) |
-| Digits | 0-9 |
-| Punctuation | . , ; : ! ? - _ ( ) [ ] { } |
-| Typographics (plain text) | `—` (ref), `–` (ref), `°` (ref), `©` (ref), `±` (ref) |
+See **STD-DOC-003 section 11.1** for the complete list of unconditionally allowed characters. For .md files, typographic symbols are additionally allowed in plain text (level [W]).
 
 ### 10.2. Exceptions by Agreement
 
@@ -463,8 +427,7 @@ Client          Server          Database
 
 ## 12. Pre-merge Checklist
 
-- [ ] No emoji in documentation
-- [ ] No Unicode icons
+- [ ] No emoji or Unicode icons in documentation (STD-DOC-003 sections 4-5)
 - [ ] No typographic symbols (em dash, copyright, etc.) in code blocks or headings
 - [ ] Status indicators — text tags `[OK]`, `[FAIL]`
 - [ ] Unordered lists use strictly `-` marker
@@ -487,10 +450,11 @@ Client          Server          Database
 | 2.1.3 | 2025-01 | Extended `(ref)` exception to code blocks: identifier characters allowed with marker in code blocks too; `Incorrect` examples in code blocks now contain the actual symbol with `(ref)`; restored Unicode symbols in EN table 4.4 |
 | 2.1.4 | 2025-01 | Stack signature parameterized: format `Built with: <technologies>`, specific stack is project responsibility; default value moved to README_TEMPLATE |
 | 2.1.5 | 2025-05 | Added section 7 "Badges" with shields.io rules, placeholders for projects without CI; section numbering shifted |
+| 2.2.0 | 2026-05 | Deduplication: removed 7 elements duplicated with STD-DOC-003 (prohibited elements table, allowed characters, ASCII diagram whitelist, icon library, brand logos, sanitization regex, unconditionally allowed). Replaced with cross-references. Kept .md-specific rules: typographics scope, (ref) exception, SVG insertion, badges, stack signature, formatting rules, text tags |
 
 ---
 
-**Document complies with MARKDOWN_STANDARD v2.1 (level [W])**
+**Document complies with MARKDOWN_STANDARD v2.2 (level [W])**
 
 ---
 Built with: Next.js 16 + TypeScript + Tailwind CSS
