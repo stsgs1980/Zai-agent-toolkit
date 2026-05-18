@@ -74,9 +74,10 @@ interface NodeDetailProps {
   nodeId: string;
   edges: GraphEdge[];
   onClose: () => void;
+  onOpen?: (nodeId: string) => void;
 }
 
-function NodeDetail({ nodeId, edges, onClose }: NodeDetailProps) {
+function NodeDetail({ nodeId, edges, onClose, onOpen }: NodeDetailProps) {
   const incoming = edges.filter((e) => e.to === nodeId);
   const outgoing = edges.filter((e) => e.from === nodeId);
   const group = classifyNode(nodeId);
@@ -105,12 +106,27 @@ function NodeDetail({ nodeId, edges, onClose }: NodeDetailProps) {
               {nodeId}
             </span>
           </div>
-          <button
-            onClick={onClose}
-            className="text-zinc-500 hover:text-white text-sm leading-none ml-2 transition-colors cursor-pointer"
-          >
-            x
-          </button>
+          <div className="flex items-center gap-1 ml-2">
+            {onOpen && (
+              <button
+                onClick={() => onOpen(nodeId)}
+                className="text-zinc-500 hover:text-sky-400 text-xs leading-none transition-colors cursor-pointer flex items-center gap-1 px-1.5 py-0.5 rounded"
+                style={{ border: '1px solid #1e293b55' }}
+                title="Open document"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                Open
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="text-zinc-500 hover:text-white text-sm leading-none transition-colors cursor-pointer"
+            >
+              x
+            </button>
+          </div>
         </div>
         <div
           className="absolute bottom-0 left-0 right-0 h-px"
@@ -311,7 +327,11 @@ function drawGrid(ctx: CanvasRenderingContext2D, w: number, h: number) {
 
 // ── Main GraphViewer component ─────────────────────────────
 
-export function GraphViewer() {
+interface GraphViewerProps {
+  onNodeClick?: (nodeId: string) => void;
+}
+
+export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [edges, setEdges] = useState<GraphEdge[]>([]);
@@ -721,15 +741,35 @@ export function GraphViewer() {
       }
     }
 
+    // Double-click handler — open document
+    function handleDblClick(e: MouseEvent) {
+      const canvasRect = canvas.getBoundingClientRect();
+      const mx = e.clientX - canvasRect.left;
+      const my = e.clientY - canvasRect.top;
+
+      for (const node of nodes) {
+        const dx = node.x - mx;
+        const dy = node.y - my;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const radius = Math.max(4, Math.min(14, 4 + node.degree * 1.2));
+        if (dist < radius + 8) {
+          onNodeClick?.(node.id);
+          return;
+        }
+      }
+    }
+
     canvas.addEventListener("click", handleClick);
     canvas.addEventListener("mousemove", handleMouseMove);
+    canvas.addEventListener("dblclick", handleDblClick);
 
     return () => {
       cancelAnimationFrame(animFrame);
       canvas.removeEventListener("click", handleClick);
       canvas.removeEventListener("mousemove", handleMouseMove);
+      canvas.removeEventListener("dblclick", handleDblClick);
     };
-  }, [filteredEdges, selectedNode, hoveredNode]);
+  }, [filteredEdges, selectedNode, hoveredNode, onNodeClick]);
 
   // ── Loading / error / empty states ────────────────────
 
@@ -832,9 +872,10 @@ export function GraphViewer() {
             nodeId={selectedNode}
             edges={filteredEdges}
             onClose={() => setSelectedNode(null)}
+            onOpen={onNodeClick}
           />
         </div>
-      )}
+      )
 
       {/* ── Overlay: Open in Pyvis button (bottom-right) ── */}
       <div className="absolute bottom-3 right-3 z-10">
@@ -881,7 +922,7 @@ export function GraphViewer() {
             <svg className="w-3.5 h-3.5 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
             </svg>
-            <span className="text-zinc-600 text-xs">Click a node to inspect</span>
+            <span className="text-zinc-600 text-xs">Click to inspect · Dbl-click to open</span>
           </div>
         </div>
       )}

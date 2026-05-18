@@ -307,6 +307,31 @@ export default function MemoryDashboard() {
 
   const openEntry = (entry: MemoryEntry) => { setSelectedEntry(entry); setDetailOpen(true); fetchRelated(entry) }
 
+  // Open a memory entry by its graph node ID
+  const openEntryByNodeId = useCallback(async (nodeId: string) => {
+    // First try to find in already-loaded entries
+    const found = allEntries.find(e => e.id === nodeId)
+    if (found) {
+      openEntry(found)
+      return
+    }
+    // Try fetching from API by ID
+    try {
+      const res = await fetch(`/api/memory?action=query&query=${encodeURIComponent(nodeId)}&limit=10`)
+      const data = await res.json()
+      if (data.success && data.data?.length > 0) {
+        // Find exact match or closest
+        const exact = data.data.find((e: MemoryEntry) => e.id === nodeId)
+        const entry = exact || data.data[0]
+        openEntry(entry)
+      } else {
+        toast({ title: 'Entry not found', description: `No memory entry for node: ${nodeId}` })
+      }
+    } catch {
+      toast({ title: 'Error', description: 'Failed to fetch entry' })
+    }
+  }, [allEntries, fetchRelated])
+
   useEffect(() => { fetchStats(); fetchAllEntries() }, [])
   useEffect(() => { if (!semanticMode) fetchEntries() }, [selectedType, semanticMode])
 
@@ -423,7 +448,7 @@ export default function MemoryDashboard() {
         {viewMode === 'graph' && (
           <div className="space-y-2">
             <GraphStats />
-            <GraphViewer />
+            <GraphViewer onNodeClick={openEntryByNodeId} />
           </div>
         )}
 
