@@ -87,7 +87,7 @@ cd $env:USERPROFILE\.zcode
 #### Step 3: Clone Toolkit
 
 ```powershell
-git clone https://github.com/stsgs1980/Zai-agent-toolkit_v.git
+git clone https://github.com/stsgs1980/Zai-agent-toolkit.git
 ```
 
 #### Step 4: Create Symlinks
@@ -98,9 +98,9 @@ ZCode Desktop expects skills in `~/.zcode/skills/`. Create symbolic links:
 # Remove existing directories if they exist (backup first!)
 # Then create symlinks:
 
-New-Item -ItemType SymbolicLink -Path "skills" -Target "Zai-agent-toolkit_v\skills"
-New-Item -ItemType SymbolicLink -Path "instructions" -Target "Zai-agent-toolkit_v\instructions"
-New-Item -ItemType SymbolicLink -Path "standards" -Target "Zai-agent-toolkit_v\standards"
+New-Item -ItemType SymbolicLink -Path "skills" -Target "Zai-agent-toolkit\skills"
+New-Item -ItemType SymbolicLink -Path "instructions" -Target "Zai-agent-toolkit\instructions"
+New-Item -ItemType SymbolicLink -Path "standards" -Target "Zai-agent-toolkit\standards"
 ```
 
 #### Step 5: Verify Installation
@@ -126,7 +126,7 @@ Create `update-toolkit.ps1` in `$env:USERPROFILE\.zcode\`:
 Write-Host "Updating Z.ai Agent Toolkit..." -ForegroundColor Green
 
 # Navigate to toolkit
-Set-Location "$env:USERPROFILE\.zcode\Zai-agent-toolkit_v"
+Set-Location "$env:USERPROFILE\.zcode\Zai-agent-toolkit"
 
 # Fetch and pull changes
 git fetch origin
@@ -386,7 +386,7 @@ Use the first available.
 #### Step 3: Create Directory
 
 ```powershell
-cd $env:USERPROFILE\.zcode\Zai-agent-toolkit_v\skills
+cd $env:USERPROFILE\.zcode\Zai-agent-toolkit\skills
 mkdir my-skill-name
 ```
 
@@ -458,7 +458,7 @@ Edit `skills/skill-id-system/SKILL.md`:
 #### Step 6: Commit and Push
 
 ```powershell
-cd $env:USERPROFILE\.zcode\Zai-agent-toolkit_v
+cd $env:USERPROFILE\.zcode\Zai-agent-toolkit
 git add .
 git commit -m "Add skill: my-skill-name (ZAI-USER-001)"
 git push
@@ -488,7 +488,7 @@ Z.ai Server                GitHub                Your Windows
 
 1. On Z.ai (after creating skill):
    ```bash
-   cd /home/z/my-project/Zai-agent-toolkit_v
+   cd /home/z/my-project/Zai-agent-toolkit
    git add .
    git commit -m "Add new skill"
    git push
@@ -499,7 +499,7 @@ Z.ai Server                GitHub                Your Windows
    cd $env:USERPROFILE\.zcode
    .\update-toolkit.ps1
    # OR manually:
-   cd Zai-agent-toolkit_v
+   cd Zai-agent-toolkit
    git pull
    ```
 
@@ -507,7 +507,7 @@ Z.ai Server                GitHub                Your Windows
 
 1. On Windows:
    ```powershell
-   cd $env:USERPROFILE\.zcode\Zai-agent-toolkit_v
+   cd $env:USERPROFILE\.zcode\Zai-agent-toolkit
    git add .
    git commit -m "Update skill"
    git push
@@ -515,7 +515,7 @@ Z.ai Server                GitHub                Your Windows
 
 2. On Z.ai server:
    ```bash
-   cd /home/z/my-project/Zai-agent-toolkit_v
+   cd /home/z/my-project/Zai-agent-toolkit
    git pull
    ```
 
@@ -585,7 +585,7 @@ Every skill should have:
 3. Check symlink is correct:
    ```powershell
    ls $env:USERPROFILE\.zcode\skills
-   # Should show Zai-agent-toolkit_v\skills contents
+   # Should show Zai-agent-toolkit\skills contents
    ```
 
 ### Symlink Broken
@@ -598,7 +598,7 @@ Every skill should have:
 Remove-Item $env:USERPROFILE\.zcode\skills
 
 # Recreate
-New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.zcode\skills" -Target "$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\skills"
+New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.zcode\skills" -Target "$env:USERPROFILE\.zcode\Zai-agent-toolkit\skills"
 ```
 
 ### Git Conflicts
@@ -638,7 +638,7 @@ cd $env:USERPROFILE\.zcode
 .\update-toolkit.ps1
 
 # Create skill manually
-cd Zai-agent-toolkit_v\skills
+cd Zai-agent-toolkit\skills
 mkdir my-skill
 # Create SKILL.md...
 
@@ -659,8 +659,8 @@ Toolkit skills: ZAI-GIT-xxx, ZAI-SDK-xxx, ...
 
 | What | Where |
 |------|-------|
-| Toolkit | `$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\` |
-| Skills | `Zai-agent-toolkit_v\skills\` |
+| Toolkit | `$env:USERPROFILE\.zcode\Zai-agent-toolkit\` |
+| Skills | `Zai-agent-toolkit\skills\` |
 | ID Registry | `skills\skill-id-system\SKILL.md` |
 | This Guide | `docs\TUTORIAL.md` |
 

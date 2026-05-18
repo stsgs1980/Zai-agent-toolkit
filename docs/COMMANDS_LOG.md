@@ -17,7 +17,7 @@ sync-toolkit
 .\sync-toolkit.ps1
 
 # Method 3: Manual git pull
-cd $env:USERPROFILE\.zcode\Zai-agent-toolkit_v
+cd $env:USERPROFILE\.zcode\Zai-agent-toolkit
 git pull
 ```
 
@@ -65,14 +65,14 @@ File: `skills/skill-id-system/SKILL.md` -> Registry section
 ### Windows
 
 ```text
-$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\     # Toolkit repository
+$env:USERPROFILE\.zcode\Zai-agent-toolkit\     # Toolkit repository
 $env:USERPROFILE\.zcode\skills\                   # Symbolic link -> toolkit/skills
 ```
 
 ### Linux (Z.ai)
 
 ```text
-/home/z/my-project/Zai-agent-toolkit_v/           # Toolkit (repository clone)
+/home/z/my-project/Zai-agent-toolkit/           # Toolkit (repository clone)
 /home/z/my-project/skills/                        # Skills in sandbox
 ```
 
@@ -126,7 +126,7 @@ git log --oneline -10
 
 ```powershell
 # Run once in PowerShell:
-cd $env:USERPROFILE\.zcode\Zai-agent-toolkit_v
+cd $env:USERPROFILE\.zcode\Zai-agent-toolkit
 .\scripts\setup-sync-command.ps1
 
 # Restart PowerShell
@@ -146,7 +146,7 @@ Add to PowerShell profile (`notepad $PROFILE`):
 
 ```powershell
 function sync-toolkit {
-    Set-Location $env:USERPROFILE\.zcode\Zai-agent-toolkit_v
+    Set-Location $env:USERPROFILE\.zcode\Zai-agent-toolkit
     git pull
     Write-Host "Toolkit updated!" -ForegroundColor Green
 }

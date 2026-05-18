@@ -328,12 +328,12 @@ Skills are stored in the Z.ai Agent Toolkit repository, not in individual projec
 
 **Default location on Z.ai server:**
 ```text
-/home/z/my-project/Zai-agent-toolkit_v/skills/
+/home/z/my-project/Zai-agent-toolkit/skills/
 ```
 
 **Your local location (Windows):**
 ```text
-$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\skills\
+$env:USERPROFILE\.zcode\Zai-agent-toolkit\skills\
 ```
 
 ### Synchronization
@@ -348,7 +348,7 @@ Skills created in Z.ai sandbox are NOT automatically synced to your local machin
 
 | Type | Location | Scope |
 |------|----------|-------|
-| Toolkit skills | `Zai-agent-toolkit_v/skills/` | Available in all projects |
+| Toolkit skills | `Zai-agent-toolkit/skills/` | Available in all projects |
 | Project skills | `<project>/skills/` | Only in this project |
 
 **Recommendation:** Use toolkit for reusable skills, project for project-specific.

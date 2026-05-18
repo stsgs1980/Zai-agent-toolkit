@@ -255,7 +255,7 @@ flowchart TB
     end
 
     subgraph ToolkitCheck["TOOLKIT CHECK"]
-        B --> C{Exists in<br>/Zai-agent-toolkit_v/skills/?}
+        B --> C{Exists in<br>/Zai-agent-toolkit/skills/?}
         C -->|Yes| D[Use Custom Version]
         C -->|No| E{Has _sts suffix?}
     end
@@ -300,7 +300,7 @@ flowchart TB
         C -.->|symlink| F
         D -.->|symlink| G
 
-        subgraph LocalToolkit["Zai-agent-toolkit_v/"]
+        subgraph LocalToolkit["Zai-agent-toolkit/"]
             E[skills/]
             F[instructions/]
             G[standards/]
@@ -308,12 +308,12 @@ flowchart TB
     end
 
     subgraph GitHub["GITHUB"]
-        H[github.com/stsgs1980/<br>Zai-agent-toolkit_v]
+        H[github.com/stsgs1980/<br>Zai-agent-toolkit]
     end
 
     subgraph Sandbox["Z.ai SANDBOX (/home/z/my-project/)"]
         I[System Skills/]
-        J[Zai-agent-toolkit_v/<br>submodule]
+        J[Zai-agent-toolkit/<br>submodule]
     end
 
     %% Sync flows
@@ -339,10 +339,10 @@ $env:USERPROFILE\.zcode\
 +-- agent/
 +-- cli/
 +-- v2/
-+-- skills/ -----------------> Zai-agent-toolkit_v\skills\ (symlink)
-+-- instructions/ -----------> Zai-agent-toolkit_v\instructions\ (symlink)
-+-- standards/ --------------> Zai-agent-toolkit_v\standards\ (symlink)
-+-- Zai-agent-toolkit_v/
++-- skills/ -----------------> Zai-agent-toolkit\skills\ (symlink)
++-- instructions/ -----------> Zai-agent-toolkit\instructions\ (symlink)
++-- standards/ --------------> Zai-agent-toolkit\standards\ (symlink)
++-- Zai-agent-toolkit/
     +-- skills/
     +-- instructions/
     +-- standards/
@@ -353,10 +353,10 @@ $env:USERPROFILE\.zcode\
 
 | Direction | Command | Location |
 |-----------|---------|----------|
-| Sandbox -> GitHub | `git push` | `/home/z/my-project/Zai-agent-toolkit_v/` |
-| GitHub -> Windows | `git pull` or `sync-toolkit` | `$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\` |
-| Windows -> GitHub | `git push` | `$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\` |
-| GitHub -> Sandbox | `git pull` | `/home/z/my-project/Zai-agent-toolkit_v/` |
+| Sandbox -> GitHub | `git push` | `/home/z/my-project/Zai-agent-toolkit/` |
+| GitHub -> Windows | `git pull` or `sync-toolkit` | `$env:USERPROFILE\.zcode\Zai-agent-toolkit\` |
+| Windows -> GitHub | `git push` | `$env:USERPROFILE\.zcode\Zai-agent-toolkit\` |
+| GitHub -> Sandbox | `git pull` | `/home/z/my-project/Zai-agent-toolkit/` |
 
 ### sync-toolkit_sts (ZAI-STS-002)
 
@@ -375,7 +375,7 @@ Personal skill for orchestrating sync between all three locations.
 |   +-- LLM/
 |   +-- ... (50+ skills)
 |
-+-- Zai-agent-toolkit_v/
++-- Zai-agent-toolkit/
     +-- skills/                # Custom Skills (persistent)
         +-- commit-work/        # ZAI-DEV-004
         +-- session-log/        # ZAI-SESSION-002

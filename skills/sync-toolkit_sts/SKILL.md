@@ -51,7 +51,7 @@ Activate when user says:
 ### Step 1: Check Status
 
 ```bash
-cd /home/z/my-project/Zai-agent-toolkit_v
+cd /home/z/my-project/Zai-agent-toolkit
 git status
 ```
 
@@ -74,7 +74,7 @@ On Windows run:
   sync-toolkit
 
 Or manually:
-  cd $env:USERPROFILE\.zcode\Zai-agent-toolkit_v
+  cd $env:USERPROFILE\.zcode\Zai-agent-toolkit
   git pull
 ```
 
@@ -86,12 +86,12 @@ Or manually:
 
 User has shortcut: `sync-toolkit`
 
-This runs: `$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\sync-toolkit.ps1`
+This runs: `$env:USERPROFILE\.zcode\Zai-agent-toolkit\sync-toolkit.ps1`
 
 ### Manual Command
 
 ```powershell
-cd $env:USERPROFILE\.zcode\Zai-agent-toolkit_v
+cd $env:USERPROFILE\.zcode\Zai-agent-toolkit
 git pull
 ```
 
@@ -105,7 +105,7 @@ The sync-toolkit.ps1 script:
 # sync-toolkit.ps1
 Write-Host "Syncing Z.ai Agent Toolkit..." -ForegroundColor Green
 
-Set-Location "$env:USERPROFILE\.zcode\Zai-agent-toolkit_v"
+Set-Location "$env:USERPROFILE\.zcode\Zai-agent-toolkit"
 
 Write-Host "Pulling updates..." -ForegroundColor Cyan
 git pull origin main

@@ -10,7 +10,7 @@ set -e
 
 # === Configuration ===
 GITHUB_USER="stsgs1980"
-REPO="Zai-agent-toolkit_v"
+REPO="Zai-agent-toolkit"
 TOOLKIT_VERSION="v2.0.4"
 TMP_DIR="/tmp/zai-agent-toolkit-setup"
 

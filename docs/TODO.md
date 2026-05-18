@@ -14,21 +14,19 @@
 
 ### Solution
 
-Convert toolkit connections to git submodules pointing to `Zai-agent-toolkit_v` (canonical repository).
+Convert toolkit connections to git submodules pointing to `Zai-agent-toolkit` (canonical repository).
 
 ### Risks
 
-1. **Two repositories**: `Zai-agent-toolkit` (old, draft) and `Zai-agent-toolkit_v` (canonical).
-   The submodule must point to `_v`, otherwise the audit is lost.
-2. **Old repository will be deleted** -- this means all existing submodule references
-   (if any) will break. A migration plan for URLs is needed.
-3. **50+ projects** -- this number is unverified. Is it really 50?
-4. **Conflict with sync pipeline**: if a project switches to submodules,
+1. **Single repository**: `Zai-agent-toolkit` is the canonical repository on GitHub.
+   All internal references now consistently use this name.
+2. **50+ projects** -- this number is unverified. Is it really 50?
+3. **Conflict with sync pipeline**: if a project switches to submodules,
    then `sync-toolkit.ps1` in the project root is no longer relevant
    (now update via `git submodule update`).
-5. **Windows vs Linux**: submodules on Windows require `git submodule update --init --recursive`
+4. **Windows vs Linux**: submodules on Windows require `git submodule update --init --recursive`
    on every clone. Same in CI on Linux. All dev environments must be informed.
-6. **Circular dependency**: if the toolkit itself is managed via submodule,
+5. **Circular dependency**: if the toolkit itself is managed via submodule,
    then updating it requires a cycle: push to toolkit -> submodule update in project.
    `sync-toolkit` will need to be rewritten.
 
@@ -38,8 +36,8 @@ Convert toolkit connections to git submodules pointing to `Zai-agent-toolkit_v` 
 |---|------|--------|-------|
 | 1 | Check `gh auth status` (GitHub CLI) | Pending | OK |
 | 2 | Get list of all repositories via GitHub API | Pending | `find-toolkit-repos.ps1` exists, fix in P2.4.3 |
-| 3 | Find repositories with Zai-agent-toolkit | Pending | Search both names: old and `_v` |
-| 4 | Create copy -> submodule conversion script | Pending | Script must change URL to `_v`, clean old copy |
+| 3 | Find repositories with Zai-agent-toolkit | Pending | Search by name |
+| 4 | Create copy -> submodule conversion script | Pending | Script must set URL to canonical repo, clean old copy |
 | 5 | Test on 1-2 repositories | Pending | Pick non-critical projects |
 | 6 | Run mass conversion | Pending | Only after testing |
 | 7 | Create `update-all-toolkits` command | Pending | After submodules this is `git submodule update --remote` |
@@ -303,7 +301,7 @@ C:\Users\stsgr\.zcode\
 |   +-- folder_indexer.py
 +-- skills\                <- Symlink to toolkit
 +-- hooks\
-+-- Zai-agent-toolkit_v\
++-- Zai-agent-toolkit\
 ```
 
 ---
@@ -316,11 +314,11 @@ File: `skills/sync-toolkit_sts/SKILL.md`
 
 | Line | Was (hardcoded) | Now |
 |--------|----------------|--------------|
-| 77 | `cd C:\Users\stsgr\.zcode\Zai-agent-toolkit` | `cd $env:USERPROFILE\.zcode\Zai-agent-toolkit_v` |
-| 89 | `C:\Users\stsgr\.zcode\Zai-agent-toolkit\sync-toolkit.ps1` | `$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\sync-toolkit.ps1` |
-| 94 | `cd C:\Users\stsgr\.zcode\Zai-agent-toolkit` | `cd $env:USERPROFILE\.zcode\Zai-agent-toolkit_v` |
+| 77 | `cd C:\Users\stsgr\.zcode\Zai-agent-toolkit` | `cd $env:USERPROFILE\.zcode\Zai-agent-toolkit` |
+| 89 | `C:\Users\stsgr\.zcode\Zai-agent-toolkit\sync-toolkit.ps1` | `$env:USERPROFILE\.zcode\Zai-agent-toolkit\sync-toolkit.ps1` |
+| 94 | `cd C:\Users\stsgr\.zcode\Zai-agent-toolkit` | `cd $env:USERPROFILE\.zcode\Zai-agent-toolkit` |
 
-All URLs updated from `Zai-agent-toolkit` to `Zai-agent-toolkit_v` in active code and docs.
+Hardcoded paths replaced with `$env:USERPROFILE` variables. All repo name references are `Zai-agent-toolkit` (matching the GitHub repository name).
 
 ### 5.2 Two Sync Mechanisms -- Resolved
 
@@ -342,7 +340,7 @@ Both now delegate to the same `update-toolkit.ps1` script.
 
 ### 5.4 Old Repository URL in All Scripts (FIXED)
 
-All active references now point to `Zai-agent-toolkit_v`:
+All active references now point to `Zai-agent-toolkit`:
 
 | File | Status |
 |------|--------|
@@ -398,9 +396,9 @@ Translated to English (v2.0.5).
 |-----------|--------|------------|--------|
 | P0 | Fix hardcoded paths in sync-toolkit SKILL.md | -- | Done |
 | P1 | Deduplicate sync scripts | P0 | Done |
-| P1 | Update URLs from `Zai-agent-toolkit` to `_v` | -- | Done |
+| P1 | Update URLs: ensure all references match GitHub repo name `Zai-agent-toolkit` | -- | Done |
 | P2 | Resolve `extract_severity_levels()` | -- | Done |
-| P2 | Rewrite submodule plan for `_v` | P1 (URL) | Done |
+| P2 | Rewrite submodule plan (single canonical repo) | P1 (URL) | Done |
 | P2 | Clean 7 files with anti-monolith references | -- | Done |
 | P3 | Implement graph layer in memory_cli.py | -- | Pending |
 | P3 | Index real folders + populate memory | graph layer optional | Pending |

@@ -174,8 +174,8 @@ Check `skills/skill-id-system/SKILL.md` for full registry.
 
 | Environment | Path |
 |-------------|------|
-| Z.ai server | `/home/z/my-project/Zai-agent-toolkit_v/skills/` |
-| Your Windows | `$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\skills\` |
+| Z.ai server | `/home/z/my-project/Zai-agent-toolkit/skills/` |
+| Your Windows | `$env:USERPROFILE\.zcode\Zai-agent-toolkit\skills\` |
 
 ### Synchronization
 
@@ -190,7 +190,7 @@ Z.ai server:    git push  -->  GitHub  -->  git pull / update-toolkit.ps1  :Your
 
 | Type | Location | Scope |
 |------|----------|-------|
-| Toolkit | `Zai-agent-toolkit_v/skills/` | All projects (via symlink) |
+| Toolkit | `Zai-agent-toolkit/skills/` | All projects (via symlink) |
 | Project | `<project>/skills/` | Only this project |
 
 **Use toolkit for:** Reusable skills you want everywhere

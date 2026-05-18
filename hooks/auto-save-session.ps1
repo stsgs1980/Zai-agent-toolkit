@@ -25,7 +25,7 @@ if ($Tags) { $metadata += ",tags=$Tags" }
 if ($Project) { $metadata += ",project=$Project" }
 
 # Store in memory
-$result = & python "$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\tools\memory_cli.py" store session "$content" --metadata $metadata 2>&1
+$result = & python "$env:USERPROFILE\.zcode\Zai-agent-toolkit\tools\memory_cli.py" store session "$content" --metadata $metadata 2>&1
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "Session saved: $sessionId" -ForegroundColor Green

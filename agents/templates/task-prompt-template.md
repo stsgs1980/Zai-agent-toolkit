@@ -142,7 +142,7 @@ Stage Summary:
 
 ## STANDARDS COMPLIANCE
 
-Follow these standards (available in /home/z/my-project/Zai-agent-toolkit_v/standards/):
+Follow these standards (available in /home/z/my-project/Zai-agent-toolkit/standards/):
 - STD-DOC-003: No emoji/Unicode in code or output
 - STD-ENV-001: No hardcoded personal paths, use .env.example
 - STD-FE-001: Frontend component patterns

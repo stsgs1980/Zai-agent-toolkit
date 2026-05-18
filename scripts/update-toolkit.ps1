@@ -15,11 +15,11 @@ Write-Host "  Z.ai Agent Toolkit Updater" -ForegroundColor Cyan
 Write-Host "================================================" -ForegroundColor Cyan
 Write-Host ""
 
-$toolkitPath = "$env:USERPROFILE\.zcode\Zai-agent-toolkit_v"
+$toolkitPath = "$env:USERPROFILE\.zcode\Zai-agent-toolkit"
 
 if (-not (Test-Path $toolkitPath)) {
     Write-Host "[ERROR] Toolkit not found at $toolkitPath" -ForegroundColor Red
-    Write-Host "Please install first: git clone https://github.com/stsgs1980/Zai-agent-toolkit_v.git" -ForegroundColor Yellow
+    Write-Host "Please install first: git clone https://github.com/stsgs1980/Zai-agent-toolkit.git" -ForegroundColor Yellow
     if (-not $NoPause) { pause }
     exit 1
 }
