@@ -1,0 +1,48 @@
+@startuml Graph Layer Edge Types
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontSize 11
+
+title Graph Layer — Edge Types & Traversal Examples
+
+graph "Knowledge Graph" as G {
+
+    node "session_20260518" as s1
+    node "task_fix_auth" as t1
+    node "bug_crash_login" as b1
+    node "commit_abc123" as c1
+    node "src/auth.ts" as f1
+    node "src/lib/jwt.ts" as f2
+    node "REQ-001" as r1
+    node "knowledge_jwt_best" as k1
+
+    s1 -[bold,#Blue]-> t1 : same_session
+    s1 -[bold,#Blue]-> b1 : same_session
+    t1 -[bold,#Red]-> b1 : fixed_by
+    t1 -[bold,#Green]-> c1 : implements
+    c1 -[bold,#Orange]-> f1 : modifies
+    f1 -[bold,#Purple]-> f2 : imports
+    f1 -[#Gray]-> r1 : implements
+    t1 -[#Teal]-> k1 : depends_on
+}
+
+legend right
+    |= Edge Type |= Color |= Meaning |
+    | same_session | <#Blue> | Created in same session |
+    | fixed_by | <#Red> | Bug fix chain |
+    | implements | <#Green> | Code fulfills requirement |
+    | modifies | <#Orange> | Commit changes file |
+    | imports | <#Purple> | Code dependency |
+    | depends_on | <#Teal> | Task prerequisite |
+    | parent_dir | <#Gray> | File in directory |
+end legend
+
+note bottom of G
+  **Traversal examples:**
+  • session → all tasks → all fixes (chain)
+  • bug → who fixed it → what commit → what files
+  • file → who imports it → reverse dependency
+  • requirement → all implementing code
+end note
+
+@enduml

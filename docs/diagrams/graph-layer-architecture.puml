@@ -1,0 +1,64 @@
+@startuml Graph Layer Architecture
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam componentStyle rectangle
+skinparam defaultFontSize 12
+
+title Graph Layer — Architecture Overview
+
+package "Windows: C:\\Users\\stsgr\\.zcode\\" as win {
+
+    package "memory\\" as mem {
+        database "ChromaDB\n(chromadb/)" as chroma {
+            card "session\nknowledge\npattern\nproject\ntemplate" as collections
+        }
+        database "SQLite\n(memory.db)" as sqlite {
+            card "MemoryEntry\nMemoryCollection\nMemoryBackup" as prisma_models
+        }
+        file "graph.json\n(edges)" as graph_json
+    }
+
+    package "tools\\" as tools {
+        component "memory_cli.py" as cli
+        component "folder_indexer.py" as indexer
+        component "graph_engine.py\n**NEW**" as engine
+    }
+
+    package "memory-dashboard/\n(Next.js :3000)" as dash {
+        component "API Routes" as api {
+            [memories/route.ts] as r_list
+            [memory/route.ts] as r_crud
+            [memory/related/route.ts] as r_related
+            [memory/semantic/route.ts] as r_semantic
+            [memory/graph/route.ts] as r_graph
+        }
+        component "Prisma Client" as prisma
+        [r_crud] --> prisma
+        [r_list] --> prisma
+        [r_related] ..> chroma : "LLM (replace)"
+        [r_semantic] ..> chroma : "LLM (replace)"
+        [r_graph] --> graph_json : "NetworkX\n(fast, free)"
+    }
+}
+
+package "Z.ai Sandbox (Linux)" as sandbox {
+    component "Code Development" as dev
+    note right of dev: Write code here\nPush to GitHub\nWindows pulls
+}
+
+' Relationships
+cli --> engine : "graph subcommand"
+engine --> graph_json : "load/save edges"
+engine --> chroma : "validate nodes"
+indexer --> graph_json : "parent_dir edges\n(with --graph flag)"
+
+dev ..> tools : "git push"
+
+legend right
+    |= Color |= Meaning |
+    |<#LightBlue>| Existing component |
+    |<#LightGreen>| **NEW** — to implement |
+    |<#LightGray>| To replace with graph |
+end legend
+
+@enduml

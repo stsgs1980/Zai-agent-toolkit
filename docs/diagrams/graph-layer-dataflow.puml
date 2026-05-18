@@ -1,0 +1,64 @@
+@startuml Graph Layer Data Flow
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontSize 12
+
+title Graph Layer — Data Flow & Commands
+
+actor User as user
+actor "Z.ai\nSandbox" as sandbox
+
+package "Python CLI (memory_cli.py)" as cli {
+    usecase "memory store\nsession \"...\"" as uc_store
+    usecase "memory query\n\"react hooks\"" as uc_query
+    usecase "memory graph\nadd-edge" as uc_add
+    usecase "memory graph\nquery-path" as uc_path
+    usecase "memory graph\nneighbors" as uc_neighbors
+    usecase "memory graph\nviz" as uc_viz
+    usecase "memory graph\nstats" as uc_stats
+    usecase "memory graph\nvalidate" as uc_validate
+}
+
+package "graph_engine.py" as engine {
+    usecase "load graph.json\n→ NetworkX DiGraph" as uc_load
+    usecase "add_edge(from,to,type)" as uc_addedge
+    usecase "shortest_path(A,B)" as uc_shortest
+    usecase "neighbors(node)" as uc_nb
+    usecase "subgraph(tag)" as uc_sub
+    usecase "validate()\norphan check" as uc_val
+}
+
+database "ChromaDB" as chroma
+file "graph.json" as graph
+file "graph.html\n(pyvis)" as html
+
+user --> uc_store
+user --> uc_query
+user --> uc_add
+user --> uc_path
+user --> uc_neighbors
+user --> uc_viz
+user --> uc_stats
+user --> uc_validate
+
+uc_store --> chroma : "embed & store"
+uc_store ..> uc_addedge : "auto same_session\nedge"
+uc_query --> chroma : "vector search"
+
+uc_add --> uc_load
+uc_path --> uc_load
+uc_neighbors --> uc_load
+uc_stats --> uc_load
+uc_validate --> uc_load
+
+uc_load --> graph : "read/write"
+uc_addedge --> graph : "append edge"
+uc_shortest --> graph : "traverse"
+uc_val --> chroma : "check node exists"
+
+uc_viz --> html : "pyvis generates\ninteractive HTML"
+html --> user : "open in browser"
+
+sandbox --> uc_store : "via tunnel\n(future)"
+
+@enduml
