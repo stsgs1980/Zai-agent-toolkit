@@ -370,7 +370,7 @@ $pagePath = Join-Path $BaseDir "app\page.tsx"
 if (Test-Path $pagePath) {
     $pageContent = Get-Content -Path $pagePath -Raw
 
-    if ($pageContent -match "MemoryDashboard") {
+    if ($pageContent -match "import \{ MemoryDashboard \} from '@/components/MemoryDashboard'") {
         Write-Host "  SKIP: page.tsx already uses MemoryDashboard" -ForegroundColor DarkGray
     } else {
         $newPageContent = @"
