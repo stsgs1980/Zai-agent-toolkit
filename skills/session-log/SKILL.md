@@ -1,6 +1,6 @@
 ---
 name: session-log
-id: ZAI-SESSION-002
+id: ZAI-SESSION-001
 version: 1.1
 compatibility: both
 description: >
@@ -13,7 +13,7 @@ trigger: session log, create session log, log this, knowledge base
 
 # Skill: Session Log v1.1
 
-> ID: ZAI-SESSION-002
+> ID: ZAI-SESSION-001
 > Version: 1.1
 > Last Updated: 2026-05
 

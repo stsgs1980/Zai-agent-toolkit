@@ -136,7 +136,7 @@ flowchart TB
 | Skill | ZAI ID | Trigger |
 |-------|--------|---------|
 | session-resume | System | New session start |
-| session-log | ZAI-SESSION-002 | Every 15 min, after commit, 5+ files |
+| session-log | ZAI-SESSION-001 | Every 15 min, after commit, 5+ files |
 | session-handoff | System | Context > 80%, session end |
 
 ---
@@ -184,11 +184,11 @@ flowchart TB
 
 ### Skills Used
 
-| Skill | ZAI ID | Purpose |
-|-------|--------|---------|
-| git-safe-ops | System | Backup + recover for risky ops |
-| git-checkpoint | System | Create recovery tag |
-| git-safety | System | Deadlock prevention rules |
+| Skill | Owner | Purpose |
+|-------|-------|---------|
+| git-safe-ops | Z.ai System | Backup + recover for risky ops |
+| git-checkpoint | Z.ai System | Create recovery tag |
+| git-safety | Z.ai System | Deadlock prevention rules |
 
 ---
 
@@ -377,8 +377,8 @@ Personal skill for orchestrating sync between all three locations.
 |
 +-- Zai-agent-toolkit/
     +-- skills/                # Custom Skills (persistent)
-        +-- commit-work/        # ZAI-DEV-004
-        +-- session-log/        # ZAI-SESSION-002
+        +-- commit-work/        # ZAI-DEV-002
+        +-- session-log/        # ZAI-SESSION-001
         +-- skill-creator/      # ZAI-META-002
         +-- *_sts/              # Personal skills
 ```
@@ -390,15 +390,17 @@ Personal skill for orchestrating sync between all three locations.
 | Domain | ID Range | Examples |
 |--------|----------|----------|
 | META | ZAI-META-001+ | skill-id-system, skill-creator |
+| MEM | ZAI-MEM-001+ | memory-store, memory-query, memory-delete, memory-export |
+| FS | ZAI-FS-001+ | folder-indexer |
 | DEV | ZAI-DEV-001+ | project-clone, commit-work, database-schema-designer |
-| SEC | ZAI-SEC-001+ | (planned) |
-| GIT | ZAI-GIT-001+ | (planned) |
-| HEALTH | ZAI-HEALTH-001+ | (planned) |
 | SESSION | ZAI-SESSION-001+ | session-log, context-consolidation |
+| ARCH | ZAI-ARCH-001+ | mermaid-diagrams |
 | QA | ZAI-QA-001+ | qa-test-planner |
 | REQ | ZAI-REQ-001+ | requirements-clarity |
-| ARCH | ZAI-ARCH-001+ | mermaid-diagrams |
 | STS | ZAI-STS-001+ | Personal skills (_sts suffix) |
+
+> **Note:** Git, SDK, Security, Documentation, and Health domains are handled
+> by Z.ai system skills and do NOT have ZAI- prefix IDs.
 
 ---
 

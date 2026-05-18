@@ -1,6 +1,6 @@
 ---
 name: commit-work
-id: ZAI-DEV-004
+id: ZAI-DEV-002
 version: 1.0
 compatibility: both
 description: "Create high-quality git commits: review/stage intended changes, split into logical commits, and write clear commit messages (including Conventional Commits). Use when the user asks to commit, craft a commit message, stage changes, or split work into multiple commits."
@@ -11,7 +11,7 @@ trigger: commit, create commit, conventional commit, stage changes, write commit
 # Skill: Commit Work v1.0
 
 
-> ID: ZAI-DEV-004
+> ID: ZAI-DEV-002
 > Version: 1.0
 > Last Updated: 2026-05
 

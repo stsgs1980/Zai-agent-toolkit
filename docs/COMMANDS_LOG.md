@@ -50,13 +50,17 @@ Format: `ZAI-<DOMAIN>-<NUMBER>`
 |--------|------|---------|
 | Personal (STS) | STS | ZAI-STS-001 |
 | Architecture | ARCH | ZAI-ARCH-001 |
-| Git | GIT | ZAI-GIT-001 |
 | Development | DEV | ZAI-DEV-001 |
 | Meta-systems | META | ZAI-META-001 |
+| Memory | MEM | ZAI-MEM-001 |
+| Session | SESSION | ZAI-SESSION-001 |
+| Filesystem | FS | ZAI-FS-001 |
+| Quality | QA | ZAI-QA-001 |
+| Requirements | REQ | ZAI-REQ-001 |
 
 ### Skills Registry
 
-File: `skills/skill-id-system/SKILL.md` -> Registry section
+File: `docs/skill-id-registry.md` (canonical) or `skills/skill-id-system/SKILL.md` (summary)
 
 ---
 
@@ -180,15 +184,33 @@ function sync-toolkit {
 
 ## 9. Assigned ID Registry
 
-### Skills with IDs (assigned)
+### Toolkit Skills (with ZAI- IDs)
 
 | ID | Skill | Description |
 |----|-------|-------------|
 | ZAI-META-001 | skill-id-system | ID system for skills |
 | ZAI-META-002 | skill-creator | Create and optimize skills |
-| ZAI-DEV-002 | anti-monolith | System skill (Z.ai sandbox) -- not in toolkit |
-| ZAI-STS-001 | prompt-engineering_sts | Prompt engineering techniques |
+| ZAI-DEV-001 | project-clone | Smart project cloning |
+| ZAI-DEV-002 | commit-work | Structured commit workflow |
+| ZAI-DEV-001 | database-schema-designer | Database schema design |
+| ZAI-SESSION-001 | session-log | Session knowledge capture |
+| ZAI-SESSION-001 | context-consolidation | Context compression |
+| ZAI-ARCH-001 | mermaid-diagrams | Mermaid diagram generation |
+| ZAI-MEM-001 | memory-store | Store to ChromaDB |
+| ZAI-MEM-002 | memory-query | Query ChromaDB |
+| ZAI-MEM-003 | memory-delete | Delete from ChromaDB |
+| ZAI-MEM-004 | memory-export | Export memory to JSON |
+| ZAI-FS-001 | folder-indexer | Directory indexing |
+| ZAI-QA-001 | qa-test-planner | QA test planning |
+| ZAI-REQ-001 | requirements-clarity | Requirements analysis |
+| ZAI-STS-001 | prompt-engineering_sts | Prompt engineering |
 | ZAI-STS-002 | sync-toolkit_sts | Toolkit synchronization |
+| ZAI-STS-003 | performance-code-generator_sts | Code optimization |
+| ZAI-STS-004 | frontend-styling-expert_sts | CSS/styling specialist |
+| ZAI-STS-005 | phi-layout_sts | Golden ratio layouts |
+| ZAI-STS-006 | zai-ui-composer_sts | UI composition |
+
+> Full registry with system skills: see `docs/skill-id-registry.md`
 
 ---
 

@@ -165,11 +165,15 @@ rectangle "**PROCESS FLOWS**" as FLOWS #FFF7ED {
 legend right
     |**Domain**|**ID Range**|**Examples**|
     |META|ZAI-META-001+|skill-id-system, skill-creator|
-    |DEV|ZAI-DEV-001+|commit-work, project-clone|
-    |SESSION|ZAI-SESSION-001+|session-log, session-handoff|
-    |GIT|ZAI-GIT-001+|git-safe-ops, git-checkpoint|
-    |HEALTH|ZAI-HEALTH-001+|health-check, api-retry|
+    |MEM|ZAI-MEM-001+|memory-store, memory-query|
+    |FS|ZAI-FS-001+|folder-indexer|
+    |DEV|ZAI-DEV-001+|project-clone, commit-work|
+    |SESSION|ZAI-SESSION-001+|session-log, context-consolidation|
+    |ARCH|ZAI-ARCH-001+|mermaid-diagrams|
+    |QA|ZAI-QA-001+|qa-test-planner|
+    |REQ|ZAI-REQ-001+|requirements-clarity|
     |STS|ZAI-STS-001+|Personal _sts skills|
+    |**System**|**(no ZAI- ID)**|**git-safe-ops, api-retry, etc.**|
 endlegend
 
 ' ============================================

@@ -1,6 +1,6 @@
 ---
 name: context-consolidation
-id: ZAI-SESSION-003
+id: ZAI-SESSION-002
 version: 1.0
 compatibility: both
 description: >
@@ -13,7 +13,7 @@ trigger: context, memory, consolidate, summarize, compress, token limit, long co
 
 # Skill: Context Consolidation v1.0
 
-> ID: ZAI-SESSION-003
+> ID: ZAI-SESSION-002
 > Version: 1.0
 > Last Updated: 2026-05
 

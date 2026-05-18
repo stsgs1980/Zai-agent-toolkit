@@ -232,7 +232,7 @@ Without IDs, it's hard to:
 - Track versions and updates
 
 With IDs:
-- "Use ZAI-GIT-001 for safe git operations" - clear reference
+- "Use ZAI-DEV-002 for commit workflow" - clear reference
 - ZAI-STS-001 - clearly your skill, not built-in
 
 ### ID Format
@@ -251,79 +251,22 @@ ZAI-<DOMAIN>-<NUMBER>
 
 | Domain | For Skills About |
 |--------|------------------|
-| GIT | Git operations (clone, commit, checkpoint, safety) |
-| SDK | API integration (z-ai-web-dev-sdk, retry, fallback) |
-| ARCH | Architecture (C4, Mermaid, database design) |
-| QA | Quality assurance (testing, validation) |
-| SEC | Security (sanitization, input validation) |
-| SESSION | Session management (handoff, resume) |
-| REQ | Requirements (clarity, PRD) |
-| DOC | Documents (PDF, DOCX, PPT generation) |
-| DEV | Development (dev server, project setup) |
-| HEALTH | Health monitoring (API health, retry logic) |
 | META | Toolkit itself (ID system, skill creator) |
-| USER | Your custom skills |
+| MEM | Memory system (ChromaDB storage and retrieval) |
+| FS | Filesystem tools (indexing, scanning) |
+| DEV | Development (project clone, commit, schema design) |
+| SESSION | Session management (logging, context consolidation) |
+| ARCH | Architecture (Mermaid diagrams) |
+| QA | Quality assurance (test planning) |
+| REQ | Requirements (clarity, PRD) |
+| STS | Personal skills (user signature: _sts) |
 
-### Current Registry
+> **Note:** Git operations, SDK integration, security, documentation, and health monitoring
+> are handled by Z.ai sandbox system skills (see Section 4.2). They do NOT receive ZAI- IDs.
 
-#### Git Operations (GIT)
+### 4.1 Toolkit Skills Registry
 
-| ID | Skill | Purpose |
-|----|-------|---------|
-| ZAI-GIT-001 | git-safe-ops | Safe git operations with deadlock prevention |
-| ZAI-GIT-002 | git-checkpoint | Create WIP commits and recovery tags |
-| ZAI-GIT-003 | commit-work | Structured commit workflow |
-
-#### SDK Integration (SDK)
-
-| ID | Skill | Purpose |
-|----|-------|---------|
-| ZAI-SDK-001 | z-ai-web-dev-sdk | Z.ai SDK for chat, images, search |
-| ZAI-SDK-002 | api-retry | Retry logic with exponential backoff |
-| ZAI-SDK-003 | fallback | Fallback provider strategy |
-| ZAI-SDK-004 | health-check | API health monitoring |
-
-#### Architecture (ARCH)
-
-| ID | Skill | Purpose |
-|----|-------|---------|
-| ZAI-ARCH-001 | c4-architecture | C4 model architecture diagrams |
-| ZAI-ARCH-002 | mermaid-diagrams | Mermaid diagram generation |
-| ZAI-ARCH-003 | database-schema-designer | Database schema design |
-
-#### Quality Assurance (QA)
-
-| ID | Skill | Purpose |
-|----|-------|---------|
-| ZAI-QA-001 | qa-test-planner | Test planning and bug reports |
-| ZAI-QA-002 | sanitize-validate | Input sanitization and validation |
-
-#### Session Management (SESSION)
-
-| ID | Skill | Purpose |
-|----|-------|---------|
-| ZAI-SESSION-001 | session-handoff | Context handoff between sessions |
-| ZAI-SESSION-002 | session-log | Automatic session knowledge capture |
-
-#### Requirements (REQ)
-
-| ID | Skill | Purpose |
-|----|-------|---------|
-| ZAI-REQ-001 | requirements-clarity | Requirements analysis |
-
-#### Documentation (DOC)
-
-| ID | Skill | Purpose |
-|----|-------|---------|
-| ZAI-DOC-001 | doc-gen | Professional document generation |
-
-#### Development (DEV)
-
-| ID | Skill | Purpose |
-|----|-------|---------|
-| ZAI-DEV-001 | dev-watchdog | Dev server keepalive |
-| ZAI-DEV-002 | anti-monolith | System skill (Z.ai sandbox) |
-| ZAI-DEV-003 | project-clone | Smart project cloning with dialogs |
+These skills belong to the Zai-agent-toolkit repository and have ZAI- prefix IDs.
 
 #### Meta (META)
 
@@ -332,13 +275,93 @@ ZAI-<DOMAIN>-<NUMBER>
 | ZAI-META-001 | skill-id-system | This ID system |
 | ZAI-META-002 | skill-creator | Create new skills with auto-ID |
 
-#### User-Created (USER)
+#### Memory (MEM)
 
-| ID | Skill | Created |
+| ID | Skill | Purpose |
 |----|-------|---------|
-| ZAI-STS-001 | (available) | - |
-| ZAI-STS-002 | (available) | - |
-| ZAI-STS-003 | (available) | - |
+| ZAI-MEM-001 | memory-store | Store sessions, knowledge, patterns in ChromaDB |
+| ZAI-MEM-002 | memory-query | Semantic search across stored memory entries |
+| ZAI-MEM-003 | memory-delete | Delete entries from ChromaDB |
+| ZAI-MEM-004 | memory-export | Export memory entries to JSON |
+
+#### Filesystem (FS)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-FS-001 | folder-indexer | Scan directories and create searchable indexes |
+
+#### Development (DEV)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-DEV-001 | project-clone | Smart project cloning with user confirmation |
+| ZAI-DEV-002 | commit-work | Structured conventional commit workflow |
+| ZAI-DEV-001 | database-schema-designer | Database schema design |
+
+#### Session (SESSION)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-SESSION-001 | session-log | Automatic session knowledge capture |
+| ZAI-SESSION-001 | context-consolidation | Long-running session context compression |
+
+#### Architecture (ARCH)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-ARCH-001 | mermaid-diagrams | Mermaid diagram generation |
+
+#### Quality Assurance (QA)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-QA-001 | qa-test-planner | Test planning and bug reports |
+
+#### Requirements (REQ)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-REQ-001 | requirements-clarity | Requirements analysis and PRD generation |
+
+#### Personal (STS)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-STS-001 | prompt-engineering_sts | Expert prompt engineering with scoring |
+| ZAI-STS-002 | sync-toolkit_sts | Sync toolkit between sandbox and Windows |
+| ZAI-STS-003 | performance-code-generator_sts | High-performance code generation |
+| ZAI-STS-004 | frontend-styling-expert_sts | CSS/styling specialist |
+| ZAI-STS-005 | phi-layout_sts | Golden ratio CSS Grid layouts |
+| ZAI-STS-006 | zai-ui-composer_sts | Production UI composition |
+
+### 4.2 System Skills (Z.ai Sandbox)
+
+These skills are provided by the Z.ai platform. They do NOT have ZAI- prefix IDs.
+Some have toolkit twins (personalized _sts versions in the toolkit).
+
+| Skill | Category | Toolkit Twin |
+|-------|----------|-------------|
+| fullstack-dev | Development | -- |
+| visual-design-foundations | Design | -- |
+| phi-layout | Design | phi-layout_sts (ZAI-STS-005) |
+| zai-ui-composer | Design | zai-ui-composer_sts (ZAI-STS-006) |
+| frontend-styling-expert | Design | frontend-styling-expert_sts (ZAI-STS-004) |
+| performance-code-generator | Development | performance-code-generator_sts (ZAI-STS-003) |
+| ui-ux-pro-max | Design | -- |
+| session-resume | Session | -- |
+| session-handoff | Session | -- |
+| git-checkpoint | Git | -- |
+| git-safe-ops | Git | -- |
+| git-safety | Git | -- |
+| sanitize-validate | Security | -- |
+| api-retry | API | -- |
+| health-check | API | -- |
+| fallback | API | -- |
+| dev-watchdog | Development | -- |
+| z-ai-web-dev-sdk | SDK | -- |
+| doc-gen | Documents | -- |
+| c4-architecture | Architecture | -- |
+| anti-monolith | Architecture | -- |
 
 ---
 
@@ -369,25 +392,18 @@ The AI will:
 
 #### Step 1: Determine Domain
 
-For user-created skills, always use `USER` domain.
+For user-created skills, always use `STS` domain (with `_sts` suffix in folder name).
 
 #### Step 2: Get Next ID
 
-Check the registry in `skills/skill-id-system/SKILL.md`:
-
-```text
-ZAI-STS-001: available
-ZAI-STS-002: available
-...
-```
-
-Use the first available.
+Check the registry in `docs/skill-id-registry.md` for the next available STS ID.
+Currently ZAI-STS-007 is the next available.
 
 #### Step 3: Create Directory
 
 ```powershell
 cd $env:USERPROFILE\.zcode\Zai-agent-toolkit\skills
-mkdir my-skill-name
+mkdir my-skill-name_sts
 ```
 
 #### Step 4: Create SKILL.md
@@ -448,11 +464,11 @@ Built with: Next.js 16 + TypeScript + Tailwind CSS
 Edit `skills/skill-id-system/SKILL.md`:
 
 ```markdown
-### 5.10. User-Created (USER)
+### 5.10. Personal (STS)
 
 | ID | Skill Name | Version |
 |----|------------|---------|
-| ZAI-STS-001 | my-skill-name | 1.0 |
+| ZAI-STS-007 | my-skill-name_sts | 1.0 |
 ```
 
 #### Step 6: Commit and Push
@@ -652,7 +668,8 @@ git push
 
 ```text
 Your skills: ZAI-STS-001, ZAI-STS-002, ...
-Toolkit skills: ZAI-GIT-xxx, ZAI-SDK-xxx, ...
+Toolkit skills: ZAI-DEV-xxx, ZAI-MEM-xxx, ZAI-SESSION-xxx, ...
+System skills: no ZAI- prefix (git-safe-ops, api-retry, etc.)
 ```
 
 ### File Locations

@@ -2,14 +2,14 @@
 name: project-clone
 compatibility: sandbox
 description: Smart project cloning with user confirmation
-id: ZAI-DEV-003
+id: ZAI-DEV-001
 version: 1.0
 trigger: clone, git clone, клонировать, склонировать
 ---
 
 # Skill: Project Clone v1.0
 
-> ID: ZAI-DEV-003
+> ID: ZAI-DEV-001
 > Version: 1.0
 > Last Updated: 2026-05
 

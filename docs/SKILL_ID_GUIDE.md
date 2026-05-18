@@ -108,22 +108,22 @@ trigger: keyword1, keyword2
 
 | ID | Skill | Purpose |
 |----|-------|---------|
-| ZAI-SESSION-002 | session-log | Session logging |
-| ZAI-SESSION-003 | context-consolidation | Consolidate context |
+| ZAI-SESSION-001 | session-log | Session logging |
+| ZAI-SESSION-001 | context-consolidation | Consolidate context |
 
 ### Development (DEV)
 
 | ID | Skill | Purpose |
 |----|-------|---------|
-| ZAI-DEV-003 | project-clone | Smart project cloning |
-| ZAI-DEV-004 | commit-work | Commit workflow |
-| ZAI-DEV-005 | database-schema-designer | DB schema design |
+| ZAI-DEV-001 | project-clone | Smart project cloning |
+| ZAI-DEV-002 | commit-work | Commit workflow |
+| ZAI-DEV-001 | database-schema-designer | DB schema design |
 
 ### Architecture (ARCH)
 
 | ID | Skill | Purpose |
 |----|-------|---------|
-| ZAI-ARCH-002 | mermaid-diagrams | Mermaid diagrams |
+| ZAI-ARCH-001 | mermaid-diagrams | Mermaid diagrams |
 
 ### Quality Assurance (QA)
 

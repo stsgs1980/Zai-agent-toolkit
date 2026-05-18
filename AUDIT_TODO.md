@@ -31,10 +31,10 @@
 
 ### 1.2 Fix AGENT_RULES.md Section 7 (Skill Table)
 
-- [x] 1.2.1 Fix ZAI-SESSION-002: session-resume -> session-log
+- [x] 1.2.1 Fix ZAI-SESSION-001: session-resume -> session-log
 - [x] 1.2.2 Fix ZAI-QA-002: sanitize-validate -> ZAI-SEC-001 (or remove if skill doesn't exist)
-- [x] 1.2.3 Fix ZAI-ARCH-003: database-schema-designer -> ZAI-DEV-005
-- [x] 1.2.4 Fix ZAI-GIT-003: commit-work -> ZAI-DEV-004
+- [x] 1.2.3 Fix ZAI-ARCH-003: database-schema-designer -> ZAI-DEV-001
+- [x] 1.2.4 Fix ZAI-GIT-003: commit-work -> ZAI-DEV-002
 - [x] 1.2.5 Remove 12 phantom skills with no directory (or mark as "planned/system")
 - [x] 1.2.6 Add all 10+ missing toolkit skills to the table
 
@@ -60,8 +60,8 @@
 - [x] 1.6.1 IMPLEMENTATION_ORDER.md:29 - STD-DOC-001 -> STD-DOC-002 for MARKDOWN_STANDARD
 - [x] 1.6.2 README.md:186 - STD-DOC-006 -> STD-DOC-005 for CODE_EXAMPLES_GUIDE
 - [x] 1.6.3 SKILL_ID_GUIDE.md: ZAI-USER-XXX references -> ZAI-STS-XXX
-- [x] 1.6.4 TUTORIAL.md:306 - fix ZAI-SESSION-002 = session-resume -> session-log
-- [x] 1.6.5 memory-store/SKILL.md:89 - ZAI-OPS-003 -> ZAI-SESSION-002
+- [x] 1.6.4 TUTORIAL.md:306 - fix ZAI-SESSION-001 = session-resume -> session-log
+- [x] 1.6.5 memory-store/SKILL.md:89 - ZAI-OPS-003 -> ZAI-SESSION-001
 
 ---
 

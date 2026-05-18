@@ -26,7 +26,7 @@ Rules in this skill are tagged with severity levels:
 
 ## Priority and Compatibility
 
-When this skill is active alongside other styling skills (ui-ux-pro-max, visual-design-foundations), phi-layout takes priority for:
+When this skill is active alongside other styling skills (ui-ux-pro-max [system skill], visual-design-foundations [system skill]), phi-layout takes priority for:
 
 - **Grid layout structure** (`grid-template-columns`, `grid-template-rows`) -- phi-layout always wins
 - **Spacing values** -- Fibonacci scale replaces the 8-point grid when golden proportions are requested

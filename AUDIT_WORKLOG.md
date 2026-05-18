@@ -61,15 +61,15 @@
 | Item | File | Change |
 |------|------|--------|
 | P1.1 | docs/skill-id-registry.md | Added 12 missing skills (MEM, FS, SESSION, ARCH, QA, REQ, DEV-004/005). Added MEM, FS domains. Fixed STS-006 status. Added stack signature footer |
-| P1.2 | AGENT_RULES.md Section 7 | Complete rewrite: split into Toolkit Skills (21) and System Skills (17). Fixed ZAI-SESSION-002 (session-resume -> session-log). Fixed ZAI-DEV-004 (commit-work). Fixed ZAI-DEV-005 (database-schema-designer). Removed phantom IDs |
+| P1.2 | AGENT_RULES.md Section 7 | Complete rewrite: split into Toolkit Skills (21) and System Skills (17). Fixed ZAI-SESSION-001 (session-resume -> session-log). Fixed ZAI-DEV-002 (commit-work). Fixed ZAI-DEV-001 (database-schema-designer). Removed phantom IDs |
 | P1.3 | AGENT_RULES.md Section 8 | Added zai-sdk-guidelines.md |
 | P1.4 | AGENT_RULES.md numbering | Fixed duplicate "## 1." -> sequential 0-14. Numbered "Z.ai SDK Integration" as Section 10 |
 | P1.5 | standards/STANDARD_ID_SYSTEM.md | Updated STD-GIT-001 version 1.1->1.5. Marked STD-DOC-001 as DEPRECATED. Added STD-ENV-002. Fixed empty code blocks |
 | P1.6.1 | standards/IMPLEMENTATION_ORDER.md:29 | STD-DOC-001 -> STD-DOC-002 for MARKDOWN_STANDARD |
 | P1.6.2 | README.md:186,254 | STD-DOC-006 -> STD-DOC-005 for CODE_EXAMPLES_GUIDE |
 | P1.6.3 | docs/SKILL_ID_GUIDE.md | ZAI-USER-001 -> ZAI-STS-007 (3 occurrences) |
-| P1.6.4 | docs/TUTORIAL.md:306 | ZAI-SESSION-002 = session-resume -> session-log |
-| P1.6.5 | skills/memory-store/SKILL.md:89 | ZAI-OPS-003 -> ZAI-SESSION-002 |
+| P1.6.4 | docs/TUTORIAL.md:306 | ZAI-SESSION-001 = session-resume -> session-log |
+| P1.6.5 | skills/memory-store/SKILL.md:89 | ZAI-OPS-003 -> ZAI-SESSION-001 |
 
 ---
 

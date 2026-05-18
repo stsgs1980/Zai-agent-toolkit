@@ -162,19 +162,19 @@ See `instructions/writing-plans.md` for full details.
 |----|-------|-------------|
 | ZAI-META-001 | `skill-id-system` | Creating new skills, understanding skill IDs |
 | ZAI-META-002 | `skill-creator` | Full skill creation workflow with automatic ID assignment |
-| ZAI-DEV-003 | `project-clone` | Cloning repositories with user confirmation |
-| ZAI-DEV-004 | `commit-work` | Creating high-quality conventional commits with change analysis |
-| ZAI-DEV-005 | `database-schema-designer` | Designing robust database schemas |
+| ZAI-DEV-001 | `project-clone` | Cloning repositories with user confirmation |
+| ZAI-DEV-002 | `commit-work` | Creating high-quality conventional commits with change analysis |
+| ZAI-DEV-003 | `database-schema-designer` | Designing robust database schemas |
 | ZAI-REQ-001 | `requirements-clarity` | Clarifying vague requirements, generating PRD through dialogue |
-| ZAI-ARCH-002 | `mermaid-diagrams` | Creating flowcharts, sequence diagrams, ERDs with Mermaid |
+| ZAI-ARCH-001 | `mermaid-diagrams` | Creating flowcharts, sequence diagrams, ERDs with Mermaid |
 | ZAI-QA-001 | `qa-test-planner` | Comprehensive QA test planning |
 | ZAI-MEM-001 | `memory-store` | Storing sessions, knowledge, patterns in ChromaDB |
 | ZAI-MEM-002 | `memory-query` | Semantic search across stored memory entries |
 | ZAI-MEM-003 | `memory-delete` | Deleting entries from ChromaDB |
 | ZAI-MEM-004 | `memory-export` | Exporting memory entries to JSON |
 | ZAI-FS-001 | `folder-indexer` | Scanning directories and creating searchable indexes |
-| ZAI-SESSION-002 | `session-log` | Automatic session knowledge capture and snapshots |
-| ZAI-SESSION-003 | `context-consolidation` | Managing long-running session context compression |
+| ZAI-SESSION-001 | `session-log` | Automatic session knowledge capture and snapshots |
+| ZAI-SESSION-002 | `context-consolidation` | Managing long-running session context compression |
 | ZAI-STS-001 | `prompt-engineering_sts` | Expert prompt engineering with scoring frameworks |
 | ZAI-STS-002 | `sync-toolkit_sts` | Syncing toolkit between Z.ai sandbox and Windows PC |
 | ZAI-STS-003 | `performance-code-generator_sts` | High-performance code generation with optimization |
@@ -184,25 +184,31 @@ See `instructions/writing-plans.md` for full details.
 
 ### 8.2 System Skills (Z.ai sandbox only)
 
-| ID | Skill | When to Use |
-|----|-------|-------------|
-| - | `fullstack-dev` | Next.js 16 development |
-| - | `visual-design-foundations` | Design tokens, typography |
-| - | `phi-layout` | Grid layouts (sandbox system version) |
-| - | `zai-ui-composer` | UI composition (sandbox system version) |
-| - | `session-resume` | Start of every new session, after context loss |
-| - | `session-handoff` | Creating handoff documents, context preservation |
-| - | `git-checkpoint` | Every 15-20 min during active work, before risky operations |
-| - | `git-safe-ops` | Before any git push/pull/rebase/merge with remote |
-| - | `sanitize-validate` | User input, form data, API requests, security |
-| - | `api-retry` | Making HTTP requests to external APIs |
-| - | `health-check` | Checking availability of chat.z.ai |
-| - | `fallback` | chat.z.ai is unavailable, need alternative providers |
-| - | `dev-watchdog` | Starting, restarting, or checking dev server |
-| - | `z-ai-web-dev-sdk` | Chat, image gen, web search via z-ai-web-dev-sdk |
-| - | `doc-gen` | Generating PDF, DOCX, XLSX documents |
-| - | `c4-architecture` | C4 architecture diagrams with Mermaid |
-| - | `anti-monolith` | Enforcing modular architecture |
+These skills are provided by the Z.ai platform. They do NOT have ZAI- IDs.
+
+| Skill | Category | When to Use |
+|-------|----------|-------------|
+| `fullstack-dev` | Development | Next.js 16 development |
+| `visual-design-foundations` | Design | Design tokens, typography |
+| `phi-layout` | Design | Grid layouts (sandbox system version; toolkit twin: phi-layout_sts) |
+| `zai-ui-composer` | Design | UI composition (sandbox system version; toolkit twin: zai-ui-composer_sts) |
+| `frontend-styling-expert` | Design | CSS/styling (sandbox system version; toolkit twin: frontend-styling-expert_sts) |
+| `performance-code-generator` | Development | Code optimization (sandbox system version; toolkit twin: performance-code-generator_sts) |
+| `ui-ux-pro-max` | Design | Advanced UI/UX patterns |
+| `session-resume` | Session | Start of every new session, after context loss |
+| `session-handoff` | Session | Creating handoff documents, context preservation |
+| `git-checkpoint` | Git | Every 15-20 min during active work, before risky operations |
+| `git-safe-ops` | Git | Before any git push/pull/rebase/merge with remote |
+| `git-safety` | Git | Deadlock prevention rules |
+| `sanitize-validate` | Security | User input, form data, API requests, security |
+| `api-retry` | API | Making HTTP requests to external APIs |
+| `health-check` | API | Checking availability of chat.z.ai |
+| `fallback` | API | chat.z.ai is unavailable, need alternative providers |
+| `dev-watchdog` | Development | Starting, restarting, or checking dev server |
+| `z-ai-web-dev-sdk` | SDK | Chat, image gen, web search via z-ai-web-dev-sdk |
+| `doc-gen` | Documents | Generating PDF, DOCX, XLSX documents |
+| `c4-architecture` | Architecture | C4 architecture diagrams with Mermaid |
+| `anti-monolith` | Architecture | Enforcing modular architecture |
 
 ## 9. Instructions to Follow
 

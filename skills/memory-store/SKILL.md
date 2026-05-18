@@ -93,7 +93,7 @@ Use after:
 ## Related Skills
 
 - memory-query (ZAI-MEM-002): Search stored entries
-- session-log (ZAI-SESSION-002): Log session progress
+- session-log (ZAI-SESSION-001): Log session progress
 
 ---
 Built with: Z.ai Agent Toolkit

@@ -1,6 +1,6 @@
 ---
 name: database-schema-designer
-id: ZAI-DEV-005
+id: ZAI-DEV-001
 version: 1.0
 compatibility: both
 description: Design robust, scalable database schemas for SQL and NoSQL databases. Provides normalization guidelines, indexing strategies, migration patterns, constraint design, and performance optimization. Ensures data integrity, query performance, and maintainable data models.
@@ -12,7 +12,7 @@ trigger: database, schema, table, SQL, NoSQL, normalize, index, migration, forei
 # Skill: Database Schema Designer v1.0
 
 
-> ID: ZAI-DEV-005
+> ID: ZAI-DEV-001
 > Version: 1.0
 > Last Updated: 2026-05
 

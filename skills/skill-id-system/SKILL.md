@@ -23,8 +23,8 @@ Skill IDs solve the following problems:
 
 | Problem | Solution |
 |---------|----------|
-| Confusion with ZCode Desktop built-in skills | Clear prefix `ZAI-` for our skills |
-| Finding skill in discussions | "Use ZAI-GIT-001 for safe git operations" |
+| Confusion with Z.ai sandbox built-in skills | Clear prefix `ZAI-` for our toolkit skills |
+| Finding skill in discussions | "Use ZAI-DEV-002 for commit workflow" |
 | Tracking skill versions | Version in header and registry |
 | Distinguishing skill types | Domain-based ID structure |
 
@@ -44,7 +44,7 @@ ZAI-<DOMAIN>-<NUMBER>
 
 **Examples:**
 - `ZAI-MEM-001` - memory-store skill
-- `ZAI-ARCH-002` - mermaid-diagrams skill
+- `ZAI-ARCH-001` - mermaid-diagrams skill
 - `ZAI-STS-001` - prompt-engineering_sts skill
 
 ---
@@ -55,36 +55,57 @@ ZAI-<DOMAIN>-<NUMBER>
 |--------|-----------|-------|
 | `MEM` | Memory | Store, query, delete, export memory records |
 | `FS` | File System | Folder indexing, file scanning |
-| `SESSION` | Session Management | Handoff, resume, context, logging |
-| `DEV` | Development | Project clone, commit, schema design, watchdog |
-| `ARCH` | Architecture | C4 diagrams, mermaid, DB design |
-| `QA` | Quality Assurance | Test planning, validation |
+| `SESSION` | Session Management | Session logging, context consolidation |
+| `DEV` | Development | Project clone, commit, schema design |
+| `ARCH` | Architecture | Mermaid diagrams |
+| `QA` | Quality Assurance | Test planning |
 | `REQ` | Requirements | Clarity, PRD generation |
 | `META` | Meta-skills | This document, skill creation |
 | `STS` | User-Created (STS) | Skills created by STS |
-| `GIT` | Git Operations | (reserved) Safe git, checkpoints |
-| `SDK` | SDK Integration | (reserved) z-ai-web-dev-sdk, API calls |
-| `SEC` | Security | (reserved) Sanitization, validation |
-| `DOC` | Documentation | (reserved) PDF, DOCX, PPT generation |
-| `HEALTH` | Health Monitoring | (reserved) API health, fallback, retry |
+
+> **Note:** Git operations, SDK integration, security, documentation, and health monitoring
+> are handled by Z.ai sandbox system skills. They do NOT receive ZAI- prefix IDs.
+> See the System Skills section in `docs/skill-id-registry.md` for the full list.
 
 ---
 
-## 4. ZCode Desktop Built-in Skills (NO PREFIX)
+## 4. Z.ai Sandbox System Skills (NO ZAI- PREFIX)
 
-ZCode Desktop has its own built-in skills. They do NOT have `ZAI-` prefix:
+Z.ai sandbox provides system skills in `/home/z/my-project/skills/`. They do NOT have `ZAI-` prefix:
 
-| Built-in Skill | Source |
-|----------------|--------|
-| `background-process-manager` | ZCode Desktop |
-| `code-analyzer` | ZCode Desktop |
-| `context-manager` | ZCode Desktop |
+| System Skill | Category | Notes |
+|-------------|----------|-------|
+| `fullstack-dev` | Development | Next.js 16 development |
+| `git-checkpoint` | Git | WIP commits and recovery tags |
+| `git-safe-ops` | Git | Backup + recover for risky ops |
+| `git-safety` | Git | Deadlock prevention rules |
+| `sanitize-validate` | Security | Input sanitization and validation |
+| `api-retry` | API | Retry logic with exponential backoff |
+| `health-check` | API | API health monitoring |
+| `fallback` | API | Fallback provider strategy |
+| `dev-watchdog` | Development | Dev server keepalive |
+| `z-ai-web-dev-sdk` | SDK | Z.ai SDK for chat, images, search |
+| `doc-gen` | Documents | PDF, DOCX, XLSX generation |
+| `c4-architecture` | Architecture | C4 model diagrams with Mermaid |
+| `anti-monolith` | Architecture | Modular architecture enforcement |
+| `session-handoff` | Session | Context handoff between sessions |
+| `session-resume` | Session | Session recovery after restart |
+| `ui-ux-pro-max` | Design | Advanced UI/UX patterns |
+| `visual-design-foundations` | Design | Design tokens, typography |
+| `phi-layout` | Design | Grid layouts (toolkit twin: phi-layout_sts) |
+| `zai-ui-composer` | Design | UI composition (toolkit twin: zai-ui-composer_sts) |
+| `frontend-styling-expert` | Design | CSS/styling (toolkit twin: frontend-styling-expert_sts) |
+| `performance-code-generator` | Development | Code optimization (toolkit twin: performance-code-generator_sts) |
 
-**Our skills always have `ZAI-` prefix to distinguish.**
+**Our toolkit skills always have `ZAI-` prefix to distinguish from system skills.**
 
 ---
 
 ## 5. Skill ID Registry
+
+> **Canonical source:** `docs/skill-id-registry.md`
+> The registry below is a summary. For the full registry with system skills,
+> reserved IDs, and compatibility info, see `docs/skill-id-registry.md`.
 
 ### 5.1. Memory (MEM)
 
@@ -105,23 +126,22 @@ ZCode Desktop has its own built-in skills. They do NOT have `ZAI-` prefix:
 
 | ID | Skill Name | Version | Status |
 |----|------------|---------|--------|
-| ZAI-SESSION-002 | session-log | 1.1 | Active |
-| ZAI-SESSION-003 | context-consolidation | 1.0 | Active |
+| ZAI-SESSION-001 | session-log | 1.1 | Active |
+| ZAI-SESSION-002 | context-consolidation | 1.0 | Active |
 
 ### 5.4. Development (DEV)
 
 | ID | Skill Name | Version | Status |
 |----|------------|---------|--------|
-| ZAI-DEV-002 | anti-monolith | 1.0 | Planned (system skill, no folder) |
-| ZAI-DEV-003 | project-clone | 1.0 | Active |
-| ZAI-DEV-004 | commit-work | 1.0 | Active |
-| ZAI-DEV-005 | database-schema-designer | 1.0 | Active |
+| ZAI-DEV-001 | project-clone | 1.0 | Active |
+| ZAI-DEV-002 | commit-work | 1.0 | Active |
+| ZAI-DEV-003 | database-schema-designer | 1.0 | Active |
 
 ### 5.5. Architecture (ARCH)
 
 | ID | Skill Name | Version | Status |
 |----|------------|---------|--------|
-| ZAI-ARCH-002 | mermaid-diagrams | 1.0 | Active |
+| ZAI-ARCH-001 | mermaid-diagrams | 1.0 | Active |
 
 ### 5.6. Quality Assurance (QA)
 

@@ -110,7 +110,7 @@ Lower distance = better match:
 ## Related Skills
 
 - memory-store (ZAI-MEM-001): Store new entries
-- context-consolidation (ZAI-WF-002): Consolidate session context
+- context-consolidation (ZAI-SESSION-002): Consolidate session context
 
 ---
 Built with: Z.ai Agent Toolkit

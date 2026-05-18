@@ -1,6 +1,6 @@
 ---
 name: mermaid-diagrams
-id: ZAI-ARCH-002
+id: ZAI-ARCH-001
 version: 1.0
 compatibility: both
 description: Comprehensive guide for creating software diagrams using Mermaid syntax. Use when users need to create, visualize, or document software through diagrams including class diagrams (domain modeling, object-oriented design), sequence diagrams (application flows, API interactions, code execution), flowcharts (processes, algorithms, user journeys), entity relationship diagrams (database schemas), C4 architecture diagrams (system context, containers, components), state diagrams, git graphs, pie charts, gantt charts, or any other diagram type. Triggers include requests to "diagram", "visualize", "model", "map out", "show the flow", or when explaining system architecture, database design, code structure, or user/application flows.
@@ -11,7 +11,7 @@ trigger: diagram, mermaid, flowchart, sequence diagram, ERD, class diagram, char
 # Skill: Mermaid Diagramming v1.0
 
 
-> ID: ZAI-ARCH-002
+> ID: ZAI-ARCH-001
 > Version: 1.0
 > Last Updated: 2026-05
 

@@ -328,12 +328,12 @@ C:\Users\stsgr\.zcode\
 | ZAI-FS-001 | folder-indexer | both |
 | ZAI-META-001 | skill-id-system | both |
 | ZAI-META-002 | skill-creator | both |
-| ZAI-SESSION-002 | session-log | both |
-| ZAI-SESSION-003 | context-consolidation | both |
+| ZAI-SESSION-001 | session-log | both |
+| ZAI-SESSION-002 | context-consolidation | both |
 | ZAI-DEV-003 | project-clone | sandbox |
 | ZAI-DEV-004 | commit-work | both |
 | ZAI-DEV-005 | database-schema-designer | both |
-| ZAI-ARCH-002 | mermaid-diagrams | both |
+| ZAI-ARCH-001 | mermaid-diagrams | both |
 | ZAI-REQ-001 | requirements-clarity | both |
 | ZAI-QA-001 | qa-test-planner | both |
 | ZAI-STS-001 | prompt-engineering_sts | both |
