@@ -421,7 +421,7 @@ export default function MemoryDashboard() {
 
         {/* ═══ GRAPH VIEW ═══ */}
         {viewMode === 'graph' && (
-          <div className="space-y-4">
+          <div className="space-y-2">
             <GraphStats />
             <GraphViewer />
           </div>

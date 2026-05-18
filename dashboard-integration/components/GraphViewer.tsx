@@ -68,7 +68,7 @@ function getNodeGlow(id: string): string {
   return NODE_GLOW[classifyNode(id)] || "#93c5fd";
 }
 
-// ── Node detail panel — neon style ─────────────────────────
+// ── Node detail panel — floating overlay, neon style ───────
 
 interface NodeDetailProps {
   nodeId: string;
@@ -85,11 +85,12 @@ function NodeDetail({ nodeId, edges, onClose }: NodeDetailProps) {
 
   return (
     <div
-      className="rounded-lg overflow-hidden"
+      className="rounded-lg overflow-hidden w-72 max-h-[60vh] overflow-y-auto"
       style={{
-        background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+        background: "linear-gradient(135deg, #0f172aee 0%, #1e293bee 100%)",
+        backdropFilter: "blur(12px)",
         border: `1px solid ${color}33`,
-        boxShadow: `0 0 20px ${color}11, inset 0 1px 0 ${color}15`,
+        boxShadow: `0 0 30px ${color}15, 0 8px 32px #00000080, inset 0 1px 0 ${color}15`,
       }}
     >
       {/* Header with gradient underline */}
@@ -106,7 +107,7 @@ function NodeDetail({ nodeId, edges, onClose }: NodeDetailProps) {
           </div>
           <button
             onClick={onClose}
-            className="text-zinc-500 hover:text-white text-sm leading-none ml-2 transition-colors"
+            className="text-zinc-500 hover:text-white text-sm leading-none ml-2 transition-colors cursor-pointer"
           >
             x
           </button>
@@ -227,7 +228,7 @@ function NodeDetail({ nodeId, edges, onClose }: NodeDetailProps) {
   );
 }
 
-// ── Edge filter — pill toggles ─────────────────────────────
+// ── Edge filter — pill toggles (overlaid on canvas) ────────
 
 interface EdgeFilterProps {
   edgeTypes: string[];
@@ -239,7 +240,15 @@ function EdgeFilter({ edgeTypes, activeTypes, onToggle }: EdgeFilterProps) {
   if (edgeTypes.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap gap-1.5 items-center">
+    <div
+      className="flex flex-wrap gap-1.5 items-center rounded-lg px-3 py-2"
+      style={{
+        background: "#0f172acc",
+        backdropFilter: "blur(8px)",
+        border: "1px solid #1e293b55",
+        boxShadow: "0 4px 12px #00000040",
+      }}
+    >
       <span className="text-[10px] text-zinc-600 uppercase tracking-wider mr-1">Filter</span>
       {edgeTypes.map((type) => {
         const active = activeTypes.has(type);
@@ -607,7 +616,7 @@ export function GraphViewer() {
         }
       }
 
-      // Legend — top-right, dark glass panel
+      // Legend — top-right inside canvas, dark glass panel
       const usedTypes = new Set(simEdges.map((e) => e.type));
       const legendTypes = Array.from(usedTypes);
       if (legendTypes.length > 0) {
@@ -727,8 +736,13 @@ export function GraphViewer() {
   if (loading) {
     return (
       <div
-        className="rounded-lg flex items-center justify-center h-[600px]"
-        style={{ background: "linear-gradient(135deg, #0f172a, #020617)" }}
+        className="rounded-lg flex items-center justify-center"
+        style={{
+          background: "linear-gradient(135deg, #0f172a, #020617)",
+          minHeight: "70vh",
+          border: "1px solid #1e293b",
+          boxShadow: "0 0 30px #0f172a, 0 0 60px #1e293b33",
+        }}
       >
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
@@ -741,8 +755,13 @@ export function GraphViewer() {
   if (error) {
     return (
       <div
-        className="rounded-lg flex items-center justify-center h-[600px]"
-        style={{ background: "linear-gradient(135deg, #0f172a, #020617)" }}
+        className="rounded-lg flex items-center justify-center"
+        style={{
+          background: "linear-gradient(135deg, #0f172a, #020617)",
+          minHeight: "70vh",
+          border: "1px solid #1e293b",
+          boxShadow: "0 0 30px #0f172a, 0 0 60px #1e293b33",
+        }}
       >
         <div className="flex flex-col items-center gap-2">
           <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
@@ -759,8 +778,13 @@ export function GraphViewer() {
   if (edges.length === 0) {
     return (
       <div
-        className="rounded-lg flex flex-col items-center justify-center h-[600px] gap-4"
-        style={{ background: "linear-gradient(135deg, #0f172a, #020617)" }}
+        className="rounded-lg flex flex-col items-center justify-center gap-4"
+        style={{
+          background: "linear-gradient(135deg, #0f172a, #020617)",
+          minHeight: "70vh",
+          border: "1px solid #1e293b",
+          boxShadow: "0 0 30px #0f172a, 0 0 60px #1e293b33",
+        }}
       >
         <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center">
           <svg className="w-6 h-6 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -776,80 +800,91 @@ export function GraphViewer() {
   }
 
   return (
-    <div className="space-y-3">
-      <EdgeFilter
-        edgeTypes={allEdgeTypes}
-        activeTypes={activeTypes}
-        onToggle={handleToggleType}
-      />
+    <div
+      className="relative rounded-lg overflow-hidden"
+      style={{
+        border: "1px solid #1e293b",
+        boxShadow: "0 0 30px #0f172a, 0 0 60px #1e293b33",
+        minHeight: "70vh",
+      }}
+    >
+      {/* Full-width canvas container */}
+      <div ref={containerRef} style={{ minHeight: "70vh" }}>
+        <canvas
+          ref={canvasRef}
+          className="cursor-pointer block"
+        />
+      </div>
 
-      <div className="flex gap-3">
-        {/* Graph canvas with glow border */}
-        <div
-          className="flex-1 overflow-hidden rounded-lg"
+      {/* ── Overlay: Edge filter pills (top-left) ── */}
+      <div className="absolute top-3 left-3 z-10">
+        <EdgeFilter
+          edgeTypes={allEdgeTypes}
+          activeTypes={activeTypes}
+          onToggle={handleToggleType}
+        />
+      </div>
+
+      {/* ── Overlay: Node detail (top-right, floating) ── */}
+      {selectedNode && (
+        <div className="absolute top-3 right-3 z-10">
+          <NodeDetail
+            nodeId={selectedNode}
+            edges={filteredEdges}
+            onClose={() => setSelectedNode(null)}
+          />
+        </div>
+      )}
+
+      {/* ── Overlay: Open in Pyvis button (bottom-right) ── */}
+      <div className="absolute bottom-3 right-3 z-10">
+        <button
+          className="rounded-lg px-3 py-2 text-xs transition-all duration-200 flex items-center gap-2"
           style={{
-            border: "1px solid #1e293b",
-            boxShadow: "0 0 30px #0f172a, 0 0 60px #1e293b33",
+            background: "#0f172acc",
+            backdropFilter: "blur(8px)",
+            border: "1px solid #1e293b55",
+            color: "#64748b",
+            boxShadow: "0 4px 12px #00000040",
           }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = "#334155";
+            e.currentTarget.style.color = "#94a3b8";
+            e.currentTarget.style.boxShadow = "0 4px 15px #1e293b55, 0 0 15px #1e293b44";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = "#1e293b55";
+            e.currentTarget.style.color = "#64748b";
+            e.currentTarget.style.boxShadow = "0 4px 12px #00000040";
+          }}
+          onClick={() => window.open("/api/memory/graph/vis", "_blank")}
         >
-          <div ref={containerRef}>
-            <canvas
-              ref={canvasRef}
-              className="cursor-pointer block"
-            />
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+          Open in Pyvis
+        </button>
+      </div>
+
+      {/* ── Overlay: Hint when no node selected (bottom-left) ── */}
+      {!selectedNode && (
+        <div className="absolute bottom-3 left-3 z-10">
+          <div
+            className="flex items-center gap-2 rounded-lg px-3 py-2"
+            style={{
+              background: "#0f172acc",
+              backdropFilter: "blur(8px)",
+              border: "1px solid #1e293b44",
+              boxShadow: "0 4px 12px #00000040",
+            }}
+          >
+            <svg className="w-3.5 h-3.5 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+            </svg>
+            <span className="text-zinc-600 text-xs">Click a node to inspect</span>
           </div>
         </div>
-
-        {/* Side panel */}
-        <div className="w-72 shrink-0 space-y-3">
-          {selectedNode ? (
-            <NodeDetail
-              nodeId={selectedNode}
-              edges={filteredEdges}
-              onClose={() => setSelectedNode(null)}
-            />
-          ) : (
-            <div
-              className="rounded-lg flex flex-col items-center justify-center h-32 gap-2"
-              style={{
-                background: "linear-gradient(135deg, #0f172a, #1e293b)",
-                border: "1px solid #1e293b44",
-              }}
-            >
-              <svg className="w-5 h-5 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
-              </svg>
-              <p className="text-zinc-600 text-xs">Click a node to inspect</p>
-            </div>
-          )}
-
-          {/* Open in Pyvis */}
-          <button
-            className="w-full rounded-lg px-3 py-2 text-sm transition-all duration-200 flex items-center justify-center gap-2"
-            style={{
-              background: "linear-gradient(135deg, #0f172a, #1e293b)",
-              border: "1px solid #1e293b",
-              color: "#64748b",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "#334155";
-              e.currentTarget.style.color = "#94a3b8";
-              e.currentTarget.style.boxShadow = "0 0 15px #1e293b55";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "#1e293b";
-              e.currentTarget.style.color = "#64748b";
-              e.currentTarget.style.boxShadow = "none";
-            }}
-            onClick={() => window.open("/api/memory/graph/vis", "_blank")}
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-            Open in Pyvis
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
