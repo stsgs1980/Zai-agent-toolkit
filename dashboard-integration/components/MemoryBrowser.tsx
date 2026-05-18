@@ -10,6 +10,7 @@ interface MemoryEntry {
   tags: string[]
   source: string
   verification_status: string
+  content: string
   raw: string
 }
 
@@ -221,6 +222,11 @@ export function MemoryBrowser() {
               </span>
             </div>
 
+            {(entry.content || entry.raw) && (
+              <p className="mt-2 text-xs text-zinc-400 font-mono leading-relaxed line-clamp-3">
+                {(entry.content || entry.raw).slice(0, 200)}
+              </p>
+            )}
             {entry.source && (
               <div className="mt-1.5 text-[10px] text-zinc-600 font-mono">
                 src: {entry.source}

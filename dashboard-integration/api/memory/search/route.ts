@@ -35,7 +35,7 @@ function runPython(tool: string, args: string[]): Promise<string> {
   });
 }
 
-// ── Parse query results ────────────────────────────────────
+// ── Types ───────────────────────────────────────────────────
 
 interface SearchResult {
   id: string;
@@ -47,48 +47,107 @@ interface SearchResult {
   verification_status: string;
 }
 
+// ── Parse query output ────────────────────────────────────
+// Format from memory_cli.py query:
+//
+// [KNOWLEDGE]
+//
+//   ID: knowledge_20260518_182151
+//   Distance: 1.1582
+//   Created: 2026-05-18T18:21:51.548825
+//   Content: A numerical representation of text in high-dimensional space.
+
 function parseQueryOutput(output: string): SearchResult[] {
   const results: SearchResult[] = [];
-  let currentId = "";
+  let current: Partial<SearchResult> | null = null;
+  let contentLines: string[] = [];
 
   for (const line of output.split("\n")) {
     const trimmed = line.trim();
     if (!trimmed) continue;
 
-    // Result header: "1. [type] id (distance: 0.XXX)"
-    const headerMatch = trimmed.match(/^\d+\.\s+\[(\w+)\]\s+(\S+)\s+\(distance:\s*([\d.]+)\)/);
-    if (headerMatch) {
-      currentId = headerMatch[2];
-      results.push({
-        id: headerMatch[2],
-        type: headerMatch[1],
-        content: "",
-        distance: parseFloat(headerMatch[3]),
-        tags: [],
-        source: "",
-        verification_status: "unverified",
-      });
+    // Type section header: [KNOWLEDGE], [PATTERN], etc.
+    const typeMatch = trimmed.match(/^\[(\w+)\]$/);
+    if (typeMatch) {
+      // Flush previous entry
+      if (current && current.id) {
+        results.push({
+          id: current.id,
+          type: current.type || "unknown",
+          content: contentLines.join("\n").trim(),
+          distance: current.distance || 0,
+          tags: current.tags || [],
+          source: current.source || "",
+          verification_status: current.verification_status || "unverified",
+        });
+      }
+      current = { type: typeMatch[1].toLowerCase() };
+      contentLines = [];
       continue;
     }
 
-    // Tags line: "  tags: tag1, tag2"
-    const tagsMatch = trimmed.match(/^tags:\s*(.*)/);
-    if (tagsMatch && results.length > 0) {
-      results[results.length - 1].tags = tagsMatch[1].split(",").filter(Boolean).map(t => t.trim());
+    // ID line
+    const idMatch = trimmed.match(/^ID:\s+(\S+)/);
+    if (idMatch && current) {
+      current.id = idMatch[1];
       continue;
     }
 
-    // Source line
-    const sourceMatch = trimmed.match(/^source:\s*(.*)/);
-    if (sourceMatch && results.length > 0) {
-      results[results.length - 1].source = sourceMatch[1].trim();
+    // Distance line
+    const distMatch = trimmed.match(/^Distance:\s+([\d.]+)/);
+    if (distMatch && current) {
+      current.distance = parseFloat(distMatch[1]);
       continue;
     }
 
-    // Content line
-    if (results.length > 0 && currentId && !trimmed.startsWith("---")) {
-      results[results.length - 1].content += (results[results.length - 1].content ? "\n" : "") + trimmed;
+    // Created line
+    const createdMatch = trimmed.match(/^Created:\s+(.+)/);
+    if (createdMatch && current) {
+      // skip, not needed in results
+      continue;
     }
+
+    // Source line (if present in metadata)
+    const sourceMatch = trimmed.match(/^Source:\s+(.+)/);
+    if (sourceMatch && current) {
+      current.source = sourceMatch[1].trim();
+      continue;
+    }
+
+    // Tags line (if present)
+    const tagsMatch = trimmed.match(/^Tags:\s+(.+)/);
+    if (tagsMatch && current) {
+      current.tags = tagsMatch[1].split(",").filter(Boolean).map(t => t.trim());
+      continue;
+    }
+
+    // Content line (starts with "Content:" or is a continuation)
+    if (trimmed.startsWith("Content:")) {
+      const contentText = trimmed.slice(8).trim();
+      contentLines = [contentText];
+      continue;
+    }
+
+    // Continuation of content (indented lines or lines that aren't key-value)
+    if (current && current.id && !trimmed.startsWith("---")) {
+      // Skip if it looks like a key-value header we don't recognize
+      if (!trimmed.match(/^[A-Z][a-z]+:/)) {
+        contentLines.push(trimmed);
+      }
+    }
+  }
+
+  // Flush last entry
+  if (current && current.id) {
+    results.push({
+      id: current.id,
+      type: current.type || "unknown",
+      content: contentLines.join("\n").trim(),
+      distance: current.distance || 0,
+      tags: current.tags || [],
+      source: current.source || "",
+      verification_status: current.verification_status || "unverified",
+    });
   }
 
   return results;
@@ -101,7 +160,6 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q") || "";
-    const type = searchParams.get("type") || "";
     const limit = searchParams.get("limit") || "10";
 
     if (!query.trim()) {
@@ -112,9 +170,6 @@ export async function GET(request: NextRequest) {
     }
 
     const args = ["query", query, "--limit", limit];
-    if (type) {
-      args.push("--type", type);
-    }
 
     const output = await runPython("memory_cli.py", args);
     const results = parseQueryOutput(output);

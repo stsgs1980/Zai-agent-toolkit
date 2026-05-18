@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { execFile } from "child_process";
 import path from "path";
 import fs from "fs";
@@ -60,35 +60,29 @@ function readGraphData(): GraphData | null {
 }
 
 // ── GET: Dashboard stats ───────────────────────────────────
-// Aggregates: entry counts by type, graph stats, experience counts
 
 export async function GET() {
   try {
-    // 1. Count entries per type (run memory_cli.py list for each type)
+    // 1. Count entries per type using export (fast, reliable JSON)
     const types = ["knowledge", "pattern", "command", "project", "session", "template", "experience"];
     const typeCounts: Record<string, number> = {};
 
-    // Try to get counts from Python
-    for (const type of types) {
+    // Run exports in parallel
+    const exportPromises = types.map(async (type) => {
       try {
-        const output = await runPython("memory_cli.py", ["list", type, "--limit", "1"]);
-        // Parse count from output — look for "N entries" or count lines
-        const countMatch = output.match(/(\d+)\s*entries?/i);
-        if (countMatch) {
-          typeCounts[type] = parseInt(countMatch[1]);
-        } else {
-          // Count lines that match entry format
-          const entryLines = output.split("\n").filter(l => l.trim().match(/^\[\w+\]/));
-          typeCounts[type] = entryLines.length;
-        }
+        const output = await runPython("memory_cli.py", ["export", type]);
+        const data = JSON.parse(output) as { count: number };
+        typeCounts[type] = data.count || 0;
       } catch {
         typeCounts[type] = 0;
       }
-    }
+    });
+
+    await Promise.all(exportPromises);
 
     const totalEntries = Object.values(typeCounts).reduce((a, b) => a + b, 0);
 
-    // 2. Graph stats (fast, from file)
+    // 2. Graph stats (fast, from file — no Python needed)
     const graphData = readGraphData();
     const graphStats = graphData
       ? {
@@ -105,7 +99,7 @@ export async function GET() {
         }
       : { nodeCount: 0, edgeCount: 0, edgeTypes: {} };
 
-    // 3. Experience stats (quick)
+    // 3. Experience stats
     let experienceStats = { total: 0, verified: 0, unverified: 0, conflict: 0 };
     try {
       const expOutput = await runPython("session_summary.py", ["list"]);
@@ -115,7 +109,7 @@ export async function GET() {
       experienceStats.unverified = lines.filter(l => l.includes("unverified")).length;
       experienceStats.conflict = lines.filter(l => l.includes("conflict")).length;
     } catch {
-      // ignore
+      // session_summary.py may not have entries yet
     }
 
     return NextResponse.json({

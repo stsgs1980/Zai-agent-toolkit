@@ -13,6 +13,7 @@ interface ExperienceEntry {
   bad_count: number
   source_type: string
   preview: string
+  tags: string[]
 }
 
 // ── Status badge colors ─────────────────────────────────────
@@ -330,7 +331,21 @@ export function ExperienceView() {
             </div>
 
             {/* Preview line */}
-            <p className="mt-2 text-xs text-zinc-500 font-mono truncate">{entry.preview}</p>
+            <p className="mt-2 text-xs text-zinc-500 font-mono line-clamp-2">{entry.preview}</p>
+
+            {/* Tags */}
+            {entry.tags && entry.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {entry.tags.slice(0, 6).map((tag, i) => (
+                  <span key={i} className="px-1.5 py-0.5 rounded-full text-[10px] bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                    {tag}
+                  </span>
+                ))}
+                {entry.tags.length > 6 && (
+                  <span className="text-[10px] text-zinc-600">+{entry.tags.length - 6}</span>
+                )}
+              </div>
+            )}
           </div>
         )
       })}

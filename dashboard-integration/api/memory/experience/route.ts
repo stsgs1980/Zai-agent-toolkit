@@ -36,6 +36,15 @@ function runPython(tool: string, args: string[]): Promise<string> {
 }
 
 // ── Parse session_summary.py list output ───────────────────
+// Format:
+//
+// Experience Entries (3)
+// ============================================================
+//
+// [?~] experience_20260518_185842
+//     1 good / 1 bad | chromadb,python,networkx,typescript
+//     # Memory System: Debugging ChromaDB + Graph Integration
+//     ...
 
 interface ExperienceEntry {
   id: string;
@@ -46,39 +55,88 @@ interface ExperienceEntry {
   bad_count: number;
   source_type: string;
   preview: string;
+  tags: string[];
 }
 
-function parseExperienceList(output: string): ExperienceEntry[] {
+function parseExperienceList(output: string): { entries: ExperienceEntry[]; count: number } {
   const entries: ExperienceEntry[] = [];
-  const lines = output.split("\n");
+  let current: Partial<ExperienceEntry> | null = null;
+  let previewLines: string[] = [];
 
-  for (const line of lines) {
+  for (const line of output.split("\n")) {
     const trimmed = line.trim();
     if (!trimmed) continue;
 
-    // Format: [type] id | GOOD:N | BAD:N | status: X | source: Y
-    const match = trimmed.match(/^\[([^\]]+)\]\s+(\S+)\s*\|.*GOOD:(\d+).*BAD:(\d+).*status:\s*(\S+)/);
-    if (match) {
-      entries.push({
-        id: match[2],
-        title: "",
-        experience_type: match[1],
-        verification_status: match[5],
-        good_count: parseInt(match[3]),
-        bad_count: parseInt(match[4]),
-        source_type: "",
-        preview: trimmed,
-      });
+    // Skip header lines
+    if (trimmed.startsWith("Experience Entries") || trimmed.startsWith("===")) continue;
+
+    // Entry header: [V~] experience_20260518_185842
+    // Status codes: V~ = verified, ?~ = unverified, X~ = conflict
+    const headerMatch = trimmed.match(/^\[([V?X])~\]\s+(\S+)/);
+    if (headerMatch) {
+      // Flush previous entry
+      if (current && current.id) {
+        entries.push({
+          id: current.id,
+          title: current.title || "",
+          experience_type: current.experience_type || "mixed",
+          verification_status: current.verification_status || "unverified",
+          good_count: current.good_count || 0,
+          bad_count: current.bad_count || 0,
+          source_type: current.source_type || "",
+          preview: previewLines.join(" ").slice(0, 200),
+          tags: current.tags || [],
+        });
+      }
+
+      const statusCode = headerMatch[1];
+      const statusMap: Record<string, string> = { V: "verified", "?": "unverified", X: "conflict" };
+      current = {
+        id: headerMatch[2],
+        verification_status: statusMap[statusCode] || "unverified",
+      };
+      previewLines = [];
+      continue;
+    }
+
+    // Good/bad count line: "7 good / 10 bad | chromadb,python,networkx"
+    const countMatch = trimmed.match(/^(\d+)\s+good\s*\/\s*(\d+)\s+bad\s*\|?\s*(.*)/);
+    if (countMatch && current) {
+      current.good_count = parseInt(countMatch[1]);
+      current.bad_count = parseInt(countMatch[2]);
+      if (countMatch[3]) {
+        current.tags = countMatch[3].split(",").filter(Boolean).map(t => t.trim());
+      }
+      continue;
+    }
+
+    // Preview lines (content)
+    if (current && current.id) {
+      previewLines.push(trimmed);
     }
   }
 
-  return entries;
+  // Flush last entry
+  if (current && current.id) {
+    entries.push({
+      id: current.id,
+      title: current.title || "",
+      experience_type: current.experience_type || "mixed",
+      verification_status: current.verification_status || "unverified",
+      good_count: current.good_count || 0,
+      bad_count: current.bad_count || 0,
+      source_type: current.source_type || "",
+      preview: previewLines.join(" ").slice(0, 200),
+      tags: current.tags || [],
+    });
+  }
+
+  return { entries, count: entries.length };
 }
 
 // ── GET: List experiences ───────────────────────────────────
 // ?action=list  (default)
 // ?action=query&q=search+query
-// ?action=verify&id=XXX&status=verified
 
 export async function GET(request: NextRequest) {
   try {
@@ -88,14 +146,14 @@ export async function GET(request: NextRequest) {
 
     if (action === "query" && query) {
       const output = await runPython("session_summary.py", ["query", query]);
-      const entries = parseExperienceList(output);
+      const entries = parseExperienceList(output).entries;
       return NextResponse.json({ entries, count: entries.length, query });
     }
 
     // Default: list all
     const output = await runPython("session_summary.py", ["list"]);
-    const entries = parseExperienceList(output);
-    return NextResponse.json({ entries, count: entries.length });
+    const result = parseExperienceList(output);
+    return NextResponse.json({ entries: result.entries, count: result.count });
   } catch (err) {
     console.error("[experience/route.ts] GET error:", err);
     return NextResponse.json(

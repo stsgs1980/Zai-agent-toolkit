@@ -35,7 +35,7 @@ function runPython(tool: string, args: string[]): Promise<string> {
   });
 }
 
-// ── Parse memory_cli.py list output ────────────────────────
+// ── Types ───────────────────────────────────────────────────
 
 interface MemoryEntry {
   id: string;
@@ -43,47 +43,48 @@ interface MemoryEntry {
   tags: string[];
   source: string;
   verification_status: string;
+  content: string;
   raw: string;
 }
 
-function parseListOutput(output: string): { entries: MemoryEntry[]; count: number } {
-  const entries: MemoryEntry[] = [];
-  const lines = output.split("\n");
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-
-    // Try format: [type] id | tags: ... | source: ... | status: ...
-    const match = trimmed.match(/^\[(\w+)\]\s+(\S+)\s*\|.*tags:\s*([^|]*)\|.*source:\s*([^|]*)\|.*status:\s*(\S+)/);
-    if (match) {
-      entries.push({
-        id: match[2],
-        type: match[1],
-        tags: match[3].trim().split(",").filter(Boolean).map(t => t.trim()),
-        source: match[4].trim(),
-        verification_status: match[5].trim(),
-        raw: trimmed,
-      });
-    }
-  }
-
-  return { entries, count: entries.length };
+interface ExportEntry {
+  id: string;
+  content: string;
+  metadata: {
+    created_at?: string;
+    source?: string;
+    type?: string;
+    tags?: string;
+    [key: string]: string | undefined;
+  };
 }
 
 // ── GET: List entries by type ───────────────────────────────
-// ?type=knowledge&limit=20
+// ?type=knowledge&limit=50
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type") || "knowledge";
-    const limit = searchParams.get("limit") || "50";
+    const limit = parseInt(searchParams.get("limit") || "50", 10);
 
-    const output = await runPython("memory_cli.py", ["list", type, "--limit", limit]);
-    const result = parseListOutput(output);
+    // Use export command for reliable JSON output
+    const output = await runPython("memory_cli.py", ["export", type]);
+    const data = JSON.parse(output) as { type: string; count: number; entries: ExportEntry[] };
 
-    return NextResponse.json(result);
+    const entries: MemoryEntry[] = (data.entries || [])
+      .slice(0, limit)
+      .map((e) => ({
+        id: e.id,
+        type: e.metadata?.type || type,
+        tags: e.metadata?.tags ? e.metadata.tags.split(",").filter(Boolean) : [],
+        source: e.metadata?.source || "",
+        verification_status: e.metadata?.verification_status || "unverified",
+        content: e.content || "",
+        raw: e.content || "",
+      }));
+
+    return NextResponse.json({ entries, count: entries.length, total: data.count });
   } catch (err) {
     console.error("[entries/route.ts] GET error:", err);
     return NextResponse.json(
