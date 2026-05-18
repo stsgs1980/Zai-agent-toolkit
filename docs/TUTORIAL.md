@@ -296,14 +296,14 @@ These skills belong to the Zai-agent-toolkit repository and have ZAI- prefix IDs
 |----|-------|---------|
 | ZAI-DEV-001 | project-clone | Smart project cloning with user confirmation |
 | ZAI-DEV-002 | commit-work | Structured conventional commit workflow |
-| ZAI-DEV-001 | database-schema-designer | Database schema design |
+| ZAI-DEV-003 | database-schema-designer | Database schema design |
 
 #### Session (SESSION)
 
 | ID | Skill | Purpose |
 |----|-------|---------|
 | ZAI-SESSION-001 | session-log | Automatic session knowledge capture |
-| ZAI-SESSION-001 | context-consolidation | Long-running session context compression |
+| ZAI-SESSION-002 | context-consolidation | Long-running session context compression |
 
 #### Architecture (ARCH)
 

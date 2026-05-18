@@ -27,7 +27,7 @@ Added status column to standard ID registry (STD-META-001 Section 4). Standards 
 
 Synced `skills/skill-id-system/SKILL.md` registry with actual 20 skills on disk. Previous registry was missing 9 skills and had 5 listed as "pending" despite already having assigned IDs.
 
-- Added 9 missing skills: MEM-001..004, FS-001, SESSION-002..003, ARCH-002, QA-001, REQ-001, DEV-004/005
+- Added 12 missing skills: MEM-001..004, FS-001, SESSION-002, ARCH-001, QA-001, REQ-001, DEV-001..003
 - Moved 5 skills from "pending" to assigned sections
 - Added MEM and FS domains to Reserved Domains table
 - Fixed ZAI-STS-006 from "(available)" to zai-ui-composer_sts
@@ -330,9 +330,9 @@ C:\Users\stsgr\.zcode\
 | ZAI-META-002 | skill-creator | both |
 | ZAI-SESSION-001 | session-log | both |
 | ZAI-SESSION-002 | context-consolidation | both |
-| ZAI-DEV-003 | project-clone | sandbox |
-| ZAI-DEV-004 | commit-work | both |
-| ZAI-DEV-005 | database-schema-designer | both |
+| ZAI-DEV-001 | project-clone | sandbox |
+| ZAI-DEV-002 | commit-work | both |
+| ZAI-DEV-003 | database-schema-designer | both |
 | ZAI-ARCH-001 | mermaid-diagrams | both |
 | ZAI-REQ-001 | requirements-clarity | both |
 | ZAI-QA-001 | qa-test-planner | both |

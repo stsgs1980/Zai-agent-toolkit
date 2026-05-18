@@ -52,14 +52,14 @@ These domains contain skills that belong to the Zai-agent-toolkit repository:
 |----|-------|---------|--------|--------|---------------|
 | ZAI-DEV-001 | project-clone | 1.0 | STS | Active | sandbox |
 | ZAI-DEV-002 | commit-work | 1.0 | STS | Active | both |
-| ZAI-DEV-001 | database-schema-designer | 1.0 | STS | Active | both |
+| ZAI-DEV-003 | database-schema-designer | 1.0 | STS | Active | both |
 
 ### SESSION Domain
 
 | ID | Skill | Version | Author | Status | Compatibility |
 |----|-------|---------|--------|--------|---------------|
 | ZAI-SESSION-001 | session-log | 1.1 | STS | Active | both |
-| ZAI-SESSION-001 | context-consolidation | 1.0 | STS | Active | both |
+| ZAI-SESSION-002 | context-consolidation | 1.0 | STS | Active | both |
 
 ### ARCH Domain
 
@@ -143,9 +143,9 @@ Next available IDs by domain:
 | META | ZAI-META-003 |
 | MEM | ZAI-MEM-005 |
 | FS | ZAI-FS-002 |
-| DEV | ZAI-DEV-002 |
-| SESSION | ZAI-SESSION-002 |
-| ARCH | ZAI-ARCH-001 |
+| DEV | ZAI-DEV-004 |
+| SESSION | ZAI-SESSION-003 |
+| ARCH | ZAI-ARCH-002 |
 | QA | ZAI-QA-002 |
 | REQ | ZAI-REQ-002 |
 | STS | ZAI-STS-007 |
