@@ -1,6 +1,20 @@
-# Add to PowerShell profile for easy session management
-# Run: Add-Content $PROFILE (Get-Content session-functions.ps1)
+# === Zai-agent-toolkit sync command ===
+function sync-toolkit {
+    Set-Location C:\Users\stsgr\.zcode\Zai-agent-toolkit
+    git pull
+    Write-Host "Toolkit updated!" -ForegroundColor Green
+}
 
+function goto-toolkit {
+    Set-Location C:\Users\stsgr\.zcode\Zai-agent-toolkit
+}
+
+function list-skills {
+    Get-ChildItem C:\Users\stsgr\.zcode\Zai-agent-toolkit\skills -Directory | Select-Object Name
+}
+# === End toolkit commands ===
+
+# === Memory functions ===
 function Save-Session {
     <#
     .SYNOPSIS
@@ -34,7 +48,7 @@ function Get-Memory {
         [Parameter(Mandatory=$true, Position=0)]
         [string]$Query,
         
-        [ValidateSet("session", "knowledge", "pattern", "project", "template")]
+        [ValidateSet("session", "knowledge", "pattern", "project", "template", "command", "experience")]
         [string]$Type,
         
         [int]$Limit = 5
@@ -58,7 +72,7 @@ function List-Memory {
     #>
     param(
         [Parameter(Mandatory=$true, Position=0)]
-        [ValidateSet("session", "knowledge", "pattern", "project", "template")]
+        [ValidateSet("session", "knowledge", "pattern", "project", "template", "command", "experience")]
         [string]$Type,
         
         [int]$Limit = 10
@@ -67,9 +81,9 @@ function List-Memory {
     & python "$env:USERPROFILE\.zcode\Zai-agent-toolkit\tools\memory_cli.py" list $Type --limit $Limit
 }
 
-# Aliases
-Set-Alias -Name ss -Value Save-Session -Force
-Set-Alias -Name qm -Value Get-Memory -Force   # Query Memory (gm is reserved)
-Set-Alias -Name lm -Value List-Memory -Force
+# Aliases (gm -> gmem, потому что gm занят Get-Member)
+Set-Alias -Name ss -Value Save-Session
+Set-Alias -Name gmem -Value Get-Memory
+Set-Alias -Name lm -Value List-Memory
 
-Write-Host "Memory functions loaded: Save-Session (ss), Get-Memory (qm), List-Memory (lm)" -ForegroundColor DarkGray
+Write-Host "Memory functions loaded: Save-Session (ss), Get-Memory (gmem), List-Memory (lm)" -ForegroundColor DarkGray
