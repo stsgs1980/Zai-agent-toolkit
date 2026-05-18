@@ -21,8 +21,6 @@ function getVizHtmlPath(): string {
 }
 
 function getToolsDir(): string {
-  // The Python tools live alongside the toolkit repo
-  // Check common locations
   const home = getHomeDir();
 
   // Try to find the toolkit via environment variable
@@ -30,19 +28,20 @@ function getToolsDir(): string {
     return path.join(process.env.ZAI_TOOLKIT_PATH, "tools");
   }
 
-  // Common Windows location
-  const windowsPath = path.join(home, "Zai-agent-toolkit", "tools");
-  if (fs.existsSync(windowsPath)) {
-    return windowsPath;
+  // Primary location: ~/.zcode/tools/ (where tools are copied for use)
+  const zcodeToolsPath = path.join(home, ".zcode", "tools");
+  if (fs.existsSync(path.join(zcodeToolsPath, "memory_cli.py"))) {
+    return zcodeToolsPath;
   }
 
-  // Check .zcode subfolder
-  const zcodePath = path.join(home, ".zcode", "tools");
-  if (fs.existsSync(zcodePath)) {
-    return zcodePath;
+  // Fallback: ~/.zcode/Zai-agent-toolkit/tools/ (the git clone)
+  const zcodeToolkitPath = path.join(home, ".zcode", "Zai-agent-toolkit", "tools");
+  if (fs.existsSync(path.join(zcodeToolkitPath, "memory_cli.py"))) {
+    return zcodeToolkitPath;
   }
 
-  return windowsPath;
+  // Return primary path even if it doesn't exist yet (error will be clear)
+  return zcodeToolsPath;
 }
 
 // ── GET: Serve or generate Pyvis HTML ──────────────────────
@@ -79,8 +78,8 @@ export async function GET(request: NextRequest) {
             error: "Python CLI not found",
             details:
               "Could not find tools/memory_cli.py. " +
-              "Set ZAI_TOOLKIT_PATH environment variable or run manually: " +
-              "python tools/memory_cli.py graph viz --format html --no-enrich",
+              "Set ZAI_TOOLKIT_PATH environment variable or copy tools to ~/.zcode/tools/. " +
+              "Or run manually: python tools/memory_cli.py graph viz --format html --no-enrich",
             searchedPath: cliPath,
           },
           { status: 503 }

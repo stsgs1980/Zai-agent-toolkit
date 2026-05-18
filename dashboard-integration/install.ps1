@@ -5,7 +5,7 @@
 # Run this script from your memory-dashboard project root:
 #
 #   cd C:\Users\stsgr\.zcode\memory-dashboard
-#   & "C:\path\to\Zai-agent-toolkit\dashboard-integration\install.ps1"
+#   & "C:\Users\stsgr\.zcode\Zai-agent-toolkit\dashboard-integration\install.ps1"
 #
 # ============================================================
 
@@ -35,7 +35,7 @@ Write-Host ""
 
 # --- Step 1: Verify we are in a Next.js project ---
 
-Write-Host "[1/6] Checking project structure..." -ForegroundColor Yellow
+Write-Host "[1/7] Checking project structure..." -ForegroundColor Yellow
 
 $packageJson = Join-Path $DashboardDir "package.json"
 if (-not (Test-Path $packageJson)) {
@@ -53,22 +53,38 @@ if (-not (Test-Path $prismaDir)) {
 
 Write-Host "  OK: Found package.json and prisma/" -ForegroundColor Green
 
-# --- Step 2: Copy API routes ---
+# --- Step 2: Detect src/ layout ---
 
-Write-Host "[2/6] Copying API routes..." -ForegroundColor Yellow
+Write-Host "[2/7] Detecting project layout..." -ForegroundColor Yellow
+
+# Some Next.js projects use src/ directory, others put app/ at root
+$SrcDir = Join-Path $DashboardDir "src"
+if (Test-Path $SrcDir) {
+    $BaseDir = $SrcDir
+    Write-Host "  Detected: src/ layout (app/ and components/ under src/)" -ForegroundColor Green
+} else {
+    $BaseDir = $DashboardDir
+    Write-Host "  Detected: flat layout (app/ and components/ at root)" -ForegroundColor Green
+}
+
+Write-Host "  Base dir for app/components/lib: $BaseDir" -ForegroundColor Gray
+
+# --- Step 3: Copy API routes ---
+
+Write-Host "[3/7] Copying API routes..." -ForegroundColor Yellow
 
 $apiMappings = @(
     @{
         Src = Join-Path $IntegrationDir "api\memory\graph\route.ts"
-        Dst = Join-Path $DashboardDir "app\api\memory\graph\route.ts"
+        Dst = Join-Path $BaseDir "app\api\memory\graph\route.ts"
     },
     @{
         Src = Join-Path $IntegrationDir "api\memory\graph\vis\route.ts"
-        Dst = Join-Path $DashboardDir "app\api\memory\graph\vis\route.ts"
+        Dst = Join-Path $BaseDir "app\api\memory\graph\vis\route.ts"
     },
     @{
         Src = Join-Path $IntegrationDir "api\memory\related-graph\route.ts"
-        Dst = Join-Path $DashboardDir "app\api\memory\related-graph\route.ts"
+        Dst = Join-Path $BaseDir "app\api\memory\related-graph\route.ts"
     }
 )
 
@@ -91,18 +107,18 @@ foreach ($mapping in $apiMappings) {
     Write-Host "  Copied: $(Split-Path -Leaf $dst)" -ForegroundColor Green
 }
 
-# --- Step 3: Copy components ---
+# --- Step 4: Copy components ---
 
-Write-Host "[3/6] Copying components..." -ForegroundColor Yellow
+Write-Host "[4/7] Copying components..." -ForegroundColor Yellow
 
 $componentMappings = @(
     @{
         Src = Join-Path $IntegrationDir "components\GraphViewer.tsx"
-        Dst = Join-Path $DashboardDir "components\GraphViewer.tsx"
+        Dst = Join-Path $BaseDir "components\GraphViewer.tsx"
     },
     @{
         Src = Join-Path $IntegrationDir "components\GraphStats.tsx"
-        Dst = Join-Path $DashboardDir "components\GraphStats.tsx"
+        Dst = Join-Path $BaseDir "components\GraphStats.tsx"
     }
 )
 
@@ -124,29 +140,26 @@ foreach ($mapping in $componentMappings) {
     Write-Host "  Copied: $(Split-Path -Leaf $dst)" -ForegroundColor Green
 }
 
-# --- Step 4: Copy lib ---
+# --- Step 5: Copy lib ---
 
-Write-Host "[4/6] Copying lib/graph-client.ts..." -ForegroundColor Yellow
+Write-Host "[5/7] Copying lib/graph-client.ts..." -ForegroundColor Yellow
 
-$libMapping = @{
-    Src = Join-Path $IntegrationDir "lib\graph-client.ts"
-    Dst = Join-Path $DashboardDir "lib\graph-client.ts"
-}
+$libDst = Join-Path $BaseDir "lib\graph-client.ts"
 
-if (Test-Path $libMapping.Src) {
-    $dstDir = Split-Path -Parent $libMapping.Dst
+if (Test-Path (Join-Path $IntegrationDir "lib\graph-client.ts")) {
+    $dstDir = Split-Path -Parent $libDst
     if (-not (Test-Path $dstDir)) {
         New-Item -ItemType Directory -Path $dstDir -Force | Out-Null
     }
-    Copy-Item -Path $libMapping.Src -Destination $libMapping.Dst -Force
-    Write-Host "  Copied: graph-client.ts" -ForegroundColor Green
+    Copy-Item -Path (Join-Path $IntegrationDir "lib\graph-client.ts") -Destination $libDst -Force
+    Write-Host "  Copied: graph-client.ts -> $libDst" -ForegroundColor Green
 } else {
     Write-Host "  SKIP: Source not found" -ForegroundColor DarkGray
 }
 
-# --- Step 5: Update Prisma schema ---
+# --- Step 6: Update Prisma schema ---
 
-Write-Host "[5/6] Updating Prisma schema..." -ForegroundColor Yellow
+Write-Host "[6/7] Updating Prisma schema..." -ForegroundColor Yellow
 
 $schemaPath = Join-Path $DashboardDir "prisma\schema.prisma"
 $schemaAddition = Join-Path $IntegrationDir "prisma\schema-addition.prisma"
@@ -213,9 +226,9 @@ if (Test-Path $schemaPath) {
     Write-Host "  ERROR: prisma/schema.prisma not found at $schemaPath" -ForegroundColor Red
 }
 
-# --- Step 6: Verify graph.json ---
+# --- Step 7: Verify graph.json and Python deps ---
 
-Write-Host "[6/6] Verifying graph.json..." -ForegroundColor Yellow
+Write-Host "[7/7] Verifying graph.json and dependencies..." -ForegroundColor Yellow
 
 if (Test-Path $GraphJsonPath) {
     Write-Host "  OK: graph.json exists at $GraphJsonPath" -ForegroundColor Green
@@ -239,6 +252,33 @@ if (Test-Path $GraphJsonPath) {
     Write-Host "  Created empty graph.json" -ForegroundColor Green
 }
 
+# Check Python dependencies
+$pythonCheck = python -c "import networkx; import pyvis; print('OK')" 2>&1
+if ($pythonCheck -match "OK") {
+    Write-Host "  OK: Python packages (networkx, pyvis) available" -ForegroundColor Green
+} else {
+    Write-Host "  WARN: Missing Python packages. Run: pip install networkx pyvis matplotlib" -ForegroundColor Yellow
+}
+
+# Check that tools are in .zcode/tools/
+$zcodeToolsDir = Join-Path $HomeDir ".zcode\tools"
+$requiredTools = @("graph_engine.py", "memory_cli.py", "folder_indexer.py")
+$missingTools = @()
+foreach ($tool in $requiredTools) {
+    if (-not (Test-Path (Join-Path $zcodeToolsDir $tool))) {
+        $missingTools += $tool
+    }
+}
+if ($missingTools.Count -gt 0) {
+    Write-Host "  WARN: Missing tools in .zcode\tools\: $($missingTools -join ', ')" -ForegroundColor Yellow
+    Write-Host "  Copy from Zai-agent-toolkit\tools\:" -ForegroundColor Gray
+    foreach ($tool in $missingTools) {
+        Write-Host "    Copy-Item `"`$env:USERPROFILE\.zcode\Zai-agent-toolkit\tools\$tool`" `"`$env:USERPROFILE\.zcode\tools\$tool`" -Force" -ForegroundColor White
+    }
+} else {
+    Write-Host "  OK: All 3 Python tools found in .zcode\tools\" -ForegroundColor Green
+}
+
 # --- Done ---
 
 Write-Host ""
@@ -247,11 +287,12 @@ Write-Host "  Installation complete!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
-Write-Host "  1. Install d3:     npm install d3 @types/d3" -ForegroundColor White
-Write-Host "  2. Start dev:      npm run dev" -ForegroundColor White
-Write-Host "  3. Test API:       http://localhost:3000/api/memory/graph" -ForegroundColor White
-Write-Host "  4. Test vis:       http://localhost:3000/api/memory/graph/vis" -ForegroundColor White
+Write-Host "  1. Start dev:      npm run dev" -ForegroundColor White
+Write-Host "  2. Test API:       http://localhost:3000/api/memory/graph" -ForegroundColor White
+Write-Host "  3. Test vis:       http://localhost:3000/api/memory/graph/vis" -ForegroundColor White
+Write-Host "  4. Add GraphViewer to a page (see README.md Step 7)" -ForegroundColor White
 Write-Host ""
-Write-Host "If you need to regenerate the Pyvis HTML, run:" -ForegroundColor Cyan
-Write-Host "  python tools/memory_cli.py graph viz --format html --no-enrich" -ForegroundColor White
+Write-Host "To populate graph with real data:" -ForegroundColor Cyan
+Write-Host "  python .zcode\tools\memory_cli.py graph stats" -ForegroundColor White
+Write-Host "  python .zcode\tools\folder_indexer.py graph-scan C:\path\to\project" -ForegroundColor White
 Write-Host ""

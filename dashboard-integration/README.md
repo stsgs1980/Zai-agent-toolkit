@@ -17,7 +17,7 @@ pre-built edges from a JSON file. Instant and free.
 | `api/memory/graph/route.ts` | API: list/add/delete graph edges | `app/api/memory/graph/route.ts` |
 | `api/memory/graph/vis/route.ts` | API: serve Pyvis visualization HTML | `app/api/memory/graph/vis/route.ts` |
 | `api/memory/related-graph/route.ts` | API: fast related entries (replaces LLM) | `app/api/memory/related-graph/route.ts` |
-| `components/GraphViewer.tsx` | React: interactive force-graph component | `components/GraphViewer.tsx` |
+| `components/GraphViewer.tsx` | React: interactive force-graph (canvas) | `components/GraphViewer.tsx` |
 | `components/GraphStats.tsx` | React: stats panel (nodes, edges, density) | `components/GraphStats.tsx` |
 | `lib/graph-client.ts` | TypeScript: helper functions for API calls | `lib/graph-client.ts` |
 | `install.ps1` | PowerShell: auto-copy files + run migration | Run from memory-dashboard root |
@@ -48,35 +48,55 @@ graph.json is created by the Python tools:
 
 ## Install Steps (Do These In Order)
 
-### Step 1: Copy the files
+### Step 1: Copy the Python tools
 
-**Option A — Run the install script (easiest):**
+Make sure all 3 Python tools are in `~/.zcode/tools/`:
+
+```powershell
+Copy-Item "$env:USERPROFILE\.zcode\Zai-agent-toolkit\tools\graph_engine.py" "$env:USERPROFILE\.zcode\tools\graph_engine.py" -Force
+Copy-Item "$env:USERPROFILE\.zcode\Zai-agent-toolkit\tools\memory_cli.py" "$env:USERPROFILE\.zcode\tools\memory_cli.py" -Force
+Copy-Item "$env:USERPROFILE\.zcode\Zai-agent-toolkit\tools\folder_indexer.py" "$env:USERPROFILE\.zcode\tools\folder_indexer.py" -Force
+```
+
+### Step 2: Install Python dependencies
+
+```powershell
+pip install networkx pyvis matplotlib
+```
+
+### Step 3: Run the install script
 
 Open PowerShell in your memory-dashboard folder and run:
 
 ```powershell
-# Replace with the actual path to this folder
-& "C:\path\to\Zai-agent-toolkit\dashboard-integration\install.ps1"
+cd C:\Users\stsgr\.zcode\memory-dashboard
+& "$env:USERPROFILE\.zcode\Zai-agent-toolkit\dashboard-integration\install.ps1"
 ```
+
+The script will:
+1. Detect if your project uses `src/` layout (auto-adjusts paths)
+2. Copy API routes, components, and lib files
+3. Add the MemoryEdge model to your Prisma schema
+4. Run `npx prisma db push`
+5. Verify graph.json exists
+6. Check Python dependencies
 
 **Option B — Copy manually:**
 
-1. Open two File Explorer windows:
-   - Left: this `dashboard-integration/` folder
-   - Right: your `memory-dashboard/` folder
+If you prefer manual installation, copy each file to the matching location.
+Note: if your project uses `src/` directory, prepend `src/` to all paths below:
 
-2. Copy each file to the matching location:
-   ```
-   prisma/schema-addition.prisma   --> merge INTO prisma/schema.prisma
-   api/memory/graph/route.ts       --> app/api/memory/graph/route.ts
-   api/memory/graph/vis/route.ts   --> app/api/memory/graph/vis/route.ts
-   api/memory/related-graph/route.ts --> app/api/memory/related-graph/route.ts
-   components/GraphViewer.tsx      --> components/GraphViewer.tsx
-   components/GraphStats.tsx       --> components/GraphStats.tsx
-   lib/graph-client.ts             --> lib/graph-client.ts
-   ```
+```
+prisma/schema-addition.prisma   --> merge INTO prisma/schema.prisma
+api/memory/graph/route.ts       --> src/app/api/memory/graph/route.ts
+api/memory/graph/vis/route.ts   --> src/app/api/memory/graph/vis/route.ts
+api/memory/related-graph/route.ts --> src/app/api/memory/related-graph/route.ts
+components/GraphViewer.tsx      --> src/components/GraphViewer.tsx
+components/GraphStats.tsx       --> src/components/GraphStats.tsx
+lib/graph-client.ts             --> src/lib/graph-client.ts
+```
 
-### Step 2: Update your Prisma schema
+### Step 4: Update your Prisma schema (if doing manual install)
 
 Open `prisma/schema.prisma` in your memory-dashboard project.
 
@@ -91,47 +111,10 @@ model and add these two lines at the bottom (before the closing `}`):
   toEdges   MemoryEdge[] @relation("ToEdges")
 ```
 
-Your MemoryEntry model should look like this when you are done:
-
-```prisma
-model MemoryEntry {
-  id        String   @id
-  type      String
-  content   String
-  metadata  String   @default("{}")
-  embedding String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // --- Graph layer relations (NEW) ---
-  fromEdges MemoryEdge[] @relation("FromEdges")
-  toEdges   MemoryEdge[] @relation("ToEdges")
-}
-```
-
-### Step 3: Run the Prisma migration
-
-In your memory-dashboard folder, open a terminal and run:
+Then run the migration:
 
 ```bash
 npx prisma db push
-```
-
-This creates the `memory_edges` table in your SQLite database. You should see
-output like: `Your database is now in sync with your Prisma schema.`
-
-If you prefer a named migration instead:
-
-```bash
-npx prisma migrate dev --name add-memory-edges
-```
-
-### Step 4: Install the extra npm package
-
-The GraphViewer component uses D3 for rendering:
-
-```bash
-npm install d3 @types/d3
 ```
 
 ### Step 5: Verify the graph.json file exists
@@ -145,19 +128,10 @@ C:\Users\stsgr\.zcode\memory\graph.json
 If you have never used the graph commands before, create it by running:
 
 ```bash
-python tools/memory_cli.py graph stats
+python ~/.zcode/tools/memory_cli.py graph stats
 ```
 
-This will create an empty graph.json automatically. Or just create it manually:
-
-```json
-{
-  "version": 1,
-  "created_at": "",
-  "edges": [],
-  "isolated_nodes": []
-}
-```
+This will create an empty graph.json automatically.
 
 ### Step 6: Test the graph API
 
@@ -195,17 +169,22 @@ export default function GraphPage() {
 }
 ```
 
+The GraphViewer uses a custom canvas-based force-directed layout (no extra
+npm dependencies needed — it does not use D3 or vis-network on the client side).
+
 ---
 
 ## Troubleshooting
 
 | Problem | Solution |
 |---------|---------|
-| `graph.json not found` error | Run `python tools/memory_cli.py graph stats` to create it |
+| `graph.json not found` error | Run `python ~/.zcode/tools/memory_cli.py graph stats` to create it |
 | Prisma migration fails | Make sure you added both the MemoryEdge model AND the relation fields to MemoryEntry |
-| GraphViewer shows blank | Check browser console for errors. Make sure `npm install d3 @types/d3` was run |
-| Pyvis HTML shows 404 | Run `python tools/memory_cli.py graph viz --format html --no-enrich` once to generate the file |
+| GraphViewer shows blank | Check browser console for errors. Make sure `shadcn/ui` is installed (Card, Button, Badge) |
+| Pyvis HTML shows 404 | Run `python ~/.zcode/tools/memory_cli.py graph viz --format html --no-enrich` once to generate the file |
 | `related-graph` falls back to LLM | This is normal if no edges exist for that node yet. Add edges with `memory graph add-edge` |
+| Files went to wrong directory | The install script auto-detects `src/` layout. If it guessed wrong, move files manually |
+| Python CLI not found | Make sure tools are copied to `~/.zcode/tools/` or set `ZAI_TOOLKIT_PATH` env var |
 
 ---
 
@@ -230,4 +209,4 @@ might get a brief read error. The code handles this with a retry.
 
 ---
 
-Built with: Z.ai Agent Toolkit v2.0.4
+Built with: Z.ai Agent Toolkit
