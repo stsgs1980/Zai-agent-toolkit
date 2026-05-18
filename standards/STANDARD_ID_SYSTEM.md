@@ -181,10 +181,10 @@ All standards must have a header in the following format:
 **Example:**
 
 ```markdown
-# Standard: Frontend Development v1.3 (EN)
+# Standard: Frontend Development v1.5 (EN)
 
 > ID: STD-FE-001
-> Version: 1.3
+> Version: 1.5
 > Level: **[C] Critical**
 > Last Updated: 2025-01
 ```

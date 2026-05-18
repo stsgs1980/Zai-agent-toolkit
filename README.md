@@ -4,13 +4,13 @@
 
 # Z.ai Agent Toolkit
 
-[![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-blue.svg)]()
+[![Version: 2.0.4](https://img.shields.io/badge/Version-2.0.4-blue.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status: Pre-release](https://img.shields.io/badge/Status-Pre--release-orange.svg)]()
 
 **Standards + Skills + Rules** for AI-driven development
 
-> Toolkit version: **v2.0.0** | Language: **English**
+> Toolkit version: **v2.0.4** | Language: **English**
 
 ---
 
@@ -349,7 +349,7 @@ flowchart TB
 
 | Component | ID | Version |
 |-----------|----|---------|
-| **Toolkit** | -- | **v2.0.0** |
+| **Toolkit** | -- | **v2.0.4** |
 | MARKDOWN_STANDARD | STD-DOC-002 | v2.2.0 |
 | UNICODE_POLICY | STD-DOC-003 | v2.1.3 |
 | README_TEMPLATE | STD-DOC-004 | v2.1 |
