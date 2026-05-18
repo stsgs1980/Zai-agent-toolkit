@@ -341,14 +341,7 @@ The WORKLOG file provides a natural audit trail. After workflow completion:
 
 ## 9. Integration with Other Standards
 
-| Standard | Interaction |
-|----------|-------------|
-| STD-AGENT-001 | Subagent contract: types, constraints, lifecycle |
-| STD-GIT-001 | Commit format and push frequency |
-| STD-GIT-002 | Sandbox git safety and deadlock recovery |
-| STD-ERR-001 | Error classification for propagation |
-| STD-ENV-002 | Z.ai sandbox constraints |
-| STD-ARCH-001 | Implementation order for orchestrated projects |
+See Cross-References section at the end of this document for the full relationship table.
 
 ---
 
@@ -385,6 +378,19 @@ The WORKLOG file provides a natural audit trail. After workflow completion:
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-05 | Initial version: orchestration patterns, dependency management, state management, git coordination, error propagation |
+
+---
+
+## Cross-References
+
+| Standard | Relationship |
+|----------|-------------|
+| STD-AGENT-001 | Subagent contract: types, constraints, lifecycle (referenced in orchestration patterns) |
+| STD-GIT-001 | Commit format and push frequency (commit point rules in Section 5.1) |
+| STD-GIT-002 | Sandbox git safety: deadlock prevention for parallel subagents (Section 5.2-5.3) |
+| STD-ERR-001 | Error classification for propagation (escalation ladder in Section 6) |
+| STD-ENV-002 | Z.ai sandbox constraints affecting subagent execution |
+| STD-ARCH-001 | Implementation order: where orchestration fits in project setup |
 
 ---
 

@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2.0.2] - 2026-05-18
+
+### Changed — Cross-References Format Unification
+
+Unified cross-references format across all 19 standards. Every standard now has a `## Cross-References` section with a two-column table (`| Standard | Relationship |`), making the link map visible at a glance without scanning the entire document.
+
+- **STD-FE-001** (Frontend Standard): added Cross-References section (5 links)
+- **STD-ARCH-001** (Implementation Order): added Cross-References section (17 links)
+- **STD-DOC-002** (Markdown Standard): added Cross-References section (1 link to STD-DOC-003)
+- **STD-AGENT-001** (Subagent Standard): replaced inline Section 7.1 table with formal Cross-References section (9 links)
+- **STD-AGENT-002** (Orchestration Standard): replaced inline Section 9 table with formal Cross-References section (6 links)
+- **STD-DOC-004** (README Template): added Cross-References section (1 link)
+- **STD-META-001** (Standard ID System): added Cross-References section (2 links)
+- **STD-DOC-003** (Unicode Policy): added Cross-References section (1 link to STD-DOC-002)
+- **STD-ENV-002** (Z.ai Integration Standard): added Cross-References section (1 link to STD-ENV-001)
+
+---
+
 ## [2.0.1] - 2026-05-18
 
 ### Fixed — Post-Validation Corrections

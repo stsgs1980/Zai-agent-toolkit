@@ -198,4 +198,13 @@ When calling chat.z.ai:
 **Document complies with MARKDOWN_STANDARD v2.1 (level [W])**
 
 ---
+
+## Cross-References
+
+| Standard | Relationship |
+|----------|-------------|
+| STD-ENV-001 | Reproducibility Standard: path rules (Section 3.1 cross-references sandbox path allowance) |
+
+---
+
 Built with: Next.js 16 + TypeScript + Tailwind CSS

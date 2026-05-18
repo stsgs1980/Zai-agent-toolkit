@@ -244,18 +244,9 @@ When using Memory System, subagents MUST:
 
 ## 7. Integration with Other Standards
 
-### 7.1 Cross-Reference Table
+See Cross-References section at the end of this document for the full relationship table.
 
-| Standard | Interaction |
-|----------|-------------|
-| STD-AGENT-002 | Orchestration rules: who calls whom, in what order |
-| STD-ENV-002 | Z.ai sandbox constraints and SDK integration |
-| STD-GIT-001 | Commit + push after subagent completes file modifications |
-| STD-GIT-002 | Sandbox git safety: deadlock prevention for parallel subagents |
-| STD-ERR-001 | Error classification and recovery in subagent results |
-| STD-META-001 | Subagent type IDs and version registry |
-
-### 7.2 Compliance Rules
+### 7.1 Compliance Rules
 
 Subagent outputs MUST comply with:
 - **STD-DOC-003** (Unicode Policy): No emoji or Unicode graphics in results
@@ -316,6 +307,22 @@ Subagent outputs MUST comply with:
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-05 | Initial version: subagent types, contract, lifecycle, constraints, context handoff |
+
+---
+
+## Cross-References
+
+| Standard | Relationship |
+|----------|-------------|
+| STD-AGENT-002 | Orchestration rules: who calls whom, in what order |
+| STD-ENV-002 | Z.ai sandbox constraints and SDK integration |
+| STD-GIT-001 | Commit + push after subagent completes file modifications |
+| STD-GIT-002 | Sandbox git safety: deadlock prevention for parallel subagents |
+| STD-ERR-001 | Error classification and recovery in subagent results |
+| STD-META-001 | Subagent type IDs and version registry |
+| STD-DOC-003 | Unicode Policy: no emoji or Unicode graphics in subagent output |
+| STD-DOC-002 | Markdown Standard: proper formatting in all .md output from subagents |
+| STD-ENV-001 | Reproducibility: no hardcoded personal paths in generated code |
 
 ---
 

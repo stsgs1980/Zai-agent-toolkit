@@ -457,4 +457,13 @@ Client          Server          Database
 **Document complies with MARKDOWN_STANDARD v2.2 (level [W])**
 
 ---
+
+## Cross-References
+
+| Standard | Relationship |
+|----------|-------------|
+| STD-DOC-003 | No-Unicode Policy: single source of truth for character rules. Sections 4-5 (prohibited elements), 6.1 (allowed characters), 6.2 (ASCII diagrams), 7 (icons/logos), 8.2-8.3 (sanitization regex), 11.1 (unconditionally allowed) are cross-referenced from this standard |
+
+---
+
 Built with: Next.js 16 + TypeScript + Tailwind CSS

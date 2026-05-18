@@ -157,4 +157,13 @@ Note: hyphen `-` is used as a separator in technical descriptions. Em dash `—`
 Note: `->` as a separator in list items violates the list marker rule. Em dash `—` in a heading is prohibited.
 
 ---
+
+## Cross-References
+
+| Standard | Relationship |
+|----------|-------------|
+| STD-DOC-002 | Markdown Standard: formatting rules for README content |
+
+---
+
 Built with: Next.js 16 + TypeScript + Tailwind CSS

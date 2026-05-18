@@ -284,4 +284,13 @@ A: Yes. For example, a linter can output: `Error: STD-FE-001 violation — compo
 
 ---
 
+## Cross-References
+
+| Standard | Relationship |
+|----------|-------------|
+| STD-ARCH-001 | Implementation Order: references all STD- IDs for project setup sequence |
+| STD-DOC-002 | Markdown Standard: header format rules for standard documents (Section 6 of this standard) |
+
+---
+
 Built with: Next.js 16 + TypeScript + Tailwind CSS

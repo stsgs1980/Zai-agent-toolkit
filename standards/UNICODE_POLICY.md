@@ -414,4 +414,13 @@ module.exports = {
 **Document complies with No-Unicode Policy v2.1**
 
 ---
+
+## Cross-References
+
+| Standard | Relationship |
+|----------|-------------|
+| STD-DOC-002 | Markdown Standard: delegates character rules to this standard; keeps .md-specific formatting rules |
+
+---
+
 Built with: Next.js 16 + TypeScript + Tailwind CSS

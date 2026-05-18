@@ -493,4 +493,16 @@ When possible, prefer soft-delete (archive) over hard-delete. See STD-FE-001 sec
 
 ---
 
+## Cross-References
+
+| Standard | Relationship |
+|----------|-------------|
+| STD-A11Y-001 | WCAG accessibility: theme contrast validation (Section 11.2), component keyboard/screen reader patterns |
+| STD-ERR-001 | Error handling: error boundaries, API error responses (cross-ref from Section 10.4) |
+| STD-SEC-001 | Input validation: Zod schemas, sanitization (cross-ref from Section 10.3) |
+| STD-GIT-001 | Git commit format for frontend code changes |
+| STD-ENV-001 | Reproducibility: .env.example for theme tokens, path.resolve() for DB |
+
+---
+
 Built with: Next.js 16 + TypeScript + Tailwind CSS

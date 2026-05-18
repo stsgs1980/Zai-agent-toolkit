@@ -275,4 +275,28 @@ For existing projects, this step becomes a remediation phase:
 
 ---
 
+## Cross-References
+
+| Standard | Relationship |
+|----------|-------------|
+| STD-META-001 | ID system: assigns all STD- identifiers used in this implementation order |
+| STD-FE-001 | Frontend: Step 2 component architecture |
+| STD-DOC-002 | Markdown: Step 3 formatting rules |
+| STD-DOC-003 | Unicode Policy: Step 3 character rules |
+| STD-ENV-001 | Reproducibility: Step 4 environment setup |
+| STD-ENV-002 | Z.ai Integration: Step 4 sandbox SDK usage |
+| STD-GIT-001 | Git Core: Step 5 commit format and push policy |
+| STD-GIT-002 | Git Sandbox Safety: Step 5 deadlock prevention |
+| STD-A11Y-001 | WCAG: Step 6 accessibility compliance |
+| STD-ERR-001 | Error Handling Core: Step 7 error patterns |
+| STD-ERR-002 | Error Recovery: Step 7 retry and fallback |
+| STD-SEC-001 | Security Core: Step 8 OWASP and secrets |
+| STD-SEC-002 | Security Extended: Step 8 auth and RBAC |
+| STD-TEST-001 | Testing: Step 9 coverage and CI |
+| STD-DOC-005 | Code Examples: Step 10 documentation quality |
+| STD-AGENT-001 | Subagent Standard: Step 11 subagent governance |
+| STD-AGENT-002 | Orchestration: Step 11 multi-agent coordination |
+
+---
+
 Built with: Next.js 16 + TypeScript + Tailwind CSS
