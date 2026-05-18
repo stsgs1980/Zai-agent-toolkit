@@ -151,7 +151,7 @@ ZCode Desktop has its own built-in skills. They do NOT have `ZAI-` prefix:
 | ZAI-STS-003 | performance-code-generator_sts | 1.0 | Active |
 | ZAI-STS-004 | frontend-styling-expert_sts | 1.0 | Active |
 | ZAI-STS-005 | phi-layout_sts | 3.0 | Active |
-| ZAI-STS-006 | zai-ui-composer_sts | 1.0 | Active |
+| ZAI-STS-006 | zai-ui-composer_sts | 1.1.2 | Active |
 | ZAI-STS-007 | (available) | - | - |
 
 ---

@@ -233,7 +233,7 @@ Without IDs, it's hard to:
 
 With IDs:
 - "Use ZAI-GIT-001 for safe git operations" - clear reference
-- ZAI-USER-001 - clearly your skill, not built-in
+- ZAI-STS-001 - clearly your skill, not built-in
 
 ### ID Format
 
@@ -336,9 +336,9 @@ ZAI-<DOMAIN>-<NUMBER>
 
 | ID | Skill | Created |
 |----|-------|---------|
-| ZAI-USER-001 | (available) | - |
-| ZAI-USER-002 | (available) | - |
-| ZAI-USER-003 | (available) | - |
+| ZAI-STS-001 | (available) | - |
+| ZAI-STS-002 | (available) | - |
+| ZAI-STS-003 | (available) | - |
 
 ---
 
@@ -361,7 +361,7 @@ Create a skill for generating weekly progress reports from git commits
 The AI will:
 1. Use skill-creator (ZAI-META-002)
 2. Ask clarifying questions
-3. Assign a ZAI-USER-XXX ID
+3. Assign a ZAI-STS-XXX ID
 4. Create the SKILL.md file
 5. Update the registry
 
@@ -376,8 +376,8 @@ For user-created skills, always use `USER` domain.
 Check the registry in `skills/skill-id-system/SKILL.md`:
 
 ```text
-ZAI-USER-001: available
-ZAI-USER-002: available
+ZAI-STS-001: available
+ZAI-STS-002: available
 ...
 ```
 
@@ -398,14 +398,14 @@ Create `my-skill-name/SKILL.md`:
 ---
 name: my-skill-name
 description: What this skill does and when to trigger
-id: ZAI-USER-001
+id: ZAI-STS-001
 version: 1.0
 trigger: keyword1, keyword2
 ---
 
 # Skill: My Skill Name v1.0
 
-> ID: ZAI-USER-001
+> ID: ZAI-STS-001
 > Version: 1.0
 > Last Updated: 2026-05
 
@@ -452,7 +452,7 @@ Edit `skills/skill-id-system/SKILL.md`:
 
 | ID | Skill Name | Version |
 |----|------------|---------|
-| ZAI-USER-001 | my-skill-name | 1.0 |
+| ZAI-STS-001 | my-skill-name | 1.0 |
 ```
 
 #### Step 6: Commit and Push
@@ -460,7 +460,7 @@ Edit `skills/skill-id-system/SKILL.md`:
 ```powershell
 cd $env:USERPROFILE\.zcode\Zai-agent-toolkit
 git add .
-git commit -m "Add skill: my-skill-name (ZAI-USER-001)"
+git commit -m "Add skill: my-skill-name (ZAI-STS-001)"
 git push
 ```
 
@@ -547,7 +547,7 @@ On Windows:  update-toolkit.ps1 before using ZCode Desktop
 Good:    weekly-report-generator
 Bad:     skill1, myskill, new_skill
 
-Good:    ZAI-USER-001
+Good:    ZAI-STS-001
 Bad:     skill-1, user_skill_1
 ```
 
@@ -651,7 +651,7 @@ git push
 ### ID Assignment
 
 ```text
-Your skills: ZAI-USER-001, ZAI-USER-002, ...
+Your skills: ZAI-STS-001, ZAI-STS-002, ...
 Toolkit skills: ZAI-GIT-xxx, ZAI-SDK-xxx, ...
 ```
 
@@ -671,7 +671,7 @@ Toolkit skills: ZAI-GIT-xxx, ZAI-SDK-xxx, ...
 1. **Install** once via git clone + symlinks
 2. **Update** with `update-toolkit.ps1`
 3. **Create skills** by asking AI or manually
-4. **Use IDs** (ZAI-USER-xxx) for your skills
+4. **Use IDs** (ZAI-STS-xxx) for your skills
 5. **Sync** via git push/pull
 
 ---

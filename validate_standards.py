@@ -104,9 +104,14 @@ def is_version_history_entry(title: str) -> bool:
 
 
 def extract_header_fields(content: str) -> dict[str, str]:
-    """Extract blockquote-style header fields (e.g. > ID: STD-xxx)."""
+    """Extract blockquote-style header fields (e.g. > ID: STD-xxx).
+    Only reads fields before the first ## heading to avoid picking up
+    example headers in later sections."""
     fields = {}
     for line in content.splitlines():
+        # Stop at the first ## heading — header block is above it
+        if re.match(r'^##\s+', line):
+            break
         m = HEADER_FIELD_PATTERN.match(line)
         if m:
             key = m.group(1).strip().lower()

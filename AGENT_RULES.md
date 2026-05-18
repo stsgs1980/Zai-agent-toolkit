@@ -116,7 +116,12 @@ are in the `standards/` directory.
 | STD-ARCH-001 | Implementation Order | [W] | 6-step mandatory sequence; Group A submits to Group B | `standards/IMPLEMENTATION_ORDER.md` |
 | STD-FE-001 | Frontend Development | [C] | 150-line limit; max 3 useState; FSD layers; no client fetch | `standards/FRONTEND_STANDARD.md` |
 | STD-GIT-001 | GitHub Standard | [C] | Conventional commits; `--force-with-lease`; push after every stage | `standards/GITHUB_STANDARD.md` |
-| STD-A11Y-001 | WCAG Accessibility | [C] | 4.5:1 contrast; keyboard nav; 44px touch targets | `standards/WCAG_2.1_AA_STANDARD.md` |
+| STD-A11Y-001 | WCAG Accessibility | [C] | 4.5:1 contrast; keyboard nav; 44px touch targets **DEPRECATED** | `standards/WCAG_2.1_AA_STANDARD.md` |
+| STD-GIT-002 | GitHub Sandbox Safety | [C] | Sandbox-specific git safety rules | `standards/GITHUB_SANDBOX_STANDARD.md` |
+| STD-ERR-002 | Error Recovery | [C] | Recovery strategies, retry policies | `standards/ERROR_RECOVERY_STANDARD.md` |
+| STD-SEC-002 | Security Extended | [C] | Advanced security patterns | `standards/SECURITY_EXTENDED_STANDARD.md` |
+| STD-AGENT-001 | Subagent Standard | [C] | Sub-agent communication protocol | `standards/SUBAGENT_STANDARD.md` |
+| STD-AGENT-002 | Orchestration Standard | [C] | Multi-agent orchestration patterns | `standards/ORCHESTRATION_STANDARD.md` |
 | STD-TEST-001 | Testing Standard | [C] | 70/20/10 pyramid; AAA pattern; 60% sandbox minimum | `standards/TESTING_STANDARD.md` |
 | STD-ERR-001 | Error Handling | [C] | ApplicationError hierarchy; structured logging; circuit breaker | `standards/ERROR_HANDLING_STANDARD.md` |
 | STD-SEC-001 | Security Standard | [C] | OWASP Top 10; secrets management; RBAC; Zod validation | `standards/SECURITY_STANDARD.md` |
@@ -240,7 +245,12 @@ Apply FIRST. Define rules that all other documents must follow.
 | STD-META-001 | `STANDARD_ID_SYSTEM.md` | [W] | Standard ID registry and rules |
 | STD-FE-001 | `FRONTEND_STANDARD.md` | [C] | Frontend development (React/Next.js) |
 | STD-GIT-001 | `GITHUB_STANDARD.md` | [C] | Git/GitHub operations standard |
-| STD-A11Y-001 | `WCAG_2.1_AA_STANDARD.md` | [C] | Accessibility compliance (WCAG 2.1 AA) |
+| STD-A11Y-001 | `WCAG_2.1_AA_STANDARD.md` | [C] | Accessibility compliance (WCAG 2.1 AA) **DEPRECATED** |
+| STD-GIT-002 | `GITHUB_SANDBOX_STANDARD.md` | [C] | Sandbox git safety |
+| STD-ERR-002 | `ERROR_RECOVERY_STANDARD.md` | [C] | Error recovery strategies |
+| STD-SEC-002 | `SECURITY_EXTENDED_STANDARD.md` | [C] | Extended security patterns |
+| STD-AGENT-001 | `SUBAGENT_STANDARD.md` | [C] | Sub-agent protocol |
+| STD-AGENT-002 | `ORCHESTRATION_STANDARD.md` | [C] | Multi-agent orchestration |
 | STD-TEST-001 | `TESTING_STANDARD.md` | [C] | Unit, integration, E2E testing standards |
 | STD-ERR-001 | `ERROR_HANDLING_STANDARD.md` | [C] | Error classification, logging, recovery |
 | STD-SEC-001 | `SECURITY_STANDARD.md` | [C] | Authentication, secrets, OWASP compliance |

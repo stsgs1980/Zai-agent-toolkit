@@ -8,6 +8,7 @@ description: >
   Triggers: every 15 min, after every commit, after 5+ file changes, on problem solved,
   on decision made. User can also manually trigger: "create session log", "log this".
   Builds KNOWLEDGE_BASE.md automatically for future reference and best practices.
+trigger: session log, create session log, log this, knowledge base
 ---
 
 # Skill: Session Log v1.1

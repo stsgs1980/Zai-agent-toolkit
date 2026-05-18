@@ -3,7 +3,7 @@
 > ID: STD-META-001
 > Version: 1.1
 > Level: **[W] Warning**
-> Last Updated: 2025-01
+> Last Updated: 2026-05
 
 This document describes the ID system for all project standards. ID provides an unambiguous reference to a standard in discussions, code, AI prompts, and documentation.
 
@@ -17,7 +17,7 @@ The ID system solves the following tasks:
 |------|---------|
 | Unambiguous reference in discussions | "Violation of STD-FE-001 section 2.1" |
 | Reference in AI prompts | "Follow STD-GIT-001 for commits" |
-| Link between standards | No-Unicode Policy references STD-DOC-001 |
+| Link between standards | No-Unicode Policy references STD-DOC-002 |
 | Search and cataloging | grep "STD-FE-" finds all Frontend Standard mentions |
 
 ---
@@ -189,7 +189,7 @@ All standards must have a header in the following format:
 > ID: STD-FE-001
 > Version: 1.5
 > Level: **[C] Critical**
-> Last Updated: 2025-01
+> Last Updated: 2026-05
 ```
 
 ---

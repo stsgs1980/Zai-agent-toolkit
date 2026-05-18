@@ -4,7 +4,7 @@
 
 The Skill ID System helps you:
 - Distinguish your skills from ZCode Desktop built-in skills
-- Track and discuss skills by short ID (e.g., "use ZAI-GIT-001")
+- Track and discuss skills by short ID (e.g., "use ZAI-MEM-001")
 - Keep your toolkit organized
 
 ---
@@ -18,7 +18,7 @@ ZAI-<DOMAIN>-<NUMBER>
 | Part | Description |
 |------|-------------|
 | `ZAI` | Prefix for all toolkit skills |
-| `DOMAIN` | Skill category (GIT, SDK, USER, etc.) |
+| `DOMAIN` | Skill category (MEM, FS, STS, etc.) |
 | `NUMBER` | Sequential number (001, 002, etc.) |
 
 ---
@@ -27,18 +27,20 @@ ZAI-<DOMAIN>-<NUMBER>
 
 | Domain | For Skills About |
 |--------|------------------|
-| `GIT` | Git operations (clone, commit, checkpoint) |
-| `SDK` | API integration, z-ai-web-dev-sdk |
+| `MEM` | Memory operations (store, query, delete, export) |
+| `FS` | File system (folder indexing, scanning) |
+| `SESSION` | Session management (logging, context, handoff) |
+| `DEV` | Development (project clone, commit, schema design) |
 | `ARCH` | Architecture diagrams, C4, Mermaid |
 | `QA` | Testing, validation |
-| `SEC` | Security, sanitization |
-| `SESSION` | Context management, handoff |
 | `REQ` | Requirements, PRD |
-| `DOC` | Documents (PDF, DOCX, PPT) |
-| `DEV` | Development (dev server, project setup) |
-| `HEALTH` | API monitoring, retry logic |
 | `META` | Toolkit itself (ID system, skill creator) |
-| `USER` | YOUR custom skills |
+| `STS` | YOUR custom skills (your signature) |
+| `GIT` | (reserved) Git operations |
+| `SDK` | (reserved) API integration |
+| `SEC` | (reserved) Security |
+| `DOC` | (reserved) Document generation |
+| `HEALTH` | (reserved) Monitoring, retry |
 
 ---
 
@@ -58,12 +60,12 @@ The AI agent will:
 
 ### Option 2: Manual Creation
 
-1. Create folder: `skills/your-skill-name/`
+1. Create folder: `skills/your-skill-name_sts/`
 2. Create `SKILL.md`:
 
 ```markdown
 ---
-name: your-skill-name
+name: your-skill-name_sts
 description: What this skill does and when to use it
 id: ZAI-STS-007
 version: 1.0
@@ -80,40 +82,69 @@ trigger: keyword1, keyword2
 ```
 
 3. Update registry in `skills/skill-id-system/SKILL.md`:
-   - Find section "5.10. User-Created (USER)"
+   - Find section "5.9. User-Created (STS)"
    - Add your skill
 
 ---
 
 ## Current Registry
 
-### Toolkit Skills
+### Memory (MEM)
 
 | ID | Skill | Purpose |
 |----|-------|---------|
-| ZAI-GIT-001 | git-safe-ops | Safe git operations |
-| ZAI-GIT-002 | git-checkpoint | Create checkpoint commits |
-| ZAI-GIT-003 | commit-work | Commit workflow |
-| ZAI-SDK-001 | z-ai-web-dev-sdk | SDK integration |
-| ZAI-SDK-002 | api-retry | Retry logic for APIs |
-| ZAI-SDK-003 | fallback | Fallback provider |
-| ZAI-SDK-004 | health-check | API health monitoring |
-| ZAI-ARCH-001 | c4-architecture | C4 diagrams |
-| ZAI-ARCH-002 | mermaid-diagrams | Mermaid diagrams |
-| ZAI-ARCH-003 | database-schema-designer | DB schema design |
-| ZAI-QA-001 | qa-test-planner | Test planning |
-| ZAI-QA-002 | sanitize-validate | Input validation |
-| ZAI-SESSION-001 | session-handoff | Context handoff |
-| ZAI-SESSION-002 | session-resume | Resume work |
-| ZAI-REQ-001 | requirements-clarity | Requirements analysis |
-| ZAI-DOC-001 | doc-gen | Document generation |
-| ZAI-DEV-001 | dev-watchdog | Dev server monitoring |
-| ZAI-DEV-002 | anti-monolith | System skill (Z.ai sandbox) -- not in toolkit |
+| ZAI-MEM-001 | memory-store | Store memory records |
+| ZAI-MEM-002 | memory-query | Query memory records |
+| ZAI-MEM-003 | memory-delete | Delete memory records |
+| ZAI-MEM-004 | memory-export | Export memory records |
+
+### File System (FS)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-FS-001 | folder-indexer | Index and scan folders |
+
+### Session (SESSION)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-SESSION-002 | session-log | Session logging |
+| ZAI-SESSION-003 | context-consolidation | Consolidate context |
+
+### Development (DEV)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
 | ZAI-DEV-003 | project-clone | Smart project cloning |
-| ZAI-META-001 | skill-id-system | This ID system |
+| ZAI-DEV-004 | commit-work | Commit workflow |
+| ZAI-DEV-005 | database-schema-designer | DB schema design |
+
+### Architecture (ARCH)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-ARCH-002 | mermaid-diagrams | Mermaid diagrams |
+
+### Quality Assurance (QA)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-QA-001 | qa-test-planner | Test planning |
+
+### Requirements (REQ)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-REQ-001 | requirements-clarity | Requirements analysis |
+
+### Meta (META)
+
+| ID | Skill | Purpose |
+|----|-------|---------|
+| ZAI-META-001 | skill-id-system | ID system and registry |
 | ZAI-META-002 | skill-creator | Create new skills |
 
-### Your Skills (ZAI-STS-XXX)
+### Your Skills (STS)
 
 **IMPORTANT:** All your skills use `STS` domain and `_sts` suffix in folder name.
 
@@ -121,7 +152,11 @@ trigger: keyword1, keyword2
 |----|-------|---------|
 | ZAI-STS-001 | prompt-engineering_sts | 2026-05 |
 | ZAI-STS-002 | sync-toolkit_sts | 2026-05 |
-| ZAI-STS-003 | (available) | - |
+| ZAI-STS-003 | performance-code-generator_sts | 2026-05 |
+| ZAI-STS-004 | frontend-styling-expert_sts | 2026-05 |
+| ZAI-STS-005 | phi-layout_sts | 2026-05 |
+| ZAI-STS-006 | zai-ui-composer_sts | 2026-05 |
+| ZAI-STS-007 | (available) | - |
 
 ### Naming Convention
 
@@ -152,7 +187,7 @@ trigger: keyword1, keyword2
 
 Just tell the AI:
 ```text
-Use ZAI-GIT-001 for safe git operations
+Use ZAI-MEM-001 for storing memory records
 ```
 
 ### How to find a skill
@@ -164,7 +199,7 @@ Check `skills/skill-id-system/SKILL.md` for full registry.
 | Source | Prefix | Example |
 |--------|--------|---------|
 | ZCode Desktop built-in | None | `background-process-manager` |
-| Z.ai Agent Toolkit | `ZAI-` | `ZAI-GIT-001` |
+| Z.ai Agent Toolkit | `ZAI-` | `ZAI-MEM-001` |
 
 ---
 
@@ -204,6 +239,7 @@ Z.ai server:    git push  -->  GitHub  -->  git pull / update-toolkit.ps1  :Your
 |------|---------|
 | `skills/skill-id-system/SKILL.md` | ID registry and system docs |
 | `skills/skill-creator/SKILL.md` | Skill creation with auto-ID |
+| `docs/skill-id-registry.md` | Detailed registry with compatibility |
 | `docs/SKILL_ID_GUIDE.md` | This guide for you |
 
 ---
