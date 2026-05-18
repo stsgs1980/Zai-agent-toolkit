@@ -3,25 +3,41 @@
 import React, { useEffect, useState } from "react";
 import { fetchGraphStats, type GraphStats } from "@/lib/graph-client";
 
-// ── Color map for edge types ───────────────────────────────
+// ── Neon color map ─────────────────────────────────────────
 
 const TYPE_COLORS: Record<string, string> = {
-  parent_dir: "#95a5a6",
-  imports: "#8e44ad",
-  same_session: "#2980b9",
-  depends_on: "#16a085",
-  follow_up: "#27ae60",
-  fixed_by: "#c0392b",
-  implements: "#f39c12",
-  modifies: "#e67e22",
-  related_to: "#3498db",
+  parent_dir: "#64748b",
+  imports: "#a855f7",
+  same_session: "#38bdf8",
+  depends_on: "#2dd4bf",
+  follow_up: "#4ade80",
+  fixed_by: "#f87171",
+  implements: "#fbbf24",
+  modifies: "#fb923c",
+  related_to: "#60a5fa",
+};
+
+const TYPE_GLOW: Record<string, string> = {
+  parent_dir: "#94a3b8",
+  imports: "#c084fc",
+  same_session: "#7dd3fc",
+  depends_on: "#5eead4",
+  follow_up: "#86efac",
+  fixed_by: "#fca5a5",
+  implements: "#fde68a",
+  modifies: "#fdba74",
+  related_to: "#93c5fd",
 };
 
 function getTypeColor(type: string): string {
-  return TYPE_COLORS[type] || "#4a90d9";
+  return TYPE_COLORS[type] || "#60a5fa";
 }
 
-// ── Simple bar chart using divs ────────────────────────────
+function getTypeGlow(type: string): string {
+  return TYPE_GLOW[type] || "#93c5fd";
+}
+
+// ── Animated bar chart ─────────────────────────────────────
 
 interface BarChartProps {
   data: Record<string, number>;
@@ -34,29 +50,51 @@ function BarChart({ data }: BarChartProps) {
   const maxVal = Math.max(...entries.map(([, v]) => v));
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
       {entries.map(([type, count]) => {
         const pct = maxVal > 0 ? (count / maxVal) * 100 : 0;
+        const color = getTypeColor(type);
+        const glow = getTypeGlow(type);
         return (
-          <div key={type} className="flex items-center gap-2">
-            <span className="text-[10px] text-zinc-400 w-24 truncate text-right">
+          <div key={type} className="group flex items-center gap-2">
+            <span
+              className="text-[10px] w-24 truncate text-right transition-colors duration-200 group-hover:text-zinc-200"
+              style={{ color: glow }}
+            >
               {type}
             </span>
-            <div className="flex-1 h-3 bg-zinc-800 rounded-sm overflow-hidden">
+            <div className="flex-1 h-2.5 bg-zinc-800/50 rounded-full overflow-hidden">
               <div
-                className="h-full rounded-sm transition-all duration-500"
+                className="h-full rounded-full transition-all duration-700 ease-out"
                 style={{
                   width: `${pct}%`,
-                  backgroundColor: getTypeColor(type),
+                  background: `linear-gradient(90deg, ${color}, ${glow})`,
+                  boxShadow: `0 0 8px ${color}44`,
                 }}
               />
             </div>
-            <span className="text-[10px] text-zinc-500 w-8 text-right">
+            <span className="text-[10px] text-zinc-500 w-8 text-right font-mono">
               {count}
             </span>
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ── Stat item with glow ────────────────────────────────────
+
+function StatItem({ label, value, color }: { label: string; value: string | number; color?: string }) {
+  return (
+    <div className="flex justify-between items-center text-xs group">
+      <span className="text-zinc-500 group-hover:text-zinc-400 transition-colors">{label}</span>
+      <span
+        className="font-mono font-medium"
+        style={{ color: color || "#e2e8f0" }}
+      >
+        {value}
+      </span>
     </div>
   );
 }
@@ -86,18 +124,31 @@ export function GraphStats() {
 
   if (loading) {
     return (
-      <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-4">
-        <p className="text-zinc-400 text-sm">Loading graph stats...</p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="rounded-lg h-32 animate-pulse"
+            style={{
+              background: "linear-gradient(135deg, #0f172a, #1e293b)",
+              border: "1px solid #1e293b44",
+            }}
+          />
+        ))}
       </div>
     );
   }
 
   if (error || !stats) {
     return (
-      <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-4">
-        <p className="text-red-400 text-sm">
-          {error || "No stats available"}
-        </p>
+      <div
+        className="rounded-lg p-4"
+        style={{
+          background: "linear-gradient(135deg, #0f172a, #1e293b)",
+          border: "1px solid #7f1d1d44",
+        }}
+      >
+        <p className="text-red-400 text-sm">{error || "No stats available"}</p>
       </div>
     );
   }
@@ -105,71 +156,94 @@ export function GraphStats() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
       {/* Summary card */}
-      <div className="bg-zinc-900 border border-zinc-700 rounded-lg">
-        <div className="px-3 pt-3 pb-1">
-          <h3 className="text-sm text-zinc-300 font-medium">Graph Summary</h3>
+      <div
+        className="rounded-lg overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+          border: "1px solid #38bdf822",
+          boxShadow: "0 0 20px #38bdf808",
+        }}
+      >
+        {/* Header accent line */}
+        <div className="h-0.5" style={{ background: "linear-gradient(90deg, #38bdf8, #38bdf800)" }} />
+        <div className="px-3 pt-3 pb-1 flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-sky-400" style={{ boxShadow: "0 0 6px #38bdf888" }} />
+          <h3 className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Graph Summary</h3>
         </div>
-        <div className="px-3 pb-3 space-y-1">
-          <div className="flex justify-between text-xs">
-            <span className="text-zinc-400">Nodes</span>
-            <span className="text-zinc-200 font-mono">{stats.nodeCount}</span>
-          </div>
-          <div className="flex justify-between text-xs">
-            <span className="text-zinc-400">Edges</span>
-            <span className="text-zinc-200 font-mono">{stats.edgeCount}</span>
-          </div>
-          <div className="flex justify-between text-xs">
-            <span className="text-zinc-400">Density</span>
-            <span className="text-zinc-200 font-mono">{stats.density}</span>
-          </div>
-          <div className="flex justify-between text-xs">
-            <span className="text-zinc-400">Isolated</span>
-            <span className="text-zinc-200 font-mono">
-              {stats.isolatedNodes}
-            </span>
-          </div>
+        <div className="px-3 pb-3 space-y-1.5">
+          <StatItem label="Nodes" value={stats.nodeCount} color="#38bdf8" />
+          <StatItem label="Edges" value={stats.edgeCount} color="#a855f7" />
+          <StatItem label="Density" value={stats.density} color="#2dd4bf" />
+          <StatItem label="Isolated" value={stats.isolatedNodes} color="#fb923c" />
         </div>
       </div>
 
       {/* Edge type distribution */}
-      <div className="bg-zinc-900 border border-zinc-700 rounded-lg">
-        <div className="px-3 pt-3 pb-1">
-          <h3 className="text-sm text-zinc-300 font-medium">Edge Types</h3>
+      <div
+        className="rounded-lg overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+          border: "1px solid #a855f722",
+          boxShadow: "0 0 20px #a855f708",
+        }}
+      >
+        <div className="h-0.5" style={{ background: "linear-gradient(90deg, #a855f7, #a855f700)" }} />
+        <div className="px-3 pt-3 pb-1 flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-purple-400" style={{ boxShadow: "0 0 6px #a855f788" }} />
+          <h3 className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Edge Types</h3>
         </div>
         <div className="px-3 pb-3">
           {Object.keys(stats.edgeTypes).length > 0 ? (
             <BarChart data={stats.edgeTypes} />
           ) : (
-            <p className="text-zinc-500 text-xs">No edges yet</p>
+            <p className="text-zinc-600 text-xs py-2">No edges yet</p>
           )}
         </div>
       </div>
 
       {/* Top connected nodes */}
-      <div className="bg-zinc-900 border border-zinc-700 rounded-lg">
-        <div className="px-3 pt-3 pb-1">
-          <h3 className="text-sm text-zinc-300 font-medium">Most Connected</h3>
+      <div
+        className="rounded-lg overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+          border: "1px solid #2dd4bf22",
+          boxShadow: "0 0 20px #2dd4bf08",
+        }}
+      >
+        <div className="h-0.5" style={{ background: "linear-gradient(90deg, #2dd4bf, #2dd4bf00)" }} />
+        <div className="px-3 pt-3 pb-1 flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-teal-400" style={{ boxShadow: "0 0 6px #2dd4bf88" }} />
+          <h3 className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Most Connected</h3>
         </div>
         <div className="px-3 pb-3">
           {stats.topConnectedNodes.length > 0 ? (
             <div className="space-y-1">
-              {stats.topConnectedNodes.slice(0, 8).map((node, i) => (
-                <div
-                  key={node.id}
-                  className="flex items-center gap-2 text-xs"
-                >
-                  <span className="text-zinc-500 w-4 text-right">
-                    {i + 1}
-                  </span>
-                  <span className="text-zinc-300 font-mono truncate flex-1">
-                    {node.id}
-                  </span>
-                  <span className="text-zinc-500">{node.degree}</span>
-                </div>
-              ))}
+              {stats.topConnectedNodes.slice(0, 8).map((node, i) => {
+                const maxDeg = stats.topConnectedNodes[0]?.degree || 1;
+                const pct = (node.degree / maxDeg) * 100;
+                return (
+                  <div key={node.id} className="flex items-center gap-2 text-xs group">
+                    <span className="text-zinc-600 w-3 text-right font-mono">{i + 1}</span>
+                    <span className="text-zinc-400 font-mono truncate flex-1 group-hover:text-zinc-200 transition-colors">
+                      {node.id}
+                    </span>
+                    <div className="w-12 h-1.5 bg-zinc-800/50 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${pct}%`,
+                          background: "linear-gradient(90deg, #2dd4bf, #5eead4)",
+                          boxShadow: "0 0 4px #2dd4bf44",
+                        }}
+                      />
+                    </div>
+                    <span className="text-zinc-500 w-5 text-right font-mono">{node.degree}</span>
+                  </div>
+                );
+              })}
             </div>
           ) : (
-            <p className="text-zinc-500 text-xs">No nodes yet</p>
+            <p className="text-zinc-600 text-xs py-2">No nodes yet</p>
           )}
         </div>
       </div>

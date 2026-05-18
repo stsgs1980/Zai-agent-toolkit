@@ -1,24 +1,6 @@
 'use client'
 
-// ============================================================
-// Memory Dashboard with Graph Integration
-// ============================================================
-// This is a REFERENCE template showing how to integrate
-// GraphViewer + GraphStats into an existing memory-dashboard.
-//
-// MINIMAL CHANGES needed (see comments marked with ★):
-//   1. Add imports for GraphViewer, GraphStats
-//   2. Add viewMode state
-//   3. Add Graph/List icons to Icons object
-//   4. Add tab toggle buttons in header
-//   5. Add Ctrl+G keyboard shortcut
-//   6. Wrap existing content in viewMode === 'entries'
-//   7. Add graph view block
-// ============================================================
-
 import { useState, useEffect, useRef, useCallback } from 'react'
-
-// ★ ADD THESE TWO IMPORTS:
 import { GraphViewer } from '@/components/GraphViewer'
 import { GraphStats } from '@/components/GraphStats'
 
@@ -48,7 +30,15 @@ const TYPE_LABELS: Record<string, string> = {
   template: 'Template'
 }
 
-// Icons (inline SVG)
+const TYPE_COLORS: Record<string, string> = {
+  knowledge: '#a855f7',
+  session: '#38bdf8',
+  pattern: '#fbbf24',
+  project: '#4ade80',
+  template: '#fb923c',
+}
+
+// Icons
 const Icons = {
   Search: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>,
   Plus: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>,
@@ -57,24 +47,28 @@ const Icons = {
   Brain: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>,
   X: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>,
   Refresh: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>,
-  // ★ ADD THESE TWO ICONS:
   Graph: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>,
   List: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>,
+  Database: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>,
 }
 
-// Terminal Frame Component
+// Terminal Frame
 function TerminalFrame({ title, children, headerRight }: { title: string; children: React.ReactNode; headerRight?: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-zinc-700 bg-zinc-900 overflow-hidden shadow-sm">
-      <div className="flex items-center gap-2 px-3 py-2 bg-zinc-800/50 border-b border-zinc-700">
+    <div
+      className="rounded-lg overflow-hidden"
+      style={{
+        background: "linear-gradient(135deg, #0f172a, #1e293b)",
+        border: "1px solid #33415544",
+      }}
+    >
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-zinc-800">
         <div className="flex gap-1.5">
-          <div className="w-3 h-3 rounded-full bg-red-400" />
-          <div className="w-3 h-3 rounded-full bg-yellow-400" />
-          <div className="w-3 h-3 rounded-full bg-green-400" />
+          <div className="w-3 h-3 rounded-full bg-red-500/70" />
+          <div className="w-3 h-3 rounded-full bg-yellow-500/70" />
+          <div className="w-3 h-3 rounded-full bg-green-500/70" />
         </div>
-        <span className="text-xs font-mono text-zinc-400 ml-2">
-          {title}
-        </span>
+        <span className="text-xs font-mono text-zinc-500 ml-2">{title}</span>
         {headerRight && <div className="ml-auto">{headerRight}</div>}
       </div>
       <div className="p-4">{children}</div>
@@ -82,14 +76,14 @@ function TerminalFrame({ title, children, headerRight }: { title: string; childr
   )
 }
 
-// Button Component
+// Button
 function Button({ children, variant = 'default', size = 'default', className = '', ...props }: any) {
-  const base = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none'
+  const base = 'inline-flex items-center justify-center rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-950 disabled:opacity-50 disabled:pointer-events-none'
   const variants: Record<string, string> = {
-    default: 'bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200',
-    outline: 'border border-zinc-700 bg-transparent hover:bg-zinc-800 text-zinc-300',
-    ghost: 'bg-transparent hover:bg-zinc-800 text-zinc-300',
-    destructive: 'bg-red-500 text-white hover:bg-red-600'
+    default: 'bg-zinc-100 text-zinc-900 hover:bg-white',
+    outline: 'border border-zinc-700 bg-transparent hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200',
+    ghost: 'bg-transparent hover:bg-zinc-800/50 text-zinc-400 hover:text-zinc-200',
+    destructive: 'bg-red-600 text-white hover:bg-red-500'
   }
   const sizes: Record<string, string> = {
     default: 'h-10 px-4 py-2 text-sm',
@@ -99,83 +93,88 @@ function Button({ children, variant = 'default', size = 'default', className = '
   return <button className={`${base} ${variants[variant]} ${sizes[size]} ${className}`} {...props}>{children}</button>
 }
 
-// Input Component
+// Input
 function Input({ className = '', ...props }: any) {
-  return <input className={`flex h-9 w-full rounded-md border border-zinc-700 bg-zinc-900 text-zinc-100 px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-zinc-500 placeholder-zinc-500 ${className}`} {...props} />
+  return <input className={`flex h-9 w-full rounded-md border border-zinc-700 bg-zinc-900/50 text-zinc-100 px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500/50 focus:border-sky-500/50 placeholder-zinc-600 transition-all duration-200 ${className}`} {...props} />
 }
 
-// Textarea Component
+// Textarea
 function Textarea({ className = '', ...props }: any) {
-  return <textarea className={`flex min-h-[60px] w-full rounded-md border border-zinc-700 bg-zinc-900 text-zinc-100 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-zinc-500 resize-none placeholder-zinc-500 ${className}`} {...props} />
+  return <textarea className={`flex min-h-[60px] w-full rounded-md border border-zinc-700 bg-zinc-900/50 text-zinc-100 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500/50 focus:border-sky-500/50 resize-none placeholder-zinc-600 transition-all duration-200 ${className}`} {...props} />
 }
 
-// Label Component
+// Label
 function Label({ children, className = '' }: any) {
-  return <label className={`text-sm font-medium leading-none text-zinc-300 ${className}`}>{children}</label>
+  return <label className={`text-sm font-medium leading-none text-zinc-400 ${className}`}>{children}</label>
 }
 
-// Badge Component
+// Badge
 function Badge({ children, variant = 'default', className = '' }: any) {
   const variants: Record<string, string> = {
-    default: 'bg-zinc-800 text-zinc-100',
-    secondary: 'bg-zinc-800/50 text-zinc-400',
-    outline: 'border border-zinc-700 bg-transparent text-zinc-300'
+    default: 'bg-zinc-800 text-zinc-200',
+    secondary: 'bg-zinc-800/50 text-zinc-500',
+    outline: 'border border-zinc-700 bg-transparent text-zinc-400'
   }
   return <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${variants[variant]} ${className}`}>{children}</span>
 }
 
-// Select Components
-function Select({ value, onValueChange, children }: any) {
+// Select
+function Select({ value, onValueChange }: any) {
   const [open, setOpen] = useState(false)
   return (
     <div className="relative">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex h-9 w-full items-center justify-between rounded-md border border-zinc-700 bg-zinc-900 text-zinc-100 px-3 py-2 text-sm"
+        className="flex h-9 w-full items-center justify-between rounded-md border border-zinc-700 bg-zinc-900/50 text-zinc-100 px-3 py-2 text-sm"
       >
         {TYPE_LABELS[value] || value}
         <svg className="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
       </button>
       {open && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border border-zinc-700 bg-zinc-900 shadow-lg">
-          <div className="p-1">
-            {['knowledge', 'session', 'pattern', 'project', 'template'].map(type => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => { onValueChange(type); setOpen(false) }}
-                className="flex w-full items-center rounded-sm px-2 py-1.5 text-sm text-zinc-300 hover:bg-zinc-800"
-              >
-                {TYPE_LABELS[type]}
-              </button>
-            ))}
-          </div>
+        <div className="absolute z-50 mt-1 w-full rounded-md border border-zinc-700 bg-zinc-900 shadow-lg overflow-hidden">
+          {['knowledge', 'session', 'pattern', 'project', 'template'].map(type => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => { onValueChange(type); setOpen(false) }}
+              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 transition-colors"
+            >
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: TYPE_COLORS[type] }} />
+              {TYPE_LABELS[type]}
+            </button>
+          ))}
         </div>
       )}
     </div>
   )
 }
 
-// Dialog Components
+// Dialog
 function Dialog({ open, onOpenChange, children }: any) {
   if (!open) return null
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="fixed inset-0 bg-black/70" onClick={() => onOpenChange(false)} />
-      <div className="relative z-50 w-full max-w-md bg-zinc-900 border border-zinc-700 rounded-lg shadow-lg p-6 mx-4">
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={() => onOpenChange(false)} />
+      <div
+        className="relative z-50 w-full max-w-md rounded-lg shadow-2xl p-6 mx-4"
+        style={{
+          background: "linear-gradient(135deg, #0f172a, #1e293b)",
+          border: "1px solid #33415566",
+        }}
+      >
         {children}
       </div>
     </div>
   )
 }
 
-// Toast notification
 function toast(message: { title: string; description?: string }) {
   alert(message.title + (message.description ? `\n${message.description}` : ''))
 }
 
-// Main Component
+// ── Main Component ──────────────────────────────────────────
+
 export default function MemoryDashboard() {
   const [entries, setEntries] = useState<MemoryEntry[]>([])
   const [allEntries, setAllEntries] = useState<MemoryEntry[]>([])
@@ -191,8 +190,6 @@ export default function MemoryDashboard() {
   const [relatedLoading, setRelatedLoading] = useState(false)
   const [semanticMode, setSemanticMode] = useState(false)
   const [newEntry, setNewEntry] = useState({ type: 'knowledge', content: '', metadata: '' })
-
-  // ★ ADD THIS STATE:
   const [viewMode, setViewMode] = useState<'entries' | 'graph'>('entries')
 
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -274,10 +271,7 @@ export default function MemoryDashboard() {
   }, [allEntries])
 
   const handleAddEntry = async () => {
-    if (!newEntry.content.trim()) {
-      toast({ title: 'Content required' })
-      return
-    }
+    if (!newEntry.content.trim()) { toast({ title: 'Content required' }); return }
     const metadata: Record<string, string> = {}
     if (newEntry.metadata) {
       newEntry.metadata.split(',').forEach(pair => {
@@ -296,55 +290,30 @@ export default function MemoryDashboard() {
         toast({ title: 'Stored' })
         setDialogOpen(false)
         setNewEntry({ type: 'knowledge', content: '', metadata: '' })
-        fetchEntries()
-        fetchStats()
-        fetchAllEntries()
+        fetchEntries(); fetchStats(); fetchAllEntries()
       }
-    } catch {
-      toast({ title: 'Error' })
-    }
+    } catch { toast({ title: 'Error' }) }
   }
 
   const handleDelete = async (id: string) => {
     try {
       const res = await fetch(`/api/memory?id=${id}`, { method: 'DELETE' })
       const data = await res.json()
-      if (data.success) {
-        setDetailOpen(false)
-        setSelectedEntry(null)
-        fetchEntries()
-        fetchStats()
-        fetchAllEntries()
-      }
+      if (data.success) { setDetailOpen(false); setSelectedEntry(null); fetchEntries(); fetchStats(); fetchAllEntries() }
     } catch {}
   }
 
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text)
-    toast({ title: 'Copied' })
-  }
+  const handleCopy = (text: string) => { navigator.clipboard.writeText(text); toast({ title: 'Copied' }) }
 
-  const openEntry = (entry: MemoryEntry) => {
-    setSelectedEntry(entry)
-    setDetailOpen(true)
-    fetchRelated(entry)
-  }
+  const openEntry = (entry: MemoryEntry) => { setSelectedEntry(entry); setDetailOpen(true); fetchRelated(entry) }
 
-  useEffect(() => {
-    fetchStats()
-    fetchAllEntries()
-  }, [])
+  useEffect(() => { fetchStats(); fetchAllEntries() }, [])
+  useEffect(() => { if (!semanticMode) fetchEntries() }, [selectedType, semanticMode])
 
-  useEffect(() => {
-    if (!semanticMode) fetchEntries()
-  }, [selectedType, semanticMode])
-
-  // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === 'k') { e.preventDefault(); searchInputRef.current?.focus() }
       if (e.ctrlKey && e.key === 'n') { e.preventDefault(); setDialogOpen(true) }
-      // ★ ADD THIS SHORTCUT:
       if (e.ctrlKey && e.key === 'g') { e.preventDefault(); setViewMode(v => v === 'graph' ? 'entries' : 'graph') }
       if (e.key === 'Escape') { setDetailOpen(false); setSelectedEntry(null) }
     }
@@ -353,50 +322,104 @@ export default function MemoryDashboard() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-zinc-950 p-6">
+    <div
+      className="min-h-screen p-6"
+      style={{ background: "linear-gradient(180deg, #020617 0%, #0f172a 100%)" }}
+    >
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <header className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-800">
-          <div>
-            <h1 className="text-xl font-semibold text-zinc-100">Memory Dashboard</h1>
-            <p className="text-sm text-zinc-500">
-              {stats ? `${stats.total} entries` : 'Loading...'}
-              <span className="ml-3 text-xs text-zinc-600">[Ctrl+K search] [Ctrl+N new] [Ctrl+G graph] [Esc back]</span>
-            </p>
+        {/* ═══ Header ═══ */}
+        <header className="flex items-center justify-between mb-6 pb-4">
+          {/* Left: Logo + title */}
+          <div className="flex items-center gap-3">
+            <div
+              className="w-9 h-9 rounded-lg flex items-center justify-center"
+              style={{
+                background: "linear-gradient(135deg, #38bdf822, #a855f722)",
+                border: "1px solid #38bdf833",
+                boxShadow: "0 0 15px #38bdf811",
+              }}
+            >
+              <Icons.Database />
+            </div>
+            <div>
+              <h1 className="text-lg font-semibold text-zinc-100 flex items-center gap-2">
+                Memory Dashboard
+                {viewMode === 'graph' && (
+                  <span
+                    className="text-[10px] px-1.5 py-0.5 rounded-full font-normal"
+                    style={{
+                      backgroundColor: "#38bdf815",
+                      color: "#38bdf8",
+                      border: "1px solid #38bdf833",
+                    }}
+                  >
+                    GRAPH
+                  </span>
+                )}
+              </h1>
+              <p className="text-xs text-zinc-600">
+                {stats ? `${stats.total} entries` : 'Loading...'}
+                <span className="ml-2 text-zinc-700">Ctrl+K Ctrl+N Ctrl+G Esc</span>
+              </p>
+            </div>
           </div>
+
+          {/* Right: Tabs + New button */}
           <div className="flex items-center gap-2">
-            {/* ★ ADD THESE TAB BUTTONS: */}
-            <div className="flex rounded-lg border border-zinc-700 overflow-hidden">
+            <div
+              className="flex rounded-lg overflow-hidden"
+              style={{
+                border: "1px solid #1e293b",
+                boxShadow: "inset 0 1px 0 #ffffff06",
+              }}
+            >
               <button
                 onClick={() => setViewMode('entries')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors ${
-                  viewMode === 'entries'
-                    ? 'bg-zinc-100 text-zinc-900'
-                    : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
-                }`}
+                className="flex items-center gap-1.5 px-3.5 py-2 text-sm transition-all duration-200"
+                style={{
+                  background: viewMode === 'entries' ? "linear-gradient(180deg, #e2e8f0, #cbd5e1)" : "transparent",
+                  color: viewMode === 'entries' ? '#0f172a' : '#64748b',
+                  boxShadow: viewMode === 'entries' ? '0 0 10px #94a3b833' : 'none',
+                }}
               >
                 <Icons.List /> Entries
               </button>
               <button
                 onClick={() => setViewMode('graph')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors ${
-                  viewMode === 'graph'
-                    ? 'bg-zinc-100 text-zinc-900'
-                    : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
-                }`}
+                className="flex items-center gap-1.5 px-3.5 py-2 text-sm transition-all duration-200"
+                style={{
+                  background: viewMode === 'graph' ? "linear-gradient(180deg, #38bdf8, #0ea5e9)" : "transparent",
+                  color: viewMode === 'graph' ? '#0c4a6e' : '#64748b',
+                  boxShadow: viewMode === 'graph' ? '0 0 15px #38bdf844' : 'none',
+                }}
               >
                 <Icons.Graph /> Graph
               </button>
             </div>
-            <Button onClick={() => setDialogOpen(true)} className="gap-2">
+            <button
+              onClick={() => setDialogOpen(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2 text-sm rounded-lg transition-all duration-200"
+              style={{
+                background: "linear-gradient(180deg, #e2e8f0, #cbd5e1)",
+                color: "#0f172a",
+              }}
+            >
               <Icons.Plus /> New
-            </Button>
+            </button>
           </div>
         </header>
 
-        {/* ═══════════════════════════════════════════════════════
-            ★ GRAPH VIEW — NEW!
-            ═══════════════════════════════════════════════════════ */}
+        {/* Accent line under header */}
+        <div
+          className="mb-6 h-px"
+          style={{
+            background: viewMode === 'graph'
+              ? "linear-gradient(90deg, transparent, #38bdf855, transparent)"
+              : "linear-gradient(90deg, transparent, #1e293b, transparent)",
+          }}
+        />
+
+        {/* ═══ GRAPH VIEW ═══ */}
         {viewMode === 'graph' && (
           <div className="space-y-4">
             <GraphStats />
@@ -404,15 +427,15 @@ export default function MemoryDashboard() {
           </div>
         )}
 
-        {/* ═══════════════════════════════════════════════════════
-            ★ ENTRIES VIEW — wrap existing content in this condition
-            ═══════════════════════════════════════════════════════ */}
+        {/* ═══ ENTRIES VIEW ═══ */}
         {viewMode === 'entries' && (
           <div className="grid grid-cols-12 gap-6">
             {/* Sidebar */}
             <aside className="col-span-3 space-y-4">
               <div className="relative">
-                <Icons.Search />
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600">
+                  <Icons.Search />
+                </div>
                 <Input
                   ref={searchInputRef}
                   value={searchQuery}
@@ -423,34 +446,49 @@ export default function MemoryDashboard() {
                 />
               </div>
               <div className="flex gap-2">
-                <Button
-                  variant={semanticMode ? 'default' : 'outline'}
-                  size="sm"
+                <button
                   onClick={() => { setSemanticMode(!semanticMode); if (!semanticMode && searchQuery) handleSemanticSearch() }}
-                  className="gap-1"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md transition-all duration-200"
+                  style={{
+                    background: semanticMode ? "linear-gradient(135deg, #a855f722, #a855f711)" : "transparent",
+                    border: `1px solid ${semanticMode ? "#a855f744" : "#1e293b"}`,
+                    color: semanticMode ? "#c084fc" : "#64748b",
+                    boxShadow: semanticMode ? "0 0 10px #a855f711" : "none",
+                  }}
                 >
                   <Icons.Brain /> AI
-                </Button>
+                </button>
                 <Button variant="outline" size="sm" onClick={handleSearch}>Search</Button>
               </div>
 
               {/* Type Filters */}
               <div className="space-y-1">
-                <span className="text-xs text-zinc-500 uppercase tracking-wide">Types</span>
+                <span className="text-[10px] text-zinc-600 uppercase tracking-wider px-3">Types</span>
                 {stats && Object.entries(stats.byType)
                   .filter(([_, count]) => count > 0)
                   .map(([type, count]) => (
                     <button
                       key={type}
                       onClick={() => { setSelectedType(type); setSemanticMode(false) }}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded text-sm transition-colors ${
-                        selectedType === type && !semanticMode
-                          ? 'bg-zinc-800 text-zinc-100'
-                          : 'text-zinc-400 hover:bg-zinc-800/50'
-                      }`}
+                      className="w-full flex items-center justify-between px-3 py-2 rounded text-sm transition-all duration-200"
+                      style={{
+                        background: selectedType === type && !semanticMode
+                          ? `${TYPE_COLORS[type] || "#38bdf8"}11` : "transparent",
+                        border: "1px solid transparent",
+                        borderColor: selectedType === type && !semanticMode
+                          ? `${TYPE_COLORS[type] || "#38bdf8"}33` : "transparent",
+                        color: selectedType === type && !semanticMode
+                          ? TYPE_COLORS[type] || "#38bdf8" : "#64748b",
+                      }}
                     >
-                      <span className="capitalize">{type}</span>
-                      <span className="text-zinc-600">{count}</span>
+                      <span className="flex items-center gap-2">
+                        <span
+                          className="w-1.5 h-1.5 rounded-full"
+                          style={{ backgroundColor: TYPE_COLORS[type] || "#38bdf8" }}
+                        />
+                        <span className="capitalize">{type}</span>
+                      </span>
+                      <span className="text-zinc-600 text-xs">{count}</span>
                     </button>
                   ))}
               </div>
@@ -460,36 +498,51 @@ export default function MemoryDashboard() {
             <main className="col-span-6">
               {semanticMode && (
                 <div className="flex items-center gap-2 mb-3">
-                  <Badge className="gap-1"><Icons.Brain /> Semantic Mode</Badge>
+                  <span
+                    className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs"
+                    style={{
+                      backgroundColor: "#a855f715",
+                      color: "#c084fc",
+                      border: "1px solid #a855f733",
+                    }}
+                  >
+                    <Icons.Brain /> Semantic
+                  </span>
                   <Button variant="ghost" size="sm" onClick={() => { setSemanticMode(false); fetchEntries() }}>Clear</Button>
                 </div>
               )}
 
               {loading || semanticLoading ? (
                 <div className="space-y-3">
-                  {[1, 2, 3].map(i => <div key={i} className="h-16 rounded bg-zinc-800 animate-pulse" />)}
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="h-16 rounded-lg animate-pulse" style={{ background: "linear-gradient(90deg, #0f172a, #1e293b, #0f172a)" }} />
+                  ))}
                 </div>
               ) : entries.length === 0 ? (
-                <div className="flex items-center justify-center h-48 text-zinc-600">No entries</div>
+                <div className="flex items-center justify-center h-48 text-zinc-700">No entries</div>
               ) : (
-                <div className="space-y-1">
+                <div className="space-y-0.5">
                   {entries.map(entry => (
                     <button
                       key={entry.id}
                       onClick={() => openEntry(entry)}
-                      className="w-full text-left group flex items-start gap-3 py-3 px-3 rounded hover:bg-zinc-800/50 transition-colors"
+                      className="w-full text-left group flex items-start gap-3 py-3 px-3 rounded-lg hover:bg-zinc-800/30 transition-all duration-200"
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
+                          <span
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ backgroundColor: TYPE_COLORS[entry.type] || "#38bdf8" }}
+                          />
                           <span className="text-xs text-zinc-500 capitalize">{entry.type}</span>
                           {(entry.distance !== undefined || entry.relevanceScore !== undefined) && (
-                            <span className="text-xs text-zinc-500">
+                            <span className="text-xs text-zinc-600">
                               {Math.round(((entry.distance ? 1 - entry.distance : entry.relevanceScore || 0)) * 100)}%
                             </span>
                           )}
-                          <span className="text-xs text-zinc-600">{new Date(entry.created_at).toLocaleDateString()}</span>
+                          <span className="text-xs text-zinc-700">{new Date(entry.created_at).toLocaleDateString()}</span>
                         </div>
-                        <p className="text-sm text-zinc-300 line-clamp-2">{entry.content}</p>
+                        <p className="text-sm text-zinc-400 group-hover:text-zinc-200 line-clamp-2 transition-colors">{entry.content}</p>
                       </div>
                     </button>
                   ))}
@@ -500,15 +553,24 @@ export default function MemoryDashboard() {
             {/* Stats Panel */}
             <aside className="col-span-3">
               {stats && (
-                <div className="space-y-4">
-                  <span className="text-xs text-zinc-500 uppercase tracking-wide">Statistics</span>
-                  <div className="space-y-3">
+                <div
+                  className="rounded-lg p-3 space-y-3"
+                  style={{
+                    background: "linear-gradient(135deg, #0f172a, #1e293b)",
+                    border: "1px solid #1e293b44",
+                  }}
+                >
+                  <span className="text-[10px] text-zinc-600 uppercase tracking-wider">Statistics</span>
+                  <div className="space-y-2">
                     {Object.entries(stats.byType)
                       .filter(([_, count]) => count > 0)
                       .map(([type, count]) => (
-                        <div key={type} className="flex items-center justify-between">
-                          <span className="text-sm text-zinc-400 capitalize">{type}</span>
-                          <span className="text-sm font-medium text-zinc-200">{count}</span>
+                        <div key={type} className="flex items-center justify-between text-xs">
+                          <span className="flex items-center gap-1.5 text-zinc-500">
+                            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: TYPE_COLORS[type] }} />
+                            {type}
+                          </span>
+                          <span className="font-mono text-zinc-300">{count}</span>
                         </div>
                       ))}
                   </div>
@@ -536,7 +598,7 @@ export default function MemoryDashboard() {
               />
             </div>
             <div>
-              <Label className="text-zinc-500">Metadata (optional)</Label>
+              <Label className="text-zinc-600">Metadata (optional)</Label>
               <Input
                 value={newEntry.metadata}
                 onChange={(e: any) => setNewEntry({ ...newEntry, metadata: e.target.value })}
@@ -546,7 +608,17 @@ export default function MemoryDashboard() {
           </div>
           <div className="flex justify-end gap-2 mt-6">
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleAddEntry}>Store</Button>
+            <button
+              onClick={handleAddEntry}
+              className="px-4 py-2 text-sm rounded-md font-medium transition-all duration-200"
+              style={{
+                background: "linear-gradient(180deg, #38bdf8, #0ea5e9)",
+                color: "#0c4a6e",
+                boxShadow: "0 0 10px #38bdf833",
+              }}
+            >
+              Store
+            </button>
           </div>
         </Dialog>
 
@@ -556,8 +628,12 @@ export default function MemoryDashboard() {
             <TerminalFrame title={`memory/${selectedEntry.type}`}>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <Badge className="capitalize">{selectedEntry.type}</Badge>
-                  <span className="text-xs text-zinc-500">{new Date(selectedEntry.created_at).toLocaleString()}</span>
+                  <span
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: TYPE_COLORS[selectedEntry.type] || "#38bdf8" }}
+                  />
+                  <span className="text-xs text-zinc-400 capitalize">{selectedEntry.type}</span>
+                  <span className="text-xs text-zinc-600">{new Date(selectedEntry.created_at).toLocaleString()}</span>
                 </div>
                 <div className="flex gap-1">
                   <Button variant="ghost" size="icon" onClick={() => handleCopy(selectedEntry.content)}><Icons.Copy /></Button>
@@ -565,8 +641,8 @@ export default function MemoryDashboard() {
                 </div>
               </div>
 
-              <div className="bg-zinc-800/50 p-3 rounded mb-4 max-h-64 overflow-auto">
-                <pre className="text-sm whitespace-pre-wrap text-zinc-200">{selectedEntry.content}</pre>
+              <div className="bg-zinc-950/50 p-3 rounded mb-4 max-h-64 overflow-auto">
+                <pre className="text-sm whitespace-pre-wrap text-zinc-300">{selectedEntry.content}</pre>
               </div>
 
               {Object.keys(selectedEntry.metadata).filter(k => k !== 'type').length > 0 && (
@@ -575,42 +651,49 @@ export default function MemoryDashboard() {
                     .filter(([k]) => k !== 'type')
                     .map(([key, value]) => (
                       <div key={key} className="flex items-center gap-2">
-                        <span className="text-zinc-500">{key}:</span>
+                        <span className="text-zinc-600">{key}:</span>
                         <span className="text-zinc-300 font-mono">{value}</span>
                       </div>
                     ))}
                 </div>
               )}
 
-              <div className="pt-4 border-t border-zinc-700">
+              <div className="pt-4 border-t border-zinc-800">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-zinc-500 uppercase">Related</span>
+                  <span className="text-[10px] text-zinc-600 uppercase tracking-wider">Related</span>
                   <Button variant="ghost" size="icon" onClick={() => fetchRelated(selectedEntry)} disabled={relatedLoading}>
                     <Icons.Refresh />
                   </Button>
                 </div>
                 {relatedLoading ? (
-                  <div className="space-y-2">{[1, 2].map(i => <div key={i} className="h-8 bg-zinc-800 rounded animate-pulse" />)}</div>
+                  <div className="space-y-2">{[1, 2].map(i => <div key={i} className="h-8 rounded animate-pulse" style={{ background: "linear-gradient(90deg, #0f172a, #1e293b, #0f172a)" }} />)}</div>
                 ) : relatedEntries.length > 0 ? (
                   <div className="space-y-1">
                     {relatedEntries.map(rel => (
                       <button
                         key={rel.id}
                         onClick={() => { setSelectedEntry(rel); fetchRelated(rel) }}
-                        className="w-full flex items-center justify-between p-2 rounded border border-zinc-700 hover:bg-zinc-800 text-left"
+                        className="w-full flex items-center justify-between p-2 rounded-lg border border-zinc-800 hover:bg-zinc-800/30 text-left transition-all duration-200"
                       >
                         <div className="flex-1 min-w-0">
                           <p className="text-xs truncate text-zinc-300">{rel.content}</p>
-                          <p className="text-[10px] text-zinc-500">{rel.similarityReason}</p>
+                          <p className="text-[10px] text-zinc-600">{rel.similarityReason}</p>
                         </div>
-                        <Badge className={`ml-2 text-[10px] ${rel.similarityScore && rel.similarityScore >= 0.7 ? 'bg-green-900 text-green-300' : ''}`}>
+                        <span
+                          className="ml-2 px-1.5 py-0.5 rounded-full text-[10px]"
+                          style={{
+                            backgroundColor: rel.similarityScore && rel.similarityScore >= 0.7 ? "#4ade8015" : "#1e293b",
+                            color: rel.similarityScore && rel.similarityScore >= 0.7 ? "#4ade80" : "#64748b",
+                            border: `1px solid ${rel.similarityScore && rel.similarityScore >= 0.7 ? "#4ade8033" : "#1e293b"}`,
+                          }}
+                        >
                           {rel.similarityScore ? Math.round(rel.similarityScore * 100) : 0}%
-                        </Badge>
+                        </span>
                       </button>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-zinc-600">No related entries</p>
+                  <p className="text-xs text-zinc-700">No related entries</p>
                 )}
               </div>
             </TerminalFrame>

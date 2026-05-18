@@ -3,28 +3,50 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { fetchGraph, type GraphEdge, type GraphStats } from "@/lib/graph-client";
 
-// ── Edge type colors (matches graph_engine.py TYPE_COLORS) ─
+// ── Neon color palette (matches graph_engine.py + cyberpunk accent) ─
 
 const EDGE_COLORS: Record<string, string> = {
-  parent_dir: "#95a5a6",
-  imports: "#8e44ad",
-  same_session: "#2980b9",
-  depends_on: "#16a085",
-  follow_up: "#27ae60",
-  fixed_by: "#c0392b",
-  implements: "#f39c12",
-  modifies: "#e67e22",
-  related_to: "#3498db",
+  parent_dir: "#64748b",
+  imports: "#a855f7",
+  same_session: "#38bdf8",
+  depends_on: "#2dd4bf",
+  follow_up: "#4ade80",
+  fixed_by: "#f87171",
+  implements: "#fbbf24",
+  modifies: "#fb923c",
+  related_to: "#60a5fa",
+};
+
+const EDGE_GLOW: Record<string, string> = {
+  parent_dir: "#64748b",
+  imports: "#c084fc",
+  same_session: "#7dd3fc",
+  depends_on: "#5eead4",
+  follow_up: "#86efac",
+  fixed_by: "#fca5a5",
+  implements: "#fde68a",
+  modifies: "#fdba74",
+  related_to: "#93c5fd",
 };
 
 const NODE_COLORS: Record<string, string> = {
-  session: "#2980b9",
-  task: "#27ae60",
-  bug: "#c0392b",
-  knowledge: "#8e44ad",
-  commit: "#e67e22",
-  src: "#16a085",
-  REQ: "#f39c12",
+  session: "#38bdf8",
+  task: "#4ade80",
+  bug: "#f87171",
+  knowledge: "#a855f7",
+  commit: "#fb923c",
+  src: "#2dd4bf",
+  REQ: "#fbbf24",
+};
+
+const NODE_GLOW: Record<string, string> = {
+  session: "#7dd3fc",
+  task: "#86efac",
+  bug: "#fca5a5",
+  knowledge: "#c084fc",
+  commit: "#fdba74",
+  src: "#5eead4",
+  REQ: "#fde68a",
 };
 
 // ── Helper: classify node by prefix ────────────────────────
@@ -39,11 +61,14 @@ function classifyNode(id: string): string {
 }
 
 function getNodeColor(id: string): string {
-  const group = classifyNode(id);
-  return NODE_COLORS[group] || "#4a90d9";
+  return NODE_COLORS[classifyNode(id)] || "#60a5fa";
 }
 
-// ── Selected node detail panel (plain HTML + Tailwind) ─────
+function getNodeGlow(id: string): string {
+  return NODE_GLOW[classifyNode(id)] || "#93c5fd";
+}
+
+// ── Node detail panel — neon style ─────────────────────────
 
 interface NodeDetailProps {
   nodeId: string;
@@ -55,82 +80,146 @@ function NodeDetail({ nodeId, edges, onClose }: NodeDetailProps) {
   const incoming = edges.filter((e) => e.to === nodeId);
   const outgoing = edges.filter((e) => e.from === nodeId);
   const group = classifyNode(nodeId);
+  const glow = getNodeGlow(nodeId);
+  const color = getNodeColor(nodeId);
 
   return (
-    <div className="bg-zinc-900 border border-zinc-700 rounded-lg overflow-hidden">
-      <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-700">
-        <span className="text-sm font-mono text-zinc-100 truncate max-w-[80%]">
-          {nodeId}
-        </span>
-        <button
-          onClick={onClose}
-          className="text-zinc-400 hover:text-white text-sm leading-none"
-        >
-          x
-        </button>
+    <div
+      className="rounded-lg overflow-hidden"
+      style={{
+        background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+        border: `1px solid ${color}33`,
+        boxShadow: `0 0 20px ${color}11, inset 0 1px 0 ${color}15`,
+      }}
+    >
+      {/* Header with gradient underline */}
+      <div className="relative px-3 py-2.5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 min-w-0">
+            <span
+              className="inline-block w-2 h-2 rounded-full shrink-0"
+              style={{ backgroundColor: color, boxShadow: `0 0 6px ${glow}` }}
+            />
+            <span className="text-sm font-mono text-zinc-100 truncate">
+              {nodeId}
+            </span>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-zinc-500 hover:text-white text-sm leading-none ml-2 transition-colors"
+          >
+            x
+          </button>
+        </div>
+        <div
+          className="absolute bottom-0 left-0 right-0 h-px"
+          style={{ background: `linear-gradient(90deg, ${color}66, transparent)` }}
+        />
       </div>
-      <div className="p-3 text-xs space-y-2">
+
+      {/* Body */}
+      <div className="p-3 text-xs space-y-3">
+        {/* Group badge */}
         <div className="flex items-center gap-2">
-          <span className="text-zinc-400">Group:</span>
+          <span className="text-zinc-500">Type</span>
           <span
-            className="px-1.5 py-0.5 rounded text-[10px] border"
+            className="px-2 py-0.5 rounded-full text-[10px] font-medium"
             style={{
-              borderColor: NODE_COLORS[group] || "#4a90d9",
-              color: NODE_COLORS[group] || "#4a90d9",
+              backgroundColor: `${color}15`,
+              color: glow,
+              border: `1px solid ${color}33`,
+              boxShadow: `0 0 8px ${color}11`,
             }}
           >
             {group}
           </span>
         </div>
-        <div className="text-zinc-400">
-          Incoming: {incoming.length} | Outgoing: {outgoing.length}
+
+        {/* Connection counts */}
+        <div className="flex gap-3">
+          <div className="flex items-center gap-1.5">
+            <svg className="w-3 h-3 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+            <span className="text-zinc-400">{incoming.length}</span>
+            <span className="text-zinc-600">in</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <svg className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            </svg>
+            <span className="text-zinc-400">{outgoing.length}</span>
+            <span className="text-zinc-600">out</span>
+          </div>
         </div>
+
+        {/* Incoming edges */}
         {incoming.length > 0 && (
           <div>
-            <div className="text-zinc-500 mb-1">Incoming edges:</div>
-            {incoming.slice(0, 5).map((e, i) => (
-              <div key={i} className="flex items-center gap-1 ml-2">
-                <span
-                  className="inline-block w-2 h-2 rounded-full shrink-0"
-                  style={{ backgroundColor: EDGE_COLORS[e.type] || "#3498db" }}
-                />
-                <span className="text-zinc-400 truncate max-w-[60%]">
-                  {e.from}
-                </span>
-                <span className="px-1 py-0 rounded bg-zinc-800 text-[10px] text-zinc-400">
-                  {e.type}
-                </span>
-              </div>
-            ))}
-            {incoming.length > 5 && (
-              <div className="text-zinc-500 ml-2">
-                +{incoming.length - 5} more
-              </div>
-            )}
+            <div className="text-zinc-600 mb-1.5 uppercase tracking-wider text-[10px]">Incoming</div>
+            <div className="space-y-1">
+              {incoming.slice(0, 5).map((e, i) => (
+                <div key={i} className="flex items-center gap-1.5 ml-1 group/edge">
+                  <span
+                    className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
+                    style={{
+                      backgroundColor: EDGE_COLORS[e.type] || "#60a5fa",
+                      boxShadow: `0 0 4px ${EDGE_GLOW[e.type] || "#93c5fd"}66`,
+                    }}
+                  />
+                  <span className="text-zinc-400 truncate max-w-[55%] group-hover/edge:text-zinc-200 transition-colors">
+                    {e.from}
+                  </span>
+                  <span
+                    className="px-1.5 py-0 rounded-full text-[9px]"
+                    style={{
+                      backgroundColor: `${EDGE_COLORS[e.type]}15`,
+                      color: EDGE_GLOW[e.type],
+                    }}
+                  >
+                    {e.type}
+                  </span>
+                </div>
+              ))}
+              {incoming.length > 5 && (
+                <div className="text-zinc-600 ml-1">+{incoming.length - 5} more</div>
+              )}
+            </div>
           </div>
         )}
+
+        {/* Outgoing edges */}
         {outgoing.length > 0 && (
           <div>
-            <div className="text-zinc-500 mb-1">Outgoing edges:</div>
-            {outgoing.slice(0, 5).map((e, i) => (
-              <div key={i} className="flex items-center gap-1 ml-2">
-                <span
-                  className="inline-block w-2 h-2 rounded-full shrink-0"
-                  style={{ backgroundColor: EDGE_COLORS[e.type] || "#3498db" }}
-                />
-                <span className="text-zinc-400 truncate max-w-[60%]">
-                  {e.to}
-                </span>
-                <span className="px-1 py-0 rounded bg-zinc-800 text-[10px] text-zinc-400">
-                  {e.type}
-                </span>
-              </div>
-            ))}
-            {outgoing.length > 5 && (
-              <div className="text-zinc-500 ml-2">
-                +{outgoing.length - 5} more
-              </div>
-            )}
+            <div className="text-zinc-600 mb-1.5 uppercase tracking-wider text-[10px]">Outgoing</div>
+            <div className="space-y-1">
+              {outgoing.slice(0, 5).map((e, i) => (
+                <div key={i} className="flex items-center gap-1.5 ml-1 group/edge">
+                  <span
+                    className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
+                    style={{
+                      backgroundColor: EDGE_COLORS[e.type] || "#60a5fa",
+                      boxShadow: `0 0 4px ${EDGE_GLOW[e.type] || "#93c5fd"}66`,
+                    }}
+                  />
+                  <span className="text-zinc-400 truncate max-w-[55%] group-hover/edge:text-zinc-200 transition-colors">
+                    {e.to}
+                  </span>
+                  <span
+                    className="px-1.5 py-0 rounded-full text-[9px]"
+                    style={{
+                      backgroundColor: `${EDGE_COLORS[e.type]}15`,
+                      color: EDGE_GLOW[e.type],
+                    }}
+                  >
+                    {e.type}
+                  </span>
+                </div>
+              ))}
+              {outgoing.length > 5 && (
+                <div className="text-zinc-600 ml-1">+{outgoing.length - 5} more</div>
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -138,7 +227,7 @@ function NodeDetail({ nodeId, edges, onClose }: NodeDetailProps) {
   );
 }
 
-// ── Edge type filter checkboxes ────────────────────────────
+// ── Edge filter — pill toggles ─────────────────────────────
 
 interface EdgeFilterProps {
   edgeTypes: string[];
@@ -150,28 +239,65 @@ function EdgeFilter({ edgeTypes, activeTypes, onToggle }: EdgeFilterProps) {
   if (edgeTypes.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap gap-2 items-center">
-      <span className="text-xs text-zinc-400">Filter:</span>
-      {edgeTypes.map((type) => (
-        <label
-          key={type}
-          className="flex items-center gap-1 cursor-pointer text-xs"
-        >
-          <input
-            type="checkbox"
-            checked={activeTypes.has(type)}
-            onChange={() => onToggle(type)}
-            className="accent-blue-500"
-          />
-          <span
-            className="inline-block w-2 h-2 rounded-full"
-            style={{ backgroundColor: EDGE_COLORS[type] || "#3498db" }}
-          />
-          <span className="text-zinc-300">{type}</span>
-        </label>
-      ))}
+    <div className="flex flex-wrap gap-1.5 items-center">
+      <span className="text-[10px] text-zinc-600 uppercase tracking-wider mr-1">Filter</span>
+      {edgeTypes.map((type) => {
+        const active = activeTypes.has(type);
+        const color = EDGE_COLORS[type] || "#60a5fa";
+        const glow = EDGE_GLOW[type] || "#93c5fd";
+        return (
+          <button
+            key={type}
+            onClick={() => onToggle(type)}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs transition-all duration-200 cursor-pointer"
+            style={{
+              backgroundColor: active ? `${color}20` : "#0f172a",
+              border: `1px solid ${active ? `${color}55` : "#1e293b"}`,
+              color: active ? glow : "#4b5563",
+              boxShadow: active ? `0 0 12px ${color}15` : "none",
+            }}
+          >
+            <span
+              className="inline-block w-1.5 h-1.5 rounded-full transition-all duration-200"
+              style={{
+                backgroundColor: active ? color : "#374151",
+                boxShadow: active ? `0 0 6px ${glow}88` : "none",
+              }}
+            />
+            {type}
+          </button>
+        );
+      })}
     </div>
   );
+}
+
+// ── Draw subtle grid background ────────────────────────────
+
+function drawGrid(ctx: CanvasRenderingContext2D, w: number, h: number) {
+  const gridSize = 40;
+  ctx.strokeStyle = "#ffffff06";
+  ctx.lineWidth = 1;
+  for (let x = gridSize; x < w; x += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, h);
+    ctx.stroke();
+  }
+  for (let y = gridSize; y < h; y += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.stroke();
+  }
+  // Center crosshair
+  ctx.strokeStyle = "#ffffff0a";
+  ctx.beginPath();
+  ctx.moveTo(w / 2, 0);
+  ctx.lineTo(w / 2, h);
+  ctx.moveTo(0, h / 2);
+  ctx.lineTo(w, h / 2);
+  ctx.stroke();
 }
 
 // ── Main GraphViewer component ─────────────────────────────
@@ -184,6 +310,7 @@ export function GraphViewer() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
+  const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [activeTypes, setActiveTypes] = useState<Set<string>>(new Set());
   const [allEdgeTypes, setAllEdgeTypes] = useState<string[]>([]);
 
@@ -228,25 +355,6 @@ export function GraphViewer() {
 
   const filteredEdges = edges.filter((e) => activeTypes.has(e.type));
 
-  // ── Build node/edge structures for canvas ──────────────
-
-  interface SimNode {
-    id: string;
-    x: number;
-    y: number;
-    vx: number;
-    vy: number;
-    color: string;
-    degree: number;
-  }
-
-  interface SimEdge {
-    source: string;
-    target: string;
-    type: string;
-    color: string;
-  }
-
   // ── Force-directed layout + canvas rendering ───────────
 
   useEffect(() => {
@@ -257,10 +365,9 @@ export function GraphViewer() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Size canvas to container
     const rect = container.getBoundingClientRect();
     const width = rect.width || 800;
-    const height = rect.height || 500;
+    const height = rect.height || 600;
     canvas.width = width * window.devicePixelRatio;
     canvas.height = height * window.devicePixelRatio;
     canvas.style.width = `${width}px`;
@@ -268,6 +375,25 @@ export function GraphViewer() {
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
 
     // Build nodes from edges
+    interface SimNode {
+      id: string;
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      color: string;
+      glow: string;
+      degree: number;
+    }
+
+    interface SimEdge {
+      source: string;
+      target: string;
+      type: string;
+      color: string;
+      glow: string;
+    }
+
     const nodeMap = new Map<string, SimNode>();
     const centerX = width / 2;
     const centerY = height / 2;
@@ -281,6 +407,7 @@ export function GraphViewer() {
           vx: 0,
           vy: 0,
           color: getNodeColor(edge.from),
+          glow: getNodeGlow(edge.from),
           degree: 0,
         });
       }
@@ -292,6 +419,7 @@ export function GraphViewer() {
           vx: 0,
           vy: 0,
           color: getNodeColor(edge.to),
+          glow: getNodeGlow(edge.to),
           degree: 0,
         });
       }
@@ -304,12 +432,13 @@ export function GraphViewer() {
       source: e.from,
       target: e.to,
       type: e.type,
-      color: EDGE_COLORS[e.type] || "#3498db",
+      color: EDGE_COLORS[e.type] || "#60a5fa",
+      glow: EDGE_GLOW[e.type] || "#93c5fd",
     }));
 
-    // Force simulation parameters
-    const REPULSION = 800;
-    const ATTRACTION = 0.005;
+    // Force simulation
+    const REPULSION = 900;
+    const ATTRACTION = 0.004;
     const DAMPING = 0.85;
     const MAX_ITERATIONS = 200;
     let iteration = 0;
@@ -317,7 +446,6 @@ export function GraphViewer() {
     function simulate() {
       if (iteration >= MAX_ITERATIONS) return;
 
-      // Repulsion between all nodes
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
           const dx = nodes[j].x - nodes[i].x;
@@ -333,12 +461,10 @@ export function GraphViewer() {
         }
       }
 
-      // Attraction along edges
       for (const edge of simEdges) {
         const source = nodeMap.get(edge.source);
         const target = nodeMap.get(edge.target);
         if (!source || !target) continue;
-
         const dx = target.x - source.x;
         const dy = target.y - source.y;
         const dist = Math.sqrt(dx * dx + dy * dy) || 1;
@@ -351,41 +477,60 @@ export function GraphViewer() {
         target.vy -= fy;
       }
 
-      // Center gravity
       for (const node of nodes) {
         node.vx += (centerX - node.x) * 0.001;
         node.vy += (centerY - node.y) * 0.001;
       }
 
-      // Apply velocity with damping
       for (const node of nodes) {
         node.vx *= DAMPING;
         node.vy *= DAMPING;
         node.x += node.vx;
         node.y += node.vy;
-
         const margin = 30;
         node.x = Math.max(margin, Math.min(width - margin, node.x));
         node.y = Math.max(margin, Math.min(height - margin, node.y));
       }
-
       iteration++;
     }
 
     function draw() {
       if (!ctx) return;
 
-      ctx.clearRect(0, 0, width, height);
+      // Dark gradient background
+      const bg = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.max(width, height) * 0.7);
+      bg.addColorStop(0, "#0f172a");
+      bg.addColorStop(1, "#020617");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, width, height);
 
-      // Draw edges
-      ctx.lineWidth = 1;
+      // Subtle grid
+      drawGrid(ctx, width, height);
+
+      // Draw edges with glow
       for (const edge of simEdges) {
         const source = nodeMap.get(edge.source);
         const target = nodeMap.get(edge.target);
         if (!source || !target) continue;
 
+        const isHighlighted =
+          selectedNode === edge.source || selectedNode === edge.target ||
+          hoveredNode === edge.source || hoveredNode === edge.target;
+
+        // Edge glow (wider, semi-transparent)
+        if (isHighlighted) {
+          ctx.beginPath();
+          ctx.strokeStyle = edge.glow + "44";
+          ctx.lineWidth = 4;
+          ctx.moveTo(source.x, source.y);
+          ctx.lineTo(target.x, target.y);
+          ctx.stroke();
+        }
+
+        // Edge line
         ctx.beginPath();
-        ctx.strokeStyle = edge.color + "99";
+        ctx.strokeStyle = isHighlighted ? edge.color + "cc" : edge.color + "55";
+        ctx.lineWidth = isHighlighted ? 1.5 : 0.8;
         ctx.moveTo(source.x, source.y);
         ctx.lineTo(target.x, target.y);
         ctx.stroke();
@@ -394,66 +539,112 @@ export function GraphViewer() {
         const dx = target.x - source.x;
         const dy = target.y - source.y;
         const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-        const arrowSize = 6;
-        const arrowX = target.x - (dx / dist) * 12;
-        const arrowY = target.y - (dy / dist) * 12;
+        const arrowSize = isHighlighted ? 8 : 6;
+        const arrowX = target.x - (dx / dist) * 14;
+        const arrowY = target.y - (dy / dist) * 14;
 
         ctx.beginPath();
-        ctx.fillStyle = edge.color + "99";
+        ctx.fillStyle = (isHighlighted ? edge.color : edge.color) + "77";
         ctx.moveTo(arrowX + (dx / dist) * arrowSize, arrowY + (dy / dist) * arrowSize);
-        ctx.lineTo(
-          arrowX + (-dy / dist) * (arrowSize * 0.5),
-          arrowY + (dx / dist) * (arrowSize * 0.5)
-        );
-        ctx.lineTo(
-          arrowX + (dy / dist) * (arrowSize * 0.5),
-          arrowY + (-dx / dist) * (arrowSize * 0.5)
-        );
+        ctx.lineTo(arrowX + (-dy / dist) * (arrowSize * 0.45), arrowY + (dx / dist) * (arrowSize * 0.45));
+        ctx.lineTo(arrowX + (dy / dist) * (arrowSize * 0.45), arrowY + (-dx / dist) * (arrowSize * 0.45));
         ctx.closePath();
         ctx.fill();
       }
 
       // Draw nodes
       for (const node of nodes) {
-        const radius = Math.max(4, Math.min(12, 4 + node.degree * 1.5));
+        const radius = Math.max(4, Math.min(14, 4 + node.degree * 1.2));
         const isSelected = selectedNode === node.id;
+        const isHovered = hoveredNode === node.id;
 
-        if (isSelected) {
+        // Outer glow ring
+        if (isSelected || isHovered) {
+          const glowRadius = radius + 12;
+          const gradient = ctx.createRadialGradient(node.x, node.y, radius, node.x, node.y, glowRadius);
+          gradient.addColorStop(0, node.glow + "44");
+          gradient.addColorStop(1, node.glow + "00");
           ctx.beginPath();
-          ctx.arc(node.x, node.y, radius + 6, 0, Math.PI * 2);
-          ctx.fillStyle = node.color + "33";
+          ctx.arc(node.x, node.y, glowRadius, 0, Math.PI * 2);
+          ctx.fillStyle = gradient;
           ctx.fill();
         }
 
+        // Subtle ambient glow for all nodes
+        const ambientGlow = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, radius + 4);
+        ambientGlow.addColorStop(0, node.color + "33");
+        ambientGlow.addColorStop(1, node.color + "00");
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, radius + 4, 0, Math.PI * 2);
+        ctx.fillStyle = ambientGlow;
+        ctx.fill();
+
+        // Node body with gradient fill
+        const bodyGrad = ctx.createRadialGradient(
+          node.x - radius * 0.3, node.y - radius * 0.3, 0,
+          node.x, node.y, radius
+        );
+        bodyGrad.addColorStop(0, node.glow);
+        bodyGrad.addColorStop(1, node.color);
         ctx.beginPath();
         ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = node.color;
+        ctx.fillStyle = bodyGrad;
         ctx.fill();
-        ctx.strokeStyle = isSelected ? "#ffffff" : "#00000044";
+
+        // Border
+        ctx.strokeStyle = isSelected ? "#ffffffbb" : isHovered ? node.glow + "aa" : node.color + "55";
         ctx.lineWidth = isSelected ? 2 : 1;
         ctx.stroke();
 
-        if (node.degree >= 2 || nodes.length < 30) {
-          ctx.font = "10px monospace";
-          ctx.fillStyle = "#e0e0e0";
+        // Label
+        if (node.degree >= 2 || nodes.length < 30 || isSelected || isHovered) {
+          const fontSize = isSelected || isHovered ? 11 : 9;
+          ctx.font = `${fontSize}px monospace`;
+          ctx.fillStyle = isSelected || isHovered ? "#f1f5f9" : "#94a3b8";
           ctx.textAlign = "center";
-          const label =
-            node.id.length > 20 ? node.id.slice(0, 18) + "..." : node.id;
-          ctx.fillText(label, node.x, node.y + radius + 14);
+          const label = node.id.length > 22 ? node.id.slice(0, 20) + ".." : node.id;
+          ctx.fillText(label, node.x, node.y + radius + 16);
         }
       }
 
-      // Legend
+      // Legend — top-right, dark glass panel
       const usedTypes = new Set(simEdges.map((e) => e.type));
-      let legendY = 15;
-      ctx.font = "11px monospace";
-      for (const type of usedTypes) {
-        ctx.fillStyle = EDGE_COLORS[type] || "#3498db";
-        ctx.fillRect(10, legendY - 8, 10, 10);
-        ctx.fillStyle = "#cccccc";
-        ctx.textAlign = "left";
-        ctx.fillText(type, 25, legendY);
-        legendY += 16;
+      const legendTypes = Array.from(usedTypes);
+      if (legendTypes.length > 0) {
+        const legendX = width - 150;
+        const legendY0 = 12;
+        const legendH = legendTypes.length * 18 + 12;
+
+        // Glass background
+        ctx.fillStyle = "#0f172a99";
+        ctx.beginPath();
+        ctx.roundRect(legendX - 8, legendY0 - 4, 150, legendH, 6);
+        ctx.fill();
+        ctx.strokeStyle = "#ffffff0d";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        let ly = legendY0 + 8;
+        ctx.font = "10px monospace";
+        for (const type of legendTypes) {
+          const color = EDGE_COLORS[type] || "#60a5fa";
+          const glow = EDGE_GLOW[type] || "#93c5fd";
+          // Colored dot with glow
+          ctx.beginPath();
+          ctx.arc(legendX + 4, ly - 3, 3, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.fill();
+          // Dot glow
+          ctx.beginPath();
+          ctx.arc(legendX + 4, ly - 3, 5, 0, Math.PI * 2);
+          ctx.fillStyle = glow + "33";
+          ctx.fill();
+          // Text
+          ctx.fillStyle = "#94a3b8";
+          ctx.textAlign = "left";
+          ctx.fillText(type, legendX + 14, ly);
+          ly += 18;
+        }
       }
     }
 
@@ -470,20 +661,20 @@ export function GraphViewer() {
 
     loop();
 
-    // Click handler for node selection
+    // Click handler
     function handleClick(e: MouseEvent) {
       const canvasRect = canvas.getBoundingClientRect();
       const mx = e.clientX - canvasRect.left;
       const my = e.clientY - canvasRect.top;
 
-      let closest: SimNode | null = null;
+      let closest: typeof nodes[0] | null = null;
       let closestDist = Infinity;
 
       for (const node of nodes) {
         const dx = node.x - mx;
         const dy = node.y - my;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const radius = Math.max(4, Math.min(12, 4 + node.degree * 1.5));
+        const radius = Math.max(4, Math.min(14, 4 + node.degree * 1.2));
         if (dist < radius + 8 && dist < closestDist) {
           closest = node;
           closestDist = dist;
@@ -491,53 +682,101 @@ export function GraphViewer() {
       }
 
       setSelectedNode(closest ? closest.id : null);
+      if (iteration >= MAX_ITERATIONS) draw();
+    }
 
-      if (iteration >= MAX_ITERATIONS) {
-        draw();
+    // Hover handler
+    function handleMouseMove(e: MouseEvent) {
+      const canvasRect = canvas.getBoundingClientRect();
+      const mx = e.clientX - canvasRect.left;
+      const my = e.clientY - canvasRect.top;
+
+      let closest: typeof nodes[0] | null = null;
+      let closestDist = Infinity;
+
+      for (const node of nodes) {
+        const dx = node.x - mx;
+        const dy = node.y - my;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const radius = Math.max(4, Math.min(14, 4 + node.degree * 1.2));
+        if (dist < radius + 6 && dist < closestDist) {
+          closest = node;
+          closestDist = dist;
+        }
+      }
+
+      const newHovered = closest ? closest.id : null;
+      if (newHovered !== hoveredNode) {
+        setHoveredNode(newHovered);
+        if (iteration >= MAX_ITERATIONS) draw();
       }
     }
 
     canvas.addEventListener("click", handleClick);
+    canvas.addEventListener("mousemove", handleMouseMove);
 
     return () => {
       cancelAnimationFrame(animFrame);
       canvas.removeEventListener("click", handleClick);
+      canvas.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [filteredEdges, selectedNode]);
+  }, [filteredEdges, selectedNode, hoveredNode]);
 
   // ── Loading / error / empty states ────────────────────
 
   if (loading) {
     return (
-      <div className="bg-zinc-900 border border-zinc-700 rounded-lg flex items-center justify-center h-[500px]">
-        <p className="text-zinc-400">Loading graph data...</p>
+      <div
+        className="rounded-lg flex items-center justify-center h-[600px]"
+        style={{ background: "linear-gradient(135deg, #0f172a, #020617)" }}
+      >
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-zinc-500 text-sm animate-pulse">Loading graph...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-zinc-900 border border-zinc-700 rounded-lg flex items-center justify-center h-[500px]">
-        <p className="text-red-400">Error: {error}</p>
+      <div
+        className="rounded-lg flex items-center justify-center h-[600px]"
+        style={{ background: "linear-gradient(135deg, #0f172a, #020617)" }}
+      >
+        <div className="flex flex-col items-center gap-2">
+          <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
+            <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <p className="text-red-400 text-sm">{error}</p>
+        </div>
       </div>
     );
   }
 
   if (edges.length === 0) {
     return (
-      <div className="bg-zinc-900 border border-zinc-700 rounded-lg flex flex-col items-center justify-center h-[500px] gap-4">
-        <p className="text-zinc-400">No graph edges found.</p>
-        <p className="text-zinc-500 text-sm">
-          Run: python tools/memory_cli.py graph add-edge --from X --to Y
-          --type same_session
-        </p>
+      <div
+        className="rounded-lg flex flex-col items-center justify-center h-[600px] gap-4"
+        style={{ background: "linear-gradient(135deg, #0f172a, #020617)" }}
+      >
+        <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center">
+          <svg className="w-6 h-6 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+          </svg>
+        </div>
+        <p className="text-zinc-500">No graph edges yet</p>
+        <code className="text-[10px] text-zinc-600 bg-zinc-900 px-3 py-1 rounded">
+          python memory_cli.py graph add-edge --from X --to Y --type same_session
+        </code>
       </div>
     );
   }
 
   return (
     <div className="space-y-3">
-      {/* Edge type filter */}
       <EdgeFilter
         edgeTypes={allEdgeTypes}
         activeTypes={activeTypes}
@@ -545,19 +784,24 @@ export function GraphViewer() {
       />
 
       <div className="flex gap-3">
-        {/* Graph canvas */}
-        <div className="bg-zinc-900 border border-zinc-700 rounded-lg flex-1 overflow-hidden">
-          <div className="p-0" ref={containerRef}>
+        {/* Graph canvas with glow border */}
+        <div
+          className="flex-1 overflow-hidden rounded-lg"
+          style={{
+            border: "1px solid #1e293b",
+            boxShadow: "0 0 30px #0f172a, 0 0 60px #1e293b33",
+          }}
+        >
+          <div ref={containerRef}>
             <canvas
               ref={canvasRef}
               className="cursor-pointer block"
-              style={{ background: "#1a1a2e" }}
             />
           </div>
         </div>
 
-        {/* Node detail panel */}
-        <div className="w-72 shrink-0">
+        {/* Side panel */}
+        <div className="w-72 shrink-0 space-y-3">
           {selectedNode ? (
             <NodeDetail
               nodeId={selectedNode}
@@ -565,22 +809,45 @@ export function GraphViewer() {
               onClose={() => setSelectedNode(null)}
             />
           ) : (
-            <div className="bg-zinc-900 border border-zinc-700 rounded-lg flex items-center justify-center h-32">
-              <p className="text-zinc-500 text-xs">
-                Click a node to see details
-              </p>
+            <div
+              className="rounded-lg flex flex-col items-center justify-center h-32 gap-2"
+              style={{
+                background: "linear-gradient(135deg, #0f172a, #1e293b)",
+                border: "1px solid #1e293b44",
+              }}
+            >
+              <svg className="w-5 h-5 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+              </svg>
+              <p className="text-zinc-600 text-xs">Click a node to inspect</p>
             </div>
           )}
 
-          {/* Open in Pyvis button */}
-          <div className="mt-3">
-            <button
-              className="w-full border border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500 rounded px-3 py-1.5 text-sm transition-colors"
-              onClick={() => window.open("/api/memory/graph/vis", "_blank")}
-            >
-              Open in Pyvis
-            </button>
-          </div>
+          {/* Open in Pyvis */}
+          <button
+            className="w-full rounded-lg px-3 py-2 text-sm transition-all duration-200 flex items-center justify-center gap-2"
+            style={{
+              background: "linear-gradient(135deg, #0f172a, #1e293b)",
+              border: "1px solid #1e293b",
+              color: "#64748b",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "#334155";
+              e.currentTarget.style.color = "#94a3b8";
+              e.currentTarget.style.boxShadow = "0 0 15px #1e293b55";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "#1e293b";
+              e.currentTarget.style.color = "#64748b";
+              e.currentTarget.style.boxShadow = "none";
+            }}
+            onClick={() => window.open("/api/memory/graph/vis", "_blank")}
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+            Open in Pyvis
+          </button>
         </div>
       </div>
     </div>
