@@ -1,10 +1,10 @@
-# Standard: Frontend Development v1.3 (EN)
+# Standard: Frontend Development v1.4 (EN)
 
 > ID: STD-FE-001
-> Version: 1.3
+> Version: 1.4
 > Level: **[C] Critical**
-> Last Updated: 2025-01
-> Related: WCAG 2.1 AA (STD-A11Y-001), GitHub Standard (STD-GIT-001)
+> Last Updated: 2026-05
+> Related: WCAG 2.1 AA (STD-A11Y-001), GitHub Standard (STD-GIT-001), Error Handling (STD-ERR-001)
 
 ## 1. Scope
 This standard is mandatory for the development of all User Interfaces built on the **React ecosystem**.
@@ -424,7 +424,72 @@ if (existing) {
 
 ---
 
-## 11. Version History
+## 11. UI Theme & Color System
+
+### 11.1. Dark Theme
+
+Dark theme is required. Use only CSS variables for theme-aware colors:
+
+| Token | Usage |
+|-------|-------|
+| `bg-primary` | Primary background |
+| `text-foreground` | Primary text |
+| `bg-muted` | Muted/subtle background |
+| `text-muted-foreground` | Secondary/helper text |
+
+Never hardcode hex colors in components. All color references MUST go through CSS variables to ensure theme switching works correctly. See STD-A11Y-001 section 7 for contrast validation requirements.
+
+### 11.2. Color Palette
+
+Default palette: `stone`, `slate`, `neutral`, `green`, `emerald`.
+
+`indigo` / `blue` -- only if explicitly requested by the user.
+
+Rationale: the default palettes are selected for WCAG 2.1 AA contrast compliance across both light and dark themes. Non-default palettes require manual contrast verification per STD-A11Y-001 section 1.1.
+
+### 11.3. Anti-Fragility: Error Isolation
+
+Non-critical operations (backup, AI analysis, background sync) MUST NOT break the main user flow. If a non-critical operation fails, log the error and continue.
+
+Critical operations (save, delete, submit) MUST show the error to the user via toast notification with a clear, actionable message.
+
+```typescript
+// Non-critical: failure is logged, does not block
+try {
+  await autoBackup()  // non-blocking
+} catch (e) {
+  console.error('Backup failed:', e)
+  // continue main flow
+}
+
+// Critical: failure must reach the user
+try {
+  await saveDocument(data)
+} catch (e) {
+  toast({ title: 'Save failed', description: 'Please try again', variant: 'destructive' })
+}
+```
+
+### 11.4. Deletion UI Patterns
+
+All destructive actions MUST require explicit user confirmation via AlertDialog before execution.
+
+| Entity | Location | Trigger | Confirmation |
+|--------|----------|---------|-------------|
+| Note | List + Editor | Trash2 button | AlertDialog |
+| Extracted instruction | List | Trash2 button | AlertDialog |
+| Built-in instruction | List | Trash2 button | AlertDialog (with localStorage persistence) |
+| Document | View | Trash2 button | AlertDialog |
+| Category | Sidebar | Trash2 button (hover) | AlertDialog |
+| Tag | Sidebar | X button (hover) | AlertDialog |
+| Term | Dictionary | Trash2 button (hover) | AlertDialog |
+| Bulk items | List | Bulk select + delete | AlertDialog with count |
+
+When possible, prefer soft-delete (archive) over hard-delete. See STD-FE-001 section 10.5 for auto-backup before mutations.
+
+---
+
+## 12. Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
@@ -432,6 +497,7 @@ if (existing) {
 | 1.1 | 2023-10 | Added Page/Route limit (40 lines) |
 | 1.2 | 2025-01 | Merged anti-monolith patterns, examples, refactoring strategy |
 | 1.3 | 2025-01 | Added Recommended/Hard limits, sections/features distinction, ESLint config, dynamic imports rules, co-location principle, exception documentation format |
+| 1.4 | 2026-05 | Relocated from STD-ENV-001: dark theme (11.1), color palette (11.2), anti-fragility/error isolation (11.3), deletion UI patterns (11.4). Added Related: STD-ERR-001. |
 
 ---
 

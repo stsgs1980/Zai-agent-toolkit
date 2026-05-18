@@ -66,7 +66,7 @@ STD-<DOMAIN>-<NUMBER>
 
 | ID | Document | Version | Level |
 |----|----------|---------|-------|
-| STD-FE-001 | Frontend Development Standard | 1.3 | [C] Critical |
+| STD-FE-001 | Frontend Development Standard | 1.4 | [C] Critical |
 
 ### 4.2. Git / GitHub (GIT)
 
@@ -100,7 +100,7 @@ STD-<DOMAIN>-<NUMBER>
 
 | ID | Document | Version | Level |
 |----|----------|---------|-------|
-| STD-ENV-001 | Reproducibility Standard | 1.0 | [C] Critical |
+| STD-ENV-001 | Reproducibility Standard | 2.0 | [C] Critical |
 | STD-ENV-002 | Z.ai Integration Standard | 1.1 | [C] Critical |
 
 ### 4.7. Testing (TEST)

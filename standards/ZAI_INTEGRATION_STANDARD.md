@@ -39,7 +39,7 @@ All projects MUST reside in `/home/z/my-project/`:
 
 ### 3.1 Absolute Path Exception
 
-`/home/z/my-project/` is the ONLY absolute path allowed in Z.ai sandbox code. All other absolute paths are prohibited by REPRODUCIBILITY-STANDARD (STD-ENV-001).
+`/home/z/my-project/` and related sandbox paths are allowed as environment-constant exceptions in Z.ai sandbox code. All other absolute paths are prohibited by REPRODUCIBILITY-STANDARD (STD-ENV-001 v1.1, L1 Path Rules).
 
 | Path | Status | Reason |
 |------|--------|--------|

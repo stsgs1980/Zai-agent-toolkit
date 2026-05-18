@@ -23,10 +23,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 - Renamed `projects/` to `project-index/` in memory structure
 - Updated TODO.md with current tasks
+- **Standards audit and restructuring (2026-05-18):**
+  - STD-ENV-001 (Reproducibility Standard): v1.0 -> v1.1 -> v2.0
+    - K-01 fix: replaced categorical absolute path ban with nuanced "no hardcoded personal paths" rule, added environment-constant path categories and Z.ai sandbox exception table (v1.1)
+    - Major restructuring (v2.0): removed foreign domains (dark theme, color palette, anti-fragility, dedup, push policy, deletion UI), kept only rules where violation breaks "clone + install + dev = works", added Cross-References section (bibliography-style index)
+  - STD-FE-001 (Frontend Standard): v1.3 -> v1.4
+    - Relocated from STD-ENV-001: dark theme (11.1), color palette (11.2), anti-fragility/error isolation (11.3), deletion UI patterns (11.4)
+  - STD-ENV-002 (Z.ai Integration Standard): v1.0 -> v1.1
+    - Updated section 3.1 to cross-reference STD-ENV-001 v1.1 path rules
+  - STD-META-001 (Standard ID System): registry updated
+    - STD-ENV-001 version bumped to v2.0
+    - STD-ENV-002 version bumped to v1.1
+  - 15 inter-standard contradictions identified (K-01 through K-15)
 
 ### Removed
 - Agent-Toolkit-ZCode repository (deprecated, merged into Zai-agent-toolkit)
 - Obsolete skills moved from toolkit (see commit history)
+- Duplicated rules removed from STD-ENV-001 (now in their proper domain-specific standards)
 
 ---
 
