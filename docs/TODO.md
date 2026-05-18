@@ -81,10 +81,10 @@ update-all-toolkits
 | ZAI-META-001 | skill-id-system | both |
 | ZAI-META-002 | skill-creator | both |
 | ZAI-SESSION-001 | session-log | both |
-| ZAI-SESSION-001 | context-consolidation | both |
+| ZAI-SESSION-002 | context-consolidation | both |
 | ZAI-DEV-001 | project-clone | sandbox |
 | ZAI-DEV-002 | commit-work | both |
-| ZAI-DEV-001 | database-schema-designer | both |
+| ZAI-DEV-003 | database-schema-designer | both |
 | ZAI-ARCH-001 | mermaid-diagrams | both |
 | ZAI-REQ-001 | requirements-clarity | both |
 | ZAI-QA-001 | qa-test-planner | both |
@@ -373,8 +373,8 @@ Translated to English (v2.0.5).
 | File | Status |
 |------|--------|
 | `AGENT_RULES.md` Section 8.2 (System Skills) | OK -- this is a sandbox built-in |
-| `standards/skill-id-registry.md` | Marked as "Planned (system skill)" |
-| `skills/skill-id-system/SKILL.md` | Marked as "Planned (system skill)" |
+| `docs/skill-id-registry.md` | Listed under System Skills (Z.ai Sandbox) section |
+| `skills/skill-id-system/SKILL.md` | Listed under System Skills section |
 | `skills/zai-ui-composer_sts/SKILL.md` | Marked as "System skill (Z.ai sandbox)" |
 | `standards/FRONTEND_STANDARD.md` | Changelog: merged anti-monolith patterns (historical) |
 | `standards/IMPLEMENTATION_ORDER.md` | Marked as "(system skill)" |
