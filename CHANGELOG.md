@@ -6,6 +6,48 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2.0.5] - 2026-05-18
+
+### Fixed — Repository Naming Consistency
+
+Reverted all internal references from `Zai-agent-toolkit_v` back to `Zai-agent-toolkit` to match the actual GitHub repository name. The repository was renamed on GitHub from `Zai-agent-toolkit_v` to `Zai-agent-toolkit` for consistency. All `git clone` URLs, filesystem paths, symlinks, and documentation now reference the canonical name.
+
+- 15 files updated: INSTALL.md, README.md, setup.sh, scripts/, hooks/, skills/, docs/
+- `git remote set-url` updated to point to `stsgs1980/Zai-agent-toolkit.git`
+
+### Fixed — Standard Registry: ACTIVE/FROZEN/DEPRECATED Status
+
+Added status column to standard ID registry (STD-META-001 Section 4). Standards are now classified as ACTIVE (maintained), FROZEN (kept for reference, not updated), or DEPRECATED (obsolete).
+
+- 9 ACTIVE: FE-001, GIT-001/002, DOC-002/003, ARCH-001, ENV-001/002, ERR-001, SEC-001, META-001
+- 7 FROZEN: DOC-004/005, TEST-001, ERR-002, SEC-002, AGENT-001/002
+- 2 DEPRECATED: A11Y-001, DOC-001
+
+### Fixed — Skill ID Registry Synchronization
+
+Synced `skills/skill-id-system/SKILL.md` registry with actual 20 skills on disk. Previous registry was missing 9 skills and had 5 listed as "pending" despite already having assigned IDs.
+
+- Added 9 missing skills: MEM-001..004, FS-001, SESSION-002..003, ARCH-002, QA-001, REQ-001, DEV-004/005
+- Moved 5 skills from "pending" to assigned sections
+- Added MEM and FS domains to Reserved Domains table
+- Fixed ZAI-STS-006 from "(available)" to zai-ui-composer_sts
+- Unified USER/STS domain conflict: all user skills use ZAI-STS-XXX
+
+### Fixed — Deep Scan: 18 Hidden Issues Resolved
+
+Comprehensive scan found and fixed 18 inconsistencies across the repository:
+
+- **CRITICAL**: Rewrote `docs/SKILL_ID_GUIDE.md` (13 fabricated IDs removed, now matches canonical registry). Fixed `validate_standards.py` bug where `extract_header_fields()` read example `> ID:` lines instead of the actual header (now stops at first `##` heading). Reconciled skill versions across 3 registries.
+- **HIGH**: Marked STD-A11Y-001 as DEPRECATED in AGENT_RULES.md. Added 5 missing standards to AGENT_RULES.md tables (GIT-002, ERR-002, SEC-002, AGENT-001, AGENT-002). Fixed STANDARD_ID_SYSTEM.md year (2025 -> 2026). Fixed STD-DOC-001 reference to STD-DOC-002. Added missing `trigger` field to session-log/SKILL.md.
+- **MEDIUM**: Replaced ZAI-USER with ZAI-STS throughout docs/TUTORIAL.md. Cleaned outdated Section 3 in docs/TODO.md. Updated AUDIT_TODO.md title. Fixed setup.sh skill count.
+- **LOW**: Fixed setup.sh outdated skill listing.
+
+### Validation
+
+All 19 standards pass all 10 checks (190/190). `validate_standards.py` now correctly reads only the header block.
+
+---
+
 ## [2.0.4] - 2026-05-18
 
 ### Fixed — Section Order Consistency (7 standards)

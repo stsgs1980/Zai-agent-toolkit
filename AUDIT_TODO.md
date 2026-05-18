@@ -1,8 +1,9 @@
-# AUDIT TODO: Zai-agent-toolkit v1.9.5
+# AUDIT TODO: Zai-agent-toolkit v1.9.5 -> v2.0.5
 
 > Created: 2026-05-17
 > Source: Full deep audit (4 parallel checks, ~140 issues)
 > Base version: 1.9.5
+> Current version: 2.0.5 (all items resolved)
 
 ---
 

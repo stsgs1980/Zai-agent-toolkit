@@ -3,7 +3,7 @@
 > Project-specific settings for the current project.
 > This file is NOT part of the toolkit standards -- it is created per project.
 >
-> Toolkit version: v2.0.4
+> Toolkit version: v2.0.5
 
 ---
 

@@ -97,20 +97,15 @@ update-all-toolkits
 
 ---
 
-## 3. CI/CD Fixes (OUTDATED -- audit fixed everything)
+## 3. CI/CD Fixes (RESOLVED)
 
-### Was
-
-Validation script showed 39 issues.
+All 39 CI/CD issues from initial validation have been fixed. Section retained for historical reference.
 
 | Category | Description | Status |
 |-----------|----------|--------|
-| STD-ID consistency | 6 issues | [x] Fixed (P1) |
-| Stack Signature | 29 issues | [x] Fixed (P8, P5.2) |
-| Skill References | 2 issues | [x] Fixed (P2.5.6) |
-
-Currently `validate_compatibility.py` passes ALL CHECKS PASSED.
-Section kept for history, can be deleted on next refactoring.
+| STD-ID consistency | 6 issues | Fixed |
+| Stack Signature | 29 issues | Fixed |
+| Skill References | 2 issues | Fixed |
 
 ---
 
