@@ -63,80 +63,83 @@ STD-<DOMAIN>-<NUMBER>
 
 ## 4. ID Registry (Current Assignments)
 
+> **Status**: `ACTIVE` = maintained and updated; `FROZEN` = not updated, kept for reference;
+> `DEPRECATED` = obsolete, do not use.
+
 ### 4.1. Frontend (FE)
 
-| ID | Document | Version | Level |
-|----|----------|---------|-------|
-| STD-FE-001 | Frontend Development Standard | 1.5 | [C] Critical |
+| ID | Document | Version | Level | Status |
+|----|----------|---------|-------|--------|
+| STD-FE-001 | Frontend Development Standard | 1.5 | [C] Critical | ACTIVE |
 
 ### 4.2. Git / GitHub (GIT)
 
-| ID | Document | Version | Level |
-|----|----------|---------|-------|
-| STD-GIT-001 | GitHub Core Standard | 2.0 | [C] Critical |
-| STD-GIT-002 | GitHub Sandbox Safety Standard | 1.0 | [C] Critical |
+| ID | Document | Version | Level | Status |
+|----|----------|---------|-------|--------|
+| STD-GIT-001 | GitHub Core Standard | 2.0 | [C] Critical | ACTIVE |
+| STD-GIT-002 | GitHub Sandbox Safety Standard | 1.0 | [C] Critical | ACTIVE |
 
 ### 4.3. Accessibility (A11Y)
 
-| ID | Document | Version | Level |
-|----|----------|---------|-------|
-| STD-A11Y-001 | WCAG 2.1 AA Standard | 1.1 | [C] Critical |
+| ID | Document | Version | Level | Status |
+|----|----------|---------|-------|--------|
+| STD-A11Y-001 | WCAG 2.1 AA Standard | 1.1 | [C] Critical | DEPRECATED |
 
 ### 4.4. Documentation (DOC)
 
-| ID | Document | Version | Level |
-|----|----------|---------|-------|
-| STD-DOC-001 | Markdown Standard (RU) | 2.1.5 | [W] Warning | [DEPRECATED] |
-| STD-DOC-002 | Markdown Standard (EN) | 2.2.0 | [W] Warning |
-| STD-DOC-003 | No-Unicode Policy | 2.1.3 | [C]+[W]+[I] |
-| STD-DOC-004 | README Template | - | - |
-| STD-DOC-005 | Code Examples Guide | 1.1 | [W] Warning |
+| ID | Document | Version | Level | Status |
+|----|----------|---------|-------|--------|
+| STD-DOC-001 | Markdown Standard (RU) | 2.1.5 | [W] Warning | DEPRECATED |
+| STD-DOC-002 | Markdown Standard (EN) | 2.2.0 | [W] Warning | ACTIVE |
+| STD-DOC-003 | No-Unicode Policy | 2.1.3 | [C]+[W]+[I] | ACTIVE |
+| STD-DOC-004 | README Template | - | - | FROZEN |
+| STD-DOC-005 | Code Examples Guide | 1.1 | [W] Warning | FROZEN |
 
 ### 4.5. Architecture (ARCH)
 
-| ID | Document | Version | Level |
-|----|----------|---------|-------|
-| STD-ARCH-001 | Implementation Order | 2.2 | [W] Warning |
+| ID | Document | Version | Level | Status |
+|----|----------|---------|-------|--------|
+| STD-ARCH-001 | Implementation Order | 2.2 | [W] Warning | ACTIVE |
 
 ### 4.6. Environment (ENV)
 
-| ID | Document | Version | Level |
-|----|----------|---------|-------|
-| STD-ENV-001 | Reproducibility Standard | 2.0 | [C] Critical |
-| STD-ENV-002 | Z.ai Integration Standard | 1.1 | [C] Critical |
+| ID | Document | Version | Level | Status |
+|----|----------|---------|-------|--------|
+| STD-ENV-001 | Reproducibility Standard | 2.0 | [C] Critical | ACTIVE |
+| STD-ENV-002 | Z.ai Integration Standard | 1.1 | [C] Critical | ACTIVE |
 
 ### 4.7. Testing (TEST)
 
-| ID | Document | Version | Level |
-|----|----------|---------|-------|
-| STD-TEST-001 | Testing Standard | 1.1 | [C] Critical |
+| ID | Document | Version | Level | Status |
+|----|----------|---------|-------|--------|
+| STD-TEST-001 | Testing Standard | 1.1 | [C] Critical | FROZEN |
 
 ### 4.8. Error Handling (ERR)
 
-| ID | Document | Version | Level |
-|----|----------|---------|-------|
-| STD-ERR-001 | Error Handling Core Standard | 2.0 | [C] Critical |
-| STD-ERR-002 | Error Recovery Standard | 1.0 | [C] Critical |
+| ID | Document | Version | Level | Status |
+|----|----------|---------|-------|--------|
+| STD-ERR-001 | Error Handling Core Standard | 2.0 | [C] Critical | ACTIVE |
+| STD-ERR-002 | Error Recovery Standard | 1.0 | [C] Critical | FROZEN |
 
 ### 4.9. Security (SEC)
 
-| ID | Document | Version | Level |
-|----|----------|---------|-------|
-| STD-SEC-001 | Security Core Standard | 2.0 | [C] Critical |
-| STD-SEC-002 | Security Extended Standard | 1.0 | [C] Critical |
+| ID | Document | Version | Level | Status |
+|----|----------|---------|-------|--------|
+| STD-SEC-001 | Security Core Standard | 2.0 | [C] Critical | ACTIVE |
+| STD-SEC-002 | Security Extended Standard | 1.0 | [C] Critical | FROZEN |
 
 ### 4.10. Agents (AGENT)
 
-| ID | Document | Version | Level |
-|----|----------|---------|-------|
-| STD-AGENT-001 | Subagent Standard | 1.0 | [C] Critical |
-| STD-AGENT-002 | Orchestration Standard | 1.0 | [C] Critical |
+| ID | Document | Version | Level | Status |
+|----|----------|---------|-------|--------|
+| STD-AGENT-001 | Subagent Standard | 1.0 | [C] Critical | FROZEN |
+| STD-AGENT-002 | Orchestration Standard | 1.0 | [C] Critical | FROZEN |
 
 ### 4.11. Meta (META)
 
-| ID | Document | Version | Level |
-|----|----------|---------|-------|
-| STD-META-001 | Standard ID System | 1.1 | [W] Warning |
+| ID | Document | Version | Level | Status |
+|----|----------|---------|-------|--------|
+| STD-META-001 | Standard ID System | 1.1 | [W] Warning | ACTIVE |
 
 ---
 
