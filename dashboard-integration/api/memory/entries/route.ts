@@ -95,3 +95,64 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+// ── POST: Create a new entry ──────────────────────────────
+// Body: { type: "knowledge", content: "...", tags?: "tag1,tag2", source?: "..." }
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { type, content, tags, source } = body as {
+      type?: string;
+      content?: string;
+      tags?: string;
+      source?: string;
+    };
+
+    if (!type || !content) {
+      return NextResponse.json(
+        { error: "Missing required fields: type and content" },
+        { status: 400 }
+      );
+    }
+
+    const validTypes = ["knowledge", "pattern", "command", "project", "session", "template", "experience"];
+    if (!validTypes.includes(type)) {
+      return NextResponse.json(
+        { error: `Invalid type. Valid: ${validTypes.join(", ")}` },
+        { status: 400 }
+      );
+    }
+
+    const args = ["store", type, content];
+
+    // Add metadata if provided
+    const metadata: string[] = [];
+    if (tags) metadata.push(`tags=${tags}`);
+    if (source) metadata.push(`source=${source}`);
+    if (metadata.length > 0) {
+      args.push("--metadata", metadata.join(","));
+    }
+
+    const output = await runPython("memory_cli.py", args);
+
+    // Parse the output to get the new entry ID
+    // memory_cli.py store outputs something like: "Stored: knowledge_20260518_123456"
+    const idMatch = output.match(/Stored:\s*(\S+)/i);
+    const newId = idMatch ? idMatch[1] : "";
+
+    return NextResponse.json({
+      message: "Entry created",
+      id: newId,
+      type,
+      content,
+      output: output.trim(),
+    });
+  } catch (err) {
+    console.error("[entries/route.ts] POST error:", err);
+    return NextResponse.json(
+      { error: "Failed to create entry", details: err instanceof Error ? err.message : String(err) },
+      { status: 500 }
+    );
+  }
+}

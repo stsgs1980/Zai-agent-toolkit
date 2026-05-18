@@ -27,13 +27,13 @@ interface SearchResult {
 // ── Entry type config ───────────────────────────────────────
 
 const ENTRY_TYPES = [
-  { key: 'knowledge', label: 'Knowledge', color: '#a855f7', glow: '#c084fc' },
-  { key: 'pattern', label: 'Patterns', color: '#2dd4bf', glow: '#5eead4' },
-  { key: 'command', label: 'Commands', color: '#fbbf24', glow: '#fde68a' },
-  { key: 'project', label: 'Projects', color: '#60a5fa', glow: '#93c5fd' },
-  { key: 'session', label: 'Sessions', color: '#38bdf8', glow: '#7dd3fc' },
-  { key: 'template', label: 'Templates', color: '#fb923c', glow: '#fdba74' },
-  { key: 'experience', label: 'Experience', color: '#4ade80', glow: '#86efac' },
+  { key: 'knowledge', label: 'Knowledge', color: '#a855f7', glow: '#c084fc', placeholder: 'e.g. Use useCallback for memoizing callbacks in React' },
+  { key: 'pattern', label: 'Patterns', color: '#2dd4bf', glow: '#5eead4', placeholder: 'e.g. PowerShell: single quotes for strings with special chars' },
+  { key: 'command', label: 'Commands', color: '#fbbf24', glow: '#fde68a', placeholder: 'e.g. git log --oneline -20 — show last 20 commits' },
+  { key: 'project', label: 'Projects', color: '#60a5fa', glow: '#93c5fd', placeholder: 'e.g. memory-dashboard: Next.js 15 + Prisma + ChromaDB' },
+  { key: 'session', label: 'Sessions', color: '#38bdf8', glow: '#7dd3fc', placeholder: 'e.g. Fixed UTF-8 encoding in API routes' },
+  { key: 'template', label: 'Templates', color: '#fb923c', glow: '#fdba74', placeholder: 'e.g. API route template: runPython() + execFile + encoding' },
+  { key: 'experience', label: 'Experience', color: '#4ade80', glow: '#86efac', placeholder: 'e.g. Always add encoding:utf-8 to execFile on Windows' },
 ]
 
 const STATUS_STYLES: Record<string, { bg: string; color: string }> = {
@@ -52,6 +52,14 @@ export function MemoryBrowser() {
   const [error, setError] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [mode, setMode] = useState<'browse' | 'search'>('browse')
+
+  // ── New entry form state ──────────────────────────────────
+  const [showNewForm, setShowNewForm] = useState(false)
+  const [newContent, setNewContent] = useState('')
+  const [newTags, setNewTags] = useState('')
+  const [newSource, setNewSource] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [submitSuccess, setSubmitSuccess] = useState('')
 
   // ── Load entries by type ──────────────────────────────────
 
@@ -98,8 +106,45 @@ export function MemoryBrowser() {
     setMode('browse')
     setSearchQuery('')
     setSearchResults([])
+    setShowNewForm(false)
     loadEntries(type)
   }, [loadEntries])
+
+  // ── Submit new entry ──────────────────────────────────────
+
+  const handleSubmitNew = useCallback(async () => {
+    if (!newContent.trim()) return
+    setSubmitting(true)
+    setError('')
+    try {
+      const res = await fetch('/api/memory/entries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: activeType,
+          content: newContent.trim(),
+          tags: newTags.trim(),
+          source: newSource.trim(),
+        }),
+      })
+      if (!res.ok) {
+        const errData = await res.json()
+        throw new Error(errData.error || 'Failed to create')
+      }
+      const data = await res.json()
+      setNewContent('')
+      setNewTags('')
+      setNewSource('')
+      setShowNewForm(false)
+      setSubmitSuccess(data.id || 'Created!')
+      setTimeout(() => setSubmitSuccess(''), 3000)
+      loadEntries(activeType)
+    } catch (e: any) {
+      setError(e.message)
+    } finally {
+      setSubmitting(false)
+    }
+  }, [activeType, newContent, newTags, newSource, loadEntries])
 
   // Initial load
   const [loaded, setLoaded] = useState(false)
@@ -107,6 +152,8 @@ export function MemoryBrowser() {
     setLoaded(true)
     loadEntries('knowledge')
   }
+
+  const activeTypeConf = ENTRY_TYPES.find(t => t.key === activeType)
 
   // ── Render ────────────────────────────────────────────────
 
@@ -141,7 +188,7 @@ export function MemoryBrowser() {
         })}
       </div>
 
-      {/* ── Search bar ── */}
+      {/* ── Search bar + New button ── */}
       <div className="flex items-center gap-2">
         <div className="flex-1 relative">
           <input
@@ -155,6 +202,17 @@ export function MemoryBrowser() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
+        <button
+          onClick={() => { setShowNewForm(!showNewForm); setMode('browse') }}
+          className="h-9 px-4 text-xs rounded-lg font-medium flex items-center gap-1.5 transition-all shrink-0"
+          style={{
+            background: showNewForm ? '#334155' : `linear-gradient(180deg, ${activeTypeConf?.color || '#a855f7'}, ${activeTypeConf?.color?.replace(/[0-9a-f]{2}$/, '00') || '#7c3aed'})`,
+            color: showNewForm ? '#64748b' : '#fff',
+            boxShadow: showNewForm ? 'none' : `0 0 10px ${activeTypeConf?.color || '#a855f7'}33`,
+          }}
+        >
+          {showNewForm ? 'Cancel' : '+ New'}
+        </button>
         {mode === 'search' && (
           <button
             onClick={() => { setMode('browse'); setSearchQuery(''); setSearchResults([]); loadEntries(activeType) }}
@@ -164,6 +222,68 @@ export function MemoryBrowser() {
           </button>
         )}
       </div>
+
+      {/* ── New entry form ── */}
+      {showNewForm && (
+        <div
+          className="rounded-lg p-4 space-y-3"
+          style={{
+            background: 'linear-gradient(135deg, #0f172a, #1e293b)',
+            border: `1px solid ${activeTypeConf?.color || '#a855f7'}33`,
+            boxShadow: `0 0 20px ${activeTypeConf?.color || '#a855f7'}11`,
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: activeTypeConf?.color, boxShadow: `0 0 4px ${activeTypeConf?.glow}` }} />
+            <span className="text-xs font-mono uppercase tracking-wider" style={{ color: activeTypeConf?.glow }}>
+              New {activeTypeConf?.label}
+            </span>
+          </div>
+
+          <textarea
+            value={newContent}
+            onChange={(e) => setNewContent(e.target.value)}
+            placeholder={activeTypeConf?.placeholder}
+            className="w-full h-24 px-3 py-2 text-sm rounded-md bg-zinc-900/50 border border-zinc-800 text-zinc-300 placeholder-zinc-600 resize-none focus:outline-none focus:ring-1 focus:ring-sky-500/50 font-mono"
+          />
+
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              value={newTags}
+              onChange={(e) => setNewTags(e.target.value)}
+              placeholder="Tags (comma-separated)"
+              className="h-8 px-3 text-xs rounded-md bg-zinc-900/50 border border-zinc-800 text-zinc-300 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-sky-500/50 font-mono"
+            />
+            <input
+              value={newSource}
+              onChange={(e) => setNewSource(e.target.value)}
+              placeholder="Source (optional)"
+              className="h-8 px-3 text-xs rounded-md bg-zinc-900/50 border border-zinc-800 text-zinc-300 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-sky-500/50 font-mono"
+            />
+          </div>
+
+          <div className="flex justify-end">
+            <button
+              onClick={handleSubmitNew}
+              disabled={submitting || !newContent.trim()}
+              className="h-8 px-4 text-xs rounded-md font-medium flex items-center gap-1.5 transition-all"
+              style={{
+                background: submitting ? '#334155' : 'linear-gradient(180deg, #4ade80, #16a34a)',
+                color: submitting ? '#64748b' : '#052e16',
+              }}
+            >
+              {submitting ? 'Saving...' : 'Save Entry'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Success message ── */}
+      {submitSuccess && (
+        <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs">
+          Entry created: <span className="font-mono">{submitSuccess}</span>
+        </div>
+      )}
 
       {/* ── Error ── */}
       {error && (
