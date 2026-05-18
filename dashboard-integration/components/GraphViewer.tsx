@@ -875,7 +875,7 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
             onOpen={onNodeClick}
           />
         </div>
-      )
+      )}
 
       {/* ── Overlay: Open in Pyvis button (bottom-right) ── */}
       <div className="absolute bottom-3 right-3 z-10">
