@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchGraphStats, type GraphStats } from "@/lib/graph-client";
 
 // ── Color map for edge types ───────────────────────────────
@@ -87,34 +86,30 @@ export function GraphStats() {
 
   if (loading) {
     return (
-      <Card className="bg-zinc-900 border-zinc-700">
-        <CardContent className="p-4">
-          <p className="text-zinc-400 text-sm">Loading graph stats...</p>
-        </CardContent>
-      </Card>
+      <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-4">
+        <p className="text-zinc-400 text-sm">Loading graph stats...</p>
+      </div>
     );
   }
 
   if (error || !stats) {
     return (
-      <Card className="bg-zinc-900 border-zinc-700">
-        <CardContent className="p-4">
-          <p className="text-red-400 text-sm">
-            {error || "No stats available"}
-          </p>
-        </CardContent>
-      </Card>
+      <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-4">
+        <p className="text-red-400 text-sm">
+          {error || "No stats available"}
+        </p>
+      </div>
     );
   }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
       {/* Summary card */}
-      <Card className="bg-zinc-900 border-zinc-700">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm text-zinc-300">Graph Summary</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-1">
+      <div className="bg-zinc-900 border border-zinc-700 rounded-lg">
+        <div className="px-3 pt-3 pb-1">
+          <h3 className="text-sm text-zinc-300 font-medium">Graph Summary</h3>
+        </div>
+        <div className="px-3 pb-3 space-y-1">
           <div className="flex justify-between text-xs">
             <span className="text-zinc-400">Nodes</span>
             <span className="text-zinc-200 font-mono">{stats.nodeCount}</span>
@@ -133,33 +128,29 @@ export function GraphStats() {
               {stats.isolatedNodes}
             </span>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Edge type distribution */}
-      <Card className="bg-zinc-900 border-zinc-700">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm text-zinc-300">
-            Edge Types
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="bg-zinc-900 border border-zinc-700 rounded-lg">
+        <div className="px-3 pt-3 pb-1">
+          <h3 className="text-sm text-zinc-300 font-medium">Edge Types</h3>
+        </div>
+        <div className="px-3 pb-3">
           {Object.keys(stats.edgeTypes).length > 0 ? (
             <BarChart data={stats.edgeTypes} />
           ) : (
             <p className="text-zinc-500 text-xs">No edges yet</p>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Top connected nodes */}
-      <Card className="bg-zinc-900 border-zinc-700">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm text-zinc-300">
-            Most Connected
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="bg-zinc-900 border border-zinc-700 rounded-lg">
+        <div className="px-3 pt-3 pb-1">
+          <h3 className="text-sm text-zinc-300 font-medium">Most Connected</h3>
+        </div>
+        <div className="px-3 pb-3">
           {stats.topConnectedNodes.length > 0 ? (
             <div className="space-y-1">
               {stats.topConnectedNodes.slice(0, 8).map((node, i) => (
@@ -180,8 +171,8 @@ export function GraphStats() {
           ) : (
             <p className="text-zinc-500 text-xs">No nodes yet</p>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

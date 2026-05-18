@@ -1,9 +1,6 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { fetchGraph, type GraphEdge, type GraphStats } from "@/lib/graph-client";
 
 // ── Edge type colors (matches graph_engine.py TYPE_COLORS) ─
@@ -46,7 +43,7 @@ function getNodeColor(id: string): string {
   return NODE_COLORS[group] || "#4a90d9";
 }
 
-// ── Selected node detail panel ─────────────────────────────
+// ── Selected node detail panel (plain HTML + Tailwind) ─────
 
 interface NodeDetailProps {
   nodeId: string;
@@ -60,29 +57,30 @@ function NodeDetail({ nodeId, edges, onClose }: NodeDetailProps) {
   const group = classifyNode(nodeId);
 
   return (
-    <Card className="bg-zinc-900 border-zinc-700 text-zinc-100">
-      <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-sm font-mono truncate max-w-[80%]">
+    <div className="bg-zinc-900 border border-zinc-700 rounded-lg overflow-hidden">
+      <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-700">
+        <span className="text-sm font-mono text-zinc-100 truncate max-w-[80%]">
           {nodeId}
-        </CardTitle>
-        <Button
-          variant="ghost"
-          size="sm"
+        </span>
+        <button
           onClick={onClose}
-          className="h-6 w-6 p-0 text-zinc-400 hover:text-white"
+          className="text-zinc-400 hover:text-white text-sm leading-none"
         >
           x
-        </Button>
-      </CardHeader>
-      <CardContent className="text-xs space-y-2">
+        </button>
+      </div>
+      <div className="p-3 text-xs space-y-2">
         <div className="flex items-center gap-2">
           <span className="text-zinc-400">Group:</span>
-          <Badge
-            variant="outline"
-            style={{ borderColor: NODE_COLORS[group] || "#4a90d9" }}
+          <span
+            className="px-1.5 py-0.5 rounded text-[10px] border"
+            style={{
+              borderColor: NODE_COLORS[group] || "#4a90d9",
+              color: NODE_COLORS[group] || "#4a90d9",
+            }}
           >
             {group}
-          </Badge>
+          </span>
         </div>
         <div className="text-zinc-400">
           Incoming: {incoming.length} | Outgoing: {outgoing.length}
@@ -93,15 +91,15 @@ function NodeDetail({ nodeId, edges, onClose }: NodeDetailProps) {
             {incoming.slice(0, 5).map((e, i) => (
               <div key={i} className="flex items-center gap-1 ml-2">
                 <span
-                  className="inline-block w-2 h-2 rounded-full"
+                  className="inline-block w-2 h-2 rounded-full shrink-0"
                   style={{ backgroundColor: EDGE_COLORS[e.type] || "#3498db" }}
                 />
                 <span className="text-zinc-400 truncate max-w-[60%]">
                   {e.from}
                 </span>
-                <Badge variant="secondary" className="text-[10px] py-0">
+                <span className="px-1 py-0 rounded bg-zinc-800 text-[10px] text-zinc-400">
                   {e.type}
-                </Badge>
+                </span>
               </div>
             ))}
             {incoming.length > 5 && (
@@ -117,15 +115,15 @@ function NodeDetail({ nodeId, edges, onClose }: NodeDetailProps) {
             {outgoing.slice(0, 5).map((e, i) => (
               <div key={i} className="flex items-center gap-1 ml-2">
                 <span
-                  className="inline-block w-2 h-2 rounded-full"
+                  className="inline-block w-2 h-2 rounded-full shrink-0"
                   style={{ backgroundColor: EDGE_COLORS[e.type] || "#3498db" }}
                 />
                 <span className="text-zinc-400 truncate max-w-[60%]">
                   {e.to}
                 </span>
-                <Badge variant="secondary" className="text-[10px] py-0">
+                <span className="px-1 py-0 rounded bg-zinc-800 text-[10px] text-zinc-400">
                   {e.type}
-                </Badge>
+                </span>
               </div>
             ))}
             {outgoing.length > 5 && (
@@ -135,8 +133,8 @@ function NodeDetail({ nodeId, edges, onClose }: NodeDetailProps) {
             )}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -202,7 +200,6 @@ export function GraphViewer() {
 
         const types = Object.keys(data.stats.edgeTypes);
         setAllEdgeTypes(types);
-        // Start with all types active
         setActiveTypes(new Set(types));
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load graph");
@@ -231,7 +228,7 @@ export function GraphViewer() {
 
   const filteredEdges = edges.filter((e) => activeTypes.has(e.type));
 
-  // ── Build node/edge structures for D3 canvas ──────────
+  // ── Build node/edge structures for canvas ──────────────
 
   interface SimNode {
     id: string;
@@ -250,7 +247,7 @@ export function GraphViewer() {
     color: string;
   }
 
-  // ── Simple force-directed layout + canvas rendering ────
+  // ── Force-directed layout + canvas rendering ───────────
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -298,7 +295,6 @@ export function GraphViewer() {
           degree: 0,
         });
       }
-      // Track degree
       nodeMap.get(edge.from)!.degree++;
       nodeMap.get(edge.to)!.degree++;
     }
@@ -368,7 +364,6 @@ export function GraphViewer() {
         node.x += node.vx;
         node.y += node.vy;
 
-        // Keep within bounds
         const margin = 30;
         node.x = Math.max(margin, Math.min(width - margin, node.x));
         node.y = Math.max(margin, Math.min(height - margin, node.y));
@@ -390,7 +385,7 @@ export function GraphViewer() {
         if (!source || !target) continue;
 
         ctx.beginPath();
-        ctx.strokeStyle = edge.color + "99"; // semi-transparent
+        ctx.strokeStyle = edge.color + "99";
         ctx.moveTo(source.x, source.y);
         ctx.lineTo(target.x, target.y);
         ctx.stroke();
@@ -423,7 +418,6 @@ export function GraphViewer() {
         const radius = Math.max(4, Math.min(12, 4 + node.degree * 1.5));
         const isSelected = selectedNode === node.id;
 
-        // Glow for selected node
         if (isSelected) {
           ctx.beginPath();
           ctx.arc(node.x, node.y, radius + 6, 0, Math.PI * 2);
@@ -431,7 +425,6 @@ export function GraphViewer() {
           ctx.fill();
         }
 
-        // Node circle
         ctx.beginPath();
         ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
         ctx.fillStyle = node.color;
@@ -440,7 +433,6 @@ export function GraphViewer() {
         ctx.lineWidth = isSelected ? 2 : 1;
         ctx.stroke();
 
-        // Label (only for nodes with high degree or when zoomed)
         if (node.degree >= 2 || nodes.length < 30) {
           ctx.font = "10px monospace";
           ctx.fillStyle = "#e0e0e0";
@@ -500,7 +492,6 @@ export function GraphViewer() {
 
       setSelectedNode(closest ? closest.id : null);
 
-      // Redraw with selection highlight
       if (iteration >= MAX_ITERATIONS) {
         draw();
       }
@@ -518,35 +509,29 @@ export function GraphViewer() {
 
   if (loading) {
     return (
-      <Card className="bg-zinc-900 border-zinc-700">
-        <CardContent className="flex items-center justify-center h-[500px]">
-          <p className="text-zinc-400">Loading graph data...</p>
-        </CardContent>
-      </Card>
+      <div className="bg-zinc-900 border border-zinc-700 rounded-lg flex items-center justify-center h-[500px]">
+        <p className="text-zinc-400">Loading graph data...</p>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Card className="bg-zinc-900 border-zinc-700">
-        <CardContent className="flex items-center justify-center h-[500px]">
-          <p className="text-red-400">Error: {error}</p>
-        </CardContent>
-      </Card>
+      <div className="bg-zinc-900 border border-zinc-700 rounded-lg flex items-center justify-center h-[500px]">
+        <p className="text-red-400">Error: {error}</p>
+      </div>
     );
   }
 
   if (edges.length === 0) {
     return (
-      <Card className="bg-zinc-900 border-zinc-700">
-        <CardContent className="flex flex-col items-center justify-center h-[500px] gap-4">
-          <p className="text-zinc-400">No graph edges found.</p>
-          <p className="text-zinc-500 text-sm">
-            Run: python tools/memory_cli.py graph add-edge --from X --to Y
-            --type same_session
-          </p>
-        </CardContent>
-      </Card>
+      <div className="bg-zinc-900 border border-zinc-700 rounded-lg flex flex-col items-center justify-center h-[500px] gap-4">
+        <p className="text-zinc-400">No graph edges found.</p>
+        <p className="text-zinc-500 text-sm">
+          Run: python tools/memory_cli.py graph add-edge --from X --to Y
+          --type same_session
+        </p>
+      </div>
     );
   }
 
@@ -561,15 +546,15 @@ export function GraphViewer() {
 
       <div className="flex gap-3">
         {/* Graph canvas */}
-        <Card className="bg-zinc-900 border-zinc-700 flex-1 overflow-hidden">
-          <CardContent className="p-0" ref={containerRef}>
+        <div className="bg-zinc-900 border border-zinc-700 rounded-lg flex-1 overflow-hidden">
+          <div className="p-0" ref={containerRef}>
             <canvas
               ref={canvasRef}
               className="cursor-pointer block"
               style={{ background: "#1a1a2e" }}
             />
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Node detail panel */}
         <div className="w-72 shrink-0">
@@ -580,25 +565,21 @@ export function GraphViewer() {
               onClose={() => setSelectedNode(null)}
             />
           ) : (
-            <Card className="bg-zinc-900 border-zinc-700">
-              <CardContent className="flex items-center justify-center h-32">
-                <p className="text-zinc-500 text-xs">
-                  Click a node to see details
-                </p>
-              </CardContent>
-            </Card>
+            <div className="bg-zinc-900 border border-zinc-700 rounded-lg flex items-center justify-center h-32">
+              <p className="text-zinc-500 text-xs">
+                Click a node to see details
+              </p>
+            </div>
           )}
 
           {/* Open in Pyvis button */}
           <div className="mt-3">
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full border-zinc-700 text-zinc-300 hover:text-white"
+            <button
+              className="w-full border border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500 rounded px-3 py-1.5 text-sm transition-colors"
               onClick={() => window.open("/api/memory/graph/vis", "_blank")}
             >
               Open in Pyvis
-            </Button>
+            </button>
           </div>
         </div>
       </div>
