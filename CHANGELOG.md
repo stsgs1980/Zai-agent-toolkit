@@ -6,6 +6,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2.0.4] - 2026-05-18
+
+### Fixed — Section Order Consistency (7 standards)
+
+Enforced unified section ordering across all 19 standards: **content sections -> References (if present) -> Version History (if present) -> Cross-References (always last)**. Previously, 7 standards had Version History placed after Cross-References, breaking the convention and causing validation failures.
+
+#### Version History / Cross-References swap (6 standards)
+
+- **STD-ERR-001** (Error Handling Core): Section 8 Cross-References -> Section 8 Version History, Section 9 Version History -> Section 9 Cross-References
+- **STD-ERR-002** (Error Recovery): Section 9 Cross-References -> Section 9 References, Section 10 References -> Section 10 Version History, Section 11 Version History -> Section 11 Cross-References
+- **STD-GIT-002** (GitHub Sandbox): Section 10 Cross-References -> Section 10 Version History, Section 11 Version History -> Section 11 Cross-References
+- **STD-GIT-001** (GitHub Core): Section 11 Cross-References -> Section 11 Version History, Section 12 Version History -> Section 12 Cross-References
+- **STD-SEC-001** (Security Core): Section 9 Cross-References -> Section 9 Version History, Section 10 Version History -> Section 10 Cross-References
+- **STD-SEC-002** (Security Extended): Section 12 Cross-References -> Section 12 Version History, Section 13 Version History -> Section 13 Cross-References
+
+#### Cross-References table format fix (1 standard)
+
+- **STD-ENV-001** (Reproducibility): Replaced non-standard `| Domain | Standard | Relevant Sections |` table with unified `| Standard | Relationship |` format. Removed introductory sentence before table.
+
+### Added — Validation Tooling
+
+- `validate_standards.py`: Comprehensive 10-check validation script for all 19 standards. Checks section numbering continuity, unnumbered headers, Cross-References position, Version History position, References position, standard header presence, Cross-References table format, duplicate section numbers, sequential numbering, and internal link consistency. Color-coded output with per-file and global summaries.
+
+### Validation Results
+
+All 19 standards pass all 10 checks (190/190).
+
+---
+
 ## [2.0.3] - 2026-05-18
 
 ### Changed — Section Numbering Unification

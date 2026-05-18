@@ -778,7 +778,15 @@ Mandatory before each stage:
 
 ---
 
-## 10. Cross-References
+## 10. Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2026-05 | Extracted from STD-GIT-001 v1.5. Contains sandbox-specific content: sandbox constraints, session management, deadlock prevention and recovery, network failure recovery, sandbox safety rules, post-deadlock clone recovery, AI agent checklist. |
+
+---
+
+## 11. Cross-References
 
 | Standard | Relationship |
 |----------|-------------|
@@ -786,14 +794,6 @@ Mandatory before each stage:
 | STD-ENV-002 | Sandbox environment constraints |
 | STD-AGENT-001 | Subagent commit protocol |
 | STD-FE-001 | Post-refactor commit rules |
-
----
-
-## 11. Version History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | 2026-05 | Extracted from STD-GIT-001 v1.5. Contains sandbox-specific content: sandbox constraints, session management, deadlock prevention and recovery, network failure recovery, sandbox safety rules, post-deadlock clone recovery, AI agent checklist. |
 
 ---
 

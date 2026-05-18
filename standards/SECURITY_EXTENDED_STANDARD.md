@@ -601,21 +601,21 @@ Is this project in Z.ai sandbox (prototype/MVP)?
 
 ---
 
-## 12. Cross-References
+## 12. Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2026-05 | Extracted from STD-SEC-001 v1.1. Contains authentication, authorization, rate limiting, monitoring, deployment, incident response, and compliance requirements for production applications. |
+
+---
+
+## 13. Cross-References
 
 | Standard | Relationship |
 |----------|-------------|
 | STD-SEC-001 | Core security (secrets, validation, headers, dependencies) |
 | STD-ERR-001 | Error handling patterns (this standard focuses on security-specific errors) |
 | STD-A11Y-001 | Accessibility intersects with security (Captcha alternatives, timeout warnings) |
-
----
-
-## 13. Version History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | 2026-05 | Extracted from STD-SEC-001 v1.1. Contains authentication, authorization, rate limiting, monitoring, deployment, incident response, and compliance requirements for production applications. |
 
 ---
 

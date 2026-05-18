@@ -293,18 +293,7 @@ Internal error            | Fallback + alert                     | 1           |
 
 ---
 
-## 9. Cross-References
-
-| Standard | Relationship |
-|----------|-------------|
-| STD-ERR-001 | Core error handling (classification, structure, patterns) |
-| STD-AGENT-002 | Orchestration error propagation (escalation ladder) |
-| STD-SEC-001 | Security error handling (sensitive data in logs) |
-| STD-GIT-002 | Sandbox git error recovery (deadlock, network failures) |
-
----
-
-## 10. References
+## 9. References
 
 - OWASP Error Handling: https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html
 - Node.js Best Practices: https://github.com/goldbergyoni/nodebestpractices#1-error-handling-practices
@@ -312,11 +301,22 @@ Internal error            | Fallback + alert                     | 1           |
 
 ---
 
-## 11. Version History
+## 10. Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-05 | Extracted from STD-ERR-001 v1.0. Contains retry logic, circuit breaker, fallback mechanisms, monitoring and alerting, and orchestration integration. |
+
+---
+
+## 11. Cross-References
+
+| Standard | Relationship |
+|----------|-------------|
+| STD-ERR-001 | Core error handling (classification, structure, patterns) |
+| STD-AGENT-002 | Orchestration error propagation (escalation ladder) |
+| STD-SEC-001 | Security error handling (sensitive data in logs) |
+| STD-GIT-002 | Sandbox git error recovery (deadlock, network failures) |
 
 ---
 

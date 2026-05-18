@@ -157,29 +157,27 @@ Everything violating this formula is a bug.
 
 ---
 
-## 6. Cross-References
-
-The following standards contain rules that support reproducibility within their respective domains:
-
-| Domain | Standard | Relevant Sections |
-|--------|----------|-------------------|
-| Error handling | STD-ERR-001 | Section 5.2 (no internal error leaks) |
-| Error recovery | STD-ERR-002 | Section 4 (fallback mechanisms) |
-| Security | STD-SEC-001 | Section 2.1 (env validation), Section 2.2 (.env management) |
-| Git operations | STD-GIT-001 | Section 5 (push policy), Section 8 (.gitignore), Section 6 (versioning) |
-| Frontend | STD-FE-001 | Section 10.5 (auto-backup), Section 10.6 (deduplication) |
-| Z.ai sandbox | STD-ENV-002 | Section 3 (project directory), Section 3.1 (absolute path exception) |
-| Testing | STD-TEST-001 | Section 6 (CI pipeline), Section 11 (sandbox coverage) |
-
----
-
-## 7. Version History
+## 6. Version History
 
 | Version | Date | Changes |
 |--------|------|---------|
 | 2.0 | 2026-05-18 | Major restructuring: removed rules not directly ensuring reproducibility (dark theme, color palette, error handling, anti-fragility, dedup, push policy, deletion UI). These rules relocated to their domain-specific standards (STD-FE-001, STD-ERR-001, STD-GIT-001). Added Cross-References section. Renumbered sections. |
 | 1.1 | 2026-05-18 | K-01 fix: replaced categorical absolute path ban with nuanced rule. Added Z.ai sandbox exception. |
 | 1.0 | 2025-01 | Initial standard |
+
+---
+
+## 7. Cross-References
+
+| Standard | Relationship |
+|----------|-------------|
+| STD-ERR-001 | Error handling: no internal error leaks (Section 5.2) |
+| STD-ERR-002 | Error recovery: fallback mechanisms (Section 4) |
+| STD-SEC-001 | Security: env validation (Section 2.1), .env management (Section 2.2) |
+| STD-GIT-001 | Git: push policy (Section 5), .gitignore (Section 8), versioning (Section 6) |
+| STD-FE-001 | Frontend: auto-backup (Section 10.5), deduplication (Section 10.6) |
+| STD-ENV-002 | Z.ai sandbox: project directory (Section 3), absolute path exception (Section 3.1) |
+| STD-TEST-001 | Testing: CI pipeline (Section 6), sandbox coverage (Section 11) |
 
 ---
 Built with: Next.js 16 + TypeScript + Tailwind CSS

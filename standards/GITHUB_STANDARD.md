@@ -431,17 +431,7 @@ After every git operation, log to `worklog.md`:
 
 ---
 
-## 11. Cross-References
-
-| Standard | Relationship |
-|----------|-------------|
-| STD-GIT-002 | Sandbox git safety (deadlock, recovery, network failures) |
-| STD-AGENT-001 | Subagent commit protocol |
-| STD-FE-001 | Post-refactor commit rules |
-
----
-
-## 12. Version History
+## 11. Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
@@ -452,6 +442,16 @@ After every git operation, log to `worklog.md`:
 | 1.4 | 2025-05 | Added Sandbox Git Safety Rules: middleware hook deadlock, absolute prohibitions, pre-command checklist, remote ahead decision tree, rebase deadlock recovery, auto-generated files, stash safety, detached HEAD, git hooks, GPG signing, emergency recovery summary |
 | 1.5 | 2025-05 | Added Post-Deadlock Clone Recovery section: nested project trap, correct clone procedure after deadlock, cleanup checklist |
 | 2.0 | 2026-05 | Major restructuring: sandbox-specific content (sections 10.1-10.11) extracted to STD-GIT-002. Core retains commit format, branching, push policy, versioning, GitHub-specific rules. |
+
+---
+
+## 12. Cross-References
+
+| Standard | Relationship |
+|----------|-------------|
+| STD-GIT-002 | Sandbox git safety (deadlock, recovery, network failures) |
+| STD-AGENT-001 | Subagent commit protocol |
+| STD-FE-001 | Post-refactor commit rules |
 
 ---
 

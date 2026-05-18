@@ -352,22 +352,22 @@ These sections apply to every project, including sandbox prototypes:
 
 ---
 
-## 9. Cross-References
+## 9. Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.1 | 2025-01 | Initial security standard |
+| 2.0 | 2026-05 | Major restructuring: extended content (authentication, authorization, rate limiting, monitoring, deployment, incident response, compliance) extracted to STD-SEC-002. Core retains secrets, input validation, headers, dependency auditing, sensitive data handling. |
+
+---
+
+## 10. Cross-References
 
 | Standard | Relationship |
 |----------|-------------|
 | STD-SEC-002 | Extended security (auth, RBAC, rate limiting, monitoring, incident response, compliance) |
 | STD-ENV-001 | Environment variable validation |
 | STD-ERR-001 | Error response security (no info leaks) |
-
----
-
-## 10. Version History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.1 | 2025-01 | Initial security standard |
-| 2.0 | 2026-05 | Major restructuring: extended content (authentication, authorization, rate limiting, monitoring, deployment, incident response, compliance) extracted to STD-SEC-002. Core retains secrets, input validation, headers, dependency auditing, sensitive data handling. |
 
 ---
 

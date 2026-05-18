@@ -636,7 +636,16 @@ export function getUserMessage(error: ApplicationError): string {
 
 ---
 
-## 8. Cross-References
+## 8. Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2025-01 | Initial version: error classification, structure, patterns, logging, API responses, frontend handling, recovery strategies, monitoring |
+| 2.0 | 2026-05 | Major restructuring: recovery strategies (retry, circuit breaker, fallback) and monitoring/alerting extracted to STD-ERR-002. Core retains error classification, structure, patterns, logging, API responses, frontend handling. |
+
+---
+
+## 9. Cross-References
 
 | Standard | Relationship |
 |----------|-------------|
@@ -644,15 +653,6 @@ export function getUserMessage(error: ApplicationError): string {
 | STD-SEC-001 | Security error handling (no info leaks in error responses) |
 | STD-AGENT-001 | Subagent error contract (failure reporting) |
 | STD-AGENT-002 | Orchestration error propagation (escalation ladder) |
-
----
-
-## 9. Version History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | 2025-01 | Initial version: error classification, structure, patterns, logging, API responses, frontend handling, recovery strategies, monitoring |
-| 2.0 | 2026-05 | Major restructuring: recovery strategies (retry, circuit breaker, fallback) and monitoring/alerting extracted to STD-ERR-002. Core retains error classification, structure, patterns, logging, API responses, frontend handling. |
 
 ---
 
