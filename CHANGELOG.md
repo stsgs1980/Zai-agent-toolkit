@@ -27,13 +27,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - STD-ENV-001 (Reproducibility Standard): v1.0 -> v1.1 -> v2.0
     - K-01 fix: replaced categorical absolute path ban with nuanced "no hardcoded personal paths" rule, added environment-constant path categories and Z.ai sandbox exception table (v1.1)
     - Major restructuring (v2.0): removed foreign domains (dark theme, color palette, anti-fragility, dedup, push policy, deletion UI), kept only rules where violation breaks "clone + install + dev = works", added Cross-References section (bibliography-style index)
-  - STD-FE-001 (Frontend Standard): v1.3 -> v1.4
+  - STD-FE-001 (Frontend Standard): v1.3 -> v1.4 -> v1.5
     - Relocated from STD-ENV-001: dark theme (11.1), color palette (11.2), anti-fragility/error isolation (11.3), deletion UI patterns (11.4)
+    - K-06/K-07: replaced duplicated error handling and Zod validation with cross-references to STD-ERR-001 and STD-SEC-001
+    - K-08: added autoBackup() specification (non-blocking, /tmp/, timestamp format, 24h retention)
+    - K-09: added custom theme preset validation rule
+  - STD-SEC-001 (Security Standard): v1.0 -> v1.1
+    - K-03: lockfile now mentions bun.lock alongside package-lock.json
+    - K-04: missing secrets now warn (not crash), aligned with STD-ENV-001
+    - K-05: added SQLite note for Z.ai sandbox projects
+    - K-11: removed localhost URL from CORS dev config
+    - K-14: fixed section numbering (§12-§14 reordered)
+  - STD-GIT-001 (GitHub Standard):
+    - K-13: added emergency exception note for git reset --hard in deadlock recovery
+  - STD-ARCH-001 (Implementation Order):
+    - K-02/K-10: Step 3 updated — "Remove hardcoded personal paths" instead of "Remove absolute paths", dark theme moved to Step 3a note
+  - K-12: Unified Stack Signatures across all standards (replaced "Z.ai Agent Toolkit" with project default)
   - STD-ENV-002 (Z.ai Integration Standard): v1.0 -> v1.1
     - Updated section 3.1 to cross-reference STD-ENV-001 v1.1 path rules
   - STD-META-001 (Standard ID System): registry updated
     - STD-ENV-001 version bumped to v2.0
     - STD-ENV-002 version bumped to v1.1
+    - STD-FE-001 version bumped to v1.5
+    - STD-SEC-001 version bumped to v1.1
   - 15 inter-standard contradictions identified (K-01 through K-15)
 
 ### Removed

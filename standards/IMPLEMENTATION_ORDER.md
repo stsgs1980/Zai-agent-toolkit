@@ -91,12 +91,14 @@ Work tools. Copied into the project and used from day one.
 
 **What is done:**
 
-- Create .env.example with relative paths
+- Create .env.example with all variables and safe defaults
 - Configure db.ts: connection_limit=1, mkdirSync, relative paths via process.cwd()
-- Remove absolute paths (/home/, http://localhost:)
+- Remove hardcoded personal paths (environment-constant paths allowed per STD-ENV-002)
+- Remove localhost URLs in source code (use relative paths or XTransformPort)
 - Verify dependencies (no dead packages)
-- Configure dark theme via CSS variables
 - Log result to WORKLOG.md (Task ID: 3)
+
+**Note:** Dark theme and color palette configuration is now in FRONTEND_STANDARD (STD-FE-001 §11), applied at Step 3a.
 
 **Why third:** Infrastructure must be stable before code and documentation start relying on it.
 
@@ -185,8 +187,8 @@ Step 6: README_TEMPLATE              Assemble README from template
 | No-Unicode before Reproducibility | .ts/.tsx files change during DB setup — repeated cleanup |
 | Markdown Standard before No-Unicode | Emoji in .md and code — double pass through files |
 | README Template before Markdown Standard | README format does not comply with standard — reformatting |
-| Any standard without Reproducibility | Absolute paths, dead packages — hidden bugs |
-| Reproducibility after README | Absolute paths in .env and db.ts break deploy — rewriting config and reformatting README |
+| Any standard without Reproducibility | Hardcoded personal paths, dead packages — hidden bugs |
+| Reproducibility after README | Personal paths in .env and db.ts break deploy — rewriting config and reformatting README |
 | Skipping step 2 (worklog) | No work history, no coordination between agents, no rollback possible |
 
 ---

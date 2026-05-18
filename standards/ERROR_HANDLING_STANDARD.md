@@ -834,4 +834,4 @@ groups:
 
 ---
 
-Built with: Z.ai Agent Toolkit
+Built with: Next.js 16 + TypeScript + Tailwind CSS

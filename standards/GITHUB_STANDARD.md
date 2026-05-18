@@ -144,9 +144,12 @@ git log --oneline -20 > /tmp/git-log-backup.txt
 If a previous session left git in blocked state:
 
 ```bash
+# IMPORTANT: Backup first per Section 4 (stash + copy + log)
 rm -rf .git/rebase-merge .git/rebase-apply
 git reset --hard HEAD
 ```
+
+**Note:** `git reset --hard` in this section is an EMERGENCY recovery from a deadlocked state (rebase/merge stuck, all tools blocked). This is the ONLY exception to the §3.1 prohibition, because in a deadlock state there is no working data to lose — the repository is already unusable. In all other cases, §3.1 applies: backup first.
 
 ### 4.2 No Panic Diagnostics
 

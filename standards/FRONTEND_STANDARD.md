@@ -1,7 +1,7 @@
-# Standard: Frontend Development v1.4 (EN)
+# Standard: Frontend Development v1.5 (EN)
 
 > ID: STD-FE-001
-> Version: 1.4
+> Version: 1.5
 > Level: **[C] Critical**
 > Last Updated: 2026-05
 > Related: WCAG 2.1 AA (STD-A11Y-001), GitHub Standard (STD-GIT-001), Error Handling (STD-ERR-001)
@@ -332,7 +332,7 @@ return NextResponse.json(
 
 ### 10.3. Input Validation
 
-All input MUST be validated with Zod before processing:
+All input MUST be validated with Zod before processing. For comprehensive validation schemas and security considerations, see **STD-SEC-001 Section 5.1** (validation schemas, SQL injection prevention) and **STD-FE-001 Section 10.4** (error handling).
 
 ```typescript
 import { z } from 'zod'
@@ -361,27 +361,16 @@ export async function POST(request: Request) {
 
 ### 10.4. Error Handling
 
-API routes MUST NOT leak internal error details to clients:
-
-```typescript
-// PROHIBITED -- leaks Prisma error details
-catch (error) {
-  return NextResponse.json({ error: error.message }, { status: 500 })
-}
-
-// REQUIRED -- generic message + server-side logging
-catch (error) {
-  console.error('Error creating user:', error)
-  return NextResponse.json(
-    { success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to create user' } },
-    { status: 500 }
-  )
-}
-```
+API routes MUST NOT leak internal error details to clients. For complete error handling patterns, see **STD-ERR-001 Section 5.2** (error handler middleware) and **STD-SEC-001 Section 12.4** (sandbox core checklist).
 
 ### 10.5. Auto-Backup Before Mutations
 
-Write mutations (POST, PATCH, DELETE) SHOULD call autoBackup() before execution:
+Write mutations (POST, PATCH, DELETE) SHOULD create a backup before execution. The backup implementation MUST follow these rules:
+
+1. Non-blocking: backup failure MUST NOT prevent the mutation (log error, continue)
+2. Location: `/tmp/` directory (system temp, not committed to git)
+3. Format: `{entity}-{timestamp}.json` (e.g., `user-20260518T120000.json`)
+4. Retention: cleanup backups older than 24 hours on next backup call
 
 ```typescript
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
@@ -447,6 +436,8 @@ Default palette: `stone`, `slate`, `neutral`, `green`, `emerald`.
 
 Rationale: the default palettes are selected for WCAG 2.1 AA contrast compliance across both light and dark themes. Non-default palettes require manual contrast verification per STD-A11Y-001 section 1.1.
 
+**Custom theme presets** (e.g., Champagne, Cyan Night, Zinc) MUST be validated against STD-A11Y-001 section 7 contrast requirements before use. Each preset MUST document its contrast ratios for all token pairs.
+
 ### 11.3. Anti-Fragility: Error Isolation
 
 Non-critical operations (backup, AI analysis, background sync) MUST NOT break the main user flow. If a non-critical operation fails, log the error and continue.
@@ -498,6 +489,7 @@ When possible, prefer soft-delete (archive) over hard-delete. See STD-FE-001 sec
 | 1.2 | 2025-01 | Merged anti-monolith patterns, examples, refactoring strategy |
 | 1.3 | 2025-01 | Added Recommended/Hard limits, sections/features distinction, ESLint config, dynamic imports rules, co-location principle, exception documentation format |
 | 1.4 | 2026-05 | Relocated from STD-ENV-001: dark theme (11.1), color palette (11.2), anti-fragility/error isolation (11.3), deletion UI patterns (11.4). Added Related: STD-ERR-001. |
+| 1.5 | 2026-05 | K-06/K-07: replaced duplicated error handling (10.4) and Zod validation (10.3) with cross-references to STD-ERR-001 and STD-SEC-001. K-08: added autoBackup() specification (10.5). K-09: added custom theme preset validation rule (11.2). |
 
 ---
 

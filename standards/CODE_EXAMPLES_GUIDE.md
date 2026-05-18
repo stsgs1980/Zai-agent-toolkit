@@ -576,4 +576,4 @@ print(result)  # 8
 **File is fully ready to use.** Save as `code-examples-guide.md`.
 
 ---
-Built with: Z.ai Agent Toolkit
+Built with: Next.js 16 + TypeScript + Tailwind CSS

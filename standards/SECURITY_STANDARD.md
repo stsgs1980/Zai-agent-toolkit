@@ -1,7 +1,7 @@
-# Standard: Security v1.0 (EN)
+# Standard: Security v1.1 (EN)
 
 > ID: STD-SEC-001
-> Version: 1.0
+> Version: 1.1
 > Level: **[C] Critical**
 > Last Updated: 2025-01
 
@@ -51,11 +51,13 @@ function validateSecrets() {
 
   const missing = required.filter(key => !process.env[key]);
   if (missing.length > 0) {
-    throw new Error(`Missing required secrets: ${missing.join(', ')}`);
+    console.warn(`Missing required environment variables: ${missing.join(', ')}`);
+    // In production: throw new Error(`Missing required secrets: ${missing.join(', ')}`);
+    // In sandbox/development: warn only, do not crash (see STD-ENV-001 §1.1)
   }
 
-  // Validate secret strength
-  if (process.env.JWT_SECRET.length < 32) {
+  // Validate secret strength (only if secret exists)
+  if (process.env.JWT_SECRET && process.env.JWT_SECRET.length < 32) {
     throw new Error('JWT_SECRET must be at least 32 characters');
   }
 }
@@ -65,6 +67,8 @@ function validateSecrets() {
 
 ```bash
 # .env.example (committed to repo)
+# Note: For Z.ai sandbox projects using SQLite, DATABASE_URL uses file: protocol
+# Example: DATABASE_URL="file:./dev.db"
 DATABASE_URL=postgresql://user:password@localhost:5432/db
 JWT_SECRET=your-secret-key-here
 API_KEY=your-api-key-here
@@ -660,7 +664,7 @@ jobs:
 | License | Allow-list only |
 | Age | Prefer stable, maintained packages |
 | Downloads | Prefer packages with significant usage |
-| Lock File | Always commit package-lock.json |
+| Lock File | Always commit lockfile (`bun.lock` or `package-lock.json`) |
 
 ---
 
@@ -776,7 +780,7 @@ function sanitizeLog(data: Record<string, unknown>): Record<string, unknown> {
 const securityConfig = {
   development: {
     https: false,
-    cors: { origin: 'http://localhost:3000' },
+    cors: { origin: '*' },  // Dev only — restrict in production
     csp: { 'upgrade-insecure-requests': false },
   },
 
@@ -837,11 +841,11 @@ const securityConfig = {
 
 ---
 
-## 13. Scope Tiers: Core vs Extended
+## 12. Scope Tiers: Core vs Extended
 
 Not all projects require the full security standard. Sandbox prototypes and MVPs need a focused subset, while production applications require complete coverage.
 
-### 13.1. Core (Required for ALL projects)
+### 12.1. Core (Required for ALL projects)
 
 These sections apply to every project, including sandbox prototypes:
 
@@ -854,7 +858,7 @@ These sections apply to every project, including sandbox prototypes:
 | 8.1 | Dependency Auditing | npm audit — automated check |
 | 9.3 | Sensitive Data Handling | Never log passwords/tokens |
 
-### 13.2. Extended (Required for production / user-facing projects)
+### 12.2. Extended (Required for production / user-facing projects)
 
 These sections apply when the project handles real user data, is deployed to production, or serves external users:
 
@@ -866,9 +870,9 @@ These sections apply when the project handles real user data, is deployed to pro
 | 9.1-9.2 | Security Event Logging & Audit | When compliance required |
 | 10.1-10.2 | Secure Deployment Configuration | When deploying to production |
 | 11.1-11.2 | Incident Response | When serving real users |
-| 12 | Compliance (GDPR, SOC 2) | When handling personal data |
+| 13 | Compliance (GDPR, SOC 2) | When handling personal data |
 
-### 13.3. Decision Matrix
+### 12.3. Decision Matrix
 
 ```text
 Is this project in Z.ai sandbox (prototype/MVP)?
@@ -887,7 +891,7 @@ Is this project in Z.ai sandbox (prototype/MVP)?
                                       Add RBAC if multi-user
 ```
 
-### 13.4. Quick Core Checklist (for sandbox projects)
+### 12.4. Quick Core Checklist (for sandbox projects)
 
 - [ ] Secrets in .env (not in code)
 - [ ] .env in .gitignore
@@ -901,7 +905,7 @@ Is this project in Z.ai sandbox (prototype/MVP)?
 
 ---
 
-## 14. Compliance Checklist
+## 13. Compliance Checklist
 
 ### GDPR Requirements
 
@@ -924,7 +928,7 @@ Is this project in Z.ai sandbox (prototype/MVP)?
 
 ---
 
-## 12. References
+## 14. References
 
 - OWASP Top 10: https://owasp.org/Top10/
 - OWASP Cheat Sheet Series: https://cheatsheetseries.owasp.org/
@@ -934,4 +938,4 @@ Is this project in Z.ai sandbox (prototype/MVP)?
 
 ---
 
-Built with: Z.ai Agent Toolkit
+Built with: Next.js 16 + TypeScript + Tailwind CSS

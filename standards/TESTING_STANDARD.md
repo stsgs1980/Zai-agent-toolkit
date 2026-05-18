@@ -583,4 +583,4 @@ Document skipped E2E with a comment in the test configuration:
 
 ---
 
-Built with: Z.ai Agent Toolkit
+Built with: Next.js 16 + TypeScript + Tailwind CSS

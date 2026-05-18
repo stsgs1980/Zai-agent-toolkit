@@ -66,7 +66,7 @@ STD-<DOMAIN>-<NUMBER>
 
 | ID | Document | Version | Level |
 |----|----------|---------|-------|
-| STD-FE-001 | Frontend Development Standard | 1.4 | [C] Critical |
+| STD-FE-001 | Frontend Development Standard | 1.5 | [C] Critical |
 
 ### 4.2. Git / GitHub (GIT)
 
@@ -119,7 +119,7 @@ STD-<DOMAIN>-<NUMBER>
 
 | ID | Document | Version | Level |
 |----|----------|---------|-------|
-| STD-SEC-001 | Security Standard | 1.0 | [C] Critical |
+| STD-SEC-001 | Security Standard | 1.1 | [C] Critical |
 
 ### 4.10. Meta (META)
 
