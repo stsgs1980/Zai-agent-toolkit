@@ -1,9 +1,10 @@
 # Standard: Testing v1.0 (EN)
 
 > ID: STD-TEST-001
-> Version: 1.0
+> Version: 1.1
 > Level: **[C] Critical**
-> Last Updated: 2025-01
+> Last Updated: 2026-05
+> Related: STD-ERR-001, STD-SEC-001, STD-ENV-001, STD-ERR-002
 
 ---
 
@@ -580,6 +581,18 @@ Document skipped E2E with a comment in the test configuration:
 - Playwright Documentation: https://playwright.dev/
 - Testing Library: https://testing-library.com/
 - K6 Documentation: https://k6.io/
+
+---
+
+## Cross-References
+
+| Standard | Relationship |
+|----------|-------------|
+| STD-ERR-001 | Error handling patterns to test: error boundaries, API error responses |
+| STD-ERR-002 | Recovery testing: retry logic, circuit breaker, fallback mechanisms |
+| STD-SEC-001 | Security testing: input validation, XSS prevention, secrets handling |
+| STD-ENV-001 | Reproducibility testing: .env.example, path validation |
+| STD-ENV-002 | Sandbox testing constraints (Section 11 of this standard) |
 
 ---
 

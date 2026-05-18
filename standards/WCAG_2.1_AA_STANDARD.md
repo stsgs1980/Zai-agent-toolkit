@@ -1,9 +1,10 @@
 # Standard: WCAG 2.1 AA Accessibility v1.0
 
 > ID: STD-A11Y-001
-> Version: 1.0
+> Version: 1.1
 > Level: **[C] Critical**
-> Related: https://www.w3.org/TR/WCAG21/
+> Last Updated: 2026-05
+> Related: STD-FE-001, STD-TEST-001, https://www.w3.org/TR/WCAG21/
 
 ---
 
@@ -283,6 +284,16 @@ Filled values MUST show ratio >= 4.5:1 for normal text.
 # axe-core integration for automated checks
 # Lighthouse accessibility score >= 90
 ```
+
+---
+
+## Cross-References
+
+| Standard | Relationship |
+|----------|-------------|
+| STD-FE-001 | Frontend Standard references this standard for theme contrast validation (Section 11.2) and component accessibility patterns |
+| STD-TEST-001 | Testing Standard for automated and manual accessibility testing |
+| STD-DOC-005 | Accessible code examples in documentation |
 
 ---
 

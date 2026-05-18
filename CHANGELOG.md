@@ -6,6 +6,92 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2.0.0] - 2026-05-18
+
+### Major Restructuring: Architecture Refactoring
+
+This release restructures the entire toolkit architecture based on a comprehensive audit that identified 3 critical problems: monolithic standards, missing subagent governance, and orphan standards with no cross-references.
+
+### Added — Phase 2: Subagent Layer (NEW)
+
+- **STD-AGENT-001** (Subagent Standard v1.0): Defines subagent types, contract, lifecycle, constraints, context handoff, and anti-patterns. Fills the critical gap of no governance for Z.ai sandbox subagents.
+  - Subagent type registry: Explore, Plan, full-stack-developer, general-purpose
+  - Input/output/failure contracts
+  - Lifecycle phases: SPAWN -> INITIALIZE -> EXECUTE -> REPORT -> COMPLETE
+  - Constraints: recursion depth = 1, file scope, timeouts, network access
+  - WORKLOG-based context handoff protocol
+  - Memory System integration (ZAI-MEM-001 through ZAI-MEM-004)
+- **STD-AGENT-002** (Orchestration Standard v1.0): Defines multi-agent coordination, task dependencies, state management, git coordination, and error propagation.
+  - Orchestration patterns: Sequential Pipeline, Parallel Fan-Out, Map-Reduce, Retry with Fallback
+  - Task dependency management with circular dependency prevention
+  - State machine: PENDING -> IN_PROGRESS -> COMPLETED/BLOCKED/FAILED/CANCELLED
+  - Git coordination: commit points, parallel safety, conflict prevention
+  - Error escalation ladder: self-recovery -> fallback -> user intervention
+  - Workflow templates: standard development, audit/restructuring, multi-file refactoring
+- **agents/ directory** with 3 templates:
+  - `agents/templates/task-prompt-template.md`: STD-AGENT-001 compliant prompt templates for all 4 subagent types
+  - `agents/templates/context-handoff-template.md`: Structured handoff for multi-session work
+  - `agents/templates/subagent-result-template.md`: Standardized result reporting format
+- **AGENT domain** added to STD-META-001 Reserved Domains table
+
+### Changed — Phase 1: Monolith Splitting
+
+- **STD-GIT-001** (GitHub Core Standard): v1.5 -> v2.0
+  - Extracted all sandbox-specific content (sections 10.1-10.11, 800 lines) to STD-GIT-002
+  - Core retains: commit format, branch naming, forbidden operations, backup, push policy, versioning, branch protection, .gitignore, GitHub-specific rules
+  - Added Cross-References section (Section 10)
+- **STD-GIT-002** (GitHub Sandbox Safety Standard): NEW v1.0
+  - Contains: sandbox constraints, session management, deadlock prevention, deadlock recovery, network failure recovery (8 scenarios), sandbox safety rules (middleware deadlock, absolute prohibitions, pre-command checklist, remote ahead decision tree, rebase recovery, stash safety, detached HEAD, git hooks, GPG signing), post-deadlock clone recovery
+- **STD-SEC-001** (Security Core Standard): v1.1 -> v2.0
+  - Extracted extended content (auth, RBAC, rate limiting, monitoring, deployment, incident response, compliance, 622 lines) to STD-SEC-002
+  - Core retains: OWASP top 10, secrets management, input validation/sanitization, security headers, dependency auditing, sensitive data handling, quick core checklist
+  - Added Cross-References section
+- **STD-SEC-002** (Security Extended Standard): NEW v1.0
+  - Contains: authentication (passwords, hashing, sessions, JWT, MFA), authorization (RBAC, resource-level, least privilege), CSRF protection, rate limiting, security event logging, secure deployment, incident response, compliance (GDPR, SOC 2), decision matrix
+- **STD-ERR-001** (Error Handling Core Standard): v1.0 -> v2.0
+  - Extracted recovery content (retry, circuit breaker, fallback, monitoring, 323 lines) to STD-ERR-002
+  - Core retains: error classification, object structure, try-catch patterns, logging, API error responses, frontend error handling
+  - Added Cross-References section and checklist
+- **STD-ERR-002** (Error Recovery Standard): NEW v1.0
+  - Contains: retry logic with exponential backoff, circuit breaker pattern, fallback mechanisms, monitoring and alerting, orchestration integration, recovery decision matrix
+
+### Changed — Phase 3: Orphan Resolution
+
+- **STD-DOC-005** (Code Examples Guide): v1.0 -> v1.1
+  - Added Related standards header (STD-DOC-002, STD-A11Y-001, STD-SEC-001)
+  - Added Cross-References section: links to Markdown formatting, Unicode Policy, accessibility, security
+- **STD-TEST-001** (Testing Standard): v1.0 -> v1.1
+  - Added Related standards header (STD-ERR-001, STD-SEC-001, STD-ENV-001, STD-ERR-002)
+  - Added Cross-References section: links to error handling, recovery testing, security testing, reproducibility, sandbox constraints
+- **STD-A11Y-001** (WCAG Accessibility Standard): v1.0 -> v1.1
+  - Added Related standards header (STD-FE-001, STD-TEST-001)
+  - Added Cross-References section: links to frontend standard, testing, code examples
+
+### Changed — Infrastructure Updates
+
+- **STD-META-001** (Standard ID System): v1.0 -> v1.1
+  - Added AGENT domain to Reserved Domains table
+  - Added Section 4.10: Agents (STD-AGENT-001, STD-AGENT-002)
+  - Updated all version numbers in registry
+- **STD-ARCH-001** (Implementation Order): v2.1 -> v2.2
+  - Added 5 new standards to catalog table (STD-GIT-002, STD-ERR-002, STD-SEC-002, STD-AGENT-001, STD-AGENT-002)
+  - Updated scope descriptions for split standards
+- **VERSION**: 1.9.5 -> 2.0.0 (major version bump for architecture restructuring)
+- **README.md**: Updated structure, standards table, version references
+
+### Summary Statistics
+
+| Metric | Before | After |
+|--------|--------|-------|
+| Standards count | 14 | 19 |
+| Largest standard | 1183 lines (STD-GIT-001) | 800 lines (STD-GIT-002) |
+| Standards > 200 lines | 12/14 | 12/19 |
+| Orphan standards | 1 (STD-DOC-005) | 0 |
+| Agent governance | None | 2 standards + 3 templates |
+| Cross-referenced standards | 8/14 | 19/19 |
+
+---
+
 ## [Unreleased]
 
 ### Added

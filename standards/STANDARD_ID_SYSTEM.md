@@ -57,6 +57,7 @@ STD-<DOMAIN>-<NUMBER>
 | `SEC` | Security | OWASP, secrets, authentication |
 | `DB` | Database | (reserved) Prisma, migrations, schemas |
 | `ENV` | Environment | Infrastructure, reproducibility |
+| `AGENT` | Agents | Subagents, orchestration |
 
 ---
 
@@ -72,7 +73,8 @@ STD-<DOMAIN>-<NUMBER>
 
 | ID | Document | Version | Level |
 |----|----------|---------|-------|
-| STD-GIT-001 | GitHub Standard | 1.5 | [C] Critical |
+| STD-GIT-001 | GitHub Core Standard | 2.0 | [C] Critical |
+| STD-GIT-002 | GitHub Sandbox Safety Standard | 1.0 | [C] Critical |
 
 ### 4.3. Accessibility (A11Y)
 
@@ -107,25 +109,34 @@ STD-<DOMAIN>-<NUMBER>
 
 | ID | Document | Version | Level |
 |----|----------|---------|-------|
-| STD-TEST-001 | Testing Standard | 1.0 | [C] Critical |
+| STD-TEST-001 | Testing Standard | 1.1 | [C] Critical |
 
 ### 4.8. Error Handling (ERR)
 
 | ID | Document | Version | Level |
 |----|----------|---------|-------|
-| STD-ERR-001 | Error Handling Standard | 1.0 | [C] Critical |
+| STD-ERR-001 | Error Handling Core Standard | 2.0 | [C] Critical |
+| STD-ERR-002 | Error Recovery Standard | 1.0 | [C] Critical |
 
 ### 4.9. Security (SEC)
 
 | ID | Document | Version | Level |
 |----|----------|---------|-------|
-| STD-SEC-001 | Security Standard | 1.1 | [C] Critical |
+| STD-SEC-001 | Security Core Standard | 2.0 | [C] Critical |
+| STD-SEC-002 | Security Extended Standard | 1.0 | [C] Critical |
 
-### 4.10. Meta (META)
+### 4.10. Agents (AGENT)
 
 | ID | Document | Version | Level |
 |----|----------|---------|-------|
-| STD-META-001 | Standard ID System | 1.0 | [W] Warning |
+| STD-AGENT-001 | Subagent Standard | 1.0 | [C] Critical |
+| STD-AGENT-002 | Orchestration Standard | 1.0 | [C] Critical |
+
+### 4.11. Meta (META)
+
+| ID | Document | Version | Level |
+|----|----------|---------|-------|
+| STD-META-001 | Standard ID System | 1.1 | [W] Warning |
 
 ---
 

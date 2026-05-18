@@ -1,9 +1,10 @@
 # Standard: Code Examples Guide v1.0 (EN)
 
 > ID: STD-DOC-005
-> Version: 1.0
+> Version: 1.1
 > Level: **[W] Warning**
-> Last Updated: 2025-01
+> Last Updated: 2026-05
+> Related: STD-DOC-002, STD-A11Y-001, STD-SEC-001
 
 ---
 
@@ -576,4 +577,15 @@ print(result)  # 8
 **File is fully ready to use.** Save as `code-examples-guide.md`.
 
 ---
+## Cross-References
+
+| Standard | Relationship |
+|----------|-------------|
+| STD-DOC-002 | Markdown formatting for code blocks (language tags, 4-backtick nesting) |
+| STD-DOC-003 | Unicode Policy: no emoji in code examples |
+| STD-A11Y-001 | Accessible code examples: color-only indicators forbidden, screen reader considerations |
+| STD-SEC-001 | Security in examples: no real API keys, mark dangerous commands |
+
+---
+
 Built with: Next.js 16 + TypeScript + Tailwind CSS

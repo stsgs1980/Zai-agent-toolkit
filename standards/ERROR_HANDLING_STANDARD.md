@@ -1,9 +1,10 @@
-# Standard: Error Handling v1.0 (EN)
+# Standard: Error Handling Core v2.0 (EN)
 
 > ID: STD-ERR-001
-> Version: 1.0
+> Version: 2.0
 > Level: **[C] Critical**
-> Last Updated: 2025-01
+> Last Updated: 2026-05
+> Related: STD-ERR-002, STD-SEC-001, STD-AGENT-001
 
 ---
 
@@ -610,198 +611,18 @@ export function getUserMessage(error: ApplicationError): string {
 
 ---
 
-## 7. Recovery Strategies
+## 7. Cross-References
 
-### 7.1 Retry Logic
-
-```typescript
-// lib/retry.ts
-interface RetryConfig {
-  maxAttempts: number;
-  delay: number;        // Base delay in ms
-  maxDelay: number;     // Max delay in ms
-  backoff: 'linear' | 'exponential';
-  retryIf: (error: Error) => boolean;
-}
-
-export async function withRetry<T>(
-  fn: () => Promise<T>,
-  config: RetryConfig
-): Promise<T> {
-  let lastError: Error;
-
-  for (let attempt = 1; attempt <= config.maxAttempts; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error;
-
-      if (!config.retryIf(error)) {
-        throw error;
-      }
-
-      if (attempt === config.maxAttempts) {
-        throw error;
-      }
-
-      const delay = config.backoff === 'exponential'
-        ? Math.min(config.delay * Math.pow(2, attempt - 1), config.maxDelay)
-        : config.delay * attempt;
-
-      await sleep(delay);
-    }
-  }
-
-  throw lastError;
-}
-
-// Usage
-const result = await withRetry(
-  () => fetchExternalAPI(),
-  {
-    maxAttempts: 3,
-    delay: 1000,
-    maxDelay: 10000,
-    backoff: 'exponential',
-    retryIf: (error) => error instanceof ExternalServiceError,
-  }
-);
-```
-
-### 7.2 Circuit Breaker
-
-```typescript
-// lib/circuit-breaker.ts
-enum State { CLOSED, OPEN, HALF_OPEN }
-
-class CircuitBreaker {
-  private state = State.CLOSED;
-  private failures = 0;
-  private lastFailureTime: number;
-
-  constructor(
-    private threshold: number,
-    private timeout: number,
-    private halfOpenRequests: number = 1
-  ) {}
-
-  async execute<T>(fn: () => Promise<T>): Promise<T> {
-    if (this.state === State.OPEN) {
-      if (Date.now() - this.lastFailureTime > this.timeout) {
-        this.state = State.HALF_OPEN;
-      } else {
-        throw new CircuitOpenError('Circuit breaker is open');
-      }
-    }
-
-    try {
-      const result = await fn();
-      this.onSuccess();
-      return result;
-    } catch (error) {
-      this.onFailure();
-      throw error;
-    }
-  }
-
-  private onSuccess(): void {
-    this.failures = 0;
-    this.state = State.CLOSED;
-  }
-
-  private onFailure(): void {
-    this.failures++;
-    this.lastFailureTime = Date.now();
-
-    if (this.failures >= this.threshold) {
-      this.state = State.OPEN;
-    }
-  }
-}
-```
-
-### 7.3 Fallback Mechanisms
-
-```typescript
-// lib/fallback.ts
-async function getUser(id: string): Promise<User> {
-  try {
-    // Primary source
-    return await database.getUser(id);
-  } catch (error) {
-    logger.warn({ error, userId: id }, 'Database fetch failed, trying cache');
-
-    try {
-      // Fallback: cache
-      const cached = await cache.get(`user:${id}`);
-      if (cached) return cached;
-    } catch (cacheError) {
-      logger.error({ cacheError }, 'Cache fallback failed');
-    }
-
-    // Final fallback: stale data or default
-    throw new ExternalServiceError('User service');
-  }
-}
-```
+| Standard | Relationship |
+|----------|-------------|
+| STD-ERR-002 | Recovery strategies (retry, circuit breaker, fallback, monitoring) |
+| STD-SEC-001 | Security error handling (no info leaks in error responses) |
+| STD-AGENT-001 | Subagent error contract (failure reporting) |
+| STD-AGENT-002 | Orchestration error propagation (escalation ladder) |
 
 ---
 
-## 8. Monitoring & Alerting
-
-### 8.1 Error Metrics
-
-```typescript
-// Key metrics to track
-const errorMetrics = {
-  // Counters
-  errors_total: counter,           // Total errors by code
-  errors_by_endpoint: counter,     // Errors by API endpoint
-  errors_by_service: counter,      // Errors by service
-
-  // Rates
-  error_rate: gauge,               // Errors per minute
-  error_rate_p95: histogram,       // 95th percentile response time on errors
-
-  // Recovery
-  retry_success_rate: gauge,       // Successful retries
-  circuit_breaker_opens: counter,  // Circuit breaker activations
-};
-```
-
-### 8.2 Alerting Rules
-
-```yaml
-# alerts/errors.yml
-groups:
-  - name: error-alerts
-    rules:
-      - alert: HighErrorRate
-        expr: rate(errors_total[5m]) > 10
-        for: 5m
-        labels:
-          severity: warning
-        annotations:
-          summary: "High error rate detected"
-
-      - alert: CriticalError
-        expr: increase(errors_total{code="INTERNAL_ERROR"}[1h]) > 5
-        labels:
-          severity: critical
-        annotations:
-          summary: "Critical internal errors detected"
-
-      - alert: CircuitBreakerOpen
-        expr: increase(circuit_breaker_opens[5m]) > 0
-        labels:
-          severity: warning
-        annotations:
-          summary: "Circuit breaker opened for {{ $labels.service }}"
-```
-
----
-
-## 9. Checklist
+## 8. Checklist
 
 ### Before Deployment
 
@@ -826,11 +647,12 @@ groups:
 
 ---
 
-## References
+## 9. Version History
 
-- OWASP Error Handling: https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html
-- Node.js Best Practices: https://github.com/goldbergyoni/nodebestpractices#1-error-handling-practices
-- Circuit Breaker Pattern: https://martinfowler.com/bliki/CircuitBreaker.html
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2025-01 | Initial version: error classification, structure, patterns, logging, API responses, frontend handling, recovery strategies, monitoring |
+| 2.0 | 2026-05 | Major restructuring: recovery strategies (retry, circuit breaker, fallback) and monitoring/alerting extracted to STD-ERR-002. Core retains error classification, structure, patterns, logging, API responses, frontend handling. |
 
 ---
 

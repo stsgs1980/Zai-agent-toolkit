@@ -1,9 +1,10 @@
-# Standard: Security v1.1 (EN)
+# Standard: Security Core v2.0 (EN)
 
 > ID: STD-SEC-001
-> Version: 1.1
+> Version: 2.0
 > Level: **[C] Critical**
-> Last Updated: 2025-01
+> Last Updated: 2026-05
+> Related: STD-SEC-002, STD-ENV-001
 
 ---
 
@@ -118,302 +119,9 @@ jobs:
 
 ---
 
-## 3. Authentication
+## 3. Input Validation & Sanitization
 
-### 3.1 Password Requirements
-
-```typescript
-const passwordPolicy = {
-  minLength: 12,
-  requireUppercase: true,
-  requireLowercase: true,
-  requireNumbers: true,
-  requireSymbols: true,
-  maxLength: 128,           // Prevent DoS
-  blockedPatterns: [
-    'password',
-    '123456',
-    'qwerty',
-  ],
-};
-
-function validatePassword(password: string): ValidationResult {
-  if (password.length < passwordPolicy.minLength) {
-    return { valid: false, error: 'Password too short' };
-  }
-
-  if (password.length > passwordPolicy.maxLength) {
-    return { valid: false, error: 'Password too long' };
-  }
-
-  for (const pattern of passwordPolicy.blockedPatterns) {
-    if (password.toLowerCase().includes(pattern)) {
-      return { valid: false, error: 'Password contains blocked pattern' };
-    }
-  }
-
-  // Check against breached passwords database
-  if (await isBreachedPassword(password)) {
-    return { valid: false, error: 'Password found in data breach' };
-  }
-
-  return { valid: true };
-}
-```
-
-### 3.2 Password Hashing
-
-```typescript
-import bcrypt from 'bcrypt';
-
-const HASH_ROUNDS = 12; // Adjust based on hardware
-
-async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, HASH_ROUNDS);
-}
-
-async function verifyPassword(
-  password: string,
-  hash: string
-): Promise<boolean> {
-  return bcrypt.compare(password, hash);
-}
-
-// [OK] Use constant-time comparison for tokens
-import { timingSafeEqual } from 'crypto';
-
-function secureCompare(a: string, b: string): boolean {
-  const bufA = Buffer.from(a, 'utf8');
-  const bufB = Buffer.from(b, 'utf8');
-
-  if (bufA.length !== bufB.length) {
-    return false;
-  }
-
-  return timingSafeEqual(bufA, bufB);
-}
-```
-
-### 3.3 Session Management
-
-```typescript
-// Session configuration
-const sessionConfig = {
-  name: 'sessionId',           // Not 'connect.sid'
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,            // No JS access
-    secure: true,              // HTTPS only
-    sameSite: 'strict',        // CSRF protection
-    maxAge: 15 * 60 * 1000,    // 15 minutes
-    domain: '.example.com',    // Restrict domain
-    path: '/',
-  },
-};
-
-// Regenerate session on authentication
-async function login(req: Request, user: User) {
-  await req.session.regenerate();
-  req.session.userId = user.id;
-  req.session.createdAt = Date.now();
-  req.session.ip = req.ip;
-  req.session.userAgent = req.get('user-agent');
-}
-```
-
-### 3.4 JWT Best Practices
-
-```typescript
-import jwt from 'jsonwebtoken';
-
-interface TokenPayload {
-  sub: string;        // User ID
-  iat: number;        // Issued at
-  exp: number;        // Expiration
-  jti: string;        // Unique token ID (for revocation)
-  type: 'access' | 'refresh';
-}
-
-// Access token: short-lived
-const ACCESS_TOKEN_TTL = '15m';
-
-// Refresh token: longer-lived, stored securely
-const REFRESH_TOKEN_TTL = '7d';
-
-function generateAccessToken(user: User): string {
-  return jwt.sign(
-    {
-      sub: user.id,
-      type: 'access',
-      jti: crypto.randomUUID(),
-    },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: ACCESS_TOKEN_TTL,
-      issuer: 'your-app',
-      audience: 'your-app-users',
-    }
-  );
-}
-
-// Token blacklist for revocation
-const tokenBlacklist = new Redis();
-
-async function revokeToken(jti: string): Promise<void> {
-  await tokenBlacklist.set(`revoked:${jti}`, '1', 'EX', 86400 * 7);
-}
-
-async function isTokenRevoked(jti: string): Promise<boolean> {
-  return tokenBlacklist.exists(`revoked:${jti}`);
-}
-```
-
-### 3.5 Multi-Factor Authentication (MFA)
-
-```typescript
-import speakeasy from 'speakeasy';
-import qrcode from 'qrcode';
-
-// Setup MFA
-async function setupMFA(userId: string): Promise<MFASecret> {
-  const secret = speakeasy.generateSecret({
-    name: `YourApp (${userId})`,
-    length: 20,
-  });
-
-  // Store secret encrypted
-  await storeEncryptedSecret(userId, secret.base32);
-
-  const qrUrl = await qrcode.toDataURL(secret.otpauth_url);
-
-  return {
-    secret: secret.base32,
-    qrCode: qrUrl,
-  };
-}
-
-// Verify MFA code
-function verifyMFA(secret: string, token: string): boolean {
-  return speakeasy.totp.verify({
-    secret,
-    encoding: 'base32',
-    token,
-    window: 1, // Allow 1 step drift
-  });
-}
-```
-
----
-
-## 4. Authorization
-
-### 4.1 Role-Based Access Control (RBAC)
-
-```typescript
-// Define roles and permissions
-const ROLES = {
-  ADMIN: {
-    permissions: ['*'], // All permissions
-  },
-  MANAGER: {
-    permissions: [
-      'users:read',
-      'users:write',
-      'reports:read',
-      'reports:write',
-    ],
-  },
-  USER: {
-    permissions: [
-      'profile:read',
-      'profile:write',
-    ],
-  },
-};
-
-// Permission check
-function hasPermission(
-  userRole: string,
-  permission: string
-): boolean {
-  const role = ROLES[userRole];
-  if (!role) return false;
-
-  if (role.permissions.includes('*')) return true;
-  return role.permissions.includes(permission);
-}
-
-// Middleware
-function requirePermission(permission: string) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    if (!hasPermission(req.user.role, permission)) {
-      throw new AuthorizationError(`Missing permission: ${permission}`);
-    }
-    next();
-  };
-}
-
-// Usage
-app.delete('/api/users/:id',
-  requireAuth,
-  requirePermission('users:delete'),
-  deleteUser
-);
-```
-
-### 4.2 Resource-Level Authorization
-
-```typescript
-// Always check resource ownership
-async function getDocument(req: Request, res: Response) {
-  const document = await db.documents.find(req.params.id);
-
-  if (!document) {
-    throw new NotFoundError('Document');
-  }
-
-  // Check ownership or permission
-  const canAccess =
-    document.ownerId === req.user.id ||
-    hasPermission(req.user.role, 'documents:read_all');
-
-  if (!canAccess) {
-    throw new AuthorizationError('Cannot access this document');
-  }
-
-  return document;
-}
-```
-
-### 4.3 Principle of Least Privilege
-
-```typescript
-// [OK] Good: Minimal permissions for service accounts
-const dbUser = {
-  role: 'app_user',
-  permissions: ['SELECT', 'INSERT', 'UPDATE'],
-  tables: ['users', 'documents'], // Only needed tables
-};
-
-// [FAIL] Bad: Over-privileged
-const dbUser = {
-  role: 'superuser', // Too much access
-};
-
-// API tokens with specific scopes
-const apiToken = {
-  scopes: ['read:users', 'write:documents'],
-  expiresAt: Date.now() + 3600000, // 1 hour
-};
-```
-
----
-
-## 5. Input Validation & Sanitization
-
-### 5.1 Validation Schema
+### 3.1 Validation Schema
 
 ```typescript
 import { z } from 'zod';
@@ -446,7 +154,7 @@ function validateUserRegistration(data: unknown) {
 }
 ```
 
-### 5.2 SQL Injection Prevention
+### 3.2 SQL Injection Prevention
 
 ```typescript
 // [FAIL] NEVER: String concatenation
@@ -462,7 +170,7 @@ const user = await prisma.user.findFirst({
 });
 ```
 
-### 5.3 XSS Prevention
+### 3.3 XSS Prevention
 
 ```typescript
 import DOMPurify from 'dompurify';
@@ -483,36 +191,11 @@ function renderUserContent(content: string): string {
 }
 ```
 
-### 5.4 CSRF Protection
-
-```typescript
-import csurf from 'csurf';
-
-const csrfProtection = csurf({ cookie: true });
-
-// Apply to state-changing routes
-app.post('/api/users', csrfProtection, createUser);
-
-// Provide token to frontend
-app.get('/api/csrf-token', csrfProtection, (req, res) => {
-  res.json({ csrfToken: req.csrfToken() });
-});
-
-// Frontend: Include in requests
-fetch('/api/users', {
-  method: 'POST',
-  headers: {
-    'X-CSRF-Token': csrfToken,
-  },
-  body: JSON.stringify(data),
-});
-```
-
 ---
 
-## 6. Security Headers
+## 4. Security Headers
 
-### 6.1 Required Headers
+### 4.1 Required Headers
 
 ```typescript
 import helmet from 'helmet';
@@ -548,7 +231,7 @@ app.use(helmet({
 }));
 ```
 
-### 6.2 Additional Headers
+### 4.2 Additional Headers
 
 ```typescript
 // Custom security headers
@@ -579,56 +262,9 @@ app.use((req, res, next) => {
 
 ---
 
-## 7. Rate Limiting & DDoS Protection
+## 5. Secure Dependencies
 
-### 7.1 Rate Limiting
-
-```typescript
-import rateLimit from 'express-rate-limit';
-
-// General API rate limit
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,                  // 100 requests per window
-  message: 'Too many requests, please try again later',
-  standardHeaders: true,
-  legacyHeaders: false,
-  keyGenerator: (req) => req.ip || req.user?.id,
-});
-
-// Stricter limits for authentication
-const authLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5,                    // 5 attempts per hour
-  message: 'Too many login attempts, account temporarily locked',
-  skipSuccessfulRequests: true,
-});
-
-app.use('/api/', apiLimiter);
-app.use('/api/auth/login', authLimiter);
-app.use('/api/auth/register', authLimiter);
-```
-
-### 7.2 Slow Down Suspicious Requests
-
-```typescript
-import slowDown from 'express-slow-down';
-
-const speedLimiter = slowDown({
-  windowMs: 15 * 60 * 1000,
-  delayAfter: 50,    // Allow 50 requests at full speed
-  delayMs: 500,      // Add 500ms delay per request after
-  maxDelayMs: 20000, // Cap at 20 seconds
-});
-
-app.use('/api/', speedLimiter);
-```
-
----
-
-## 8. Secure Dependencies
-
-### 8.1 Dependency Auditing
+### 5.1 Dependency Auditing
 
 ```json
 // package.json scripts
@@ -656,78 +292,11 @@ jobs:
       # Auto-merge security updates
 ```
 
-### 8.2 Dependency Policies
-
-| Policy | Requirement |
-|--------|-------------|
-| Security Vulnerabilities | None with CVSS > 7 |
-| License | Allow-list only |
-| Age | Prefer stable, maintained packages |
-| Downloads | Prefer packages with significant usage |
-| Lock File | Always commit lockfile (`bun.lock` or `package-lock.json`) |
-
 ---
 
-## 9. Logging & Monitoring
+## 6. Sensitive Data Handling
 
-### 9.1 Security Events to Log
-
-```typescript
-// Events requiring audit logging
-const SECURITY_EVENTS = {
-  // Authentication
-  'auth.login.success': { userId, ip, userAgent },
-  'auth.login.failure': { email, ip, reason },
-  'auth.logout': { userId, ip },
-  'auth.mfa.enabled': { userId },
-  'auth.mfa.disabled': { userId },
-  'auth.password.changed': { userId },
-  'auth.password.reset': { userId, email },
-
-  // Authorization
-  'auth.access.denied': { userId, resource, action },
-  'auth.role.changed': { userId, oldRole, newRole },
-
-  // Data access
-  'data.export': { userId, resource, records },
-  'data.delete': { userId, resource, recordId },
-
-  // Admin
-  'admin.user.created': { adminId, newUserId },
-  'admin.user.deleted': { adminId, deletedUserId },
-  'admin.config.changed': { adminId, key },
-
-  // Security
-  'security.rate_limited': { ip, endpoint },
-  'security.injection_attempt': { ip, payload },
-  'security.suspicious_activity': { userId, type },
-};
-```
-
-### 9.2 Log Format
-
-```typescript
-// Security log entry
-interface SecurityLog {
-  timestamp: string;
-  event: string;
-  severity: 'info' | 'warning' | 'critical';
-  actor: {
-    userId?: string;
-    ip: string;
-    userAgent: string;
-  };
-  resource?: {
-    type: string;
-    id: string;
-  };
-  details: Record<string, unknown>;
-  result: 'success' | 'failure';
-  requestId: string;
-}
-```
-
-### 9.3 Sensitive Data Handling
+### 6.1 Never Log Sensitive Data
 
 ```typescript
 // Never log sensitive data
@@ -755,143 +324,21 @@ function sanitizeLog(data: Record<string, unknown>): Record<string, unknown> {
 
 ---
 
-## 10. Secure Deployment
-
-### 10.1 Pre-Deployment Checklist
-
-- [ ] All secrets in environment variables
-- [ ] Security headers configured
-- [ ] HTTPS enforced
-- [ ] Rate limiting enabled
-- [ ] Input validation on all endpoints
-- [ ] Authentication required where needed
-- [ ] Authorization checked per resource
-- [ ] No sensitive data in logs
-- [ ] Dependencies audited
-- [ ] CSP configured
-- [ ] Error messages don't leak info
-- [ ] Database connections encrypted
-- [ ] Backups encrypted
-
-### 10.2 Environment Configuration
-
-```typescript
-// Environment-specific security
-const securityConfig = {
-  development: {
-    https: false,
-    cors: { origin: '*' },  // Dev only — restrict in production
-    csp: { 'upgrade-insecure-requests': false },
-  },
-
-  staging: {
-    https: true,
-    cors: { origin: 'https://staging.example.com' },
-    csp: { 'upgrade-insecure-requests': true },
-  },
-
-  production: {
-    https: true,
-    cors: { origin: 'https://example.com' },
-    csp: { 'upgrade-insecure-requests': true },
-    hsts: { maxAge: 31536000, includeSubDomains: true },
-  },
-};
-```
-
----
-
-## 11. Incident Response
-
-### 11.1 Response Phases
-
-```text
-1. DETECT -> Identify the incident
-2. CONTAIN -> Limit the damage
-3. ERADICATE -> Remove the threat
-4. RECOVER -> Restore services
-5. LEARN -> Post-mortem and improve
-```
-
-### 11.2 Immediate Actions
-
-```markdown
-## Security Incident Checklist
-
-### Immediate (0-1 hour)
-- [ ] Confirm the incident
-- [ ] Notify security team
-- [ ] Preserve evidence (logs, screenshots)
-- [ ] Assess scope and impact
-- [ ] Contain if active attack
-
-### Short-term (1-24 hours)
-- [ ] Document timeline
-- [ ] Identify affected users/systems
-- [ ] Patch vulnerability
-- [ ] Reset compromised credentials
-- [ ] Notify affected users if required
-
-### Long-term (1-7 days)
-- [ ] Complete post-mortem
-- [ ] Update security procedures
-- [ ] Implement additional controls
-- [ ] Schedule security training
-```
-
----
-
-## 12. Scope Tiers: Core vs Extended
-
-Not all projects require the full security standard. Sandbox prototypes and MVPs need a focused subset, while production applications require complete coverage.
-
-### 12.1. Core (Required for ALL projects)
+## 7. Core Scope Definition
 
 These sections apply to every project, including sandbox prototypes:
 
 | Section | Topic | Why Always Required |
 |---------|-------|---------------------|
 | 2 | Secrets Management | .env files, gitignore — prevents credential leaks |
-| 5.1-5.3 | Input Validation & Sanitization | Zod validation, SQL injection prevention, XSS prevention |
-| 5.5 | CSRF Protection | Required for any form submission |
-| 6.1-6.2 | Security Headers | Helmet configuration — one-time setup |
-| 8.1 | Dependency Auditing | npm audit — automated check |
-| 9.3 | Sensitive Data Handling | Never log passwords/tokens |
+| 3.1-3.3 | Input Validation & Sanitization | Zod validation, SQL injection prevention, XSS prevention |
+| 4.1-4.2 | Security Headers | Helmet configuration — one-time setup |
+| 5.1 | Dependency Auditing | npm audit — automated check |
+| 6.1 | Sensitive Data Handling | Never log passwords/tokens |
 
-### 12.2. Extended (Required for production / user-facing projects)
+---
 
-These sections apply when the project handles real user data, is deployed to production, or serves external users:
-
-| Section | Topic | When Required |
-|---------|-------|---------------|
-| 3.1-3.5 | Authentication (MFA, JWT, Sessions) | When users log in |
-| 4.1-4.3 | Authorization (RBAC, Resource-Level) | When roles exist |
-| 7.1-7.2 | Rate Limiting & DDoS Protection | When exposed to internet |
-| 9.1-9.2 | Security Event Logging & Audit | When compliance required |
-| 10.1-10.2 | Secure Deployment Configuration | When deploying to production |
-| 11.1-11.2 | Incident Response | When serving real users |
-| 13 | Compliance (GDPR, SOC 2) | When handling personal data |
-
-### 12.3. Decision Matrix
-
-```text
-Is this project in Z.ai sandbox (prototype/MVP)?
-  |
-  +-- YES --> Apply Core only
-  |           Focus on: .env, Zod validation, no leaked errors
-  |
-  +-- NO --> Is it user-facing / production?
-              |
-              +-- YES --> Apply Core + Extended
-              |           Full security standard required
-              |
-              +-- NO --> Internal tool?
-                          |
-                          +-- YES --> Apply Core
-                                      Add RBAC if multi-user
-```
-
-### 12.4. Quick Core Checklist (for sandbox projects)
+## 8. Quick Core Checklist (for sandbox projects)
 
 - [ ] Secrets in .env (not in code)
 - [ ] .env in .gitignore
@@ -905,36 +352,22 @@ Is this project in Z.ai sandbox (prototype/MVP)?
 
 ---
 
-## 13. Compliance Checklist
+## Cross-References
 
-### GDPR Requirements
-
-- [ ] Data encryption at rest
-- [ ] Data encryption in transit
-- [ ] Right to erasure capability
-- [ ] Data portability
-- [ ] Privacy policy
-- [ ] Cookie consent
-- [ ] Data retention policy
-
-### SOC 2 Requirements
-
-- [ ] Access controls documented
-- [ ] Change management process
-- [ ] Incident response plan
-- [ ] Vulnerability scanning
-- [ ] Background checks for employees
-- [ ] Security training
+| Standard | Relationship |
+|----------|-------------|
+| STD-SEC-002 | Extended security (auth, RBAC, rate limiting, monitoring, incident response, compliance) |
+| STD-ENV-001 | Environment variable validation |
+| STD-ERR-001 | Error response security (no info leaks) |
 
 ---
 
-## 14. References
+## Version History
 
-- OWASP Top 10: https://owasp.org/Top10/
-- OWASP Cheat Sheet Series: https://cheatsheetseries.owasp.org/
-- NIST Cybersecurity Framework: https://www.nist.gov/cyberframework
-- CWE Top 25: https://cwe.mitre.org/top25/
-- Security Headers: https://securityheaders.com/
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.1 | 2025-01 | Initial security standard |
+| 2.0 | 2026-05 | Major restructuring: extended content (authentication, authorization, rate limiting, monitoring, deployment, incident response, compliance) extracted to STD-SEC-002. Core retains secrets, input validation, headers, dependency auditing, sensitive data handling. |
 
 ---
 

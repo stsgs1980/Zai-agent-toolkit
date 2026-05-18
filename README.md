@@ -4,13 +4,13 @@
 
 # Z.ai Agent Toolkit
 
-[![Version: 1.9.5](https://img.shields.io/badge/Version-1.9.5-blue.svg)]()
+[![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-blue.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status: Pre-release](https://img.shields.io/badge/Status-Pre--release-orange.svg)]()
 
 **Standards + Skills + Rules** for AI-driven development
 
-> Toolkit version: **v1.9.5** | Language: **English**
+> Toolkit version: **v2.0.0** | Language: **English**
 
 ---
 
@@ -132,11 +132,22 @@ zai-agent-toolkit/
     STANDARD_ID_SYSTEM.md     Standard ID registry
     CODE_EXAMPLES_GUIDE.md    Code examples formatting
     FRONTEND_STANDARD.md      Frontend development
-    GITHUB_STANDARD.md        Git/GitHub operations
+    GITHUB_STANDARD.md        Git/GitHub core operations
+    GITHUB_SANDBOX_STANDARD.md Sandbox git safety
     WCAG_2.1_AA_STANDARD.md   Accessibility WCAG 2.1 AA
     TESTING_STANDARD.md       Unit, integration, E2E testing
-    ERROR_HANDLING_STANDARD.md Error handling
-    SECURITY_STANDARD.md      Security, OWASP
+    ERROR_HANDLING_STANDARD.md Error handling core
+    ERROR_RECOVERY_STANDARD.md Error recovery (retry, circuit breaker)
+    SECURITY_STANDARD.md      Security core (secrets, validation)
+    SECURITY_EXTENDED_STANDARD.md Security extended (auth, RBAC)
+    SUBAGENT_STANDARD.md      Subagent types and contract
+    ORCHESTRATION_STANDARD.md Multi-agent coordination
+
+  agents/                    Subagent templates (STD-AGENT-001 compliant)
+    templates/
+      task-prompt-template.md  Prompt templates for all subagent types
+      context-handoff-template.md  Multi-session handoff template
+      subagent-result-template.md  Result reporting template
 
   templates/                  Group A: Operational templates (deploy after B)
     WORKLOG.md                Agent work journal
@@ -195,11 +206,16 @@ These define rules. They are read and accepted, not modified per project.
 | STD-ARCH-001 | `IMPLEMENTATION_ORDER.md` | [W] | 6-step implementation sequence |
 | STD-META-001 | `STANDARD_ID_SYSTEM.md` | [W] | Standard ID registry and rules |
 | STD-FE-001 | `FRONTEND_STANDARD.md` | [C] | React/Next.js frontend development |
-| STD-GIT-001 | `GITHUB_STANDARD.md` | [C] | Git operations, commit format, branching |
+| STD-GIT-001 | `GITHUB_STANDARD.md` | [C] | Git core operations, commit format, branching |
+| STD-GIT-002 | `GITHUB_SANDBOX_STANDARD.md` | [C] | Sandbox git safety, deadlock recovery |
 | STD-A11Y-001 | `WCAG_2.1_AA_STANDARD.md` | [C] | UI accessibility compliance |
 | STD-TEST-001 | `TESTING_STANDARD.md` | [C] | Unit, integration, E2E testing |
-| STD-ERR-001 | `ERROR_HANDLING_STANDARD.md` | [C] | Error handling, logging, recovery |
-| STD-SEC-001 | `SECURITY_STANDARD.md` | [C] | Authentication, secrets, OWASP |
+| STD-ERR-001 | `ERROR_HANDLING_STANDARD.md` | [C] | Error handling, logging, response patterns |
+| STD-ERR-002 | `ERROR_RECOVERY_STANDARD.md` | [C] | Error recovery, retry, circuit breaker |
+| STD-SEC-001 | `SECURITY_STANDARD.md` | [C] | Core security: secrets, validation, headers |
+| STD-SEC-002 | `SECURITY_EXTENDED_STANDARD.md` | [C] | Extended: auth, RBAC, rate limiting, compliance |
+| STD-AGENT-001 | `SUBAGENT_STANDARD.md` | [C] | Subagent types, contract, lifecycle |
+| STD-AGENT-002 | `ORCHESTRATION_STANDARD.md` | [C] | Multi-agent coordination, dependencies |
 
 ### Group A -- Operational (templates)
 
@@ -253,21 +269,26 @@ These are deployed into a project. They SUBMIT to Group B standards.
 
 | Component | ID | Version |
 |-----------|----|---------|
-| **Toolkit** | -- | **v1.9.5** |
-| MARKDOWN_STANDARD | STD-DOC-002 | v2.1.5 |
+| **Toolkit** | -- | **v2.0.0** |
+| MARKDOWN_STANDARD | STD-DOC-002 | v2.2.0 |
 | UNICODE_POLICY | STD-DOC-003 | v2.1.3 |
 | README_TEMPLATE | STD-DOC-004 | v2.1 |
-| CODE_EXAMPLES_GUIDE | STD-DOC-005 | v1.0 |
-| REPRODUCIBILITY-STANDARD | STD-ENV-001 | v1.0 |
+| CODE_EXAMPLES_GUIDE | STD-DOC-005 | v1.1 |
+| REPRODUCIBILITY-STANDARD | STD-ENV-001 | v2.0 |
 | ZAI_INTEGRATION_STANDARD | STD-ENV-002 | v1.1 |
-| IMPLEMENTATION_ORDER | STD-ARCH-001 | v2.1 |
-| STANDARD_ID_SYSTEM | STD-META-001 | v1.0 |
-| FRONTEND_STANDARD | STD-FE-001 | v1.3 |
-| GITHUB_STANDARD | STD-GIT-001 | v1.5 |
-| WCAG_2.1_AA_STANDARD | STD-A11Y-001 | v1.0 |
-| TESTING_STANDARD | STD-TEST-001 | v1.0 |
-| ERROR_HANDLING_STANDARD | STD-ERR-001 | v1.0 |
-| SECURITY_STANDARD | STD-SEC-001 | v1.0 |
+| IMPLEMENTATION_ORDER | STD-ARCH-001 | v2.2 |
+| STANDARD_ID_SYSTEM | STD-META-001 | v1.1 |
+| FRONTEND_STANDARD | STD-FE-001 | v1.5 |
+| GITHUB_STANDARD | STD-GIT-001 | v2.0 |
+| GITHUB_SANDBOX_STANDARD | STD-GIT-002 | v1.0 |
+| WCAG_2.1_AA_STANDARD | STD-A11Y-001 | v1.1 |
+| TESTING_STANDARD | STD-TEST-001 | v1.1 |
+| ERROR_HANDLING_STANDARD | STD-ERR-001 | v2.0 |
+| ERROR_RECOVERY_STANDARD | STD-ERR-002 | v1.0 |
+| SECURITY_STANDARD | STD-SEC-001 | v2.0 |
+| SECURITY_EXTENDED_STANDARD | STD-SEC-002 | v1.0 |
+| SUBAGENT_STANDARD | STD-AGENT-001 | v1.0 |
+| ORCHESTRATION_STANDARD | STD-AGENT-002 | v1.0 |
 | WORKLOG / TASK_TEMPLATE / README_WORKLOG | -- | v2.1.1 |
 
 When updating individual standards, update the toolkit version in `AGENT_RULES.md` and `README.md`.
