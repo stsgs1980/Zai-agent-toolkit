@@ -303,6 +303,318 @@ class MarkdownParser:
         return sorted(tags)
 
 
+# ── Plain Text Parser (for .txt and unstructured text) ─────
+
+class PlainTextParser:
+    """
+    Parse plain text documents (.txt) without markdown formatting.
+    Detects terminology, instructions, and commands using structural heuristics:
+      - "Term - Definition" patterns (capitalized word followed by dash)
+      - "Term:" patterns (word followed by colon on its own or start of line)
+      - Numbered/bulleted step sequences
+      - Lines starting with known CLI prefixes (git, npm, pip, etc.)
+      - Blank-line-separated sections as pseudo-sections
+    """
+
+    # CLI command prefixes (shared with MarkdownParser)
+    CLI_PREFIXES = [
+        "npm ", "npx ", "pip ", "cargo ", "go ", "docker ", "kubectl ",
+        "git ", "python ", "node ", "deno ", "curl ", "wget ",
+        "make ", "cmake ", "gcc ", "pipenv ", "poetry ", "bun ",
+        "export ", "cd ", "ls ", "cat ", "echo ", "mkdir ", "rm ",
+        "chmod ", "sudo ", "apt ", "brew ", "choco ", "winget ",
+    ]
+
+    def __init__(self, content: str, source: str = ""):
+        self.content = content
+        self.source = source
+        self.lines = content.split("\n")
+
+    def extract_title(self) -> str:
+        """Extract title: first non-empty line, or source name."""
+        for line in self.lines:
+            stripped = line.strip()
+            if stripped:
+                return stripped
+        return self.source or "Untitled"
+
+    def extract_sections(self) -> List[Dict]:
+        """
+        Extract pseudo-sections from plain text.
+        Sections are separated by blank lines; a line that looks like a header
+        (short, possibly ALL CAPS or Title Case, no trailing period) becomes a title.
+        """
+        sections = []
+        current_title = ""
+        current_content = ""
+        current_level = 1
+
+        for line in self.lines:
+            stripped = line.strip()
+
+            if not stripped:
+                # Blank line — might end a section
+                if current_content.strip() or current_title:
+                    # Only commit if we have content
+                    pass
+                continue
+
+            # Detect header-like lines: short, no period at end, possibly ALL CAPS
+            is_header = self._looks_like_header(stripped)
+
+            if is_header:
+                # Save previous section
+                if current_content.strip():
+                    sections.append({
+                        "level": current_level,
+                        "title": current_title or "Introduction",
+                        "content": current_content.strip(),
+                    })
+                current_title = stripped
+                current_content = ""
+                current_level = 2
+            else:
+                current_content += line + "\n"
+
+        # Save last section
+        if current_content.strip():
+            sections.append({
+                "level": current_level,
+                "title": current_title or "Content",
+                "content": current_content.strip(),
+            })
+
+        return sections
+
+    def _looks_like_header(self, line: str) -> bool:
+        """Heuristic: does this line look like a section header?"""
+        if len(line) > 80:
+            return False
+        if line.endswith((".", ",", ";", ":", "!", "?")):
+            # Ends with colon might be a term definition start, not header
+            if line.endswith(":"):
+                # "Key Terms:" could be a header, but "Term: definition" is not
+                words = line.rstrip(":").split()
+                return len(words) <= 4
+            return False
+        # ALL CAPS line = likely header
+        if line.isupper() and len(line) > 2:
+            return True
+        # Title Case with multiple words and short = likely header
+        words = line.split()
+        if 1 <= len(words) <= 6:
+            # Check if most words are capitalized (Title Case)
+            caps_count = sum(1 for w in words if w[0].isupper())
+            if caps_count >= len(words) * 0.5 and len(words) >= 2:
+                return True
+        # Short standalone line (<= 5 words, no period)
+        if len(words) <= 5 and not any(c.isdigit() for c in line):
+            return True
+        return False
+
+    def extract_terms(self) -> List[Dict]:
+        """
+        Extract terminology from plain text.
+        Patterns:
+          - "Term - definition" (capitalized word(s) + dash + explanation)
+          - "Term:" or "Term -" at line start
+          - Standalone capitalized word followed by multi-line explanation
+        """
+        terms = []
+        seen = set()
+
+        # Pattern 1: "Term - definition" or "Term — definition"
+        for match in re.finditer(
+            r'^([A-Z][\w\s]{1,40}?)\s*[\u2014\u2013\-:]\s*(.+)$',
+            self.content, re.MULTILINE
+        ):
+            term = match.group(1).strip()
+            definition = match.group(2).strip()
+            # Filter out false positives: too many words = probably not a term
+            if (term not in seen
+                and len(term.split()) <= 4
+                and len(definition) > 5
+                and not term.lower().startswith(("the ", "this ", "that ", "these ", "those "))):
+                seen.add(term)
+                terms.append({"term": term, "definition": definition, "pattern": "dash_def"})
+
+        # Pattern 2: "Term:" at start of line followed by explanation on next lines
+        for i, line in enumerate(self.lines):
+            match = re.match(r'^([A-Z][\w\s]{1,30}?):\s*$', line.strip())
+            if match:
+                term = match.group(1).strip()
+                if term in seen or len(term.split()) > 4:
+                    continue
+                # Collect following lines as definition
+                definition_lines = []
+                for j in range(i + 1, min(i + 6, len(self.lines))):
+                    next_line = self.lines[j].strip()
+                    if not next_line or self._looks_like_header(next_line):
+                        break
+                    definition_lines.append(next_line)
+                definition = " ".join(definition_lines)
+                if len(definition) > 10:
+                    seen.add(term)
+                    terms.append({"term": term, "definition": definition, "pattern": "colon_def"})
+
+        # Pattern 3: Short section titles from extract_sections() as terms
+        for section in self.extract_sections():
+            title = section["title"].strip()
+            content = section["content"].strip()
+            words = title.split()
+            if (title not in seen
+                and 1 <= len(words) <= 3
+                and len(content) > 30
+                and not title.lower().startswith(("how to", "step", "example", "note"))):
+                seen.add(title)
+                terms.append({"term": title, "definition": content[:300], "pattern": "section_title"})
+
+        return terms
+
+    def extract_instructions(self) -> List[Dict]:
+        """
+        Extract instructions/how-to from plain text.
+        Detects: numbered lists, "How to" lines, imperative verb sequences.
+        """
+        instructions = []
+        sections = self.extract_sections()
+
+        for section in sections:
+            content = section["content"]
+            title = section["title"]
+
+            # Detect numbered steps
+            has_steps = bool(re.search(r'^\s*\d+[.\)]\s', content, re.MULTILINE))
+
+            # Detect imperative verbs at start of lines
+            has_imperative = bool(re.search(
+                r'^(?:\s*[-*\u2022]\s+(?:run|create|add|install|open|use|set|configure|'
+                r'build|deploy|start|stop|enable|disable|check|verify|test|make|pull|push))',
+                content, re.MULTILINE | re.IGNORECASE
+            ))
+
+            # Detect "How to" in title
+            is_howto = "how to" in title.lower() or "how-to" in title.lower()
+
+            if is_howto or has_steps or has_imperative:
+                instructions.append({
+                    "title": title,
+                    "content": content.strip(),
+                    "section_level": section["level"],
+                    "has_code": bool(re.search(r'(?:git |npm |pip |python |docker )', content)),
+                    "has_steps": has_steps,
+                })
+
+        # Also detect standalone numbered sequences not in sections
+        current_steps = []
+        step_title = ""
+        for line in self.lines:
+            if re.match(r'^\s*\d+[.\)]\s', line):
+                if not current_steps:
+                    # Look back for a title
+                    pass
+                current_steps.append(line.strip())
+            else:
+                if len(current_steps) >= 3:
+                    # We found a step sequence
+                    title_words = []
+                    for prev_line in reversed(self.lines[:self.lines.index(line) - len(current_steps)]):
+                        prev_stripped = prev_line.strip()
+                        if prev_stripped and not prev_stripped.startswith(("1.", "2.", "3.")):
+                            title_words.insert(0, prev_stripped)
+                            if len(title_words) >= 2:
+                                break
+                    step_title = " ".join(title_words) if title_words else "Steps"
+                    instructions.append({
+                        "title": step_title,
+                        "content": "\n".join(current_steps),
+                        "section_level": 2,
+                        "has_code": bool(re.search(r'(?:git |npm |pip |python |docker )', "\n".join(current_steps))),
+                        "has_steps": True,
+                    })
+                current_steps = []
+
+        return instructions
+
+    def extract_commands(self) -> List[Dict]:
+        """Extract CLI commands from plain text (lines starting with known prefixes)."""
+        commands = []
+        seen_cmds = set()
+
+        for line in self.lines:
+            stripped = line.strip().lstrip("$> ")
+            if not stripped or stripped.startswith("#"):
+                continue
+
+            is_cmd = any(stripped.startswith(prefix) for prefix in self.CLI_PREFIXES)
+            if is_cmd and stripped not in seen_cmds:
+                seen_cmds.add(stripped)
+                commands.append({
+                    "command": stripped[:120],
+                    "full_code": stripped,
+                    "language": "shell",
+                    "source_section": "",
+                })
+
+        return commands
+
+    def extract_tags(self) -> List[str]:
+        """Auto-generate tags from plain text content."""
+        tags = set()
+
+        # Technology name patterns (same as MarkdownParser)
+        tech_patterns = [
+            r'\b(react|nextjs|next\.js|vue|angular|svelte|typescript|javascript|python|rust|go|golang)\b',
+            r'\b(docker|kubernetes|k8s|nginx|postgres|mysql|redis|mongodb|elasticsearch)\b',
+            r'\b(git|github|gitlab|ci/cd|jenkins|github\.actions)\b',
+            r'\b(prisma|drizzle|typeorm|sequelize|supabase|firebase)\b',
+            r'\b(tailwind|css|scss|sass|bootstrap|chakra)\b',
+            r'\b(chromadb|langchain|openai|anthropic|ollama|llm|rag)\b',
+            r'\b(linux|ubuntu|debian|macos|windows|wsl)\b',
+        ]
+        for pattern in tech_patterns:
+            for match in re.finditer(pattern, self.content, re.IGNORECASE):
+                tags.add(match.group(1).lower().replace(".js", "js"))
+
+        # Section titles as tags (strip trailing punctuation)
+        for section in self.extract_sections():
+            title = section["title"].strip().rstrip(":;.,!?")
+            words = title.split()
+            if 1 <= len(words) <= 3 and title.isascii() and title:
+                tags.add(title.lower().replace(" ", "-"))
+
+        return sorted(tags)
+
+
+def detect_parser(content: str, source: str = "") -> object:
+    """
+    Auto-detect which parser to use based on content and file extension.
+    Returns MarkdownParser or PlainTextParser instance.
+    """
+    # Check file extension
+    source_lower = source.lower()
+    if source_lower.endswith(".txt"):
+        return PlainTextParser(content, source)
+
+    # Check if content has markdown formatting
+    md_signals = [
+        bool(re.search(r'^#{1,6}\s', content, re.MULTILINE)),  # headings
+        bool(re.search(r'\*\*[^*]+\*\*', content)),             # bold
+        bool(re.search(r'```', content)),                        # code blocks
+        bool(re.search(r'^\|.*\|$', content, re.MULTILINE)),    # tables
+        bool(re.search(r'^---', content)),                       # frontmatter
+    ]
+    md_score = sum(md_signals)
+
+    if md_score >= 2:
+        return MarkdownParser(content, source)
+    elif md_score == 0:
+        return PlainTextParser(content, source)
+    else:
+        # Ambiguous — try markdown first since it has richer extraction
+        return MarkdownParser(content, source)
+
+
 # ── LLM Extractor (via ai_extract.mjs bridge) ─────────────
 
 class LLMExtractor:
@@ -474,8 +786,8 @@ def ingest_document(
     """
     from memory_cli import get_client, store_entry, get_graph_engine
 
-    # Always use regex parser for title, sections, basic tags
-    parser = MarkdownParser(content, source)
+    # Auto-detect parser: MarkdownParser for .md, PlainTextParser for .txt
+    parser = detect_parser(content, source)
     title = parser.extract_title()
     sections = parser.extract_sections()
 
