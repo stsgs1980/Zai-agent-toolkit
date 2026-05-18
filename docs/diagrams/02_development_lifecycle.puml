@@ -1,0 +1,140 @@
+@startuml DEVELOPMENT_LIFECYCLE
+!theme cerulean
+skinparam shadowing false
+skinparam SequenceMessageAlign center
+skinparam ParticipantPadding 15
+skinparam MaxMessageSize 200
+skinparam ArrowColor #64748B
+skinparam DefaultFontSize 11
+
+title == Жизненный цикл задачи разработки\nSequence Diagram — взаимодействие стандартов ==
+
+autonumber
+
+box "Разработчик" #FEF3C7
+  actor Dev as dev
+end box
+
+box "Код и UI" #EFF6FF
+  participant "Frontend\nSTD-FE-001" as fe
+  participant "A11Y\nSTD-A11Y-001" as a11y
+end box
+
+box "Безопасность и ошибки" #FECACA
+  participant "Security\nSTD-SEC-001/002" as sec
+  participant "Error Handling\nSTD-ERR-001" as err
+end box
+
+box "Инфраструктура" #D1FAE5
+  participant "Git\nSTD-GIT-001/002" as git
+  participant "Environment\nSTD-ENV-001/002" as env
+end box
+
+box "Агенты" #FCE7F3
+  participant "Subagent\nSTD-AGENT-001" as agent
+  participant "Orchestration\nSTD-AGENT-002" as orch
+end box
+
+box "Мета" #E0F2FE
+  participant "Testing\nSTD-TEST-001" as test
+  participant "ID System\nSTD-META-001" as meta
+end box
+
+== Инициализация задачи ==
+
+dev -> fe: Начать разработку компонента
+activate fe
+
+fe -> env: Проверить конфигурацию\n(STD-ENV-001 L1-L3)
+activate env
+env --> fe: Конфигурация OK
+deactivate env
+
+fe -> sec: Проверить требования\nбезопасности (STD-SEC-001)
+activate sec
+
+== Разработка ==
+
+sec -> fe: OWASP Top 10 +\nInput Validation (STD-SEC-001 1-3)
+deactivate sec
+
+fe -> fe: Написать компонент\n(STD-FE-001: модульность,\n< 300 строк, динамический импорт)
+
+fe -> a11y: Проверить доступность\n(STD-A11Y-001)
+activate a11y
+a11y -> a11y: Контраст, клавиатура,\nfocus, prefers-reduced-motion
+a11y --> fe: A11Y совместим
+deactivate a11y
+
+== Обработка ошибок ==
+
+alt Успешное выполнение
+  fe -> err: Обернуть в try-catch\n(STD-ERR-001 3.1)
+  activate err
+  err --> fe: Error Boundary готов
+  deactivate err
+else Ошибка в рантайме
+  fe -> err: Классифицировать ошибку\n(STD-ERR-001 1.1)
+  activate err
+  err -> err: Определить тип:\nTransient / Permanent / System
+  err -> sec: Логировать с очисткой\nсекретных данных (STD-SEC-001 6.1)
+  activate sec
+  sec --> err: Данные очищены
+  deactivate sec
+  err -> orch: Эскалация ошибки\n(STD-AGENT-002 6.1)
+  activate orch
+  orch -> agent: Передать подагенту\n(STD-AGENT-001 3.2)
+  activate agent
+  agent --> orch: Результат / Failure
+  deactivate agent
+  orch --> err: Retry или Fallback\n(STD-ERR-002 2-4)
+  deactivate orch
+  err --> fe: Обработано / Graceful degradation
+  deactivate err
+end
+
+== Коммит и доставка ==
+
+fe -> git: Подготовить коммит\n(STD-GIT-001: conventional commit)
+activate git
+
+git -> git: Проверить формат:\ntype(scope): description
+
+git -> env: Запустить CI-проверки\n(STD-ENV-001 L3)
+activate env
+
+env -> test: Запустить тесты\n(STD-TEST-001)
+activate test
+test -> test: Unit + Integration + E2E
+test --> env: Тесты пройдены
+deactivate test
+
+env -> sec: Dependency audit\n(STD-SEC-001 5.1)
+activate sec
+sec --> env: Зависимости чисты
+deactivate sec
+
+env --> git: CI pipeline OK
+deactivate env
+
+git -> git: Push + Tag (vX.Y.Z)\n(STD-GIT-001 5-6)
+git -> meta: Зарегистрировать ID\n(STD-META-001 8)
+activate meta
+meta --> git: ID подтверждён
+deactivate meta
+
+git --> fe: Коммит завершён
+deactivate git
+
+fe --> dev: Задача выполнена
+deactivate fe
+
+note over dev, meta
+  **Ключевой принцип:**
+  Каждый стандарт проверяется
+  на своём этапе жизненного цикла.
+  Ошибка на любом этапе
+  эскалируется по STD-ERR-001/002
+end note
+
+@enduml

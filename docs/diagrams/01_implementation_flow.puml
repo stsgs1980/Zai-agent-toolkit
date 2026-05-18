@@ -1,0 +1,99 @@
+@startuml IMPLEMENTATION_FLOW
+!theme cerulean
+skinparam shadowing false
+skinparam ActivityBackgroundColor #EFF6FF
+skinparam ActivityBorderColor #3B82F6
+skinparam ActivityDiamondBackgroundColor #FEF9C3
+skinparam ActivityDiamondBorderColor #F59E0B
+skinparam ActivityBarColor #3B82F6
+skinparam PartitionBackgroundColor #F8FAFC
+skinparam PartitionBorderColor #94A3B8
+skinparam NoteBackgroundColor #FFF7ED
+skinparam NoteBorderColor #F59E0B
+skinparam ArrowColor #64748B
+skinparam DefaultFontSize 12
+
+title == Порядок внедрения стандартов\nActivity Diagram (STD-ARCH-001) ==
+
+start
+
+partition "ФАЗА 1: Фундамент" #E0F2FE {
+  :Зарегистрировать STD-ID\n(STD-META-001);
+  note right
+    Реестр ID —
+    первый шаг
+  end note
+
+  :Принять все 19 стандартов\n(STD-ARCH-001 Group B);
+
+  :Развернуть Worklog\n(STD-ENV-001 L4);
+}
+
+partition "ФАЗА 2: Формат и кодировка" #EDE9FE {
+  :REPRODUCIBILITY-STANDARD\n(STD-ENV-001 v2.0);
+
+  :UNICODE_POLICY\n(STD-DOC-003 v2.1);
+
+  :MARKDOWN_STANDARD\n(STD-DOC-002 v2.2);
+
+  :README_TEMPLATE\n(STD-DOC-004 v2.1);
+}
+
+partition "ФАЗА 3: Инфраструктура" #D1FAE5 {
+  :GitHub Core\n(STD-GIT-001 v2.0);
+
+  :Sandbox Safety\n(STD-GIT-002 v1.0);
+
+  :Z.ai Integration\n(STD-ENV-002 v1.1);
+}
+
+partition "ФАЗА 4: Безопасность и ошибки" #FECACA {
+  fork
+    :Security Core\n(STD-SEC-001 v2.0);
+  fork again
+    :Error Handling\n(STD-ERR-001 v2.0);
+  end fork
+
+  :Security Extended\n(STD-SEC-002 v1.0);
+
+  :Error Recovery\n(STD-ERR-002 v1.0);
+}
+
+partition "ФАЗА 5: Frontend и A11Y" #FEF3C7 {
+  :Frontend Development\n(STD-FE-001 v1.5);
+
+  :WCAG 2.1 AA\n(STD-A11Y-001 v1.1);
+
+  :Code Examples\n(STD-DOC-005 v1.1);
+}
+
+partition "ФАЗА 6: Агенты и тесты" #FCE7F3 {
+  :Subagent Standard\n(STD-AGENT-001 v1.0);
+
+  :Orchestration\n(STD-AGENT-002 v1.0);
+
+  :Testing Standard\n(STD-TEST-001 v1.1);
+}
+
+partition "ВЕРИФИКАЦИЯ" #DBEAFE {
+  :Проверить Cross-References\nво всех 19 стандартах;
+
+  if (Все ссылки корректны?) then (да)
+    :Проверить версии\nзаголовок vs реестр;
+  else (нет)
+    :Исправить сломанные ссылки;
+    note right: 0 broken links = OK
+    ->повтор;
+  endif
+
+  if (Версии совпадают?) then (да)
+    :Обновить CHANGELOG;
+  else (нет)
+    :Синхронизировать версии;
+    ->повтор;
+  endif
+}
+
+stop
+
+@enduml

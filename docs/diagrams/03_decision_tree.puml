@@ -1,0 +1,133 @@
+@startuml STANDARDS_DECISION_TREE
+!theme cerulean
+skinparam shadowing false
+skinparam ActivityBackgroundColor #EFF6FF
+skinparam ActivityBorderColor #3B82F6
+skinparam ActivityDiamondBackgroundColor #FEF9C3
+skinparam ActivityDiamondBorderColor #F59E0B
+skinparam ActivityBarColor #3B82F6
+skinparam PartitionBackgroundColor #F8FAFC
+skinparam PartitionBorderColor #94A3B8
+skinparam NoteBackgroundColor #FFF7ED
+skinparam NoteBorderColor #F59E0B
+skinparam ArrowColor #64748B
+skinparam DefaultFontSize 12
+
+title == Какой стандарт применять?\nДерево решений ==
+
+start
+
+:Получена новая задача;
+
+switch (Тип задачи?)
+case ( "Новый проект" )
+  :**STD-ARCH-001** Impl. Order
+  Определяет порядок внедрения
+  всех остальных стандартов;
+
+  :Фаза 1: **STD-META-001** + **STD-ENV-001**
+  Зарегистрировать ID,
+  настроить окружение;
+
+  :Фаза 2: **STD-DOC-002** + **STD-DOC-003**
+  Markdown + Unicode;
+
+  :Фаза 3: **STD-GIT-001** + **STD-GIT-002**
+  Git workflow;
+
+case ( "Frontend компонент" )
+  :**STD-FE-001** Frontend Dev
+  Модульность, < 300 строк,
+  динамический импорт;
+
+  if (UI доступен пользователю?) then (да)
+    :**STD-A11Y-001** WCAG 2.1 AA
+    Контраст, клавиатура,
+    focus, reduced-motion;
+  else (нет)
+    :Только STD-FE-001;
+  endif
+
+  if (Есть API-маршрут?) then (да)
+    :**STD-FE-001 10** API Route
+    Validation + Error Handling;
+  else (нет)
+  endif
+
+case ( "Безопасность" )
+  if (Базовая защита?) then (да)
+    :**STD-SEC-001** Security Core
+    OWASP, Secrets, XSS,
+    Input Validation, Headers;
+  else (Расширенная)
+    :**STD-SEC-002** Security Extended
+    Auth, RBAC, CSRF,
+    Rate Limiting, Audit;
+  endif
+
+case ( "Обработка ошибки" )
+  if (Синхронная ошибка?) then (да)
+    :**STD-ERR-001** Error Handling
+    Try-catch, классификация,
+    логирование, Error Boundary;
+  else (Асинхронная / восстановление)
+    :**STD-ERR-002** Error Recovery
+    Retry + Backoff,
+    Circuit Breaker, Fallback;
+  endif
+
+case ( "Git операция" )
+  if (Стандартный workflow?) then (да)
+    :**STD-GIT-001** GitHub Core
+    Conventional commits,
+    branch naming, versioning;
+  else (Sandbox / deadlock)
+    :**STD-GIT-002** Sandbox Safety
+    Deadlock prevention,
+    recovery, network failure;
+  endif
+
+case ( "Агент / оркестрация" )
+  if (Один подагент?) then (да)
+    :**STD-AGENT-001** Subagent
+    Контракт, lifecycle,
+    constraints, handoff;
+  else (Множественные агенты)
+    :**STD-AGENT-002** Orchestration
+    Pipeline, fan-out,
+    map-reduce, error propagation;
+  endif
+
+case ( "Документация" )
+  switch (Тип документа?)
+  case ( "Markdown файл" )
+    :**STD-DOC-002** Markdown
+    Запрещённые/разрешённые
+    элементы, badges;
+  case ( "Unicode / символы" )
+    :**STD-DOC-003** No-Unicode
+    Запрещённые категории,
+    whitelist, fallback;
+  case ( "README проекта" )
+    :**STD-DOC-004** README Template
+    Обязательные секции;
+  case ( "Пример кода" )
+    :**STD-DOC-005** Code Examples
+    Copy-paste ready,
+    self-contained;
+  endswitch
+
+endswitch
+
+:Проверить Cross-References\nв применимом стандарте;
+
+note right
+  Каждый стандарт содержит
+  секцию Cross-References,
+  указывающую на связанные
+  стандарты
+end note
+
+stop
+
+@enduml
