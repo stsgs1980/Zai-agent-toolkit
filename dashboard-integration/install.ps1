@@ -85,6 +85,10 @@ $apiMappings = @(
     @{
         Src = Join-Path $IntegrationDir "api\memory\related-graph\route.ts"
         Dst = Join-Path $BaseDir "app\api\memory\related-graph\route.ts"
+    },
+    @{
+        Src = Join-Path $IntegrationDir "api\memory\doc-intelligence\route.ts"
+        Dst = Join-Path $BaseDir "app\api\memory\doc-intelligence\route.ts"
     }
 )
 
@@ -119,6 +123,10 @@ $componentMappings = @(
     @{
         Src = Join-Path $IntegrationDir "components\GraphStats.tsx"
         Dst = Join-Path $BaseDir "components\GraphStats.tsx"
+    },
+    @{
+        Src = Join-Path $IntegrationDir "components\DocIntelligenceView.tsx"
+        Dst = Join-Path $BaseDir "components\DocIntelligenceView.tsx"
     }
 )
 

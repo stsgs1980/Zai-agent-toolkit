@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { GraphViewer } from '@/components/GraphViewer'
 import { GraphStats } from '@/components/GraphStats'
+import { DocIntelligenceView } from '@/components/DocIntelligenceView'
 
 // Types
 interface MemoryEntry {
@@ -27,7 +28,8 @@ const TYPE_LABELS: Record<string, string> = {
   session: 'Session',
   pattern: 'Pattern',
   project: 'Project',
-  template: 'Template'
+  template: 'Template',
+  command: 'Command',
 }
 
 const TYPE_COLORS: Record<string, string> = {
@@ -36,6 +38,7 @@ const TYPE_COLORS: Record<string, string> = {
   pattern: '#fbbf24',
   project: '#4ade80',
   template: '#fb923c',
+  command: '#f43f5e',
 }
 
 // Icons
@@ -190,7 +193,7 @@ export default function MemoryDashboard() {
   const [relatedLoading, setRelatedLoading] = useState(false)
   const [semanticMode, setSemanticMode] = useState(false)
   const [newEntry, setNewEntry] = useState({ type: 'knowledge', content: '', metadata: '' })
-  const [viewMode, setViewMode] = useState<'entries' | 'graph'>('entries')
+  const [viewMode, setViewMode] = useState<'entries' | 'graph' | 'doc-intel'>('entries')
 
   const searchInputRef = useRef<HTMLInputElement>(null)
 
@@ -420,6 +423,17 @@ export default function MemoryDashboard() {
               >
                 <Icons.Graph /> Graph
               </button>
+              <button
+                onClick={() => setViewMode('doc-intel')}
+                className="flex items-center gap-1.5 px-3.5 py-2 text-sm transition-all duration-200"
+                style={{
+                  background: viewMode === 'doc-intel' ? "linear-gradient(180deg, #a855f7, #7c3aed)" : "transparent",
+                  color: viewMode === 'doc-intel' ? '#fff' : '#64748b',
+                  boxShadow: viewMode === 'doc-intel' ? '0 0 15px #a855f744' : 'none',
+                }}
+              >
+                <Icons.Brain /> AI Doc
+              </button>
             </div>
             <button
               onClick={() => setDialogOpen(true)}
@@ -440,6 +454,8 @@ export default function MemoryDashboard() {
           style={{
             background: viewMode === 'graph'
               ? "linear-gradient(90deg, transparent, #38bdf855, transparent)"
+              : viewMode === 'doc-intel'
+              ? "linear-gradient(90deg, transparent, #a855f755, transparent)"
               : "linear-gradient(90deg, transparent, #1e293b, transparent)",
           }}
         />
@@ -450,6 +466,11 @@ export default function MemoryDashboard() {
             <GraphStats />
             <GraphViewer onNodeClick={openEntryByNodeId} />
           </div>
+        )}
+
+        {/* ═══ DOC INTELLIGENCE VIEW ═══ */}
+        {viewMode === 'doc-intel' && (
+          <DocIntelligenceView />
         )}
 
         {/* ═══ ENTRIES VIEW ═══ */}

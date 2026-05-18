@@ -1,21 +1,27 @@
 #!/usr/bin/env python3
 """
-Document Intelligence for ZCode Memory System
+Document Intelligence for ZCODE Memory System
 Parses Markdown documents, extracts terminology, instructions, commands, and tags.
-Uses ChromaDB's built-in embedding for semantic grouping (no external LLM needed).
+
+Two extraction modes:
+  1. Regex (default) - fast, offline, uses MarkdownParser heuristics
+  2. LLM (--llm) - uses z-ai-web-dev-sdk via ai_extract.mjs bridge for AI-powered extraction
 
 Usage:
-    python doc_intelligence.py ingest doc.md                  # Ingest a markdown file
+    python doc_intelligence.py extract doc.md                 # Regex preview
+    python doc_intelligence.py extract doc.md --llm           # LLM preview
+    python doc_intelligence.py ingest doc.md                  # Ingest with regex
+    python doc_intelligence.py ingest doc.md --llm            # Ingest with LLM
     python doc_intelligence.py ingest --stdin < doc.md        # Ingest from stdin
     python doc_intelligence.py ingest doc.md --source wiki    # Custom source tag
-    python doc_intelligence.py extract doc.md                 # Preview extraction without storing
-    python doc_intelligence.py batch ./docs/                  # Ingest all .md files in directory
+    python doc_intelligence.py batch ./docs/                  # Ingest all .md files
 """
 
 import argparse
 import json
 import os
 import re
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -35,10 +41,14 @@ DOC_EDGE_TYPES = {
 
 DEFAULT_MEMORY_PATH = Path.home() / ".zcode" / "memory" / "chromadb"
 
-# ── Markdown Parser ────────────────────────────────────────
+# Path to ai_extract.mjs bridge (same directory as this script)
+AI_EXTRACT_BRIDGE = Path(__file__).parent / "ai_extract.mjs"
+
+
+# ── Markdown Parser (Regex-based) ──────────────────────────
 
 class MarkdownParser:
-    """Parse markdown and extract structured knowledge."""
+    """Parse markdown and extract structured knowledge using regex heuristics."""
 
     def __init__(self, content: str, source: str = ""):
         self.content = content
@@ -68,7 +78,6 @@ class MarkdownParser:
                 current = {"level": level, "title": title, "content": ""}
             elif current is not None:
                 current["content"] += line + "\n"
-            # Skip content before first heading
 
         if current:
             sections.append(current)
@@ -77,11 +86,11 @@ class MarkdownParser:
 
     def extract_terms(self) -> List[Dict]:
         """
-        Extract terminology/definitions.
+        Extract terminology/definitions using regex patterns.
         Patterns:
           - **Term**: definition
-          - **Term** — definition
-          - `Term` — definition
+          - **Term** - definition
+          - `Term` - definition
           - ## Term / ### Term (short heading likely a term)
           - | Term | Definition | (table rows)
         """
@@ -89,15 +98,15 @@ class MarkdownParser:
         seen = set()
 
         # Pattern 1: **Bold term**: definition
-        for match in re.finditer(r'\*\*([^*]+)\*\*\s*[:—–-]\s*(.+)', self.content):
+        for match in re.finditer(r'\*\*([^*]+)\*\*\s*[:\u2014\u2013\-]\s*(.+)', self.content):
             term = match.group(1).strip()
             definition = match.group(2).strip()
             if term not in seen and len(definition) > 5:
                 seen.add(term)
                 terms.append({"term": term, "definition": definition, "pattern": "bold_def"})
 
-        # Pattern 2: `Code term` — definition
-        for match in re.finditer(r'`([^`]+)`\s*[:—–-]\s*(.+)', self.content):
+        # Pattern 2: `Code term` - definition
+        for match in re.finditer(r'`([^`]+)`\s*[:\u2014\u2013\-]\s*(.+)', self.content):
             term = match.group(1).strip()
             definition = match.group(2).strip()
             if term not in seen and len(definition) > 5:
@@ -110,7 +119,6 @@ class MarkdownParser:
             if "|" in line and line.strip().startswith("|"):
                 cells = [c.strip() for c in line.split("|")[1:-1]]
                 if len(cells) >= 2:
-                    # Skip separator rows like |---|---|
                     if all(set(c) <= {"-", ":", " "} for c in cells):
                         in_table = True
                         continue
@@ -141,12 +149,7 @@ class MarkdownParser:
 
     def extract_instructions(self) -> List[Dict]:
         """
-        Extract instructions/how-to steps.
-        Patterns:
-          - Numbered lists (1. 2. 3.)
-          - Step headers: ## Step 1, ## How to X
-          - Code blocks with comments explaining steps
-          - Bulleted action lists with imperative verbs
+        Extract instructions/how-to steps using regex patterns.
         """
         instructions = []
         sections = self.extract_sections()
@@ -156,11 +159,17 @@ class MarkdownParser:
             title = section["title"]
             title_lower = title.lower()
 
-            # Check if section looks like instructions
-            is_howto = any(kw in title_lower for kw in ["how to", "how-to", "howto", "guide", "tutorial", "setup", "install", "configure", "getting started"])
-            has_steps = bool(re.search(r'^\s*\d+[\.\)]\s', content, re.MULTILINE))
+            is_howto = any(kw in title_lower for kw in [
+                "how to", "how-to", "howto", "guide", "tutorial",
+                "setup", "install", "configure", "getting started",
+                "deployment", "build", "run"
+            ])
+            has_steps = bool(re.search(r'^\s*\d+[.\)]\s', content, re.MULTILINE))
             has_code = "```" in content
-            has_imperative = bool(re.search(r'^(?:\s*[-*•]\s+(?:run|create|add|install|open|use|set|configure|build|deploy|start|stop|enable|disable|check|verify|test))', content, re.MULTILINE | re.IGNORECASE))
+            has_imperative = bool(re.search(
+                r'^(?:\s*[-*\u2022]\s+(?:run|create|add|install|open|use|set|configure|build|deploy|start|stop|enable|disable|check|verify|test))',
+                content, re.MULTILINE | re.IGNORECASE
+            ))
 
             if is_howto or has_steps or (has_code and has_imperative):
                 instructions.append({
@@ -174,17 +183,10 @@ class MarkdownParser:
         return instructions
 
     def extract_commands(self) -> List[Dict]:
-        """
-        Extract CLI commands and code recipes.
-        Patterns:
-          - Code blocks containing shell commands
-          - Lines starting with $ or > or #
-          - npm/pip/cargo/go/docker/git/kubectl commands
-        """
+        """Extract CLI commands and code recipes."""
         commands = []
         seen_cmds = set()
 
-        # Extract from code blocks
         in_code_block = False
         code_lang = ""
         code_buf = []
@@ -192,7 +194,6 @@ class MarkdownParser:
         for line in self.lines:
             if line.strip().startswith("```"):
                 if in_code_block:
-                    # End of code block
                     code = "\n".join(code_buf).strip()
                     if code and self._looks_like_command(code, code_lang):
                         first_cmd = self._first_command_line(code)
@@ -207,14 +208,13 @@ class MarkdownParser:
                     code_buf = []
                     in_code_block = False
                 else:
-                    # Start of code block
                     code_lang = line.strip()[3:].strip().lower()
                     in_code_block = True
                     code_buf = []
             elif in_code_block:
                 code_buf.append(line)
 
-        # Also extract inline code that looks like commands
+        # Inline code that looks like commands
         for match in re.finditer(r'`([^`]{3,80})`', self.content):
             code = match.group(1).strip()
             if self._is_cli_command(code) and code not in seen_cmds:
@@ -229,25 +229,25 @@ class MarkdownParser:
         return commands
 
     def _looks_like_command(self, code: str, lang: str) -> bool:
-        """Heuristic: does this code block contain CLI commands?"""
         if lang in ("bash", "sh", "shell", "zsh", "fish", "powershell", "cmd", "bat"):
             return True
-        # Check for common command prefixes
-        cli_prefixes = ["npm ", "pip ", "cargo ", "go ", "docker ", "kubectl ",
-                       "git ", "python ", "node ", "deno ", "curl ", "wget ",
-                       "make ", "cmake ", "gcc ", "pipenv ", "poetry "]
+        cli_prefixes = [
+            "npm ", "npx ", "pip ", "cargo ", "go ", "docker ", "kubectl ",
+            "git ", "python ", "node ", "deno ", "curl ", "wget ",
+            "make ", "cmake ", "gcc ", "pipenv ", "poetry ", "bun "
+        ]
         first_line = code.split("\n")[0].strip().lstrip("$> ")
         return any(first_line.startswith(p) for p in cli_prefixes)
 
     def _is_cli_command(self, code: str) -> bool:
-        """Check if inline code is a CLI command."""
         code = code.strip().lstrip("$> ")
-        cli_prefixes = ["npm ", "pip ", "cargo ", "go ", "docker ", "kubectl ",
-                       "git ", "python ", "node ", "curl ", "make "]
+        cli_prefixes = [
+            "npm ", "npx ", "pip ", "cargo ", "go ", "docker ", "kubectl ",
+            "git ", "python ", "node ", "curl ", "make ", "bun "
+        ]
         return any(code.startswith(p) for p in cli_prefixes)
 
     def _first_command_line(self, code: str) -> str:
-        """Extract the primary command from a code block."""
         for line in code.split("\n"):
             line = line.strip()
             if not line or line.startswith("#"):
@@ -258,15 +258,10 @@ class MarkdownParser:
         return ""
 
     def extract_tags(self) -> List[str]:
-        """
-        Auto-generate tags from content.
-        - Existing tags (frontmatter, #tag patterns)
-        - Key terms from headings
-        - Technology names
-        """
+        """Auto-generate tags from content."""
         tags = set()
 
-        # Pattern 1: YAML frontmatter tags
+        # YAML frontmatter tags
         if self.content.startswith("---"):
             end = self.content.find("---", 3)
             if end > 0:
@@ -276,23 +271,19 @@ class MarkdownParser:
                         tag = tag.strip().strip("\"'")
                         if tag:
                             tags.add(tag.lower())
-                for match in re.finditer(r'-\s+(.+)', frontmatter):
-                    tag = match.group(1).strip().strip("\"'")
-                    if tag and not tag.startswith("http"):
-                        tags.add(tag.lower())
 
-        # Pattern 2: #tag patterns in content
+        # #tag patterns
         for match in re.finditer(r'(?:^|\s)#([a-zA-Z][\w-]*)', self.content):
             tag = match.group(1).lower()
             if tag not in ("title", "description", "summary", "note", "todo", "fixme",
                           "see", "ref", "source", "date", "author"):
                 tags.add(tag)
 
-        # Pattern 3: Technology names from headings and code
+        # Technology names
         tech_patterns = [
             r'\b(react|nextjs|next\.js|vue|angular|svelte|typescript|javascript|python|rust|go|golang)\b',
             r'\b(docker|kubernetes|k8s|nginx|postgres|mysql|redis|mongodb|elasticsearch)\b',
-            r'\b(git|github|gitlab|ci/cd|jenkins|github.actions)\b',
+            r'\b(git|github|gitlab|ci/cd|jenkins|github\.actions)\b',
             r'\b(prisma|drizzle|typeorm|sequelize|supabase|firebase)\b',
             r'\b(tailwind|css|scss|sass|bootstrap|chakra)\b',
             r'\b(chromadb|langchain|openai|anthropic|ollama|llm|rag)\b',
@@ -300,9 +291,9 @@ class MarkdownParser:
         ]
         for pattern in tech_patterns:
             for match in re.finditer(pattern, self.content, re.IGNORECASE):
-                tags.add(match.group(1).lower())
+                tags.add(match.group(1).lower().replace(".js", "js"))
 
-        # Pattern 4: Section headings (short ones are likely tags)
+        # Short section headings as tags
         for section in self.extract_sections():
             title = section["title"].strip()
             words = title.split()
@@ -312,6 +303,154 @@ class MarkdownParser:
         return sorted(tags)
 
 
+# ── LLM Extractor (via ai_extract.mjs bridge) ─────────────
+
+class LLMExtractor:
+    """
+    AI-powered extraction using z-ai-web-dev-sdk via Node.js bridge.
+    Provides richer, context-aware extraction than regex heuristics.
+    """
+
+    def __init__(self, content: str, source: str = ""):
+        self.content = content
+        self.source = source
+
+    def _call_bridge(self, mode: str, input_content: str = None) -> Dict:
+        """Call ai_extract.mjs and return parsed JSON."""
+        if not AI_EXTRACT_BRIDGE.exists():
+            raise FileNotFoundError(
+                f"AI bridge not found: {AI_EXTRACT_BRIDGE}\n"
+                f"Make sure ai_extract.mjs is in the same directory as doc_intelligence.py"
+            )
+
+        input_data = input_content or self.content
+
+        try:
+            result = subprocess.run(
+                ["node", str(AI_EXTRACT_BRIDGE), mode],
+                input=input_data,
+                capture_output=True,
+                text=True,
+                timeout=60,
+            )
+
+            if result.returncode != 0:
+                stderr = result.stderr.strip()
+                raise RuntimeError(f"ai_extract.mjs failed: {stderr}")
+
+            return json.loads(result.stdout.strip())
+
+        except subprocess.TimeoutExpired:
+            raise RuntimeError("AI extraction timed out (60s)")
+        except json.JSONDecodeError as e:
+            raise RuntimeError(f"Failed to parse AI response: {e}")
+
+    def extract_terms(self) -> List[Dict]:
+        """Extract terms with LLM - returns term + translation + explanation."""
+        try:
+            data = self._call_bridge("terms")
+        except Exception as e:
+            print(f"  WARNING: LLM terms extraction failed: {e}", file=sys.stderr)
+            return []
+
+        items = data.get("items", [])
+        terms = []
+        seen = set()
+
+        for item in items:
+            term = item.get("term", "").strip()
+            if not term or term in seen:
+                continue
+            seen.add(term)
+            terms.append({
+                "term": term,
+                "definition": item.get("explanation", ""),
+                "translation": item.get("translation", ""),
+                "usage": item.get("usage", ""),
+                "pattern": "llm",
+            })
+
+        return terms
+
+    def extract_instructions(self) -> List[Dict]:
+        """Extract step-by-step instructions with LLM."""
+        try:
+            data = self._call_bridge("instructions")
+        except Exception as e:
+            print(f"  WARNING: LLM instructions extraction failed: {e}", file=sys.stderr)
+            return []
+
+        items = data.get("items", [])
+        instructions = []
+
+        for item in items:
+            steps = item.get("steps", [])
+            has_code = any(
+                block.get("code", "")
+                for step in steps
+                for block in step.get("codeBlocks", [])
+            )
+            instructions.append({
+                "title": item.get("title", ""),
+                "description": item.get("description", ""),
+                "content": json.dumps(steps, ensure_ascii=False),
+                "steps": steps,
+                "has_code": has_code,
+                "has_steps": len(steps) > 0,
+                "pattern": "llm",
+            })
+
+        return instructions
+
+    def extract_commands(self) -> List[Dict]:
+        """Extract CLI commands with LLM."""
+        try:
+            data = self._call_bridge("commands")
+        except Exception as e:
+            print(f"  WARNING: LLM commands extraction failed: {e}", file=sys.stderr)
+            return []
+
+        items = data.get("items", [])
+        commands = []
+        seen = set()
+
+        for item in items:
+            cmd = item.get("command", "").strip()
+            if not cmd or cmd in seen:
+                continue
+            seen.add(cmd)
+            commands.append({
+                "command": cmd,
+                "full_code": item.get("full_code", cmd),
+                "language": item.get("language", "shell"),
+                "description": item.get("description", ""),
+                "source_section": "",
+                "pattern": "llm",
+            })
+
+        return commands
+
+    def analyze(self) -> Dict:
+        """Analyze document: summary, tags, category, difficulty."""
+        try:
+            data = self._call_bridge("analyze")
+        except Exception as e:
+            print(f"  WARNING: LLM analysis failed: {e}", file=sys.stderr)
+            return {
+                "summary": "",
+                "suggested_tags": [],
+                "category": "",
+                "difficulty": "",
+            }
+
+        return {
+            "summary": data.get("summary", ""),
+            "suggested_tags": data.get("suggested_tags", []),
+            "category": data.get("category", ""),
+            "difficulty": data.get("difficulty", ""),
+        }
+
+
 # ── Document Ingestion ─────────────────────────────────────
 
 def ingest_document(
@@ -319,21 +458,44 @@ def ingest_document(
     source: str = "",
     no_graph: bool = False,
     dry_run: bool = False,
+    use_llm: bool = False,
 ) -> Dict:
     """
     Ingest a document: parse, extract, store to ChromaDB, create graph edges.
+
+    Args:
+        content: Markdown content
+        source: Source identifier (file path, URL, etc.)
+        no_graph: Skip graph edge creation
+        dry_run: Preview only, don't store
+        use_llm: Use LLM-powered extraction instead of regex
 
     Returns a summary dict of what was extracted and stored.
     """
     from memory_cli import get_client, store_entry, get_graph_engine
 
+    # Always use regex parser for title, sections, basic tags
     parser = MarkdownParser(content, source)
     title = parser.extract_title()
     sections = parser.extract_sections()
-    terms = parser.extract_terms()
-    instructions = parser.extract_instructions()
-    commands = parser.extract_commands()
-    tags = parser.extract_tags()
+
+    # Choose extraction engine
+    if use_llm:
+        llm = LLMExtractor(content, source)
+        terms = llm.extract_terms()
+        instructions = llm.extract_instructions()
+        commands = llm.extract_commands()
+        analysis = llm.analyze()
+        # Merge regex tags + LLM suggested tags
+        regex_tags = parser.extract_tags()
+        llm_tags = analysis.get("suggested_tags", [])
+        tags = sorted(set(regex_tags) | set(llm_tags))
+    else:
+        terms = parser.extract_terms()
+        instructions = parser.extract_instructions()
+        commands = parser.extract_commands()
+        tags = parser.extract_tags()
+        analysis = {}
 
     result = {
         "title": title,
@@ -343,14 +505,19 @@ def ingest_document(
         "instructions": len(instructions),
         "commands": len(commands),
         "tags": tags,
+        "analysis": analysis,
+        "mode": "llm" if use_llm else "regex",
         "stored_ids": [],
         "edges_created": [],
     }
 
     if dry_run:
-        result["terms_detail"] = terms[:5]
-        result["instructions_detail"] = [{"title": i["title"], "has_code": i["has_code"]} for i in instructions]
-        result["commands_detail"] = [c["command"] for c in commands[:5]]
+        result["terms_detail"] = terms[:8]
+        result["instructions_detail"] = [
+            {"title": i["title"], "has_code": i["has_code"], "steps_count": len(i.get("steps", []))}
+            for i in instructions
+        ]
+        result["commands_detail"] = [c["command"] for c in commands[:8]]
         return result
 
     client = get_client()
@@ -362,16 +529,22 @@ def ingest_document(
         pass
 
     # 1. Store source document as 'project' entry
+    doc_metadata = {
+        "source": source,
+        "title": title,
+        "doc_type": "markdown",
+        "tags": ",".join(tags),
+    }
+    if analysis:
+        doc_metadata["summary"] = analysis.get("summary", "")
+        doc_metadata["category"] = analysis.get("category", "")
+        doc_metadata["difficulty"] = analysis.get("difficulty", "")
+
     doc_id = store_entry(
         "project",
         content,
-        metadata={
-            "source": source,
-            "title": title,
-            "doc_type": "markdown",
-            "tags": ",".join(tags),
-        },
-        no_graph=True,  # We'll create custom edges
+        metadata=doc_metadata,
+        no_graph=True,
     )
     result["stored_ids"].append(doc_id)
 
@@ -385,12 +558,18 @@ def ingest_document(
             engine = None
 
     for term in terms:
+        term_content = term["definition"]
+        if term.get("translation"):
+            term_content = f"{term['translation']}\n\n{term_content}"
+        if term.get("usage"):
+            term_content += f"\n\nUsage:\n{term['usage']}"
+
         term_id = store_entry(
             "knowledge",
-            term["definition"],
+            term_content,
             metadata={
                 "term": term["term"],
-                "pattern": term["pattern"],
+                "pattern": term.get("pattern", "unknown"),
                 "source": source,
                 "tags": ",".join(tags),
             },
@@ -398,20 +577,24 @@ def ingest_document(
         )
         result["stored_ids"].append(term_id)
 
-        # Create edge: doc defines_term term
         if engine:
             engine.add_edge(doc_id, term_id, "defines_term")
             result["edges_created"].append(f"{doc_id} --defines_term--> {term_id}")
 
     # 3. Store instructions as 'pattern' entries
     for inst in instructions:
+        # For LLM instructions, store structured steps as JSON
+        inst_content = inst["content"]
+        if inst.get("description"):
+            inst_content = f"{inst['description']}\n\n{inst_content}"
+
         inst_id = store_entry(
             "pattern",
-            inst["content"],
+            inst_content,
             metadata={
                 "title": inst["title"],
-                "has_code": str(inst["has_code"]),
-                "has_steps": str(inst["has_steps"]),
+                "has_code": str(inst.get("has_code", False)),
+                "has_steps": str(inst.get("has_steps", False)),
                 "source": source,
                 "tags": ",".join(tags),
             },
@@ -430,7 +613,7 @@ def ingest_document(
             cmd["full_code"],
             metadata={
                 "command": cmd["command"][:100],
-                "language": cmd["language"],
+                "language": cmd.get("language", "text"),
                 "source": source,
                 "tags": ",".join(tags),
             },
@@ -458,18 +641,27 @@ def ingest_document(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Document Intelligence for ZCode Memory System",
+        description="Document Intelligence for ZCODE Memory System",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
+    python doc_intelligence.py extract README.md
+    python doc_intelligence.py extract README.md --llm
     python doc_intelligence.py ingest README.md
+    python doc_intelligence.py ingest README.md --llm
     python doc_intelligence.py ingest --stdin < doc.md
-    python doc_intelligence.py extract doc.md
+    python doc_intelligence.py ingest doc.md --source wiki
     python doc_intelligence.py batch ./docs/
+    python doc_intelligence.py batch ./docs/ --llm
         """
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Commands")
+
+    # Shared LLM flag
+    def add_llm_flag(p):
+        p.add_argument("--llm", action="store_true",
+                       help="Use LLM (z-ai-web-dev-sdk) for extraction instead of regex")
 
     # ingest
     ingest_p = subparsers.add_parser("ingest", help="Ingest a markdown document")
@@ -477,16 +669,19 @@ Examples:
     ingest_p.add_argument("--stdin", action="store_true", help="Read from stdin")
     ingest_p.add_argument("--source", "-s", default="", help="Source tag (e.g. 'wiki', 'readme')")
     ingest_p.add_argument("--no-graph", action="store_true", help="Skip graph edge creation")
+    add_llm_flag(ingest_p)
 
     # extract (preview)
     extract_p = subparsers.add_parser("extract", help="Preview extraction without storing")
     extract_p.add_argument("file", help="Markdown file to analyze")
+    add_llm_flag(extract_p)
 
     # batch
     batch_p = subparsers.add_parser("batch", help="Ingest all .md files in directory")
     batch_p.add_argument("directory", help="Directory to scan")
     batch_p.add_argument("--source", "-s", default="", help="Source tag for all files")
     batch_p.add_argument("--no-graph", action="store_true", help="Skip graph edge creation")
+    add_llm_flag(batch_p)
 
     args = parser.parse_args()
 
@@ -499,6 +694,9 @@ Examples:
     if tools_dir != Path.cwd():
         os.chdir(tools_dir)
         sys.path.insert(0, str(tools_dir))
+
+    use_llm = getattr(args, 'llm', False)
+    mode_label = "LLM" if use_llm else "regex"
 
     if args.command == "ingest":
         if args.stdin:
@@ -515,29 +713,24 @@ Examples:
             print("ERROR: Provide a file or use --stdin")
             sys.exit(1)
 
-        print(f"Ingesting: {source}")
+        print(f"Ingesting [{mode_label}]: {source}")
         print("=" * 50)
 
-        result = ingest_document(content, source=source, no_graph=args.no_graph)
+        result = ingest_document(content, source=source, no_graph=args.no_graph, use_llm=use_llm)
 
         print(f"\nDocument: {result['title']}")
+        print(f"Mode: {result['mode']}")
         print(f"Sections: {result['sections']}")
         print(f"Terms extracted: {result['terms']}")
         print(f"Instructions: {result['instructions']}")
         print(f"Commands: {result['commands']}")
         print(f"Tags: {', '.join(result['tags'])}")
-        print(f"Entries stored: {len(result['stored_ids'])}")
+
+        if result.get('analysis', {}).get('summary'):
+            print(f"\nSummary: {result['analysis']['summary']}")
+
+        print(f"\nEntries stored: {len(result['stored_ids'])}")
         print(f"Graph edges: {len(result['edges_created'])}")
-
-        if result['terms'] > 0:
-            print(f"\nTop terms:")
-            for t in (result.get('terms_detail') or [])[:5]:
-                print(f"  - {t['term']}: {t['definition'][:60]}...")
-
-        if result['commands'] > 0:
-            print(f"\nCommands found:")
-            for c in (result.get('commands_detail') or [])[:5]:
-                print(f"  $ {c}")
 
     elif args.command == "extract":
         path = Path(args.file)
@@ -546,9 +739,9 @@ Examples:
             sys.exit(1)
 
         content = path.read_text(encoding="utf-8")
-        result = ingest_document(content, source=str(path), dry_run=True)
+        result = ingest_document(content, source=str(path), dry_run=True, use_llm=use_llm)
 
-        print(f"Dry-run extraction: {result['title']}")
+        print(f"Dry-run [{mode_label}]: {result['title']}")
         print("=" * 50)
         print(f"Sections: {result['sections']}")
         print(f"Terms: {result['terms']}")
@@ -556,16 +749,32 @@ Examples:
         print(f"Commands: {result['commands']}")
         print(f"Tags: {', '.join(result['tags'])}")
 
+        if result.get('analysis', {}).get('summary'):
+            print(f"\nAI Summary: {result['analysis']['summary']}")
+            if result['analysis'].get('category'):
+                print(f"Category: {result['analysis']['category']}")
+            if result['analysis'].get('difficulty'):
+                print(f"Difficulty: {result['analysis']['difficulty']}")
+
         if result.get('terms_detail'):
             print(f"\nExtracted terms:")
             for t in result['terms_detail']:
-                print(f"  [{t['pattern']}] {t['term']}: {t['definition'][:80]}...")
+                pattern = t.get('pattern', '?')
+                term = t['term']
+                definition = t.get('definition', '')[:80]
+                translation = t.get('translation', '')
+                if translation:
+                    print(f"  [{pattern}] {term} = {translation}")
+                    print(f"           {definition}...")
+                else:
+                    print(f"  [{pattern}] {term}: {definition}...")
 
         if result.get('instructions_detail'):
             print(f"\nInstructions:")
             for i in result['instructions_detail']:
-                code_flag = " [code]" if i['has_code'] else ""
-                print(f"  - {i['title']}{code_flag}")
+                code_flag = " [code]" if i.get('has_code') else ""
+                steps = i.get('steps_count', '?')
+                print(f"  - {i['title']} ({steps} steps){code_flag}")
 
         if result.get('commands_detail'):
             print(f"\nCommands:")
@@ -583,28 +792,33 @@ Examples:
             print(f"No .md files found in {directory}")
             sys.exit(0)
 
-        print(f"Found {len(md_files)} markdown files")
+        print(f"Found {len(md_files)} markdown files [{mode_label}]")
 
-        total = {"entries": 0, "edges": 0, "terms": 0, "commands": 0}
+        total = {"entries": 0, "edges": 0, "terms": 0, "commands": 0, "instructions": 0}
         for i, path in enumerate(md_files, 1):
             print(f"\n[{i}/{len(md_files)}] {path.name}...")
             try:
                 content = path.read_text(encoding="utf-8")
-                result = ingest_document(content, source=str(path), no_graph=args.no_graph)
+                result = ingest_document(
+                    content, source=str(path),
+                    no_graph=args.no_graph, use_llm=use_llm
+                )
                 total["entries"] += len(result["stored_ids"])
                 total["edges"] += len(result["edges_created"])
                 total["terms"] += result["terms"]
                 total["commands"] += result["commands"]
+                total["instructions"] += result["instructions"]
                 print(f"  Terms: {result['terms']}, Instructions: {result['instructions']}, Commands: {result['commands']}")
             except Exception as e:
                 print(f"  ERROR: {e}")
 
         print(f"\n{'=' * 50}")
-        print(f"Batch complete!")
+        print(f"Batch complete [{mode_label}]!")
         print(f"Files: {len(md_files)}")
         print(f"Total entries: {total['entries']}")
         print(f"Total edges: {total['edges']}")
         print(f"Total terms: {total['terms']}")
+        print(f"Total instructions: {total['instructions']}")
         print(f"Total commands: {total['commands']}")
 
 
