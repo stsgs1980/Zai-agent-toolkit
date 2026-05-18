@@ -237,6 +237,86 @@ These are deployed into a project. They SUBMIT to Group B standards.
 
 ---
 
+## Standards Interaction Map
+
+> **Overview** -- this graph shows Cross-References between all 19 standards grouped by domain.
+> For exact section references, see the Cross-References table in each standard file.
+
+```mermaid
+flowchart TB
+    subgraph L1["L1 -- Foundation"]
+        direction LR
+        META["STD-META-001\nID System v1.1"]
+        DOC2["STD-DOC-002\nMarkdown v2.2"]
+        DOC3["STD-DOC-003\nNo-Unicode v2.1"]
+        DOC4["STD-DOC-004\nREADME v2.1"]
+        DOC5["STD-DOC-005\nCode Examples v1.1"]
+    end
+
+    subgraph L2["L2 -- Infrastructure"]
+        direction LR
+        ENV1["STD-ENV-001\nReproducibility v2.0"]
+        ENV2["STD-ENV-002\nZ.ai Integration v1.1"]
+        GIT1["STD-GIT-001\nGitHub Core v2.0"]
+        GIT2["STD-GIT-002\nSandbox Safety v1.0"]
+    end
+
+    subgraph L3["L3 -- Domain"]
+        direction LR
+        FE1["STD-FE-001\nFrontend v1.5"]
+        A11Y["STD-A11Y-001\nWCAG 2.1 AA v1.1"]
+        ERR1["STD-ERR-001\nError Handling v2.0"]
+        ERR2["STD-ERR-002\nError Recovery v1.0"]
+        SEC1["STD-SEC-001\nSecurity Core v2.0"]
+        SEC2["STD-SEC-002\nSecurity Extended v1.0"]
+    end
+
+    subgraph L4["L4 -- Orchestration"]
+        direction LR
+        AGENT1["STD-AGENT-001\nSubagent v1.0"]
+        AGENT2["STD-AGENT-002\nOrchestration v1.0"]
+    end
+
+    subgraph L5["L5 -- Application"]
+        direction LR
+        ARCH["STD-ARCH-001\nImpl. Order v2.2"]
+        TEST["STD-TEST-001\nTesting v1.1"]
+    end
+
+    ARCH --> META
+    ARCH --> ENV1
+    ARCH --> GIT1
+    ARCH --> FE1
+    ARCH --> ERR1
+    ARCH --> SEC1
+    ARCH --> TEST
+    ARCH --> AGENT1
+
+    ENV1 <--> ENV2
+    GIT1 <--> GIT2
+    FE1 <--> A11Y
+    ERR1 <--> ERR2
+    SEC1 <--> SEC2
+    AGENT1 <--> AGENT2
+    DOC2 <--> DOC3
+    DOC4 --> DOC2
+    DOC5 --> DOC2
+
+    ENV1 --> ERR1
+    ENV1 --> SEC1
+    FE1 --> ERR1
+    FE1 --> SEC1
+    ERR1 --> SEC1
+    TEST --> ENV1
+    TEST --> ERR1
+    AGENT1 --> GIT1
+    AGENT1 --> ERR1
+    AGENT2 --> ENV2
+    META --> DOC2
+```
+
+---
+
 ## Key Rules Summary
 
 ### Unicode Policy
