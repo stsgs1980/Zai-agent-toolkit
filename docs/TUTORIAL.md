@@ -36,14 +36,14 @@ Z.ai Agent Toolkit is a collection of reusable skills for AI agents. These skill
 | AI forgets context between sessions | session-handoff preserves context |
 | Git mistakes cause problems | git-safety prevents disasters |
 | No standardized document output | doc-gen ensures quality |
-| Inconsistent code architecture | anti-monolith enforces modularity |
+| Inconsistent code architecture | anti-monolith (system skill) enforces modularity |
 
 ### Architecture
 
 ```text
 Z.ai Sandbox                    Your Windows PC
 +------------------+           +------------------+
-| /home/z/         |           | C:\Users\stsgr\  |
+| /home/z/         |           | $env:USERPROFILE\  |
 |   my-project/    |           |   .zcode\        |
 |     Zai-agent-   |<--sync--->|     Zai-agent-   |
 |     toolkit/     |   Git     |     toolkit\     |
@@ -74,20 +74,20 @@ Press `Win + X`, select "Windows PowerShell" or "Terminal".
 #### Step 2: Navigate to ZCode Directory
 
 ```powershell
-cd C:\Users\stsgr\.zcode
+cd $env:USERPROFILE\.zcode
 ```
 
 If the directory does not exist:
 
 ```powershell
-mkdir C:\Users\stsgr\.zcode
-cd C:\Users\stsgr\.zcode
+mkdir $env:USERPROFILE\.zcode
+cd $env:USERPROFILE\.zcode
 ```
 
 #### Step 3: Clone Toolkit
 
 ```powershell
-git clone https://github.com/stsgs1980/Zai-agent-toolkit.git
+git clone https://github.com/stsgs1980/Zai-agent-toolkit_v.git
 ```
 
 #### Step 4: Create Symlinks
@@ -98,9 +98,9 @@ ZCode Desktop expects skills in `~/.zcode/skills/`. Create symbolic links:
 # Remove existing directories if they exist (backup first!)
 # Then create symlinks:
 
-New-Item -ItemType SymbolicLink -Path "skills" -Target "Zai-agent-toolkit\skills"
-New-Item -ItemType SymbolicLink -Path "instructions" -Target "Zai-agent-toolkit\instructions"
-New-Item -ItemType SymbolicLink -Path "standards" -Target "Zai-agent-toolkit\standards"
+New-Item -ItemType SymbolicLink -Path "skills" -Target "Zai-agent-toolkit_v\skills"
+New-Item -ItemType SymbolicLink -Path "instructions" -Target "Zai-agent-toolkit_v\instructions"
+New-Item -ItemType SymbolicLink -Path "standards" -Target "Zai-agent-toolkit_v\standards"
 ```
 
 #### Step 5: Verify Installation
@@ -117,7 +117,7 @@ You should see skill folders like:
 
 ### Update Script
 
-Create `update-toolkit.ps1` in `C:\Users\stsgr\.zcode\`:
+Create `update-toolkit.ps1` in `$env:USERPROFILE\.zcode\`:
 
 ```powershell
 # update-toolkit.ps1
@@ -126,7 +126,7 @@ Create `update-toolkit.ps1` in `C:\Users\stsgr\.zcode\`:
 Write-Host "Updating Z.ai Agent Toolkit..." -ForegroundColor Green
 
 # Navigate to toolkit
-Set-Location "$env:USERPROFILE\.zcode\Zai-agent-toolkit"
+Set-Location "$env:USERPROFILE\.zcode\Zai-agent-toolkit_v"
 
 # Fetch and pull changes
 git fetch origin
@@ -139,7 +139,7 @@ Write-Host "Current version: $(Get-Content VERSION)" -ForegroundColor Cyan
 To run:
 
 ```powershell
-cd C:\Users\stsgr\.zcode
+cd $env:USERPROFILE\.zcode
 .\update-toolkit.ps1
 ```
 
@@ -322,7 +322,7 @@ ZAI-<DOMAIN>-<NUMBER>
 | ID | Skill | Purpose |
 |----|-------|---------|
 | ZAI-DEV-001 | dev-watchdog | Dev server keepalive |
-| ZAI-DEV-002 | anti-monolith | Modular React/Next.js architecture |
+| ZAI-DEV-002 | anti-monolith | System skill (Z.ai sandbox) |
 | ZAI-DEV-003 | project-clone | Smart project cloning with dialogs |
 
 #### Meta (META)
@@ -386,7 +386,7 @@ Use the first available.
 #### Step 3: Create Directory
 
 ```powershell
-cd C:\Users\stsgr\.zcode\Zai-agent-toolkit\skills
+cd $env:USERPROFILE\.zcode\Zai-agent-toolkit_v\skills
 mkdir my-skill-name
 ```
 
@@ -458,7 +458,7 @@ Edit `skills/skill-id-system/SKILL.md`:
 #### Step 6: Commit and Push
 
 ```powershell
-cd C:\Users\stsgr\.zcode\Zai-agent-toolkit
+cd $env:USERPROFILE\.zcode\Zai-agent-toolkit_v
 git add .
 git commit -m "Add skill: my-skill-name (ZAI-USER-001)"
 git push
@@ -488,7 +488,7 @@ Z.ai Server                GitHub                Your Windows
 
 1. On Z.ai (after creating skill):
    ```bash
-   cd /home/z/my-project/Zai-agent-toolkit
+   cd /home/z/my-project/Zai-agent-toolkit_v
    git add .
    git commit -m "Add new skill"
    git push
@@ -496,10 +496,10 @@ Z.ai Server                GitHub                Your Windows
 
 2. On Windows:
    ```powershell
-   cd C:\Users\stsgr\.zcode
+   cd $env:USERPROFILE\.zcode
    .\update-toolkit.ps1
    # OR manually:
-   cd Zai-agent-toolkit
+   cd Zai-agent-toolkit_v
    git pull
    ```
 
@@ -507,7 +507,7 @@ Z.ai Server                GitHub                Your Windows
 
 1. On Windows:
    ```powershell
-   cd C:\Users\stsgr\.zcode\Zai-agent-toolkit
+   cd $env:USERPROFILE\.zcode\Zai-agent-toolkit_v
    git add .
    git commit -m "Update skill"
    git push
@@ -515,7 +515,7 @@ Z.ai Server                GitHub                Your Windows
 
 2. On Z.ai server:
    ```bash
-   cd /home/z/my-project/Zai-agent-toolkit
+   cd /home/z/my-project/Zai-agent-toolkit_v
    git pull
    ```
 
@@ -584,8 +584,8 @@ Every skill should have:
 2. Make description more specific
 3. Check symlink is correct:
    ```powershell
-   ls C:\Users\stsgr\.zcode\skills
-   # Should show Zai-agent-toolkit\skills contents
+   ls $env:USERPROFILE\.zcode\skills
+   # Should show Zai-agent-toolkit_v\skills contents
    ```
 
 ### Symlink Broken
@@ -595,10 +595,10 @@ Every skill should have:
 **Solution:**
 ```powershell
 # Remove broken symlink
-Remove-Item C:\Users\stsgr\.zcode\skills
+Remove-Item $env:USERPROFILE\.zcode\skills
 
 # Recreate
-New-Item -ItemType SymbolicLink -Path "C:\Users\stsgr\.zcode\skills" -Target "C:\Users\stsgr\.zcode\Zai-agent-toolkit\skills"
+New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.zcode\skills" -Target "$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\skills"
 ```
 
 ### Git Conflicts
@@ -622,7 +622,7 @@ git stash pop
 **Symptom:** ZCode Desktop doesn't recognize your skills.
 
 **Check:**
-1. Symlink exists: `ls C:\Users\stsgr\.zcode\skills`
+1. Symlink exists: `ls $env:USERPROFILE\.zcode\skills`
 2. SKILL.md exists in skill folder
 3. SKILL.md has valid YAML frontmatter
 
@@ -634,11 +634,11 @@ git stash pop
 
 ```powershell
 # Update toolkit
-cd C:\Users\stsgr\.zcode
+cd $env:USERPROFILE\.zcode
 .\update-toolkit.ps1
 
 # Create skill manually
-cd Zai-agent-toolkit\skills
+cd Zai-agent-toolkit_v\skills
 mkdir my-skill
 # Create SKILL.md...
 
@@ -659,8 +659,8 @@ Toolkit skills: ZAI-GIT-xxx, ZAI-SDK-xxx, ...
 
 | What | Where |
 |------|-------|
-| Toolkit | `C:\Users\stsgr\.zcode\Zai-agent-toolkit\` |
-| Skills | `Zai-agent-toolkit\skills\` |
+| Toolkit | `$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\` |
+| Skills | `Zai-agent-toolkit_v\skills\` |
 | ID Registry | `skills\skill-id-system\SKILL.md` |
 | This Guide | `docs\TUTORIAL.md` |
 

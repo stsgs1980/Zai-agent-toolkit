@@ -1,23 +1,23 @@
 # Skills Process Flows
 
 > Visual documentation for Z.ai Agent Toolkit processes
-> Generated: 2026-05-17
+> Generated: 2026-05-18
 
 ---
 
 ## 0. Unified Architecture (PlantUML)
 
-**Единая диаграмма всей архитектуры и процессов:**
+Unified diagram of the entire architecture and processes:
 
 ![Skills Architecture](./diagrams/00-skills-architecture.png)
 
-> Source: `diagrams/skills-architecture.puml` — редактируемый PlantUML файл
+> Source: `diagrams/skills-architecture.puml` -- editable PlantUML file
 
 ---
 
 ## 1. Skill Selection Flow
 
-Как агент выбирает и вызывает skills в зависимости от типа задачи.
+How the agent selects and invokes skills based on task type.
 
 ![Skill Selection Flow](./diagrams/01-skill-selection-flow.png)
 
@@ -58,7 +58,7 @@ flowchart TB
 
 ## 2. Skill Creation Flow
 
-Процесс создания нового skill с автоматическим назначением ID.
+Process for creating a new skill with automatic ID assignment.
 
 ![Skill Creation Flow](./diagrams/02-skill-creation-flow.png)
 
@@ -93,7 +93,7 @@ flowchart LR
 
 ## 3. Session Lifecycle
 
-Жизненный цикл сессии с использованием session-resume, session-log, session-handoff.
+Session lifecycle using session-resume, session-log, session-handoff.
 
 ![Session Lifecycle](./diagrams/03-session-lifecycle.png)
 
@@ -143,7 +143,7 @@ flowchart TB
 
 ## 4. Git Safety Flow
 
-Защита от потери данных при git операциях.
+Data loss protection during git operations.
 
 ![Git Safety Flow](./diagrams/04-git-safety-flow.png)
 
@@ -194,7 +194,7 @@ flowchart TB
 
 ## 5. Health & Retry Flow
 
-Обработка API ошибок с автоматическим retry и fallback.
+Handling API errors with automatic retry and fallback.
 
 ![Health & Retry Flow](./diagrams/05-health-retry-flow.png)
 
@@ -244,7 +244,7 @@ flowchart TB
 
 ## 6. Toolkit vs System Decision
 
-Откуда берётся skill — toolkit или системная директория.
+Where a skill comes from -- the toolkit or the system directory.
 
 ![Toolkit vs System](./diagrams/06-toolkit-vs-system.png)
 
@@ -255,7 +255,7 @@ flowchart TB
     end
 
     subgraph ToolkitCheck["TOOLKIT CHECK"]
-        B --> C{Exists in<br>/Zai-agent-toolkit/skills/?}
+        B --> C{Exists in<br>/Zai-agent-toolkit_v/skills/?}
         C -->|Yes| D[Use Custom Version]
         C -->|No| E{Has _sts suffix?}
     end
@@ -284,13 +284,13 @@ flowchart TB
 
 ## 7. Full Sync Architecture (Windows + GitHub + Sandbox)
 
-Полная архитектура синхронизации между Windows, GitHub и Z.ai Sandbox.
+Complete synchronization architecture between Windows, GitHub, and Z.ai Sandbox.
 
 ![Full Sync Architecture](./diagrams/07-full-sync-architecture.png)
 
 ```mermaid
 flowchart TB
-    subgraph Windows["WINDOWS (C:\\Users\\stsgr\\.zcode\\)"]
+    subgraph Windows["WINDOWS ($env:USERPROFILE\.zcode\)"]
         A[ZCode Client]
         B[skills/]
         C[instructions/]
@@ -300,7 +300,7 @@ flowchart TB
         C -.->|symlink| F
         D -.->|symlink| G
 
-        subgraph LocalToolkit["Zai-agent-toolkit/"]
+        subgraph LocalToolkit["Zai-agent-toolkit_v/"]
             E[skills/]
             F[instructions/]
             G[standards/]
@@ -308,12 +308,12 @@ flowchart TB
     end
 
     subgraph GitHub["GITHUB"]
-        H[github.com/stsgs1980/<br>Zai-agent-toolkit]
+        H[github.com/stsgs1980/<br>Zai-agent-toolkit_v]
     end
 
     subgraph Sandbox["Z.ai SANDBOX (/home/z/my-project/)"]
         I[System Skills/]
-        J[Zai-agent-toolkit/<br>submodule]
+        J[Zai-agent-toolkit_v/<br>submodule]
     end
 
     %% Sync flows
@@ -335,14 +335,14 @@ flowchart TB
 ### Windows Directory Structure
 
 ```text
-C:\Users\stsgr\.zcode\
+$env:USERPROFILE\.zcode\
 +-- agent/
 +-- cli/
 +-- v2/
-+-- skills/ -----------------> Zai-agent-toolkit\skills\ (symlink)
-+-- instructions/ -----------> Zai-agent-toolkit\instructions\ (symlink)
-+-- standards/ --------------> Zai-agent-toolkit\standards\ (symlink)
-+-- Zai-agent-toolkit/
++-- skills/ -----------------> Zai-agent-toolkit_v\skills\ (symlink)
++-- instructions/ -----------> Zai-agent-toolkit_v\instructions\ (symlink)
++-- standards/ --------------> Zai-agent-toolkit_v\standards\ (symlink)
++-- Zai-agent-toolkit_v/
     +-- skills/
     +-- instructions/
     +-- standards/
@@ -353,10 +353,10 @@ C:\Users\stsgr\.zcode\
 
 | Direction | Command | Location |
 |-----------|---------|----------|
-| Sandbox -> GitHub | `git push` | `/home/z/my-project/Zai-agent-toolkit/` |
-| GitHub -> Windows | `git pull` or `sync-toolkit` | `C:\Users\stsgr\.zcode\Zai-agent-toolkit\` |
-| Windows -> GitHub | `git push` | `C:\Users\stsgr\.zcode\Zai-agent-toolkit\` |
-| GitHub -> Sandbox | `git pull` | `/home/z/my-project/Zai-agent-toolkit/` |
+| Sandbox -> GitHub | `git push` | `/home/z/my-project/Zai-agent-toolkit_v/` |
+| GitHub -> Windows | `git pull` or `sync-toolkit` | `$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\` |
+| Windows -> GitHub | `git push` | `$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\` |
+| GitHub -> Sandbox | `git pull` | `/home/z/my-project/Zai-agent-toolkit_v/` |
 
 ### sync-toolkit_sts (ZAI-STS-002)
 
@@ -375,7 +375,7 @@ Personal skill for orchestrating sync between all three locations.
 |   +-- LLM/
 |   +-- ... (50+ skills)
 |
-+-- Zai-agent-toolkit/
++-- Zai-agent-toolkit_v/
     +-- skills/                # Custom Skills (persistent)
         +-- commit-work/        # ZAI-DEV-004
         +-- session-log/        # ZAI-SESSION-002
@@ -401,4 +401,5 @@ Personal skill for orchestrating sync between all three locations.
 | STS | ZAI-STS-001+ | Personal skills (_sts suffix) |
 
 ---
+
 Built with: Python + PowerShell + Markdown

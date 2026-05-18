@@ -33,7 +33,7 @@ cd $env:USERPROFILE\.zcode
 ### Step 4: Clone the toolkit
 
 ```powershell
-git clone https://github.com/stsgs1980/Zai-agent-toolkit.git
+git clone https://github.com/stsgs1980/Zai-agent-toolkit_v.git
 ```
 
 Wait for download to complete.
@@ -41,15 +41,15 @@ Wait for download to complete.
 ### Step 5: Create symlinks
 
 ```powershell
-New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.zcode\skills" -Target "$env:USERPROFILE\.zcode\Zai-agent-toolkit\skills"
+New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.zcode\skills" -Target "$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\skills"
 ```
 
 ```powershell
-New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.zcode\instructions" -Target "$env:USERPROFILE\.zcode\Zai-agent-toolkit\instructions"
+New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.zcode\instructions" -Target "$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\instructions"
 ```
 
 ```powershell
-New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.zcode\standards" -Target "$env:USERPROFILE\.zcode\Zai-agent-toolkit\standards"
+New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.zcode\standards" -Target "$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\standards"
 ```
 
 ### Step 6: Verify
@@ -59,9 +59,9 @@ dir $env:USERPROFILE\.zcode
 ```
 
 You should see:
-- `l---- skills -> ...Zai-agent-toolkit\skills`
-- `l---- instructions -> ...Zai-agent-toolkit\instructions`
-- `l---- standards -> ...Zai-agent-toolkit\standards`
+- `l---- skills -> ...Zai-agent-toolkit_v\skills`
+- `l---- instructions -> ...Zai-agent-toolkit_v\instructions`
+- `l---- standards -> ...Zai-agent-toolkit_v\standards`
 
 ### Step 7: Restart ZCode Desktop
 
@@ -77,13 +77,13 @@ Close and reopen ZCode Desktop application.
 2. Run:
 
 ```powershell
-& "$env:USERPROFILE\.zcode\Zai-agent-toolkit\scripts\update-toolkit.ps1"
+& "$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\scripts\update-toolkit.ps1"
 ```
 
 ### Option B: Manual Way
 
 ```powershell
-cd $env:USERPROFILE\.zcode\Zai-agent-toolkit
+cd $env:USERPROFILE\.zcode\Zai-agent-toolkit_v
 git pull origin main
 ```
 
@@ -95,12 +95,12 @@ git pull origin main
 # 1. Clone toolkit
 mkdir -p ~/.zcode
 cd ~/.zcode
-git clone https://github.com/stsgs1980/Zai-agent-toolkit.git
+git clone https://github.com/stsgs1980/Zai-agent-toolkit_v.git
 
 # 2. Create symlinks
-ln -s ~/.zcode/Zai-agent-toolkit/skills ~/.zcode/skills
-ln -s ~/.zcode/Zai-agent-toolkit/instructions ~/.zcode/instructions
-ln -s ~/.zcode/Zai-agent-toolkit/standards ~/.zcode/standards
+ln -s ~/.zcode/Zai-agent-toolkit_v/skills ~/.zcode/skills
+ln -s ~/.zcode/Zai-agent-toolkit_v/instructions ~/.zcode/instructions
+ln -s ~/.zcode/Zai-agent-toolkit_v/standards ~/.zcode/standards
 
 # 3. Verify
 ls -la ~/.zcode/skills
@@ -109,7 +109,7 @@ ls -la ~/.zcode/skills
 ### Update (Mac / Linux)
 
 ```bash
-cd ~/.zcode/Zai-agent-toolkit && git pull origin main
+cd ~/.zcode/Zai-agent-toolkit_v && git pull origin main
 ```
 
 ---
@@ -213,7 +213,7 @@ echo "zai-agent-toolkit/" >> .gitignore
   agent/                 ← ZCode managed (safe)
   cli/                   ← ZCode managed (safe)
   v2/                    ← ZCode managed (safe)
-  Zai-agent-toolkit/     ← Git repository (git pull here)
+  Zai-agent-toolkit_v/     ← Git repository (git pull here)
     skills/
     instructions/
     standards/
@@ -222,9 +222,9 @@ echo "zai-agent-toolkit/" >> .gitignore
       update-toolkit.bat ← Windows update script (alternative)
     VERSION
 
-  skills -> ./Zai-agent-toolkit/skills        ← Symlink (safe)
-  instructions -> ./Zai-agent-toolkit/instructions  ← Symlink (safe)
-  standards -> ./Zai-agent-toolkit/standards  ← Symlink (safe)
+  skills -> ./Zai-agent-toolkit_v/skills        ← Symlink (safe)
+  instructions -> ./Zai-agent-toolkit_v/instructions  ← Symlink (safe)
+  standards -> ./Zai-agent-toolkit_v/standards  ← Symlink (safe)
 ```
 
 ---
@@ -269,7 +269,7 @@ git add .gitignore && git commit -m "fix: remove toolkit submodule"
 
 | Environment | Toolkit Location | Included in Git? |
 |-------------|-----------------|------------------|
-| Local dev | `~/.zcode/Zai-agent-toolkit/` | NO |
+| Local dev | `~/.zcode/Zai-agent-toolkit_v/` | NO |
 | GitHub repo | Not included | NO (in .gitignore) |
 | Vercel deploy | Not included | NO |
 | ZCode Desktop | Reads from `~/.zcode/skills` | N/A |

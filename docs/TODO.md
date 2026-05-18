@@ -1,55 +1,62 @@
 # TODO: Zai-agent-toolkit
 
-> Последнее обновление: 2026-05-17
+> Last updated: 2026-05-18
 
 ---
 
-## 1. Конвертация toolkit в git submodule (PLANNED)
+## 1. Toolkit Git Submodule Conversion (PLANNED)
 
-### Проблема
-- 50+ проектов используют Zai-agent-toolkit как копию
-- Обновление toolkit требует ручного действия в каждом проекте
-- Нет автоматической синхронизации
+### Problem
 
-### Решение
-Переделать подключение toolkit на git submodule.
+- 50+ projects use Zai-agent-toolkit as a copy
+- Updating the toolkit requires manual action in each project
+- No automatic synchronization
 
-### ОПАСНОСТИ
-1. **Два репозитория**: `Zai-agent-toolkit` (старый, черновик) и `Zai-agent-toolkit_v` (каноничный).
-   Submodule должен указывать на `_v`, иначе аудит потерян.
-2. **Старый репозиторий удалится** — значит все существующие submodule ссылки
-   (если уже есть) умрут. Надо предусмотреть миграцию URL.
-3. **50+ проектов** — цифра непроверенная. Реально ли 50?
-4. **Конфликт с sync-контуром**: если проект переходит на submodule, то
-   `sync-toolkit.ps1` в корне проекта уже неактуален (теперь обновление через `git submodule update`).
-5. **Windows vs Linux**: submodule на Windows требует `git submodule update --init --recursive`
-   при каждом клоне. В CI на Linux — то же самое. Надо убедиться что все dev-окружения поняли.
-6. **Замкнутый круг**: если сам toolkit управляется через submodule,
-   то для его обновления нужен цикл: push в toolkit → submodule update в проекте.
-   `sync-toolkit` придётся переписать.
+### Solution
 
-### Замечания по шагам
+Convert toolkit connections to git submodules pointing to `Zai-agent-toolkit_v` (canonical repository).
 
-| # | Задача | Статус | Замечание |
-|---|--------|--------|-----------|
-| 1 | Проверить gh auth status (GitHub CLI) | Pending | OK |
-| 2 | Получить список всех репозиториев через GitHub API | Pending | `find-toolkit-repos.ps1` уже существует, фикс P2.4.3 |
-| 3 | Найти репозитории с Zai-agent-toolkit | Pending | Искать оба имени: старый и `_v` |
-| 4 | Создать скрипт конвертации copy -> submodule | Pending | Скрипт должен менять URL на `_v`, чистить старую копию |
-| 5 | Тестировать на 1-2 репозиториях | Pending | Взять не-критичные проекты |
-| 6 | Запустить массовую конвертацию | Pending | Только после теста |
-| 7 | Создать команду `update-all-toolkits` | Pending | Учесть что после submodule это `git submodule update --remote` |
+### Risks
 
-### Результат
-После конвертации:
+1. **Two repositories**: `Zai-agent-toolkit` (old, draft) and `Zai-agent-toolkit_v` (canonical).
+   The submodule must point to `_v`, otherwise the audit is lost.
+2. **Old repository will be deleted** -- this means all existing submodule references
+   (if any) will break. A migration plan for URLs is needed.
+3. **50+ projects** -- this number is unverified. Is it really 50?
+4. **Conflict with sync pipeline**: if a project switches to submodules,
+   then `sync-toolkit.ps1` in the project root is no longer relevant
+   (now update via `git submodule update`).
+5. **Windows vs Linux**: submodules on Windows require `git submodule update --init --recursive`
+   on every clone. Same in CI on Linux. All dev environments must be informed.
+6. **Circular dependency**: if the toolkit itself is managed via submodule,
+   then updating it requires a cycle: push to toolkit -> submodule update in project.
+   `sync-toolkit` will need to be rewritten.
+
+### Steps
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| 1 | Check `gh auth status` (GitHub CLI) | Pending | OK |
+| 2 | Get list of all repositories via GitHub API | Pending | `find-toolkit-repos.ps1` exists, fix in P2.4.3 |
+| 3 | Find repositories with Zai-agent-toolkit | Pending | Search both names: old and `_v` |
+| 4 | Create copy -> submodule conversion script | Pending | Script must change URL to `_v`, clean old copy |
+| 5 | Test on 1-2 repositories | Pending | Pick non-critical projects |
+| 6 | Run mass conversion | Pending | Only after testing |
+| 7 | Create `update-all-toolkits` command | Pending | After submodules this is `git submodule update --remote` |
+
+### Result
+
+After conversion:
+
 ```powershell
-# Одна команда обновляет toolkit во всех проектах:
+# One command updates the toolkit in all projects:
 update-all-toolkits
 ```
 
-### Требования
+### Requirements
+
 - GitHub Personal Access Token (gh CLI)
-- Доступ к репозиториям на запись
+- Write access to repositories
 
 ---
 
@@ -57,12 +64,12 @@ update-all-toolkits
 
 ### Done
 
-| # | Задача | Статус |
-|---|--------|--------|
-| 1 | Создать skill-id-system (ZAI-META-001) | Done |
-| 2 | Создать skill-creator (ZAI-META-002) | Done |
-| 3 | Назначить ID всем skills | Done |
-| 4 | Добавить тег compatibility | Done |
+| # | Task | Status |
+|---|------|--------|
+| 1 | Create skill-id-system (ZAI-META-001) | Done |
+| 2 | Create skill-creator (ZAI-META-002) | Done |
+| 3 | Assign IDs to all skills | Done |
+| 4 | Add compatibility tag | Done |
 
 ### Current Skills Registry
 
@@ -92,27 +99,28 @@ update-all-toolkits
 
 ---
 
-## 3. CI/CD Fixes (OUTDATED — аудит всё починил)
+## 3. CI/CD Fixes (OUTDATED -- audit fixed everything)
 
-### Было
-Validation script показывал 39 issues.
+### Was
 
-| Категория | Описание | Статус |
+Validation script showed 39 issues.
+
+| Category | Description | Status |
 |-----------|----------|--------|
 | STD-ID consistency | 6 issues | [x] Fixed (P1) |
 | Stack Signature | 29 issues | [x] Fixed (P8, P5.2) |
 | Skill References | 2 issues | [x] Fixed (P2.5.6) |
 
-Сейчас `validate_compatibility.py` проходит ALL CHECKS PASSED.
-Секция оставлена для истории, можно удалить при следующем рефакторинге.
+Currently `validate_compatibility.py` passes ALL CHECKS PASSED.
+Section kept for history, can be deleted on next refactoring.
 
 ---
 
 ## 4. Memory System (IN PROGRESS)
 
-### Создано
+### Created
 
-| Компонент | ID | Статус |
+| Component | ID | Status |
 |-----------|-----|--------|
 | memory-store | ZAI-MEM-001 | Done |
 | memory-query | ZAI-MEM-002 | Done |
@@ -124,99 +132,99 @@ Validation script показывал 39 issues.
 
 ### Pending
 
-| # | Задача | Статус |
-|---|--------|--------|
-| 1 | Индексировать реальные папки с документами | Pending |
-| 2 | Наполнить memory знаниями через ADE | Pending |
-| 3 | Web-интерфейс для просмотра памяти | Pending |
-| 4 | Интеграция с проектами в ZCodeProject | Pending |
-| 5 | Добавить графовый слой (NetworkX + edges.json) | Pending |
+| # | Task | Status |
+|---|------|--------|
+| 1 | Index real document folders | Pending |
+| 2 | Populate memory with knowledge via ADE | Pending |
+| 3 | Web interface for browsing memory | Pending |
+| 4 | Integration with ZCodeProject projects | Pending |
+| 5 | Add graph layer (NetworkX + edges.json) | Pending |
 
 ### Memory Graph Layer (PROPOSED)
 
-ChromaDB — векторная, не графовая. Для связей между записями предлагается надстройка.
+ChromaDB is vector-based, not graph-based. For connections between records, an overlay is proposed.
 
-#### Архитектура
+#### Architecture
 
-```
-ChromaDB                         edges.json (или memory/graph.json)
+```text
+ChromaDB                         edges.json (or memory/graph.json)
   {id, vector, metadata}           [{from, to, type, weight}, ...]
        |                                    |
        +--- memory_cli.py ---+--- NetworkX --+
                                   |
-                            обход графа:
+                            graph traversal:
                             shortest_path()
                             ancestors()
                             subgraph()
 ```
 
-#### Что даёт
+#### Capabilities
 
-| Сейчас (только векторы) | С графами |
+| Current (vectors only) | With graphs |
 |---|---|
-| "Найди похожее на X" | "Найди всё, что связано с X" |
-| Плоский semantic search | Цепочки: сессия → задача → фикс → коммит |
-| Нет связей между записями | Edge: `depends_on`, `follow_up`, `fixed_by`, `implements` |
+| "Find similar to X" | "Find everything connected to X" |
+| Flat semantic search | Chains: session -> task -> fix -> commit |
+| No connections between records | Edge: `depends_on`, `follow_up`, `fixed_by`, `implements` |
 
-#### Новые команды `memory_cli.py`
+#### New `memory_cli.py` Commands
 
-| Команда | Назначение |
+| Command | Purpose |
 |---------|-----------|
-| `memory graph add-edge --from X --to Y --type depends_on` | Добавить ребро |
-| `memory graph query-path --from X --to Y` | Кратчайший путь между нодами |
-| `memory graph subgraph --tag memory` | Подграф по тегу |
-| `memory graph viz [--output graph.png]` | Визуализация (matplotlib или .dot) |
-| `memory graph stats` | Статистика: ноды, рёбра, связность |
+| `memory graph add-edge --from X --to Y --type depends_on` | Add edge |
+| `memory graph query-path --from X --to Y` | Shortest path between nodes |
+| `memory graph subgraph --tag memory` | Subgraph by tag |
+| `memory graph viz [--output graph.png]` | Visualization (matplotlib or .dot) |
+| `memory graph stats` | Statistics: nodes, edges, connectivity |
 
-#### Технические риски
+#### Technical Risks
 
-| Риск | Опасность | Решение |
+| Risk | Danger | Solution |
 |------|-----------|---------|
-| edges.json рассинхронится с ChromaDB | Ребро указывает на несуществующий node_id | `graph validate` — проверка целостности |
-| edges.json разрастётся | 50К+ рёбер — тормоза при загрузке | Разбить по файлам (edges-sessions.json, edges-code.json) |
-| NetworkX в памяти при больших графах | Ограничение RAM | Lazy loading подграфов |
-| Ручное редактирование edges.json | Ошибки в JSON, битые ссылки | Валидация перед загрузкой |
+| edges.json gets out of sync with ChromaDB | Edge points to non-existent node_id | `graph validate` -- integrity check |
+| edges.json grows large | 50K+ edges -- slow loading | Split by files (edges-sessions.json, edges-code.json) |
+| NetworkX in memory for large graphs | RAM limitation | Lazy loading of subgraphs |
+| Manual editing of edges.json | JSON errors, broken references | Validate before loading |
 
-### Рекомендация: единое пространство на 10-20К файлов
+### Recommendation: unified space for 10-20K files
 
-#### Принцип
+#### Principle
 
-Не все файлы одинаково полезны. Классификация на входе:
+Not all files are equally useful. Input classification:
 
+```text
+all 20K files
+  +-- text (md, py, ts, json, yml, txt, cfg, log)  -> ChromaDB + graph
+  +-- documents (pdf, docx, xlsx, pptx)              -> meta + tags (optional OCR)
+  +-- media (png, jpg, svg, mp3, mp4)                -> meta + tags (optional caption)
+  +-- binaries (exe, dll, bin, pdb, ico)            -> meta only (path, size, date)
+  +-- junk (node_modules, .git, __pycache__, cache)  -> exclude by mask
 ```
-все 20K файлов
-  ├─ текст (md, py, ts, json, yml, txt, cfg, log)  → ChromaDB + граф
-  ├─ документы (pdf, docx, xlsx, pptx)              → мета + теги (опционально OCR)
-  ├─ медиа (png, jpg, svg, mp3, mp4)                → мета + теги (опционально caption)
-  ├─ бинарники (exe, dll, bin, pdb, ico)            → только мета (путь, размер, дата)
-  └─ мусор (node_modules, .git, __pycache__, cache)  → исключить маской
-```
 
-#### Три слоя хранения
+#### Three Storage Layers
 
-| Слой | Технология | Что хранит | Оценка размера на 20K |
+| Layer | Technology | What It Stores | Estimated Size for 20K |
 |------|-----------|-----------|----------------------|
-| **Мета-индекс** | folder_indexer.py (JSON кэш) | Все 20K: путь, размер, дата, тип, хеш, теги | 2-3 MB |
-| **Векторы** | ChromaDB | ~8K текстовых файлов (чанками по 500-1000 токенов) | 40-60 MB |
-| **Граф** | edges.json + NetworkX | 20K nodes + рёбра: parent_dir, imports, same_session | 3-5 MB |
+| **Meta-index** | folder_indexer.py (JSON cache) | All 20K: path, size, date, type, hash, tags | 2-3 MB |
+| **Vectors** | ChromaDB | ~8K text files (chunks of 500-1000 tokens) | 40-60 MB |
+| **Graph** | edges.json + NetworkX | 20K nodes + edges: parent_dir, imports, same_session | 3-5 MB |
 
-#### Что эмбеддим, что нет
+#### What Gets Embedded, What Does Not
 
-| Тип файлов | Расширения | Эмбеддинг | Мета-индекс | Граф |
+| File Type | Extensions | Embedding | Meta-index | Graph |
 |------------|-----------|-----------|-------------|------|
-| Исходники | .py, .ts, .js, .rs, .go, .java, .c, .h | Да, пофайлово | Да | Да |
-| Доки | .md, .txt, .rst, .pdf (текст) | Да, пофайлово (PDF с парсингом) | Да | Да |
-| Конфиги | .json, .yml, .yaml, .toml, .ini, .cfg, .env | Да, целиком | Да | Да |
-| Логи | .log, .out, .err | Нет (мусор) | Да (только путь) | Нет |
-| Картинки | .png, .jpg, .svg, .webp, .ico | Нет | Да (+ размеры) | Опционально |
-| Документы | .pdf, .docx, .xlsx | Опционально (OCR) | Да | Да |
-| Бинарники | .exe, .dll, .so, .bin, .pdb, .min.js | Нет | Да | Нет |
-| node_modules | — | Исключить | Исключить | Исключить |
-| .git | — | Исключить | Исключить | Исключить |
+| Source code | .py, .ts, .js, .rs, .go, .java, .c, .h | Yes, per file | Yes | Yes |
+| Docs | .md, .txt, .rst, .pdf (text) | Yes, per file (PDF with parsing) | Yes | Yes |
+| Configs | .json, .yml, .yaml, .toml, .ini, .cfg, .env | Yes, whole file | Yes | Yes |
+| Logs | .log, .out, .err | No (junk) | Yes (path only) | No |
+| Images | .png, .jpg, .svg, .webp, .ico | No | Yes (+ dimensions) | Optional |
+| Documents | .pdf, .docx, .xlsx | Optional (OCR) | Yes | Yes |
+| Binaries | .exe, .dll, .so, .bin, .pdb, .min.js | No | Yes | No |
+| node_modules | -- | Exclude | Exclude | Exclude |
+| .git | -- | Exclude | Exclude | Exclude |
 
-#### Как фильтровать на входе
+#### Input Filtering Rules
 
-Правила для `folder_indexer.py` (маски исключения):
+Rules for `folder_indexer.py` (exclusion masks):
 
 ```python
 EXCLUDE_DIRS = ['node_modules', '.git', '__pycache__', '.venv', 'dist', 'build', 'cache']
@@ -229,204 +237,180 @@ META_ONLY_EXTS = ['.png', '.jpg', '.jpeg', '.svg', '.webp', '.gif', '.ico',
                   '.zip', '.tar', '.gz', '.7z']
 ```
 
-#### Команды `memory_cli.py` для работы с 20K файлов
+#### `memory_cli.py` Commands for 20K Files
 
 ```bash
-# Первичный проход — просканировать 20K, разложить по слоям
+# Initial scan -- index 20K, distribute across layers
 memory scan C:\Users\stsgr\projects --full-scan
 
-# Инкрементальное обновление (только изменённые с даты X)
+# Incremental update (only changed since date X)
 memory scan C:\Users\stsgr\projects --incremental --since 2026-05-01
 
-# Поиск по всем слоям сразу
-memory search "кэширование токенов"                    # ChromaDB semantic
-memory search --ext .env                                # мета-индекс
-memory search --tag project:myapp --type config         # мета + теги
+# Search across all layers
+memory search "token caching"                    # ChromaDB semantic
+memory search --ext .env                                # meta-index
+memory search --tag project:myapp --type config         # meta + tags
 
-# Навигация по графу
-memory graph path "src/main.rs" "src/lib/auth.rs"       # путь импортов
-memory graph files-in "src/features/"                   # все файлы папки
-memory graph related "docker-compose.yml"               # связанные по тегу
+# Graph navigation
+memory graph path "src/main.rs" "src/lib/auth.rs"       # import path
+memory graph files-in "src/features/"                   # all files in folder
+memory graph related "docker-compose.yml"               # connected by tag
 
-# Статистика
-memory graph stats                                      # ноды, рёбра, топ-типы
-memory scan stats                                       # сколько всего, по типам
+# Statistics
+memory graph stats                                      # nodes, edges, top types
+memory scan stats                                       # total count, by type
 ```
 
-#### Производительность
+#### Performance
 
-| Операция | Ожидание | Комментарий |
+| Operation | Expected | Comment |
 |----------|----------|-------------|
-| Первичный scan 20K файлов | 2-10 мин | Зависит от диска (SSD быстрее) |
-| Эмбеддинг ~8K текстовых | 5-15 мин | Однократно, можно фоном |
-| Инкрементальный scan | 1-5 сек | Только diff по дате/хешу |
-| Semantic search | 200-500ms | ChromaDB, 8K документов |
-| Графовый запрос (путь, соседи) | <50ms | NetworkX в памяти |
-| Граф визуализация (500+ nodes) | 1-3 сек | matplotlib |
+| Initial scan 20K files | 2-10 min | Depends on disk (SSD faster) |
+| Embedding ~8K text files | 5-15 min | One-time, can run in background |
+| Incremental scan | 1-5 sec | Only diff by date/hash |
+| Semantic search | 200-500ms | ChromaDB, 8K documents |
+| Graph query (path, neighbors) | <50ms | NetworkX in memory |
+| Graph visualization (500+ nodes) | 1-3 sec | matplotlib |
 
-#### Риски 20K файлов
+#### 20K Files Risks
 
-| Риск | Вероятность | Решение |
+| Risk | Probability | Solution |
 |------|------------|---------|
-| Дубликаты файлов (копии проектов) | Высокая | Хешировать содержимое (SHA256), группировать дубли |
-| Огромные файлы (логи БД на 100MB) | Средняя | Пропускать файлы >10MB для эмбеддинга |
-| node_modules не везде отфильтрован | Средняя | Маски + ручная проверка топ-10 больших папок |
-| ChromaDB разрастётся (много чанков) | Низкая | 8K файлов × 3 чанка = 24K векторов — ChromaDB держит 1M+ |
-| Пути длиннее 255 символов (Windows) | Средняя | folder_indexer должен обрабатывать `\\?\` префикс |
+| Duplicate files (project copies) | High | Hash content (SHA256), group duplicates |
+| Huge files (100MB DB logs) | Medium | Skip files >10MB for embedding |
+| node_modules not fully filtered | Medium | Masks + manual check of top-10 large folders |
+| ChromaDB bloat (too many chunks) | Low | 8K files x 3 chunks = 24K vectors -- ChromaDB handles 1M+ |
+| Paths longer than 255 chars (Windows) | Medium | folder_indexer must handle `\\?\` prefix |
 
 ### Done
 
-| # | Задача | Статус |
-|---|--------|--------|
-| 6 | Переименовать projects/ в project-index/ | Done |
+| # | Task | Status |
+|---|------|--------|
+| 6 | Rename projects/ to project-index/ | Done |
 
-### Архитектура
+### Architecture
 
 ```text
 C:\Users\stsgr\.zcode\
 +-- memory\
-|   +-- chromadb\          <- Векторная база
-|   +-- project-index\     <- Каталог проектов
-|   +-- sessions\          <- Логи сессий
+|   +-- chromadb\          <- Vector database
+|   +-- project-index\     <- Project catalog
+|   +-- sessions\          <- Session logs
 |   +-- knowledge\         <- Knowledge base
-|   +-- graph.json         <- Edge-лист (рёбра между нодами)
+|   +-- graph.json         <- Edge list (edges between nodes)
 +-- tools\
 |   +-- memory_cli.py
 |   +-- folder_indexer.py
-+-- skills\                <- Symlink к toolkit
++-- skills\                <- Symlink to toolkit
 +-- hooks\
-+-- Zai-agent-toolkit\
++-- Zai-agent-toolkit_v\
 ```
 
 ---
 
----
+## 5. Sync Toolkit Pipeline -- Notes and Issues (TODO)
 
-## 5. Sync Toolkit контур — замечания и косяки (TODO)
+### 5.1 Hardcoded Paths in SKILL.md (FIXED)
 
-### 5.1 Хардкод в SKILL.md (пропущен в аудите P2)
+File: `skills/sync-toolkit_sts/SKILL.md`
 
-Файл: `skills/sync-toolkit_sts/SKILL.md`
-
-| Строка | Было (хардкод) | Должно стать |
+| Line | Was (hardcoded) | Now |
 |--------|----------------|--------------|
-| 77 | `cd C:\Users\stsgr\.zcode\Zai-agent-toolkit` | `cd $env:USERPROFILE\.zcode\Zai-agent-toolkit` |
-| 89 | `C:\Users\stsgr\.zcode\Zai-agent-toolkit\sync-toolkit.ps1` | `$env:USERPROFILE\.zcode\Zai-agent-toolkit\sync-toolkit.ps1` |
-| 94 | `cd C:\Users\stsgr\.zcode\Zai-agent-toolkit` | `cd $env:USERPROFILE\.zcode\Zai-agent-toolkit` |
+| 77 | `cd C:\Users\stsgr\.zcode\Zai-agent-toolkit` | `cd $env:USERPROFILE\.zcode\Zai-agent-toolkit_v` |
+| 89 | `C:\Users\stsgr\.zcode\Zai-agent-toolkit\sync-toolkit.ps1` | `$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\sync-toolkit.ps1` |
+| 94 | `cd C:\Users\stsgr\.zcode\Zai-agent-toolkit` | `cd $env:USERPROFILE\.zcode\Zai-agent-toolkit_v` |
 
-Также поменять везде URL `Zai-agent-toolkit` → `Zai-agent-toolkit_v` (после удаления старого репо).
+All URLs updated from `Zai-agent-toolkit` to `Zai-agent-toolkit_v` in active code and docs.
 
-### 5.2 Два механизма синка — конфликт
+### 5.2 Two Sync Mechanisms -- Resolved
 
-| Механизм | Где лежит | Результат |
+| Mechanism | Location | Result |
 |----------|-----------|-----------|
-| `sync-toolkit.ps1` | корень репозитория | Standalone скрипт |
-| `setup-sync-command.ps1` → функция `sync-toolkit` | `$PROFILE` | PS функция |
+| `sync-toolkit.ps1` | repository root | Thin wrapper -> `scripts/update-toolkit.ps1 -NoPause` |
+| `setup-sync-command.ps1` -> `sync-toolkit` function | `$PROFILE` | PS function |
 
-В PowerShell функция из `$PROFILE` имеет приоритет над `.ps1` файлом.
+PowerShell function from `$PROFILE` takes priority over `.ps1` file.
+Both now delegate to the same `update-toolkit.ps1` script.
 
-**Решение:** оставить один механизм. Либо standalone `.ps1` + добавить его в PATH,
-либо profile-функцию. Второй — чище (не надо править PATH).
+### 5.3 Three Scripts Deduplicated (FIXED)
 
-### 5.3 Три скрипта делают одно и то же
-
-| Файл | Что делает |
+| File | What It Does |
 |------|-----------|
-| `sync-toolkit.ps1` (корень) | `cd ~/.zcode/Zai-agent-toolkit && git pull` |
-| `scripts/update-toolkit.ps1` | То же + проверка up-to-date + `pause` |
-| `scripts/update-toolkit.bat` | То же + `pause` (для cmd) |
+| `sync-toolkit.ps1` (root) | Thin wrapper -> `scripts/update-toolkit.ps1 -NoPause` |
+| `scripts/update-toolkit.ps1` | Full-featured (version check, up-to-date, errors, `-NoPause` flag) |
+| `scripts/update-toolkit.bat` | cmd wrapper -> calls `update-toolkit.ps1 -NoPause` |
 
-**Решение:** 
-- `update-toolkit.ps1` — расширить до полноценного (проверки, up-to-date, ошибки).
-- `sync-toolkit.ps1` — сделать алиасом или тонкой обёрткой над update-toolkit.ps1.
-- `.bat` — оставить для совместимости, но внутри вызывать PS скрипт.
+### 5.4 Old Repository URL in All Scripts (FIXED)
 
-### 5.4 URL старого репозитория во всех скриптах
+All active references now point to `Zai-agent-toolkit_v`:
 
-После удаления `Zai-agent-toolkit` (старого), все ссылки должны указывать на `Zai-agent-toolkit_v`:
-
-| Файл | Строка |
+| File | Status |
 |------|--------|
-| `INSTALL.md` | `git clone https://github.com/stsgs1980/Zai-agent-toolkit.git` |
-| `README.md` | `git clone https://github.com/stsgs1980/Zai-agent-toolkit.git` |
-| `scripts/update-toolkit.ps1` | help text |
-| `scripts/update-toolkit.bat` | help text |
-| `setup.sh` | URL clone |
-| `skills/sync-toolkit_sts/SKILL.md` | инструкции |
+| `INSTALL.md` | Updated |
+| `README.md` | Updated |
+| `scripts/update-toolkit.ps1` | Updated |
+| `scripts/update-toolkit.bat` | Updated |
+| `setup.sh` | Updated |
+| `skills/sync-toolkit_sts/SKILL.md` | Updated |
+| `hooks/auto-save-session.ps1` | Updated |
+| `hooks/session-functions.ps1` | Updated |
+| `skills/skill-creator/SKILL.md` | Updated |
+| `docs/SKILL_ID_GUIDE.md` | Updated |
+| `docs/COMMANDS_LOG.md` | Updated |
 
 ---
 
-## 6. Пропущенное в аудите (Missed Items)
+## 6. Missed Audit Items (Resolved)
 
-### 6.1 extract_severity_levels() — не удалена, не подключена
+### 6.1 extract_severity_levels() -- Removed
 
-`AUDIT_TODO.md` п.2.5.5: *"validate_compatibility.py:213 - call check_severity_levels() or remove dead code"* — помечен [x] Done,
-но функция `extract_severity_levels()` всё ещё определена (строка 65) и нигде не вызывается.
+Function was dead code: defined but never called. Removed from `validate_compatibility.py`.
 
-**Варианты:**
-1. Удалить функцию (если severity check не нужен)
-2. Реализовать `check_severity_levels()` на её основе и подключить в `main()`
+### 6.2 Mixed Languages in Docs -- Fixed
 
-### 6.2 Документация — смесь русского и английского
+`docs/TODO.md` and `docs/SKILL_PROCESSES.md` were a mix of English headings and Russian body text.
+Translated to English (v2.0.5).
 
-`docs/TODO.md` и `docs/SKILL_PROCESSES.md` — English заголовки, русский body.
-Нарушение `instructions/language-rule.md`.
+### 6.3 anti-monolith -- Phantom Skill (Resolved)
 
-Можно либо перевести всё на один язык, либо явно промаркировать mixed-статус.
+`skills/anti-monolith/` does not exist in the toolkit, but was referenced in 11 files.
 
-### 6.3 anti-monolith — фантомный скилл
+#### Current Status
 
-`skills/anti-monolith/` — не существует, но упоминается в 11 файлах toolkit'а.
-
-#### Где упоминается
-
-| Файл | Статус | Что делать |
-|------|--------|-----------|
-| `AGENT_RULES.md` 8.2 (System Skills) | Ок — это sandbox built-in | Не трогать |
-| `standards/skill-id-registry.md` | `ZAI-DEV-002 \| Planned` | Оставить как Planned, но пометить "system only" |
-| `skills/skill-id-system/SKILL.md` | `ZAI-DEV-002 \| anti-monolith \| 1.0 \| Active` | Поменять статус на Planned |
-| `skills/zai-ui-composer_sts/SKILL.md` | Complementary reference | Поменять на "system skill (Z.ai sandbox)" |
-| `standards/FRONTEND_STANDARD.md` | Changelog: merged anti-monolith patterns | Ок — это история |
-| `standards/IMPLEMENTATION_ORDER.md` | "Use anti-monolith skill" | Заменить на ссылку на FRONTEND_STANDARD |
-| `docs/SKILL_ID_GUIDE.md` | Как существующий | Поменять на "system skill (Z.ai sandbox)" |
-| `docs/TUTORIAL.md` | Дважды как существующий | Поменять на "system skill (Z.ai sandbox)" |
-| `docs/COMMANDS_LOG.md` | ZAI-DEV-002 как existing | Поменять статус |
-| `CHANGELOG.md` | v1.5.0 добавлен | Ок — это история |
-
-#### Анализ
-
-| Аспект | Оценка |
-|--------|--------|
-| Концепция (декомпозиция монолитов) | Полезна |
-| Нужен ли отдельный SKILL.md в toolkit | Нет — всё покрыто FRONTEND_STANDARD.md (150-line limit, FSD-слои, разделение ответственности) |
-| Оставить ID ZAI-DEV-002 | Да, зарезервировать как Planned |
-| Сколько файлов править | 6 (skill-id-registry, skill-id-system, zai-ui-composer, IMPLEMENTATION_ORDER, SKILL_ID_GUIDE, TUTORIAL, COMMANDS_LOG) |
+| File | Status |
+|------|--------|
+| `AGENT_RULES.md` Section 8.2 (System Skills) | OK -- this is a sandbox built-in |
+| `standards/skill-id-registry.md` | Marked as "Planned (system skill)" |
+| `skills/skill-id-system/SKILL.md` | Marked as "Planned (system skill)" |
+| `skills/zai-ui-composer_sts/SKILL.md` | Marked as "System skill (Z.ai sandbox)" |
+| `standards/FRONTEND_STANDARD.md` | Changelog: merged anti-monolith patterns (historical) |
+| `standards/IMPLEMENTATION_ORDER.md` | Marked as "(system skill)" |
+| `docs/SKILL_ID_GUIDE.md` | Marked as "System skill (Z.ai sandbox) -- not in toolkit" |
+| `docs/TUTORIAL.md` | Marked as "System skill (Z.ai sandbox)" |
+| `docs/COMMANDS_LOG.md` | Marked as "System skill (Z.ai sandbox) -- not in toolkit" |
+| `CHANGELOG.md` | Historical (v1.5.0 added) |
 
 ---
 
-## 7. Итого по приоритетам
+## 7. Priority Summary
 
-| Приоритет | Задача | Зависит от |
-|-----------|--------|------------|
-| P0 | Починить хардкод в SKILL.md sync-toolkit | — |
-| P1 | Разобрать дубликаты sync-скриптов | P0 |
-| P1 | Обновить URL с `Zai-agent-toolkit` на `_v` | удаление старого репо |
-| P2 | Решить судьбу `extract_severity_levels()` | — |
-| P2 | Переписать план submodule под `_v` | P1 (URL) |
-| P2 | Почистить 7 файлов с упоминаниями anti-monolith (плановый статус или system-only) | — |
-| P3 | Реализовать графовый слой в memory_cli.py | — |
-| P3 | Индексация реальных папок + наполнение memory | графовый слой опционально |
-| P3 | Web-интерфейс для памяти | графовый слой |
-| P3 | Создать `docs/AGENT_ARCHITECTURE.md` | [x] Done |
-| P3 | Создать `agents/` директорию + AGENT.md для 5 агентов | AGENT_ARCHITECTURE.md |
-| P3 | Обновить `opencode.json` — добавить `agents.paths` | agents/ |
-| P3 | Доработать `templates/TASK_TEMPLATE.md` — chain-шаблоны | — |
-| P3 | Доработать `AGENT_RULES.md` — Section про sub-agents | — |
-| P4 | Смесь языков в docs/TODO.md, SKILL_PROCESSES.md | — |
-
----
-
-*Dokument obnovlen: 2026-05-18*
+| Priority | Task | Depends On | Status |
+|-----------|--------|------------|--------|
+| P0 | Fix hardcoded paths in sync-toolkit SKILL.md | -- | Done |
+| P1 | Deduplicate sync scripts | P0 | Done |
+| P1 | Update URLs from `Zai-agent-toolkit` to `_v` | -- | Done |
+| P2 | Resolve `extract_severity_levels()` | -- | Done |
+| P2 | Rewrite submodule plan for `_v` | P1 (URL) | Done |
+| P2 | Clean 7 files with anti-monolith references | -- | Done |
+| P3 | Implement graph layer in memory_cli.py | -- | Pending |
+| P3 | Index real folders + populate memory | graph layer optional | Pending |
+| P3 | Web interface for memory | graph layer | Pending |
+| P3 | Create `docs/AGENT_ARCHITECTURE.md` | -- | Done |
+| P3 | Create `agents/` directory + AGENT.md for 5 agents | AGENT_ARCHITECTURE.md | Pending |
+| P3 | Update `opencode.json` -- add `agents.paths` | agents/ | Pending |
+| P3 | Enhance `templates/TASK_TEMPLATE.md` -- chain templates | -- | Pending |
+| P3 | Enhance `AGENT_RULES.md` -- Section on sub-agents | -- | Pending |
+| P4 | Mixed languages in docs | -- | Done |
 
 ---
 

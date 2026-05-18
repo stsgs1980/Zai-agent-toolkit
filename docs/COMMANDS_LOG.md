@@ -1,153 +1,152 @@
-# Журнал команд Zai-agent-toolkit
+# Zai-agent-toolkit Command Reference
 
-> Последнее обновление: 2026-05-17
-> Назначение: Быстрый справочник команд для работы с toolkit
+> Last updated: 2026-05-18
+> Purpose: Quick reference for toolkit commands
 
 ---
 
-## 1. Синхронизация
+## 1. Synchronization
 
 ### Windows (ZCode Desktop)
 
 ```powershell
-# Способ 1: Быстрая команда (после настройки алиаса)
+# Method 1: Quick command (after alias setup)
 sync-toolkit
 
-# Способ 2: Прямой запуск скрипта
+# Method 2: Run script directly
 .\sync-toolkit.ps1
 
-# Способ 3: Ручной git pull
-cd C:\Users\stsgr\.zcode\Zai-agent-toolkit
+# Method 3: Manual git pull
+cd $env:USERPROFILE\.zcode\Zai-agent-toolkit_v
 git pull
 ```
 
 ### Linux (Z.ai sandbox)
 
 ```bash
-# Push изменений в GitHub
+# Push changes to GitHub
 git add .
-git commit -m "описание изменений"
+git commit -m "description of changes"
 git push origin main
 ```
 
 ---
 
-## 2. Skills - основные команды
+## 2. Skills -- Core Commands
 
-### Создание skill с ID
+### Creating a skill with ID
 
-```bash
-# Шаблон структуры
+```text
 skills/
-+-- my-skill_sts/           # _sts - подпись пользователя
++-- my-skill_sts/           # _sts - user signature
     +-- SKILL.md            # ID: ZAI-STS-XXX
 ```
 
-### Назначение ID skill
+### Skill ID Assignment
 
-Формат: `ZAI-<DOMAIN>-<NUMBER>`
+Format: `ZAI-<DOMAIN>-<NUMBER>`
 
-| Domain | Код | Пример |
-|--------|-----|--------|
-| Персональные (STS) | STS | ZAI-STS-001 |
-| Архитектура | ARCH | ZAI-ARCH-001 |
+| Domain | Code | Example |
+|--------|------|---------|
+| Personal (STS) | STS | ZAI-STS-001 |
+| Architecture | ARCH | ZAI-ARCH-001 |
 | Git | GIT | ZAI-GIT-001 |
-| Разработка | DEV | ZAI-DEV-001 |
-| Мета-системы | META | ZAI-META-001 |
+| Development | DEV | ZAI-DEV-001 |
+| Meta-systems | META | ZAI-META-001 |
 
-### Реестр skills
+### Skills Registry
 
-Файл: `skills/skill-id-system/SKILL.md` -> секция Registry
+File: `skills/skill-id-system/SKILL.md` -> Registry section
 
 ---
 
-## 3. Пути и расположение
+## 3. Paths and Locations
 
 ### Windows
 
 ```text
-C:\Users\stsgr\.zcode\Zai-agent-toolkit\     # Репозиторий toolkit
-C:\Users\stsgr\.zcode\skills\                 # Symbolic link -> toolkit/skills
+$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\     # Toolkit repository
+$env:USERPROFILE\.zcode\skills\                   # Symbolic link -> toolkit/skills
 ```
 
 ### Linux (Z.ai)
 
 ```text
-/home/z/my-project/Zai-agent-toolkit/         # Toolkit (клон репозитория)
-/home/z/my-project/skills/                    # Skills в sandbox
+/home/z/my-project/Zai-agent-toolkit_v/           # Toolkit (repository clone)
+/home/z/my-project/skills/                        # Skills in sandbox
 ```
 
 ---
 
-## 4. Типичный workflow
+## 4. Typical Workflow
 
-### Создание нового skill
+### Creating a new skill
 
-1. Создать папку: `skills/new-skill_sts/`
-2. Создать файл: `SKILL.md` с содержимым
-3. Добавить ID в заголовок: `# Skill Name [ZAI-STS-XXX]`
-4. Обновить реестр в `skill-id-system/SKILL.md`
+1. Create folder: `skills/new-skill_sts/`
+2. Create file: `SKILL.md` with content
+3. Add ID to header: `# Skill Name [ZAI-STS-XXX]`
+4. Update registry in `skill-id-system/SKILL.md`
 5. Push: `git add . && git commit -m "add new-skill_sts" && git push`
 
-### Обновление skills на Windows
+### Updating skills on Windows
 
-1. В Linux: `git push` изменений
-2. В Windows: `sync-toolkit` или `git pull`
-3. Перезапустить ZCode Desktop (если нужно)
+1. On Linux: `git push` changes
+2. On Windows: `sync-toolkit` or `git pull`
+3. Restart ZCode Desktop (if needed)
 
 ---
 
-## 5. Шпаргалка Git
+## 5. Git Cheat Sheet
 
 ```bash
-# Проверить статус
+# Check status
 git status
 
-# Добавить все изменения
+# Stage all changes
 git add .
 
-# Закоммитить
-git commit -m "сообщение"
+# Commit
+git commit -m "message"
 
-# Отправить
+# Push
 git push origin main
 
-# Получить изменения
+# Pull changes
 git pull origin main
 
-# История коммитов
+# Recent commit history
 git log --oneline -10
 ```
 
 ---
 
-## 6. Настройка команд Windows (один раз)
+## 6. Windows Command Setup (one-time)
 
-### Автоматическая настройка
+### Automatic setup
 
 ```powershell
-# Запустить один раз в PowerShell:
-cd C:\Users\stsgr\.zcode\Zai-agent-toolkit
+# Run once in PowerShell:
+cd $env:USERPROFILE\.zcode\Zai-agent-toolkit_v
 .\scripts\setup-sync-command.ps1
 
-# Перезапустить PowerShell
+# Restart PowerShell
 ```
 
-После этого команды заработают везде:
+After that, commands work everywhere:
 
-| Команда | Действие |
-|---------|----------|
-| `sync-toolkit` | Обновить toolkit из GitHub |
-| `goto-toolkit` | Перейти в папку toolkit |
-| `list-skills` | Показать все skills |
+| Command | Action |
+|---------|--------|
+| `sync-toolkit` | Update toolkit from GitHub |
+| `goto-toolkit` | Navigate to toolkit folder |
+| `list-skills` | Show all skills |
 
-### Ручная настройка (если нужно)
+### Manual setup (if needed)
 
-Добавить в PowerShell profile (`notepad $PROFILE`):
+Add to PowerShell profile (`notepad $PROFILE`):
 
 ```powershell
 function sync-toolkit {
-    Set-Location C:\Users\stsgr\.zcode\Zai-agent-toolkit
+    Set-Location $env:USERPROFILE\.zcode\Zai-agent-toolkit_v
     git pull
     Write-Host "Toolkit updated!" -ForegroundColor Green
 }
@@ -155,45 +154,42 @@ function sync-toolkit {
 
 ---
 
-## 7. Документация toolkit
+## 7. Toolkit Documentation
 
-| Файл | Назначение |
-|------|------------|
-| `docs/TUTORIAL.md` | Полное обучение по toolkit |
-| `docs/SKILL_ID_GUIDE.md` | Справочник по ID системе |
-| `docs/COMMANDS_LOG.md` | Этот журнал команд |
-| `skills/skill-id-system/SKILL.md` | Реестр всех skills |
-| `skills/skill-creator/SKILL.md` | Инструкции по созданию skills |
-
----
-
-## 8. Быстрые команды "для памяти"
-
-| Что сделать | Команда |
-|------------|---------|
-| Обновить skills на Win | `sync-toolkit` |
-| Push изменений | `git add . && git commit -m "msg" && git push` |
-| Посмотреть skills | `ls skills/` (Linux) или `list-skills` (Win) |
-| Найти skill по ID | `grep -r "ZAI-STS" skills/` |
-| Открыть PowerShell profile | `notepad $PROFILE` |
+| File | Purpose |
+|------|---------|
+| `docs/TUTORIAL.md` | Full toolkit tutorial |
+| `docs/SKILL_ID_GUIDE.md` | ID system reference |
+| `docs/COMMANDS_LOG.md` | This command reference |
+| `skills/skill-id-system/SKILL.md` | Registry of all skills |
+| `skills/skill-creator/SKILL.md` | Instructions for creating skills |
 
 ---
 
-## 9. Реестр назначенных ID
+## 8. Quick Reference
 
-### Skills с ID (назначены)
-
-| ID | Skill | Описание |
-|----|-------|----------|
-| ZAI-META-001 | skill-id-system | Система ID для skills |
-| ZAI-META-002 | skill-creator | Создание и оптимизация skills |
-| ZAI-DEV-002 | anti-monolith | Модульная архитектура React/Next.js |
-| ZAI-STS-001 | prompt-engineering_sts | Prompt engineering техники |
-| ZAI-STS-002 | sync-toolkit_sts | Синхронизация toolkit |
+| Action | Command |
+|--------|---------|
+| Update skills on Windows | `sync-toolkit` |
+| Push changes | `git add . && git commit -m "msg" && git push` |
+| List skills | `ls skills/` (Linux) or `list-skills` (Win) |
+| Find skill by ID | `grep -r "ZAI-STS" skills/` |
+| Open PowerShell profile | `notepad $PROFILE` |
 
 ---
 
-*Журнал ведётся с 2026-05-17. Добавляйте новые команды по мере работы.*
+## 9. Assigned ID Registry
+
+### Skills with IDs (assigned)
+
+| ID | Skill | Description |
+|----|-------|-------------|
+| ZAI-META-001 | skill-id-system | ID system for skills |
+| ZAI-META-002 | skill-creator | Create and optimize skills |
+| ZAI-DEV-002 | anti-monolith | System skill (Z.ai sandbox) -- not in toolkit |
+| ZAI-STS-001 | prompt-engineering_sts | Prompt engineering techniques |
+| ZAI-STS-002 | sync-toolkit_sts | Toolkit synchronization |
 
 ---
+
 Built with: Python + PowerShell + Markdown

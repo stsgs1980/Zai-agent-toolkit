@@ -770,7 +770,7 @@ Mandatory before each stage:
 
 **Integration with other standards:**
 
-- **STD-FE-001** (Anti-Monolith): after file refactoring -> commit + push
+- **STD-FE-001** (Frontend Standard): after file refactoring -> commit + push
 - **Worklog**: after updating worklog.md -> commit + push
 - **New skill/documentation**: after creation -> commit + push
 

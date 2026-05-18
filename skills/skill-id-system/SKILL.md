@@ -91,7 +91,7 @@ ZCode Desktop has its own built-in skills. They do NOT have `ZAI-` prefix:
 | ZAI-META-001 | skill-id-system | 1.0 | Active |
 | ZAI-META-002 | skill-creator | 1.1 | Active |
 | ZAI-SEC-001 | sanitize-validate | 1.0 | Active |
-| ZAI-DEV-002 | anti-monolith | 1.0 | Active |
+| ZAI-DEV-002 | anti-monolith | 1.0 | Planned (system skill) |
 | ZAI-DEV-003 | project-clone | 1.0 | Active |
 | ZAI-STS-001 | prompt-engineering_sts | 1.1 | Active |
 | ZAI-STS-002 | sync-toolkit_sts | 1.0 | Active |

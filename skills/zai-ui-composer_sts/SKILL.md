@@ -52,7 +52,7 @@ description: >
     Trading, Magazine, Holy Grail, Golden Split, Golden Inv, Timeline, Zeitgeist, Spiral,
     Fibonacci 4, Equal Grid), ALWAYS delegate grid generation to phi-layout and only
     handle skin/effects/components yourself.
-  - anti-monolith: Complementary. anti-monolith decomposes code; zai-ui-composer composes UI.
+  - anti-monolith: System skill (Z.ai sandbox). Decomposes code; zai-ui-composer composes UI.
 id: ZAI-STS-006
 author: STS
 trigger: compose UI, UI composition, zai-ui, ui-kit, skin selection, dark-zai, light-corp, amber-retro, glass card, neon effect, UI scoring, production UI

@@ -271,7 +271,7 @@ For existing projects, this step becomes a remediation phase:
 | Existing code breaks after fixes | Create git tag before remediation: `git tag pre-standards-audit` |
 | Too many violations to fix at once | Prioritize by severity: [C] first, then [W], then [I] |
 | Team resistance to standard changes | Apply incrementally, explain reasoning, show CI benefits |
-| Large monolith files | Use anti-monolith skill for incremental refactoring |
+| Large monolith files | Use FRONTEND_STANDARD (STD-FE-001) 150-line limit and FSD decomposition rules |
 
 ---
 

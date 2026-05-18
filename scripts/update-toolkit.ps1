@@ -1,5 +1,13 @@
 # Z.ai Agent Toolkit - Update Script (PowerShell)
 # Run this to get latest skills/instructions/standards
+#
+# Usage:
+#   .\update-toolkit.ps1           # Interactive mode (with pause)
+#   .\update-toolkit.ps1 -NoPause  # Non-interactive (for automation/wrappers)
+
+param(
+    [switch]$NoPause
+)
 
 Write-Host ""
 Write-Host "================================================" -ForegroundColor Cyan
@@ -7,12 +15,12 @@ Write-Host "  Z.ai Agent Toolkit Updater" -ForegroundColor Cyan
 Write-Host "================================================" -ForegroundColor Cyan
 Write-Host ""
 
-$toolkitPath = "$env:USERPROFILE\.zcode\Zai-agent-toolkit"
+$toolkitPath = "$env:USERPROFILE\.zcode\Zai-agent-toolkit_v"
 
 if (-not (Test-Path $toolkitPath)) {
     Write-Host "[ERROR] Toolkit not found at $toolkitPath" -ForegroundColor Red
-    Write-Host "Please install first: git clone https://github.com/stsgs1980/Zai-agent-toolkit.git" -ForegroundColor Yellow
-    pause
+    Write-Host "Please install first: git clone https://github.com/stsgs1980/Zai-agent-toolkit_v.git" -ForegroundColor Yellow
+    if (-not $NoPause) { pause }
     exit 1
 }
 
@@ -34,7 +42,7 @@ $remote = git rev-parse origin/main 2>$null
 if ($local -eq $remote) {
     Write-Host "[OK] Already up to date!" -ForegroundColor Green
     Write-Host ""
-    pause
+    if (-not $NoPause) { pause }
     exit 0
 }
 
@@ -60,4 +68,4 @@ if ($LASTEXITCODE -eq 0) {
 }
 
 Write-Host ""
-pause
+if (-not $NoPause) { pause }

@@ -56,22 +56,22 @@ zai-agent-toolkit/
 # 1. Clone toolkit to global location
 mkdir -p ~/.zcode
 cd ~/.zcode
-git clone https://github.com/stsgs1980/Zai-agent-toolkit.git
+git clone https://github.com/stsgs1980/Zai-agent-toolkit_v.git
 
 # 2. Create symlinks (ZCode Desktop reads from these paths)
-ln -s ~/.zcode/Zai-agent-toolkit/skills ~/.zcode/skills
-ln -s ~/.zcode/Zai-agent-toolkit/instructions ~/.zcode/instructions
-ln -s ~/.zcode/Zai-agent-toolkit/standards ~/.zcode/standards
+ln -s ~/.zcode/Zai-agent-toolkit_v/skills ~/.zcode/skills
+ln -s ~/.zcode/Zai-agent-toolkit_v/instructions ~/.zcode/instructions
+ln -s ~/.zcode/Zai-agent-toolkit_v/standards ~/.zcode/standards
 
 # 3. Update
-cd ~/.zcode/Zai-agent-toolkit && git pull origin main
+cd ~/.zcode/Zai-agent-toolkit_v && git pull origin main
 ```
 
 ### Option B: Copy to Project
 
 ```bash
-git clone https://github.com/stsgs1980/Zai-agent-toolkit.git
-cp zai-agent-toolkit/standards/*.md your-project/standards/
+git clone https://github.com/stsgs1980/Zai-agent-toolkit_v.git
+cp Zai-agent-toolkit_v/standards/*.md your-project/standards/
 ```
 
 ### Option C: Single Document

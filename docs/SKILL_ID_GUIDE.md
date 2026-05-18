@@ -108,7 +108,7 @@ trigger: keyword1, keyword2
 | ZAI-REQ-001 | requirements-clarity | Requirements analysis |
 | ZAI-DOC-001 | doc-gen | Document generation |
 | ZAI-DEV-001 | dev-watchdog | Dev server monitoring |
-| ZAI-DEV-002 | anti-monolith | Modular architecture |
+| ZAI-DEV-002 | anti-monolith | System skill (Z.ai sandbox) -- not in toolkit |
 | ZAI-DEV-003 | project-clone | Smart project cloning |
 | ZAI-META-001 | skill-id-system | This ID system |
 | ZAI-META-002 | skill-creator | Create new skills |
@@ -174,8 +174,8 @@ Check `skills/skill-id-system/SKILL.md` for full registry.
 
 | Environment | Path |
 |-------------|------|
-| Z.ai server | `/home/z/my-project/Zai-agent-toolkit/skills/` |
-| Your Windows | `C:\Users\stsgr\.zcode\Zai-agent-toolkit\skills\` |
+| Z.ai server | `/home/z/my-project/Zai-agent-toolkit_v/skills/` |
+| Your Windows | `$env:USERPROFILE\.zcode\Zai-agent-toolkit_v\skills\` |
 
 ### Synchronization
 
@@ -190,7 +190,7 @@ Z.ai server:    git push  -->  GitHub  -->  git pull / update-toolkit.ps1  :Your
 
 | Type | Location | Scope |
 |------|----------|-------|
-| Toolkit | `Zai-agent-toolkit/skills/` | All projects (via symlink) |
+| Toolkit | `Zai-agent-toolkit_v/skills/` | All projects (via symlink) |
 | Project | `<project>/skills/` | Only this project |
 
 **Use toolkit for:** Reusable skills you want everywhere

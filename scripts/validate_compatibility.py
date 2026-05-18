@@ -62,22 +62,6 @@ def extract_version(text, filename):
     return None
 
 
-def extract_severity_levels(text):
-    """Extract severity levels [C], [W], [I] from text."""
-    levels = {}
-    for std_id in extract_std_ids(text):
-        # Find the line with this STD-ID
-        for line in text.split('\n'):
-            if std_id in line:
-                if '[C]' in line:
-                    levels[std_id] = levels.get(std_id, []) + ['[C]']
-                if '[W]' in line:
-                    levels[std_id] = levels.get(std_id, []) + ['[W]']
-                if '[I]' in line:
-                    levels[std_id] = levels.get(std_id, []) + ['[I]']
-    return levels
-
-
 def check_std_id_consistency(toolkit_dir):
     """Check 1: STD-IDs in IMPLEMENTATION_ORDER match standard files."""
     issues = []
