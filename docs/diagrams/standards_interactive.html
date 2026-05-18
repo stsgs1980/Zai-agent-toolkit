@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zai Agent Toolkit — Standards Interaction Map</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #0F172A; color: #E2E8F0; min-height: 100vh; }
+  
+  .header { padding: 24px 32px; border-bottom: 1px solid #1E293B; }
+  .header h1 { font-size: 22px; font-weight: 700; color: #F8FAFC; }
+  .header p { font-size: 13px; color: #94A3B8; margin-top: 4px; }
+  
+  .controls { display: flex; gap: 8px; padding: 16px 32px; flex-wrap: wrap; align-items: center; border-bottom: 1px solid #1E293B; }
+  .controls label { font-size: 12px; color: #94A3B8; margin-right: 4px; }
+  .filter-btn { padding: 6px 14px; border-radius: 6px; border: 1px solid #334155; background: #1E293B; color: #CBD5E1; font-size: 12px; cursor: pointer; transition: all 0.15s; }
+  .filter-btn:hover { border-color: #475569; background: #334155; }
+  .filter-btn.active { border-color: #3B82F6; background: #1E3A5F; color: #93C5FD; }
+  .filter-btn .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+  
+  .info-bar { padding: 10px 32px; font-size: 12px; color: #64748B; border-bottom: 1px solid #1E293B; min-height: 36px; }
+  .info-bar .highlight { color: #F59E0B; font-weight: 600; }
+  
+  .diagram-container { padding: 24px; overflow: auto; }
+  .diagram-container svg { max-width: 100%; }
+  
+  .legend { padding: 16px 32px; border-top: 1px solid #1E293B; display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; color: #94A3B8; }
+  .legend-item .swatch { width: 14px; height: 14px; border-radius: 3px; }
+
+  #diagram { display: flex; justify-content: center; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Zai Agent Toolkit v2.0.4 — Standards Interaction Map</h1>
+  <p>19 standards / 10 domains / 5 layers. Click a node to highlight its connections.</p>
+</div>
+
+<div class="controls">
+  <label>Filter by domain:</label>
+  <button class="filter-btn active" data-domain="all">All</button>
+  <button class="filter-btn" data-domain="L1"><span class="dot" style="background:#8B5CF6"></span>Foundation</button>
+  <button class="filter-btn" data-domain="L2"><span class="dot" style="background:#3B82F6"></span>Infrastructure</button>
+  <button class="filter-btn" data-domain="L3"><span class="dot" style="background:#F59E0B"></span>Domain</button>
+  <button class="filter-btn" data-domain="L4"><span class="dot" style="background:#F97316"></span>Orchestration</button>
+  <button class="filter-btn" data-domain="L5"><span class="dot" style="background:#06B6D4"></span>Application</button>
+</div>
+
+<div class="info-bar" id="infoBar">Hover over a node or edge to see details. Click to highlight connections.</div>
+
+<div class="diagram-container">
+  <div id="diagram"></div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="swatch" style="background:#8B5CF6"></div>L1 Foundation (5)</div>
+  <div class="legend-item"><div class="swatch" style="background:#3B82F6"></div>L2 Infrastructure (4)</div>
+  <div class="legend-item"><div class="swatch" style="background:#F59E0B"></div>L3 Domain (6)</div>
+  <div class="legend-item"><div class="swatch" style="background:#F97316"></div>L4 Orchestration (2)</div>
+  <div class="legend-item"><div class="swatch" style="background:#06B6D4"></div>L5 Application (2)</div>
+  <div class="legend-item" style="color:#64748B">|</div>
+  <div class="legend-item">Solid arrow = references</div>
+  <div class="legend-item">Dashed arrow = mutual reference</div>
+</div>
+
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'dark',
+  themeVariables: {
+    primaryColor: '#1E293B',
+    primaryBorderColor: '#475569',
+    primaryTextColor: '#E2E8F0',
+    lineColor: '#475569',
+    secondaryColor: '#334155',
+    tertiaryColor: '#1E293B',
+    fontSize: '13px',
+    fontFamily: 'Segoe UI, system-ui, sans-serif',
+    nodeBorder: '#475569',
+    mainBkg: '#1E293B',
+    clusterBkg: '#0F172A',
+    clusterBorder: '#334155',
+    titleColor: '#F8FAFC',
+    edgeLabelBackground: '#1E293B',
+  },
+  flowchart: { curve: 'basis', padding: 20, nodeSpacing: 40, rankSpacing: 50, htmlLabels: true }
+});
+
+const graphDef = `flowchart TB
+    subgraph L1["L1 -- Foundation"]
+        direction LR
+        META["STD-META-001\nID System v1.1"]:::l1
+        DOC2["STD-DOC-002\nMarkdown v2.2"]:::l1
+        DOC3["STD-DOC-003\nNo-Unicode v2.1"]:::l1
+        DOC4["STD-DOC-004\nREADME v2.1"]:::l1
+        DOC5["STD-DOC-005\nCode Examples v1.1"]:::l1
+    end
+
+    subgraph L2["L2 -- Infrastructure"]
+        direction LR
+        ENV1["STD-ENV-001\nReproducibility v2.0"]:::l2
+        ENV2["STD-ENV-002\nZ.ai Integration v1.1"]:::l2
+        GIT1["STD-GIT-001\nGitHub Core v2.0"]:::l2
+        GIT2["STD-GIT-002\nSandbox Safety v1.0"]:::l2
+    end
+
+    subgraph L3["L3 -- Domain"]
+        direction LR
+        FE1["STD-FE-001\nFrontend v1.5"]:::l3
+        A11Y["STD-A11Y-001\nWCAG 2.1 AA v1.1"]:::l3
+        ERR1["STD-ERR-001\nError Handling v2.0"]:::l3
+        ERR2["STD-ERR-002\nError Recovery v1.0"]:::l3
+        SEC1["STD-SEC-001\nSecurity Core v2.0"]:::l3
+        SEC2["STD-SEC-002\nSecurity Extended v1.0"]:::l3
+    end
+
+    subgraph L4["L4 -- Orchestration"]
+        direction LR
+        AGENT1["STD-AGENT-001\nSubagent v1.0"]:::l4
+        AGENT2["STD-AGENT-002\nOrchestration v1.0"]:::l4
+    end
+
+    subgraph L5["L5 -- Application"]
+        direction LR
+        ARCH["STD-ARCH-001\nImpl. Order v2.2"]:::l5
+        TEST["STD-TEST-001\nTesting v1.1"]:::l5
+    end
+
+    ARCH --> META
+    ARCH --> ENV1
+    ARCH --> GIT1
+    ARCH --> FE1
+    ARCH --> ERR1
+    ARCH --> SEC1
+    ARCH --> TEST
+    ARCH --> AGENT1
+
+    ENV1 <--> ENV2
+    GIT1 <--> GIT2
+    FE1 <--> A11Y
+    ERR1 <--> ERR2
+    SEC1 <--> SEC2
+    AGENT1 <--> AGENT2
+    DOC2 <--> DOC3
+    DOC4 --> DOC2
+    DOC5 --> DOC2
+
+    ENV1 --> ERR1
+    ENV1 --> SEC1
+    FE1 --> ERR1
+    FE1 --> SEC1
+    ERR1 --> SEC1
+    TEST --> ENV1
+    TEST --> ERR1
+    AGENT1 --> GIT1
+    AGENT1 --> ERR1
+    AGENT2 --> ENV2
+    META --> DOC2
+
+    classDef l1 fill:#2D1B69,stroke:#8B5CF6,stroke-width:2px,color:#E2E8F0
+    classDef l2 fill:#1E3A5F,stroke:#3B82F6,stroke-width:2px,color:#E2E8F0
+    classDef l3 fill:#422006,stroke:#F59E0B,stroke-width:2px,color:#E2E8F0
+    classDef l4 fill:#431407,stroke:#F97316,stroke-width:2px,color:#E2E8F0
+    classDef l5 fill:#083344,stroke:#06B6D4,stroke-width:2px,color:#E2E8F0
+`;
+
+const { svg } = await mermaid.render('standards-map', graphDef);
+document.getElementById('diagram').innerHTML = svg;
+
+// --- Interactive features ---
+const infoBar = document.getElementById('infoBar');
+
+// Standard data for info display
+const stdData = {
+  'STD-META-001': { domain: 'L1', name: 'ID System', refs: ['STD-ARCH-001', 'STD-DOC-002'] },
+  'STD-DOC-002': { domain: 'L1', name: 'Markdown', refs: ['STD-DOC-003', 'STD-DOC-004', 'STD-DOC-005', 'STD-META-001'] },
+  'STD-DOC-003': { domain: 'L1', name: 'No-Unicode', refs: ['STD-DOC-002', 'STD-DOC-005', 'STD-AGENT-001'] },
+  'STD-DOC-004': { domain: 'L1', name: 'README Template', refs: ['STD-DOC-002'] },
+  'STD-DOC-005': { domain: 'L1', name: 'Code Examples', refs: ['STD-DOC-002', 'STD-DOC-003', 'STD-A11Y-001', 'STD-SEC-001'] },
+  'STD-ENV-001': { domain: 'L2', name: 'Reproducibility', refs: ['STD-ERR-001', 'STD-ERR-002', 'STD-SEC-001', 'STD-GIT-001', 'STD-FE-001', 'STD-ENV-002', 'STD-TEST-001'] },
+  'STD-ENV-002': { domain: 'L2', name: 'Z.ai Integration', refs: ['STD-ENV-001', 'STD-GIT-002', 'STD-AGENT-001', 'STD-AGENT-002', 'STD-TEST-001'] },
+  'STD-GIT-001': { domain: 'L2', name: 'GitHub Core', refs: ['STD-GIT-002', 'STD-AGENT-001', 'STD-FE-001', 'STD-AGENT-002'] },
+  'STD-GIT-002': { domain: 'L2', name: 'Sandbox Safety', refs: ['STD-GIT-001', 'STD-ENV-002', 'STD-AGENT-001', 'STD-FE-001', 'STD-ERR-002'] },
+  'STD-FE-001': { domain: 'L3', name: 'Frontend Dev', refs: ['STD-A11Y-001', 'STD-ERR-001', 'STD-SEC-001', 'STD-GIT-001', 'STD-ENV-001'] },
+  'STD-A11Y-001': { domain: 'L3', name: 'WCAG 2.1 AA', refs: ['STD-FE-001', 'STD-TEST-001', 'STD-DOC-005'] },
+  'STD-ERR-001': { domain: 'L3', name: 'Error Handling', refs: ['STD-ERR-002', 'STD-SEC-001', 'STD-AGENT-001', 'STD-AGENT-002'] },
+  'STD-ERR-002': { domain: 'L3', name: 'Error Recovery', refs: ['STD-ERR-001', 'STD-AGENT-002', 'STD-SEC-001', 'STD-GIT-002'] },
+  'STD-SEC-001': { domain: 'L3', name: 'Security Core', refs: ['STD-SEC-002', 'STD-ENV-001', 'STD-ERR-001'] },
+  'STD-SEC-002': { domain: 'L3', name: 'Security Extended', refs: ['STD-SEC-001', 'STD-ERR-001', 'STD-A11Y-001'] },
+  'STD-AGENT-001': { domain: 'L4', name: 'Subagent', refs: ['STD-AGENT-002', 'STD-ENV-002', 'STD-GIT-001', 'STD-GIT-002', 'STD-ERR-001', 'STD-META-001', 'STD-DOC-003', 'STD-DOC-002', 'STD-ENV-001'] },
+  'STD-AGENT-002': { domain: 'L4', name: 'Orchestration', refs: ['STD-AGENT-001', 'STD-GIT-001', 'STD-GIT-002', 'STD-ERR-001', 'STD-ENV-002', 'STD-ARCH-001'] },
+  'STD-ARCH-001': { domain: 'L5', name: 'Implementation Order', refs: ['All 17 other standards'] },
+  'STD-TEST-001': { domain: 'L5', name: 'Testing', refs: ['STD-ERR-001', 'STD-ERR-002', 'STD-SEC-001', 'STD-ENV-001', 'STD-ENV-002'] },
+};
+
+// Find all nodes in the rendered SVG
+function getNodeId(el) {
+  const text = el.textContent || '';
+  for (const id of Object.keys(stdData)) {
+    if (text.includes(id)) return id;
+  }
+  return null;
+}
+
+// Highlight connections on click
+function setupInteractivity() {
+  const nodes = document.querySelectorAll('#diagram .node');
+  const edges = document.querySelectorAll('#diagram .edgePath');
+  const allElements = [...nodes, ...edges];
+
+  nodes.forEach(node => {
+    node.style.cursor = 'pointer';
+
+    node.addEventListener('mouseenter', () => {
+      const id = getNodeId(node);
+      if (id) {
+        infoBar.innerHTML = `<span class="highlight">${id}</span> — ${stdData[id].name} | Domain: ${stdData[id].domain} | Cross-refs: ${stdData[id].refs.join(', ')}`;
+      }
+    });
+
+    node.addEventListener('mouseleave', () => {
+      if (!document.querySelector('.node.highlighted')) {
+        infoBar.innerHTML = 'Hover over a node or edge to see details. Click to highlight connections.';
+      }
+    });
+
+    node.addEventListener('click', () => {
+      // Reset all
+      allElements.forEach(el => el.style.opacity = '1');
+      nodes.forEach(n => n.classList.remove('highlighted'));
+
+      const id = getNodeId(node);
+      if (!id) return;
+
+      node.classList.add('highlighted');
+      const refs = stdData[id].refs;
+      const connectedIds = new Set([id, ...refs]);
+
+      // Dim everything not connected
+      nodes.forEach(n => {
+        const nid = getNodeId(n);
+        if (nid && !connectedIds.has(nid)) {
+          n.style.opacity = '0.2';
+        }
+      });
+
+      edges.forEach(e => { e.style.opacity = '0.15'; });
+      
+      infoBar.innerHTML = `<span class="highlight">${id}</span> — ${stdData[id].name} | ${stdData[id].refs.length} cross-references: ${stdData[id].refs.join(', ')}`;
+    });
+  });
+
+  // Click background to reset
+  document.getElementById('diagram').addEventListener('click', (e) => {
+    if (e.target.closest('.node')) return;
+    allElements.forEach(el => el.style.opacity = '1');
+    nodes.forEach(n => n.classList.remove('highlighted'));
+    infoBar.innerHTML = 'Hover over a node or edge to see details. Click to highlight connections.';
+  });
+}
+
+setupInteractivity();
+
+// Domain filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const domain = btn.dataset.domain;
+    const nodes = document.querySelectorAll('#diagram .node');
+    
+    if (domain === 'all') {
+      nodes.forEach(n => { n.style.opacity = '1'; });
+      document.querySelectorAll('#diagram .edgePath').forEach(e => { e.style.opacity = '1'; });
+      return;
+    }
+
+    nodes.forEach(n => {
+      const id = getNodeId(n);
+      if (id && stdData[id].domain === domain) {
+        n.style.opacity = '1';
+      } else {
+        n.style.opacity = '0.15';
+      }
+    });
+    document.querySelectorAll('#diagram .edgePath').forEach(e => { e.style.opacity = '0.08'; });
+  });
+});
+</script>
+
+</body>
+</html>
