@@ -343,6 +343,12 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
   const [activeTypes, setActiveTypes] = useState<Set<string>>(new Set());
   const [allEdgeTypes, setAllEdgeTypes] = useState<string[]>([]);
 
+  // ── Zoom & pan (refs to avoid re-triggering canvas effect) ──
+  const zoomRef = useRef(1);
+  const panRef = useRef({ x: 0, y: 0 });
+  const drawRef = useRef<(() => void) | null>(null);
+  const [zoomDisplay, setZoomDisplay] = useState(100);
+
   // ── Fetch data ─────────────────────────────────────────
 
   useEffect(() => {
@@ -383,6 +389,27 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
   // ── Filtered edges ─────────────────────────────────────
 
   const filteredEdges = edges.filter((e) => activeTypes.has(e.type));
+
+  // ── Zoom controls ──────────────────────────────────────
+
+  const handleZoomIn = useCallback(() => {
+    zoomRef.current = Math.min(5, zoomRef.current * 1.25);
+    setZoomDisplay(Math.round(zoomRef.current * 100));
+    drawRef.current?.();
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    zoomRef.current = Math.max(0.1, zoomRef.current / 1.25);
+    setZoomDisplay(Math.round(zoomRef.current * 100));
+    drawRef.current?.();
+  }, []);
+
+  const handleZoomReset = useCallback(() => {
+    zoomRef.current = 1;
+    panRef.current = { x: 0, y: 0 };
+    setZoomDisplay(100);
+    drawRef.current?.();
+  }, []);
 
   // ── Force-directed layout + canvas rendering ───────────
 
@@ -523,18 +550,53 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
       iteration++;
     }
 
+    // ── Hit testing helper: screen coords → world coords ──
+    function screenToWorld(sx: number, sy: number): { wx: number; wy: number } {
+      const zoom = zoomRef.current;
+      const pan = panRef.current;
+      return {
+        wx: (sx - pan.x) / zoom,
+        wy: (sy - pan.y) / zoom,
+      };
+    }
+
+    // ── Find node at world position ──
+    function findNodeAt(wx: number, wy: number, tolerance: number): typeof nodes[0] | null {
+      let closest: typeof nodes[0] | null = null;
+      let closestDist = Infinity;
+      for (const node of nodes) {
+        const dx = node.x - wx;
+        const dy = node.y - wy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const radius = Math.max(4, Math.min(14, 4 + node.degree * 1.2));
+        if (dist < radius + tolerance && dist < closestDist) {
+          closest = node;
+          closestDist = dist;
+        }
+      }
+      return closest;
+    }
+
     function draw() {
       if (!ctx) return;
 
-      // Dark gradient background
+      const zoom = zoomRef.current;
+      const pan = panRef.current;
+
+      // Dark gradient background (always full canvas)
       const bg = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.max(width, height) * 0.7);
       bg.addColorStop(0, "#0f172a");
       bg.addColorStop(1, "#020617");
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, width, height);
 
-      // Subtle grid
+      // Subtle grid (screen-space, unaffected by zoom)
       drawGrid(ctx, width, height);
+
+      // Apply zoom & pan transform
+      ctx.save();
+      ctx.translate(pan.x, pan.y);
+      ctx.scale(zoom, zoom);
 
       // Draw edges with glow
       for (const edge of simEdges) {
@@ -550,7 +612,7 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
         if (isHighlighted) {
           ctx.beginPath();
           ctx.strokeStyle = edge.glow + "44";
-          ctx.lineWidth = 4;
+          ctx.lineWidth = 4 / zoom;
           ctx.moveTo(source.x, source.y);
           ctx.lineTo(target.x, target.y);
           ctx.stroke();
@@ -559,7 +621,7 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
         // Edge line
         ctx.beginPath();
         ctx.strokeStyle = isHighlighted ? edge.color + "cc" : edge.color + "55";
-        ctx.lineWidth = isHighlighted ? 1.5 : 0.8;
+        ctx.lineWidth = isHighlighted ? 1.5 / zoom : 0.8 / zoom;
         ctx.moveTo(source.x, source.y);
         ctx.lineTo(target.x, target.y);
         ctx.stroke();
@@ -573,7 +635,7 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
         const arrowY = target.y - (dy / dist) * 14;
 
         ctx.beginPath();
-        ctx.fillStyle = (isHighlighted ? edge.color : edge.color) + "77";
+        ctx.fillStyle = edge.color + "77";
         ctx.moveTo(arrowX + (dx / dist) * arrowSize, arrowY + (dy / dist) * arrowSize);
         ctx.lineTo(arrowX + (-dy / dist) * (arrowSize * 0.45), arrowY + (dx / dist) * (arrowSize * 0.45));
         ctx.lineTo(arrowX + (dy / dist) * (arrowSize * 0.45), arrowY + (-dx / dist) * (arrowSize * 0.45));
@@ -622,21 +684,24 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
 
         // Border
         ctx.strokeStyle = isSelected ? "#ffffffbb" : isHovered ? node.glow + "aa" : node.color + "55";
-        ctx.lineWidth = isSelected ? 2 : 1;
+        ctx.lineWidth = (isSelected ? 2 : 1) / zoom;
         ctx.stroke();
 
-        // Label
-        if (node.degree >= 2 || nodes.length < 30 || isSelected || isHovered) {
-          const fontSize = isSelected || isHovered ? 11 : 9;
+        // Label (only show when zoomed in enough or always for important nodes)
+        const showLabel = node.degree >= 2 || nodes.length < 30 || isSelected || isHovered || zoom > 1.5;
+        if (showLabel) {
+          const fontSize = (isSelected || isHovered ? 11 : 9) / Math.max(zoom, 0.6);
           ctx.font = `${fontSize}px monospace`;
           ctx.fillStyle = isSelected || isHovered ? "#f1f5f9" : "#94a3b8";
           ctx.textAlign = "center";
           const label = node.id.length > 22 ? node.id.slice(0, 20) + ".." : node.id;
-          ctx.fillText(label, node.x, node.y + radius + 16);
+          ctx.fillText(label, node.x, node.y + radius + 16 / zoom);
         }
       }
 
-      // Legend — top-right inside canvas, dark glass panel
+      // Legend — drawn in screen space (outside transform)
+      ctx.restore();
+
       const usedTypes = new Set(simEdges.map((e) => e.type));
       const legendTypes = Array.from(usedTypes);
       if (legendTypes.length > 0) {
@@ -677,6 +742,9 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
       }
     }
 
+    // Expose draw for zoom/pan controls
+    drawRef.current = draw;
+
     // Run simulation
     let animFrame: number;
 
@@ -690,55 +758,82 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
 
     loop();
 
-    // Click handler
-    function handleClick(e: MouseEvent) {
+    // ── Mouse wheel zoom (centered on cursor) ──
+    function handleWheel(e: WheelEvent) {
+      e.preventDefault();
       const canvasRect = canvas.getBoundingClientRect();
       const mx = e.clientX - canvasRect.left;
       const my = e.clientY - canvasRect.top;
 
-      let closest: typeof nodes[0] | null = null;
-      let closestDist = Infinity;
+      const oldZoom = zoomRef.current;
+      const factor = e.deltaY > 0 ? 0.9 : 1.1;
+      const newZoom = Math.max(0.1, Math.min(5, oldZoom * factor));
 
-      for (const node of nodes) {
-        const dx = node.x - mx;
-        const dy = node.y - my;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const radius = Math.max(4, Math.min(14, 4 + node.degree * 1.2));
-        if (dist < radius + 8 && dist < closestDist) {
-          closest = node;
-          closestDist = dist;
-        }
-      }
+      // Pan so point under cursor stays put
+      panRef.current.x = mx - (mx - panRef.current.x) * (newZoom / oldZoom);
+      panRef.current.y = my - (my - panRef.current.y) * (newZoom / oldZoom);
+      zoomRef.current = newZoom;
 
-      setSelectedNode(closest ? closest.id : null);
-      if (iteration >= MAX_ITERATIONS) draw();
+      setZoomDisplay(Math.round(newZoom * 100));
+      draw();
     }
 
-    // Hover handler
-    function handleMouseMove(e: MouseEvent) {
+    // ── Panning state ──
+    let isPanning = false;
+    let panStartX = 0;
+    let panStartY = 0;
+
+    function handleMouseDown(e: MouseEvent) {
+      // Middle button (1) or right button (2) or Ctrl+left (0)
+      if (e.button === 1 || e.button === 2 || (e.button === 0 && e.ctrlKey)) {
+        e.preventDefault();
+        isPanning = true;
+        panStartX = e.clientX - panRef.current.x;
+        panStartY = e.clientY - panRef.current.y;
+        canvas.style.cursor = "grabbing";
+      }
+    }
+
+    function handleMouseMovePan(e: MouseEvent) {
+      if (isPanning) {
+        panRef.current.x = e.clientX - panStartX;
+        panRef.current.y = e.clientY - panStartY;
+        draw();
+        return;
+      }
+
+      // Hover detection (only if not panning)
       const canvasRect = canvas.getBoundingClientRect();
       const mx = e.clientX - canvasRect.left;
       const my = e.clientY - canvasRect.top;
+      const { wx, wy } = screenToWorld(mx, my);
 
-      let closest: typeof nodes[0] | null = null;
-      let closestDist = Infinity;
-
-      for (const node of nodes) {
-        const dx = node.x - mx;
-        const dy = node.y - my;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const radius = Math.max(4, Math.min(14, 4 + node.degree * 1.2));
-        if (dist < radius + 6 && dist < closestDist) {
-          closest = node;
-          closestDist = dist;
-        }
-      }
-
-      const newHovered = closest ? closest.id : null;
+      const hit = findNodeAt(wx, wy, 6);
+      const newHovered = hit ? hit.id : null;
       if (newHovered !== hoveredNode) {
         setHoveredNode(newHovered);
         if (iteration >= MAX_ITERATIONS) draw();
       }
+    }
+
+    function handleMouseUp() {
+      if (isPanning) {
+        isPanning = false;
+        canvas.style.cursor = "pointer";
+      }
+    }
+
+    // Click handler (uses transformed coordinates)
+    function handleClick(e: MouseEvent) {
+      if (isPanning) return;
+      const canvasRect = canvas.getBoundingClientRect();
+      const mx = e.clientX - canvasRect.left;
+      const my = e.clientY - canvasRect.top;
+      const { wx, wy } = screenToWorld(mx, my);
+
+      const hit = findNodeAt(wx, wy, 8);
+      setSelectedNode(hit ? hit.id : null);
+      if (iteration >= MAX_ITERATIONS) draw();
     }
 
     // Double-click handler — open document
@@ -746,28 +841,39 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
       const canvasRect = canvas.getBoundingClientRect();
       const mx = e.clientX - canvasRect.left;
       const my = e.clientY - canvasRect.top;
+      const { wx, wy } = screenToWorld(mx, my);
 
-      for (const node of nodes) {
-        const dx = node.x - mx;
-        const dy = node.y - my;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const radius = Math.max(4, Math.min(14, 4 + node.degree * 1.2));
-        if (dist < radius + 8) {
-          onNodeClick?.(node.id);
-          return;
-        }
+      const hit = findNodeAt(wx, wy, 8);
+      if (hit) {
+        onNodeClick?.(hit.id);
       }
     }
 
+    // Prevent context menu on right-click (for pan)
+    function handleContextMenu(e: MouseEvent) {
+      e.preventDefault();
+    }
+
+    canvas.addEventListener("wheel", handleWheel, { passive: false });
+    canvas.addEventListener("mousedown", handleMouseDown);
+    canvas.addEventListener("mousemove", handleMouseMovePan);
+    canvas.addEventListener("mouseup", handleMouseUp);
+    canvas.addEventListener("mouseleave", handleMouseUp);
     canvas.addEventListener("click", handleClick);
-    canvas.addEventListener("mousemove", handleMouseMove);
     canvas.addEventListener("dblclick", handleDblClick);
+    canvas.addEventListener("contextmenu", handleContextMenu);
 
     return () => {
       cancelAnimationFrame(animFrame);
+      canvas.removeEventListener("wheel", handleWheel);
+      canvas.removeEventListener("mousedown", handleMouseDown);
+      canvas.removeEventListener("mousemove", handleMouseMovePan);
+      canvas.removeEventListener("mouseup", handleMouseUp);
+      canvas.removeEventListener("mouseleave", handleMouseUp);
       canvas.removeEventListener("click", handleClick);
-      canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("dblclick", handleDblClick);
+      canvas.removeEventListener("contextmenu", handleContextMenu);
+      drawRef.current = null;
     };
   }, [filteredEdges, selectedNode, hoveredNode, onNodeClick]);
 
@@ -852,7 +958,8 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
       <div ref={containerRef} style={{ minHeight: "70vh" }}>
         <canvas
           ref={canvasRef}
-          className="cursor-pointer block"
+          className="block"
+          style={{ cursor: "pointer" }}
         />
       </div>
 
@@ -876,6 +983,45 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
           />
         </div>
       )}
+
+      {/* ── Overlay: Zoom controls (right side, center) ── */}
+      <div className="absolute right-3 top-1/2 -translate-y-1/2 z-10 flex flex-col items-center gap-1">
+        <div
+          className="flex flex-col items-center rounded-lg overflow-hidden"
+          style={{
+            background: "#0f172acc",
+            backdropFilter: "blur(8px)",
+            border: "1px solid #1e293b55",
+            boxShadow: "0 4px 12px #00000040",
+          }}
+        >
+          <button
+            onClick={handleZoomIn}
+            className="w-9 h-9 flex items-center justify-center text-zinc-400 hover:text-sky-400 hover:bg-white/5 transition-all duration-200 cursor-pointer"
+            title="Zoom in"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+          <button
+            onClick={handleZoomReset}
+            className="w-9 h-7 flex items-center justify-center text-[10px] font-mono text-zinc-500 hover:text-zinc-300 hover:bg-white/5 transition-all duration-200 cursor-pointer border-y border-zinc-800/50"
+            title="Reset zoom & pan"
+          >
+            {zoomDisplay}%
+          </button>
+          <button
+            onClick={handleZoomOut}
+            className="w-9 h-9 flex items-center justify-center text-zinc-400 hover:text-sky-400 hover:bg-white/5 transition-all duration-200 cursor-pointer"
+            title="Zoom out"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+            </svg>
+          </button>
+        </div>
+      </div>
 
       {/* ── Overlay: Open in Pyvis button (bottom-right) ── */}
       <div className="absolute bottom-3 right-3 z-10">
@@ -922,7 +1068,7 @@ export function GraphViewer({ onNodeClick }: GraphViewerProps = {}) {
             <svg className="w-3.5 h-3.5 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
             </svg>
-            <span className="text-zinc-600 text-xs">Click to inspect · Dbl-click to open</span>
+            <span className="text-zinc-600 text-xs">Click inspect · Dbl-click open · Scroll zoom · Right-drag pan</span>
           </div>
         </div>
       )}
