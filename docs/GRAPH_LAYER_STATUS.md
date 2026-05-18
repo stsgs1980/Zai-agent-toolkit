@@ -78,15 +78,18 @@ model MemoryBackup {
 }
 ```
 
-### 1.5 What Does NOT Exist
+### 1.5 Current Status (Updated 2026-05-18)
 
-| Missing | Description |
-|---------|-------------|
-| `edges.json` / `graph.json` | No graph data files anywhere |
-| `graph` subcommand in `memory_cli.py` | No graph CLI commands |
-| NetworkX usage | Installed but never imported or called |
-| `MemoryEdge` model in Prisma | No edge/table schema in dashboard DB |
-| Graph visualization | No graph component in dashboard |
+| Component | Status | Details |
+|-----------|--------|---------|
+| `tools/graph_engine.py` | ✅ DONE | NetworkX wrapper, all traversal/CRUD/viz |
+| `tools/memory_cli.py` graph subcommand | ✅ DONE | 10 subcommands, auto same_session edge |
+| `graph.json` (data) | ✅ Created on first use | `~/.zcode/memory/graph.json` |
+| NetworkX usage | ✅ Active | Imported and called in graph_engine.py |
+| `MemoryEdge` model in Prisma | ❌ Pending (Phase 4) | No edge/table schema in dashboard DB |
+| Dashboard graph viewer | ❌ Pending (Phase 4) | No graph component in dashboard |
+
+**Tested on Windows:** All Phase 1 + Phase 2 commands working (2026-05-18).
 
 ### 1.6 Dashboard: "Poor Man's Graph" via LLM
 
