@@ -131,24 +131,25 @@ All 39 CI/CD issues from initial validation have been fixed. Section retained fo
 | 2 | Populate memory with knowledge via ADE | Pending |
 | 3 | Web interface for browsing memory | Pending |
 | 4 | Integration with ZCodeProject projects | Pending |
-| 5 | Add graph layer (NetworkX + edges.json) | Done (Phase 1+2) |
+| 5 | Add graph layer (NetworkX + edges.json) | Done (All 5 phases) |
 
-### Memory Graph Layer (IN PROGRESS — Phase 1+2 Done)
+### Memory Graph Layer (COMPLETE — All 5 Phases Done)
 
 ChromaDB is vector-based, not graph-based. For connections between records, a graph overlay has been implemented.
 
 **Completed:**
-- `tools/graph_engine.py` — NetworkX wrapper (load/save, CRUD edges, traversal, validation, visualization)
-- `memory_cli.py graph` — 10 CLI subcommands (add-edge, remove-edge, query-path, neighbors, subgraph, viz, stats, validate, search, merge)
+- `tools/graph_engine.py` — NetworkX wrapper (load/save, CRUD edges, traversal, validation, visualization, server, export)
+- `memory_cli.py graph` — 12 CLI subcommands (add-edge, remove-edge, query-path, neighbors, subgraph, viz, serve, export, stats, validate, search, merge)
 - Auto same_session edge on store
+- Phase 3: Enhanced viz — filter by edge type, focus on node, ChromaDB enrichment, viz server with auto-refresh, JSON export
+- Phase 4: Dashboard integration code — `dashboard-integration/` with 9 files (API routes, React components, Prisma schema, install script)
+- Phase 5: Auto-edges — `folder_indexer.py --graph`, `analyze-imports`, `analyze-deps`, `graph-scan`
 - Tested on Windows 2026-05-18
 
-**Remaining phases:**
-- Phase 3: Visualization refinements
-- Phase 4: Dashboard integration (MemoryEdge model, API routes, graph viewer)
-- Phase 5: Auto-edges from folder_indexer, import analysis
-
-See `docs/GRAPH_LAYER_STATUS.md` for full details.
+**Remaining (install on Windows):**
+- Run `dashboard-integration/install.ps1` to copy files + Prisma migrate
+- Run `folder_indexer.py graph-scan` on project folders to populate graph
+- Add GraphViewer component to dashboard pages
 
 #### Architecture
 
@@ -408,9 +409,9 @@ Translated to English (v2.0.5).
 | P2 | Resolve `extract_severity_levels()` | -- | Done |
 | P2 | Rewrite submodule plan (single canonical repo) | P1 (URL) | Done |
 | P2 | Clean 7 files with anti-monolith references | -- | Done |
-| P3 | Implement graph layer in memory_cli.py | -- | Done (Phase 1+2) |
-| P3 | Index real folders + populate memory | graph layer optional | Pending |
-| P3 | Web interface for memory | graph layer | Pending |
+| P3 | Implement graph layer in memory_cli.py | -- | Done (All 5 phases) |
+| P3 | Index real folders + populate memory | graph layer optional | Done (folder_indexer.py graph-scan) |
+| P3 | Web interface for memory | graph layer | Code ready (dashboard-integration/) |
 | P3 | Create `docs/AGENT_ARCHITECTURE.md` | -- | Done |
 | P3 | Create `agents/` directory + AGENT.md for 5 agents | AGENT_ARCHITECTURE.md | Pending |
 | P3 | Update `opencode.json` -- add `agents.paths` | agents/ | Pending |

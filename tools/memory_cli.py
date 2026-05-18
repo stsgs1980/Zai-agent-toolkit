@@ -16,7 +16,10 @@ Usage:
     python memory_cli.py graph query-path             # Shortest path
     python memory_cli.py graph neighbors <node>       # Connected nodes
     python memory_cli.py graph subgraph               # Subgraph by tag
-    python memory_cli.py graph viz                    # Visualize (pyvis HTML)
+    python memory_cli.py graph viz [--filter-type T]  # Visualize (pyvis HTML)
+    python memory_cli.py graph viz --focus NODE       # Focus on node neighborhood
+    python memory_cli.py graph serve [--port 8765]    # Live viz server with auto-refresh
+    python memory_cli.py graph export                 # Export JSON for dashboard
     python memory_cli.py graph stats                  # Graph statistics
     python memory_cli.py graph validate               # Integrity check
 """
@@ -440,24 +443,44 @@ def graph_subgraph(args):
 
 
 def graph_viz(args):
-    """Handle: memory graph viz [--output FILE] [--format html|png|dot]"""
+    """Handle: memory graph viz [--output FILE] [--format html|png|dot] [--filter-type T] [--focus N] [--open]"""
     engine = get_graph_engine()
     engine.load()
-    
+
     if engine.graph.number_of_nodes() == 0:
         print("Graph is empty. Add edges first.")
         return
-    
+
     fmt = args.format
     output = args.output or f"graph.{fmt}"
-    
+
+    # Parse filter types (comma-separated)
+    filter_types = None
+    if args.filter_type:
+        filter_types = [t.strip() for t in args.filter_type.split(",")]
+
     if fmt == "html":
-        path = engine.visualize_pyvis(output=output, limit=args.limit)
+        path = engine.visualize_pyvis(
+            output=output,
+            limit=args.limit,
+            filter_types=filter_types,
+            focus_node=args.focus,
+            focus_depth=args.focus_depth,
+            enrich_chroma=not args.no_enrich,
+        )
         if path:
             print(f"Interactive visualization: {path}")
-            print("Open in browser to explore.")
+            if args.open:
+                import webbrowser
+                webbrowser.open(f"file://{path}")
     elif fmt == "png":
-        path = engine.visualize_matplotlib(output=output, limit=args.limit)
+        path = engine.visualize_matplotlib(
+            output=output,
+            limit=args.limit,
+            filter_types=filter_types,
+            focus_node=args.focus,
+            focus_depth=args.focus_depth,
+        )
         if path:
             print(f"Static visualization: {path}")
     elif fmt == "dot":
@@ -465,6 +488,44 @@ def graph_viz(args):
         if path:
             print(f"DOT file: {path}")
             print("Render with: dot -Tpng graph.dot -o graph.png")
+
+
+def graph_serve(args):
+    """Handle: memory graph serve [--port PORT] [--filter-type T] [--focus N]"""
+    engine = get_graph_engine()
+    engine.load()
+
+    filter_types = None
+    if args.filter_type:
+        filter_types = [t.strip() for t in args.filter_type.split(",")]
+
+    engine.visualize_server(
+        host=args.host,
+        port=args.port,
+        filter_types=filter_types,
+        focus_node=args.focus,
+        focus_depth=args.focus_depth,
+        auto_open=not args.no_open,
+    )
+
+
+def graph_export(args):
+    """Handle: memory graph export [--output FILE] [--filter-type T] [--focus N]"""
+    engine = get_graph_engine()
+    engine.load()
+
+    filter_types = None
+    if args.filter_type:
+        filter_types = [t.strip() for t in args.filter_type.split(",")]
+
+    output = args.output or "graph-export.json"
+    path = engine.export_json(
+        output=output,
+        filter_types=filter_types,
+        focus_node=args.focus,
+        focus_depth=args.focus_depth,
+    )
+    print(f"Exported graph data: {path}")
 
 
 def graph_stats(args):
@@ -571,7 +632,11 @@ Examples:
     python memory_cli.py graph neighbors task_1
     python memory_cli.py graph stats
     python memory_cli.py graph validate
-    python memory_cli.py graph viz --format html
+    python memory_cli.py graph viz --format html --open
+    python memory_cli.py graph viz --filter-type same_session,imports
+    python memory_cli.py graph viz --focus session_20260518 --focus-depth 3
+    python memory_cli.py graph serve --port 8765
+    python memory_cli.py graph export --output graph-data.json
         """
     )
     
@@ -649,6 +714,27 @@ Examples:
     viz_p.add_argument("--output", "-o", help="Output file path")
     viz_p.add_argument("--format", "-f", choices=["html", "png", "dot"], default="html", help="Output format")
     viz_p.add_argument("--limit", type=int, default=500, help="Max nodes to visualize")
+    viz_p.add_argument("--filter-type", "-t", help="Only show these edge types (comma-separated, e.g. same_session,imports)")
+    viz_p.add_argument("--focus", help="Focus on this node (show its neighborhood)")
+    viz_p.add_argument("--focus-depth", type=int, default=2, help="Hops from focus node (default: 2)")
+    viz_p.add_argument("--open", action="store_true", help="Auto-open in browser")
+    viz_p.add_argument("--no-enrich", action="store_true", help="Skip ChromaDB metadata enrichment")
+
+    # graph serve
+    serve_p = graph_sub.add_parser("serve", help="Start local viz server with auto-refresh")
+    serve_p.add_argument("--host", default="localhost", help="Host to bind (default: localhost)")
+    serve_p.add_argument("--port", "-p", type=int, default=8765, help="Port (default: 8765)")
+    serve_p.add_argument("--filter-type", "-t", help="Only show these edge types (comma-separated)")
+    serve_p.add_argument("--focus", help="Focus on this node")
+    serve_p.add_argument("--focus-depth", type=int, default=2, help="Hops from focus node")
+    serve_p.add_argument("--no-open", action="store_true", help="Don't auto-open browser")
+
+    # graph export
+    export_p = graph_sub.add_parser("export", help="Export graph data as JSON (for dashboard/API)")
+    export_p.add_argument("--output", "-o", help="Output file path (default: graph-export.json)")
+    export_p.add_argument("--filter-type", "-t", help="Only include these edge types (comma-separated)")
+    export_p.add_argument("--focus", help="Focus on this node")
+    export_p.add_argument("--focus-depth", type=int, default=2, help="Hops from focus node")
     
     # graph stats
     graph_sub.add_parser("stats", help="Graph statistics")
@@ -698,6 +784,8 @@ Examples:
             "neighbors": graph_neighbors,
             "subgraph": graph_subgraph,
             "viz": graph_viz,
+            "serve": graph_serve,
+            "export": graph_export,
             "stats": graph_stats,
             "validate": graph_validate,
             "search": graph_search,

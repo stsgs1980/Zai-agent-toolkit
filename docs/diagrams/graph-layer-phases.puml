@@ -3,41 +3,48 @@
 skinparam backgroundColor #FEFEFE
 skinparam defaultFontSize 12
 
-title Graph Layer — Implementation Phases & Dependencies
+title Graph Layer — Implementation Phases (ALL COMPLETE)
 
-rectangle "Phase 1\ngraph_engine.py\n**NOW**" as p1 #LightGreen {
-    card "NetworkX wrapper\nload/save graph.json\nCRUD edges\nshortest_path\nneighbors\nsubgraph\nvalidate\nstats" as p1_tasks
+rectangle "Phase 1\ngraph_engine.py\n**DONE**" as p1 #LightGreen {
+    card "NetworkX wrapper\nload/save graph.json\nCRUD edges\nshortest_path\nneighbors\nsubgraph\nvalidate\nstats\n9 edge types" as p1_tasks
 }
 
-rectangle "Phase 2\nCLI Integration\nmemory_cli.py" as p2 #LightBlue {
-    card "graph subcommand\n8 sub-subcommands\nauto same_session edge\non store" as p2_tasks
+rectangle "Phase 2\nCLI Integration\nmemory_cli.py\n**DONE**" as p2 #LightGreen {
+    card "12 graph subcommands\nauto same_session edge\non store" as p2_tasks
 }
 
-rectangle "Phase 3\nVisualization" as p3 #LightYellow {
-    card "pyvis → HTML\nmatplotlib → PNG\nopen in browser" as p3_tasks
+rectangle "Phase 3\nVisualization\n**DONE**" as p3 #LightGreen {
+    card "pyvis HTML (enhanced)\nmatplotlib PNG\nfilter by edge type\nfocus on node (ego graph)\nChromaDB enrichment\nviz server + auto-refresh\nJSON export\n--open flag" as p3_tasks
 }
 
-rectangle "Phase 4\nDashboard" as p4 #FFE0B2 {
-    card "MemoryEdge model\napi/memory/graph/route.ts\ngraph viewer component\nreplace LLM related/semantic" as p4_tasks
+rectangle "Phase 4\nDashboard\n**CODE READY**" as p4 #LightYellow {
+    card "MemoryEdge model (Prisma)\napi/memory/graph/route.ts\napi/memory/graph/vis/route.ts\napi/memory/related-graph/route.ts\nGraphViewer.tsx (Canvas)\nGraphStats.tsx\ngraph-client.ts\ninstall.ps1" as p4_tasks
 }
 
-rectangle "Phase 5\nAuto-edges" as p5 #E1BEE7 {
-    card "folder_indexer: parent_dir\nmemory_cli store: same_session\nimport analysis: imports\nrequirement linking: implements" as p5_tasks
+rectangle "Phase 5\nAuto-edges\n**DONE**" as p5 #LightGreen {
+    card "folder_indexer --graph: parent_dir\nanalyze-imports: imports (py/js/ts/rs)\nanalyze-deps: depends_on (pkg/req/cargo)\ngraph-scan: combined all\nclassify_node: auto grouping" as p5_tasks
 }
 
-rectangle "Tunnel\nCloudflare" as tunnel #FFCDD2 {
-    card "sandbox ↔ Windows\nreal-time API calls\none-command ON/OFF" as tunnel_tasks
+rectangle "Next\nInstall on Windows" as next #FFE0B2 {
+    card "Run install.ps1\nRun graph-scan on projects\nAdd GraphViewer to pages\nTest related-graph vs LLM" as next_tasks
+}
+
+rectangle "Tunnel\nCloudflare\n**INSTALLED**" as tunnel #E1BEE7 {
+    card "cloudflared on Windows\nsandbox <-> Windows\nreal-time API calls\none-command ON/OFF" as tunnel_tasks
 }
 
 p1 -down-> p2 : "must be first"
 p2 -down-> p3
 p2 -down-> p4
 p2 -down-> p5
-p4 -down-> tunnel : "when dashboard\nhas graph API"
+p4 -down-> next : "copy files\n+ Prisma migrate"
+next -down-> tunnel : "when dashboard\nhas graph API"
 
 note right of p1
-  **After Phase 2:**
-  Phases 3, 4, 5 can run in parallel
+  **All 5 phases complete:**
+  ~2840 lines Python code
+  + 9 dashboard integration files
+  Next: install on Windows
 end note
 
 @enduml

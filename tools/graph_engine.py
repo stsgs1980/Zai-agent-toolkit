@@ -548,12 +548,186 @@ class GraphEngine:
 
     # ── Visualization ──────────────────────────────────────────────
 
-    def visualize_pyvis(self, output: str = "graph.html", limit: int = 500) -> str:
+    # Color maps
+    TYPE_COLORS = {
+        "parent_dir": "#95a5a6",
+        "imports": "#8e44ad",
+        "same_session": "#2980b9",
+        "depends_on": "#16a085",
+        "follow_up": "#27ae60",
+        "fixed_by": "#c0392b",
+        "implements": "#f39c12",
+        "modifies": "#e67e22",
+        "related_to": "#3498db",
+    }
+
+    # Node group colors (by prefix pattern)
+    NODE_GROUPS = {
+        "session": {"color": "#2980b9", "shape": "diamond", "size": 25},
+        "task": {"color": "#27ae60", "shape": "square", "size": 20},
+        "bug": {"color": "#c0392b", "shape": "triangle", "size": 20},
+        "knowledge": {"color": "#8e44ad", "shape": "dot", "size": 18},
+        "commit": {"color": "#e67e22", "shape": "star", "size": 22},
+        "src": {"color": "#16a085", "shape": "dot", "size": 14},
+        "REQ": {"color": "#f39c12", "shape": "box", "size": 18},
+    }
+
+    def _classify_node(self, node_id: str) -> str:
+        """Classify a node into a group based on its ID prefix."""
+        lower = node_id.lower()
+        for prefix in self.NODE_GROUPS:
+            if lower.startswith(prefix):
+                return prefix
+        # Check for file-like nodes
+        if "/" in node_id or "\\" in node_id or "." in node_id.split("_")[-1] if "_" in node_id else False:
+            return "src"
+        return "default"
+
+    def _get_chroma_metadata(self, node_ids: List[str]) -> Dict[str, Dict]:
+        """Fetch metadata from ChromaDB for given node IDs.
+
+        Returns:
+            Dict mapping node_id -> {content_preview, metadata}
+        """
+        try:
+            import chromadb
+        except ImportError:
+            return {}
+
+        if not self.chroma_path.exists():
+            return {}
+
+        try:
+            client = chromadb.PersistentClient(path=str(self.chroma_path))
+            result = {}
+            for collection_info in client.list_collections():
+                try:
+                    collection = client.get_collection(name=collection_info.name)
+                    # ChromaDB get() with specific IDs
+                    found = collection.get(ids=node_ids, include=["documents", "metadatas"])
+                    for i, nid in enumerate(found["ids"]):
+                        doc = found["documents"][i] if found["documents"] else ""
+                        meta = found["metadatas"][i] if found["metadatas"] else {}
+                        result[nid] = {
+                            "content_preview": (doc[:120] + "...") if doc and len(doc) > 120 else (doc or ""),
+                            "metadata": meta,
+                            "collection": collection_info.name,
+                        }
+                except Exception:
+                    continue
+            return result
+        except Exception:
+            return {}
+
+    def _filter_subgraph(
+        self,
+        filter_types: Optional[List[str]] = None,
+        focus_node: Optional[str] = None,
+        focus_depth: int = 2,
+        limit: int = 500,
+    ) -> nx.DiGraph:
+        """Build a filtered subgraph for visualization.
+
+        Args:
+            filter_types: Only include edges of these types
+            focus_node: Center on this node, include neighbors up to focus_depth hops
+            focus_depth: How many hops from focus_node to include
+            limit: Max nodes in result
+
+        Returns:
+            Filtered NetworkX DiGraph
+        """
+        self.ensure_loaded()
+
+        if self.graph.number_of_nodes() == 0:
+            return self.graph.copy()
+
+        # Step 1: Filter by edge types
+        if filter_types:
+            edges_to_keep = [
+                (u, v) for u, v, d in self.graph.edges(data=True)
+                if d.get("type") in filter_types
+            ]
+            nodes_in_edges = set()
+            for u, v in edges_to_keep:
+                nodes_in_edges.add(u)
+                nodes_in_edges.add(v)
+            sub = self.graph.subgraph(nodes_in_edges).copy()
+            # Re-add only filtered edges
+            sub_filtered = nx.DiGraph()
+            sub_filtered.add_nodes_from(sub.nodes(data=True))
+            for u, v in edges_to_keep:
+                if sub.has_node(u) and sub.has_node(v):
+                    sub_filtered.add_edge(u, v, **sub[u][v])
+            sub = sub_filtered
+        else:
+            sub = self.graph.copy()
+
+        # Step 2: Focus on a specific node (ego graph)
+        if focus_node:
+            if not self.graph.has_node(focus_node):
+                print(f"WARNING: Focus node '{focus_node}' not found in graph")
+            else:
+                # Build ego graph: all nodes within focus_depth hops
+                undirected = self.graph.to_undirected()
+                try:
+                    ego_nodes = set()
+                    current_frontier = {focus_node}
+                    visited = {focus_node}
+                    for _ in range(focus_depth):
+                        next_frontier = set()
+                        for n in current_frontier:
+                            for neighbor in undirected.neighbors(n):
+                                if neighbor not in visited:
+                                    next_frontier.add(neighbor)
+                                    visited.add(neighbor)
+                        ego_nodes.update(current_frontier)
+                        current_frontier = next_frontier
+                    ego_nodes.update(current_frontier)
+                    # Intersect with type-filtered subgraph
+                    if filter_types:
+                        ego_nodes = ego_nodes & set(sub.nodes())
+                    sub = self.graph.subgraph(list(ego_nodes)[:limit]).copy()
+                    # Re-apply type filter on focused subgraph
+                    if filter_types:
+                        edges_to_keep = [
+                            (u, v) for u, v, d in sub.edges(data=True)
+                            if d.get("type") in filter_types
+                        ]
+                        sub_f = nx.DiGraph()
+                        sub_f.add_nodes_from(sub.nodes(data=True))
+                        for u, v in edges_to_keep:
+                            sub_f.add_edge(u, v, **sub[u][v])
+                        sub = sub_f
+                except nx.NetworkXError:
+                    pass
+
+        # Step 3: Limit size
+        if sub.number_of_nodes() > limit:
+            components = nx.weakly_connected_components(sub)
+            largest = max(components, key=len)
+            sub = sub.subgraph(list(largest)[:limit]).copy()
+
+        return sub
+
+    def visualize_pyvis(
+        self,
+        output: str = "graph.html",
+        limit: int = 500,
+        filter_types: Optional[List[str]] = None,
+        focus_node: Optional[str] = None,
+        focus_depth: int = 2,
+        enrich_chroma: bool = True,
+    ) -> str:
         """Generate interactive HTML visualization using pyvis.
 
         Args:
             output: Output HTML file path
             limit: Max nodes to visualize (for performance)
+            filter_types: Only show edges of these types (e.g. ["same_session", "imports"])
+            focus_node: Center visualization on this node
+            focus_depth: Hops from focus_node to include
+            enrich_chroma: If True, enrich node tooltips with ChromaDB data
 
         Returns:
             Path to generated HTML file
@@ -567,32 +741,25 @@ class GraphEngine:
             print("Run: pip install pyvis")
             return ""
 
-        if self.graph.number_of_nodes() == 0:
-            print("Graph is empty, nothing to visualize")
+        sub = self._filter_subgraph(
+            filter_types=filter_types,
+            focus_node=focus_node,
+            focus_depth=focus_depth,
+            limit=limit,
+        )
+
+        if sub.number_of_nodes() == 0:
+            print("Graph is empty or filtered result is empty, nothing to visualize")
             return ""
 
-        # Limit nodes for performance
-        sub = self.graph
-        if self.graph.number_of_nodes() > limit:
-            # Take the largest connected component
-            components = nx.weakly_connected_components(self.graph)
-            largest = max(components, key=len)
-            sub = self.graph.subgraph(list(largest)[:limit]).copy()
-
-        # Color map for edge types
-        type_colors = {
-            "parent_dir": "#95a5a6",
-            "imports": "#8e44ad",
-            "same_session": "#2980b9",
-            "depends_on": "#16a085",
-            "follow_up": "#27ae60",
-            "fixed_by": "#c0392b",
-            "implements": "#f39c12",
-            "related_to": "#3498db",
-        }
+        # Enrich with ChromaDB metadata
+        chroma_data = {}
+        if enrich_chroma:
+            node_ids = list(sub.nodes())
+            chroma_data = self._get_chroma_metadata(node_ids)
 
         net = Network(
-            height="800px",
+            height="900px",
             width="100%",
             directed=True,
             notebook=False,
@@ -608,36 +775,98 @@ class GraphEngine:
             damping=0.09,
         )
 
-        # Add nodes
+        # Add nodes with group-based styling
         for node, data in sub.nodes(data=True):
-            label = node if len(node) <= 40 else node[:37] + "..."
-            net.add_node(node, label=label, title=node, size=15)
+            group = self._classify_node(node)
+            group_info = self.NODE_GROUPS.get(group, {"color": "#4a90d9", "shape": "dot", "size": 15})
+
+            label = node if len(node) <= 35 else node[:32] + "..."
+
+            # Build rich tooltip from ChromaDB
+            tooltip_parts = [f"<b>{node}</b>"]
+            tooltip_parts.append(f"Group: {group}")
+            tooltip_parts.append(f"Degree: {sub.degree(node)}")
+
+            if node in chroma_data:
+                cd = chroma_data[node]
+                tooltip_parts.append(f"Collection: {cd.get('collection', '?')}")
+                if cd.get("content_preview"):
+                    tooltip_parts.append(f"Content: {cd['content_preview']}")
+                meta = cd.get("metadata", {})
+                if meta.get("created_at"):
+                    tooltip_parts.append(f"Created: {meta['created_at']}")
+                if meta.get("type"):
+                    tooltip_parts.append(f"Type: {meta['type']}")
+
+            tooltip = "<br>".join(tooltip_parts)
+
+            net.add_node(
+                node,
+                label=label,
+                title=tooltip,
+                color=group_info["color"],
+                size=group_info["size"],
+                shape=group_info["shape"],
+                group=group,
+            )
 
         # Add edges
         for u, v, data in sub.edges(data=True):
             etype = data.get("type", "related_to")
-            color = type_colors.get(etype, "#3498db")
+            color = self.TYPE_COLORS.get(etype, "#3498db")
             weight = data.get("weight", 1.0)
-            net.add_edge(u, v, color=color, title=f"{etype} ({weight})", width=1 + weight * 2)
+            edge_tooltip = f"{etype} (weight: {weight})"
+            meta = data.get("metadata", {})
+            if meta:
+                edge_tooltip += f"\n{json.dumps(meta, ensure_ascii=False)}"
+            net.add_edge(u, v, color=color, title=edge_tooltip, width=1 + weight * 2, label=etype if len(sub.edges) < 50 else "")
 
-        # Add legend as HTML
+        # Add legend + stats panel
+        used_types = {d.get("type", "related_to") for _, _, d in sub.edges(data=True)}
         legend_items = "".join(
-            f'<span style="color:{color}">&#9679;</span> {etype} &nbsp; '
-            for etype, color in type_colors.items()
-            if etype in {d.get("type", "related_to") for _, _, d in sub.edges(data=True)}
+            f'<span style="color:{self.TYPE_COLORS.get(t, "#3498db")}">&#9679;</span> {t} &nbsp; '
+            for t in sorted(used_types)
         )
-        net.html = net.html.replace("</body>", f"<div style='padding:10px;color:#e0e0e0'>Edge types: {legend_items}</div></body>")
+
+        # Node group legend
+        used_groups = {self._classify_node(n) for n in sub.nodes()}
+        group_legend = "".join(
+            f'<span style="color:{self.NODE_GROUPS.get(g, {}).get("color", "#4a90d9")}">&#9632;</span> {g} &nbsp; '
+            for g in sorted(used_groups)
+        )
+
+        stats_html = f"""
+        <div style='padding:10px;color:#e0e0e0;font-family:monospace;font-size:12px;
+                    background:#16213e;border-top:1px solid #2a3a5e'>
+          <b>Graph Visualization</b> | Nodes: {sub.number_of_nodes()} | Edges: {sub.number_of_edges()}
+          <br>Edge types: {legend_items}
+          <br>Node groups: {group_legend}
+          <br>Filter: {", ".join(filter_types) if filter_types else "all"} | Focus: {focus_node or "none"} (depth={focus_depth})
+        </div>
+        """
+        net.html = net.html.replace("</body>", stats_html + "</body>")
 
         output_path = Path(output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
         net.save_graph(str(output_path))
         return str(output_path)
 
-    def visualize_matplotlib(self, output: str = "graph.png", limit: int = 200) -> str:
+    def visualize_matplotlib(
+        self,
+        output: str = "graph.png",
+        limit: int = 200,
+        filter_types: Optional[List[str]] = None,
+        focus_node: Optional[str] = None,
+        focus_depth: int = 2,
+    ) -> str:
         """Generate static PNG visualization using matplotlib.
 
         Args:
             output: Output PNG file path
             limit: Max nodes to visualize
+            filter_types: Only show edges of these types
+            focus_node: Center on this node
+            focus_depth: Hops from focus_node
 
         Returns:
             Path to generated PNG file
@@ -653,59 +882,229 @@ class GraphEngine:
             print("Run: pip install matplotlib")
             return ""
 
-        if self.graph.number_of_nodes() == 0:
-            print("Graph is empty, nothing to visualize")
+        sub = self._filter_subgraph(
+            filter_types=filter_types,
+            focus_node=focus_node,
+            focus_depth=focus_depth,
+            limit=limit,
+        )
+
+        if sub.number_of_nodes() == 0:
+            print("Graph is empty or filtered result is empty, nothing to visualize")
             return ""
-
-        sub = self.graph
-        if self.graph.number_of_nodes() > limit:
-            components = nx.weakly_connected_components(self.graph)
-            largest = max(components, key=len)
-            sub = self.graph.subgraph(list(largest)[:limit]).copy()
-
-        # Color edges by type
-        type_colors = {
-            "parent_dir": "#95a5a6",
-            "imports": "#8e44ad",
-            "same_session": "#2980b9",
-            "depends_on": "#16a085",
-            "follow_up": "#27ae60",
-            "fixed_by": "#c0392b",
-            "implements": "#f39c12",
-            "related_to": "#3498db",
-        }
 
         fig, ax = plt.subplots(1, 1, figsize=(16, 12))
         pos = nx.spring_layout(sub, k=2, iterations=50)
 
+        # Color nodes by group
+        node_colors = []
+        for node in sub.nodes():
+            group = self._classify_node(node)
+            group_info = self.NODE_GROUPS.get(group, {"color": "#4a90d9"})
+            node_colors.append(group_info["color"])
+
         # Draw nodes
-        nx.draw_networkx_nodes(sub, pos, node_size=200, node_color="#4a90d9", alpha=0.8, ax=ax)
+        nx.draw_networkx_nodes(sub, pos, node_size=200, node_color=node_colors, alpha=0.8, ax=ax)
 
         # Draw edges by type
         for etype in set(d.get("type", "related_to") for _, _, d in sub.edges(data=True)):
             edge_list = [(u, v) for u, v, d in sub.edges(data=True) if d.get("type") == etype]
-            color = type_colors.get(etype, "#3498db")
+            color = self.TYPE_COLORS.get(etype, "#3498db")
             nx.draw_networkx_edges(sub, pos, edgelist=edge_list, edge_color=color, alpha=0.6, arrows=True, ax=ax)
 
         # Labels (truncated)
         labels = {n: n[:20] + "..." if len(n) > 20 else n for n in sub.nodes()}
         nx.draw_networkx_labels(sub, pos, labels, font_size=7, ax=ax)
 
-        ax.set_title(f"Memory Graph ({sub.number_of_nodes()} nodes, {sub.number_of_edges()} edges)")
+        title_parts = [f"Memory Graph ({sub.number_of_nodes()} nodes, {sub.number_of_edges()} edges)"]
+        if filter_types:
+            title_parts.append(f"Filter: {', '.join(filter_types)}")
+        if focus_node:
+            title_parts.append(f"Focus: {focus_node}")
+        ax.set_title(" | ".join(title_parts))
         ax.axis("off")
 
         # Legend
         from matplotlib.patches import Patch
         used_types = set(d.get("type", "related_to") for _, _, d in sub.edges(data=True))
         legend_elements = [
-            Patch(facecolor=type_colors[t], label=t) for t in used_types if t in type_colors
+            Patch(facecolor=self.TYPE_COLORS[t], label=t) for t in used_types if t in self.TYPE_COLORS
         ]
-        ax.legend(handles=legend_elements, loc="best", fontsize=8)
+        if legend_elements:
+            ax.legend(handles=legend_elements, loc="best", fontsize=8)
 
         plt.tight_layout()
         output_path = Path(output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
         plt.savefig(output_path, dpi=150, bbox_inches="tight")
         plt.close()
+        return str(output_path)
+
+    def visualize_server(
+        self,
+        host: str = "localhost",
+        port: int = 8765,
+        filter_types: Optional[List[str]] = None,
+        focus_node: Optional[str] = None,
+        focus_depth: int = 2,
+        auto_open: bool = True,
+    ) -> None:
+        """Start a local HTTP server serving interactive graph visualization.
+
+        Generates the HTML visualization and serves it on a local port.
+        The visualization auto-refreshes when graph.json changes.
+
+        Args:
+            host: Host to bind to
+            port: Port number
+            filter_types: Only show edges of these types
+            focus_node: Center on this node
+            focus_depth: Hops from focus_node
+            auto_open: If True, open browser automatically
+        """
+        import http.server
+        import threading
+        import webbrowser
+
+        # Generate visualization to memory dir
+        output_dir = self.graph_path.parent / "viz"
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output_file = output_dir / "graph.html"
+
+        self.visualize_pyvis(
+            output=str(output_file),
+            filter_types=filter_types,
+            focus_node=focus_node,
+            focus_depth=focus_depth,
+        )
+
+        if not output_file.exists():
+            print("ERROR: Failed to generate visualization")
+            return
+
+        # Inject auto-refresh script into HTML
+        html = output_file.read_text(encoding="utf-8")
+        refresh_script = """
+        <script>
+        // Auto-refresh every 5 seconds if graph.json changes
+        let lastCheck = Date.now();
+        setInterval(() => {
+            fetch('/api/reload?t=' + Date.now())
+                .then(r => r.json())
+                .then(data => {
+                    if (data.reload) location.reload();
+                })
+                .catch(() => {});
+        }, 5000);
+        </script>
+        """
+        html = html.replace("</head>", refresh_script + "\n</head>")
+        output_file.write_text(html, encoding="utf-8")
+
+        # Custom handler with /api/reload endpoint
+        class VizHandler(http.server.SimpleHTTPRequestHandler):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, directory=str(output_dir), **kwargs)
+
+            def do_GET(self):
+                if self.path.startswith("/api/reload"):
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/json")
+                    self.end_headers()
+                    # Check if graph.json was modified
+                    try:
+                        mtime = engine.graph_path.stat().st_mtime
+                        reload = mtime > last_check_time[0]
+                        if reload:
+                            last_check_time[0] = mtime
+                        self.wfile.write(json.dumps({"reload": reload}).encode())
+                    except Exception:
+                        self.wfile.write(json.dumps({"reload": False}).encode())
+                else:
+                    super().do_GET()
+
+            def log_message(self, format, *args):
+                # Suppress verbose logging
+                pass
+
+        last_check_time = [self.graph_path.stat().st_mtime if self.graph_path.exists() else 0]
+        engine = self
+
+        server = http.server.HTTPServer((host, port), VizHandler)
+        url = f"http://{host}:{port}/graph.html"
+
+        print(f"Graph visualization server running at: {url}")
+        print(f"Press Ctrl+C to stop")
+
+        if auto_open:
+            threading.Timer(1.0, lambda: webbrowser.open(url)).start()
+
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            print("\nServer stopped.")
+            server.server_close()
+
+    def export_json(
+        self,
+        output: str = "graph-export.json",
+        filter_types: Optional[List[str]] = None,
+        focus_node: Optional[str] = None,
+        focus_depth: int = 2,
+    ) -> str:
+        """Export graph data as JSON (for dashboard/API consumption).
+
+        Args:
+            output: Output JSON file path
+            filter_types: Only include edges of these types
+            focus_node: Only include nodes in this node's neighborhood
+            focus_depth: Hops from focus_node
+
+        Returns:
+            Path to exported JSON file
+        """
+        sub = self._filter_subgraph(
+            filter_types=filter_types,
+            focus_node=focus_node,
+            focus_depth=focus_depth,
+        )
+
+        # Build node list with metadata
+        nodes = []
+        for node, data in sub.nodes(data=True):
+            node_info = {
+                "id": node,
+                "group": self._classify_node(node),
+                "degree": sub.degree(node),
+                "in_degree": sub.in_degree(node),
+                "out_degree": sub.out_degree(node),
+            }
+            node_info.update(data)
+            nodes.append(node_info)
+
+        # Build edge list
+        edges = []
+        for u, v, data in sub.edges(data=True):
+            edges.append({"from": u, "to": v, **data})
+
+        export_data = {
+            "exported_at": datetime.now().isoformat(),
+            "stats": {
+                "nodes": sub.number_of_nodes(),
+                "edges": sub.number_of_edges(),
+            },
+            "filter": {
+                "types": filter_types,
+                "focus_node": focus_node,
+                "focus_depth": focus_depth,
+            },
+            "nodes": nodes,
+            "edges": edges,
+        }
+
+        output_path = Path(output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(export_data, indent=2, ensure_ascii=False), encoding="utf-8")
         return str(output_path)
 
     # ── Utility ────────────────────────────────────────────────────

@@ -1,0 +1,55 @@
+// ============================================================
+// Graph Layer — Prisma Schema Addition
+// ============================================================
+//
+// INSTRUCTIONS:
+//   1. Copy the MemoryEdge model below into your prisma/schema.prisma
+//   2. Add the two relation fields to your existing MemoryEntry model
+//   3. Run: npx prisma db push
+//
+// ============================================================
+
+// ── NEW MODEL: MemoryEdge ──────────────────────────────────
+
+model MemoryEdge {
+  id        String   @id @default(cuid())
+  fromNode  String   @map("from_node")
+  toNode    String   @map("to_node")
+  type      String
+  weight    Float    @default(1.0)
+  metadata  String   @default("{}")
+  createdAt DateTime @default(now())
+
+  // Relations to MemoryEntry
+  fromEntry MemoryEntry? @relation("FromEdges", fields: [fromNode], references: [id], onDelete: Cascade)
+  toEntry   MemoryEntry? @relation("ToEdges", fields: [toNode], references: [id], onDelete: Cascade)
+
+  @@index([fromNode])
+  @@index([toNode])
+  @@index([type])
+  @@map("memory_edges")
+}
+
+// ── MODIFICATIONS TO EXISTING MemoryEntry ──────────────────
+//
+// Add these two lines to your existing MemoryEntry model:
+//
+//   fromEdges MemoryEdge[] @relation("FromEdges")
+//   toEdges   MemoryEdge[] @relation("ToEdges")
+//
+// Your full MemoryEntry model should look like this:
+//
+
+model MemoryEntry {
+  id        String   @id
+  type      String
+  content   String
+  metadata  String   @default("{}")
+  embedding String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Graph layer relations
+  fromEdges MemoryEdge[] @relation("FromEdges")
+  toEdges   MemoryEdge[] @relation("ToEdges")
+}
