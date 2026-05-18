@@ -122,6 +122,8 @@ All 39 CI/CD issues from initial validation have been fixed. Section retained fo
 | folder-indexer | ZAI-FS-001 | Done |
 | memory_cli.py | - | Done |
 | folder_indexer.py | - | Done |
+| doc_intelligence.py | - | Done (Phase 6) |
+| session_summary.py | - | Done (Phase 6.5) |
 
 ### Pending
 
@@ -132,6 +134,9 @@ All 39 CI/CD issues from initial validation have been fixed. Section retained fo
 | 3 | Web interface for browsing memory | Pending |
 | 4 | Integration with ZCodeProject projects | Pending |
 | 5 | Add graph layer (NetworkX + edges.json) | Done (All 5 phases) |
+| 6 | LLM enrichment (z-ai-web-dev-sdk for extraction) | Pending |
+| 7 | Fact-checking pipeline (verify extracted knowledge) | Pending |
+| 8 | Auto-generate session summary on sandbox exit | Pending |
 
 ### Memory Graph Layer (COMPLETE — All 5 Phases Done)
 
@@ -150,6 +155,88 @@ ChromaDB is vector-based, not graph-based. For connections between records, a gr
 - Run `dashboard-integration/install.ps1` to copy files + Prisma migrate
 - Run `folder_indexer.py graph-scan` on project folders to populate graph
 - Add GraphViewer component to dashboard pages
+
+### Phase 6: Document Intelligence (COMPLETE)
+
+`tools/doc_intelligence.py` — auto-extract knowledge from markdown/text documents.
+
+**What it does:**
+- Parses `.md` and `.txt` files into structured sections
+- Extracts: terms, instructions, commands, API endpoints, API functions
+- Auto-generates tags (YAML frontmatter, #tag, tech names, section headings)
+- Stores everything to ChromaDB with graph edges
+- Supports regex mode (fast) and LLM mode (z-ai-web-dev-sdk, richer)
+
+**Extractors:**
+
+| Extractor | What It Finds | Example |
+|-----------|---------------|---------|
+| `extract_terms()` | Definitions, table cells, heading descriptions | `PostgreSQL: relational database` |
+| `extract_instructions()` | Numbered/bulleted step sequences | "1. Install... 2. Configure..." |
+| `extract_commands()` | CLI commands from code blocks | `npm install`, `tree -Depth 3` |
+| `extract_api_endpoints()` | REST API routes | `POST /api/v1/deploy/create` |
+| `extract_api_functions()` | TS/JS function signatures | `async function deployToVercel()` |
+| `extract_tags()` | Auto-generated from content | `ci/cd`, `nextjs`, `vercel` |
+
+**CLI:**
+
+```bash
+python doc_intelligence.py extract README.md          # Preview extraction
+python doc_intelligence.py ingest README.md            # Extract + store
+python doc_intelligence.py ingest README.md --llm      # Use LLM extraction
+python doc_intelligence.py batch ./docs/               # Ingest all .md in dir
+```
+
+**Tested with:**
+- PowerShell tree guide (5 commands extracted)
+- Vercel Deployment Skill README (5 API endpoints + 4 API functions)
+- @stsgs/prompting README (tab-separated tables, TypeScript types)
+- Instruction Assembler spec (~15KB stress test)
+
+### Phase 6.5: Experience System + Verification + Dedup (COMPLETE)
+
+**Experience System** (`tools/session_summary.py`):
+- Generates experience reports from sandbox sessions
+- Each report: WHAT WORKED / WHAT FAILED / WHY / VERDICT
+- Supports `from-worklog` (auto-parse worklog.md) and `manual` (CLI entry)
+- Verification lifecycle: `unverified` -> `verified` | `conflict`
+- Semantic search across experience entries
+
+**CLI:**
+
+```bash
+python session_summary.py from-worklog /path/to/worklog.md   # Auto-generate from worklog
+python session_summary.py manual --title "Deploy hell" --good "Vercel CLI" --bad "SQLite on prod" --why "Serverless can't write"
+python session_summary.py list                                # List all experiences
+python session_summary.py query "deployment failure"          # Semantic search
+python session_summary.py verify <id> --status verified       # Mark as verified
+```
+
+**Verification Status** (on ALL entries):
+- Every ChromaDB entry now has `verification_status` in metadata
+- `unverified` (default) -> `verified` (human checked) -> `conflict` (contradicts other data)
+- Experience entries show `[V~]` (verified+mixed), `[?-]` (unverified+failed) markers
+
+**Deduplication** (in `store_entry`):
+- Before storing, queries ChromaDB for similar content
+- If distance < 0.15 (near-exact match), skips and returns existing ID
+- Configurable: `store_entry(..., dedup=True, dedup_threshold=0.15)`
+- Tested: re-ingesting same doc produces 17 DEDUP skips
+
+**New Graph Edge Types:**
+
+| Edge Type | Description |
+|-----------|-------------|
+| `has_api_endpoint` | Document defines a REST API endpoint |
+| `has_api_function` | Document defines a TS/JS function/class |
+| `has_experience` | Session produced an experience report |
+
+**Current Graph Stats (test data):**
+
+```text
+Nodes: 203 | Edges: 256 | Edge types: 12
+Entry types: session, knowledge, pattern, project, template, command, experience
+```
 
 #### Architecture
 
@@ -413,10 +500,15 @@ Translated to English (v2.0.5).
 | P3 | Index real folders + populate memory | graph layer optional | Done (folder_indexer.py graph-scan) |
 | P3 | Web interface for memory | graph layer | Code ready (dashboard-integration/) |
 | P3 | Create `docs/AGENT_ARCHITECTURE.md` | -- | Done |
+| P3 | Doc Intelligence: auto-extract from documents | graph layer | Done (Phase 6) |
+| P3 | Experience system + verification + dedup | doc intelligence | Done (Phase 6.5) |
 | P3 | Create `agents/` directory + AGENT.md for 5 agents | AGENT_ARCHITECTURE.md | Pending |
 | P3 | Update `opencode.json` -- add `agents.paths` | agents/ | Pending |
 | P3 | Enhance `templates/TASK_TEMPLATE.md` -- chain templates | -- | Pending |
 | P3 | Enhance `AGENT_RULES.md` -- Section on sub-agents | -- | Pending |
+| P3 | LLM enrichment (z-ai-web-dev-sdk for extraction) | doc intelligence | Pending |
+| P3 | Fact-checking pipeline (verify extracted knowledge) | experience system | Pending |
+| P3 | Auto-generate session summary on sandbox exit | session_summary.py | Pending |
 | P4 | Mixed languages in docs | -- | Done |
 
 ---

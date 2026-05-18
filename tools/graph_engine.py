@@ -47,6 +47,9 @@ EDGE_TYPES = {
     "defines_term": "Document defines a term/concept",
     "has_instruction": "Document contains an instruction/how-to",
     "has_command": "Document references a command/CLI recipe",
+    "has_api_endpoint": "Document defines a REST API endpoint",
+    "has_api_function": "Document defines a TS/JS function/class",
+    "has_experience": "Document/session produced an experience report",
     "tagged_with": "Entry is tagged with a concept",
 }
 

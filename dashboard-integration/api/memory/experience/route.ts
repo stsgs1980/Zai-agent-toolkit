@@ -25,6 +25,7 @@ function runPython(tool: string, args: string[]): Promise<string> {
       maxBuffer: 10 * 1024 * 1024,
       timeout: 30000,
       windowsHide: true,
+      encoding: "utf-8",
       env: { ...process.env, PYTHONIOENCODING: "utf-8" },
     }, (err, stdout, stderr) => {
       if (err) {

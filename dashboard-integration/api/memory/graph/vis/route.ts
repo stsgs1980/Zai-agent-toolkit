@@ -114,6 +114,7 @@ export async function GET(request: NextRequest) {
       const { stderr } = await execFileAsync("python", args, {
         timeout: 30000,
         windowsHide: true,
+        encoding: "utf-8",
         env: { ...process.env, PYTHONIOENCODING: "utf-8" },
       });
 

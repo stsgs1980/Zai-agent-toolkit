@@ -58,7 +58,7 @@ def parse_metadata(metadata_str: Optional[str]) -> Optional[Dict[str, str]]:
     return result if result else None
 
 # Entry types
-ENTRY_TYPES = ["session", "knowledge", "pattern", "project", "template", "command"]
+ENTRY_TYPES = ["session", "knowledge", "pattern", "project", "template", "command", "experience"]
 
 
 def get_db_path() -> Path:
@@ -121,14 +121,59 @@ def get_client():
     return chromadb.PersistentClient(path=str(db_path))
 
 
-def store_entry(entry_type: str, content: str, metadata: Optional[Dict] = None, no_graph: bool = False):
-    """Store an entry in the database and optionally add a graph edge."""
+def check_duplicate(entry_type: str, content: str, threshold: float = 0.15) -> Optional[str]:
+    """
+    Check if a very similar entry already exists in the collection.
+    
+    Args:
+        entry_type: Collection to search
+        content: Content to check for duplicates
+        threshold: Max distance to consider a duplicate (lower = more similar)
+    
+    Returns:
+        Existing entry ID if duplicate found, None otherwise.
+    """
+    try:
+        client = get_client()
+        collection = client.get_collection(name=entry_type)
+        result = collection.query(
+            query_texts=[content],
+            n_results=1,
+        )
+        if result["ids"] and result["ids"][0]:
+            distance = result["distances"][0][0] if result.get("distances") else 999
+            if distance <= threshold:
+                return result["ids"][0][0]
+    except Exception:
+        pass
+    return None
+
+
+def store_entry(entry_type: str, content: str, metadata: Optional[Dict] = None,
+                no_graph: bool = False, dedup: bool = True, dedup_threshold: float = 0.15):
+    """Store an entry in the database and optionally add a graph edge.
+    
+    Args:
+        entry_type: Type of entry (session, knowledge, pattern, etc.)
+        content: Text content to store
+        metadata: Optional metadata dict
+        no_graph: Skip graph edge creation
+        dedup: Check for duplicates before storing (skip if distance < threshold)
+        dedup_threshold: Max distance to consider a duplicate (0.15 = near-exact match)
+    """
     if entry_type not in ENTRY_TYPES:
         print(f"ERROR: Invalid type. Valid types: {ENTRY_TYPES}")
         sys.exit(1)
     
     client = get_client()
     collection = client.get_collection(name=entry_type)
+    
+    # Deduplication check
+    if dedup:
+        existing_id = check_duplicate(entry_type, content, threshold=dedup_threshold)
+        if existing_id:
+            print(f"DEDUP: Skipped duplicate of {existing_id} (distance < {dedup_threshold})")
+            return existing_id
     
     # Generate ID
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

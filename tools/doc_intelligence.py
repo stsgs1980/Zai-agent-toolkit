@@ -238,6 +238,77 @@ class MarkdownParser:
 
         return commands
 
+    def extract_api_endpoints(self) -> List[Dict]:
+        """Extract REST API endpoints (POST /api/..., GET /api/...) from text."""
+        endpoints = []
+        seen = set()
+        api_pattern = re.compile(
+            r'((?:GET|POST|PUT|DELETE|PATCH)\s+/[a-zA-Z][a-zA-Z0-9_/.-]*(?:\{[^}]+\})*[^\s]*)',
+            re.IGNORECASE
+        )
+        for line in self.lines:
+            for match in api_pattern.finditer(line):
+                ep = match.group(1).strip()
+                if len(ep) > 5 and ep not in seen:
+                    seen.add(ep)
+                    method = ep.split()[0].upper()
+                    path = ep.split()[1] if len(ep.split()) > 1 else ep
+                    endpoints.append({
+                        "endpoint": ep,
+                        "method": method,
+                        "path": path,
+                        "source_section": "",
+                    })
+        return endpoints
+
+    def extract_api_functions(self) -> List[Dict]:
+        """Extract TS/JS function signatures from code blocks."""
+        functions = []
+        seen_names = set()
+        ts_type_filter = {
+            'string', 'number', 'boolean', 'void', 'class', 'function', 'object',
+            'array', 'null', 'undefined', 'Promise', 'Record', 'Date', 'Map', 'Set',
+            'Error', 'Response', 'Request', 'Headers', 'Type', 'Props', 'State',
+        }
+        func_patterns = [
+            re.compile(r'(?:export\s+)?(?:async\s+)?function\s+(\w+)\s*\([^)]*\)'),
+            re.compile(r'(?:export\s+)?const\s+(\w+)\s*=\s*(?:async\s+)?\([^)]*\)\s*(?::\s*[^=]+)?\s*=>'),
+            re.compile(r'class\s+(\w+)'),
+        ]
+        in_code_block = False
+        code_lang = ""
+        code_buf = []
+        current_section = ""
+        for line in self.lines:
+            if line.startswith("#"):
+                current_section = line.lstrip("#").strip()
+            if line.strip().startswith("```"):
+                if in_code_block:
+                    code = "\n".join(code_buf).strip()
+                    for pattern in func_patterns:
+                        for match in pattern.finditer(code):
+                            name = match.group(1)
+                            if name not in ts_type_filter and len(name) > 1 and name not in seen_names:
+                                seen_names.add(name)
+                                sig_start = match.start()
+                                sig_end = code.find("\n", sig_start)
+                                signature = code[sig_start:sig_end].strip() if sig_end != -1 else match.group(0)
+                                functions.append({
+                                    "name": name,
+                                    "signature": signature[:200],
+                                    "language": code_lang or "typescript",
+                                    "context": current_section,
+                                })
+                    code_buf = []
+                    in_code_block = False
+                else:
+                    code_lang = line.strip()[3:].strip().lower()
+                    in_code_block = True
+                    code_buf = []
+            elif in_code_block:
+                code_buf.append(line)
+        return functions
+
     def _looks_like_command(self, code: str, lang: str) -> bool:
         if lang in ("bash", "sh", "shell", "zsh", "fish", "powershell", "cmd", "bat"):
             return True
@@ -815,7 +886,7 @@ def ingest_document(
 
     Returns a summary dict of what was extracted and stored.
     """
-    from memory_cli import get_client, store_entry, get_graph_engine
+    from memory_cli import get_client, store_entry, get_graph_engine, check_duplicate
 
     # Auto-detect parser: MarkdownParser for .md, PlainTextParser for .txt
     parser = detect_parser(content, source)
@@ -828,6 +899,8 @@ def ingest_document(
         terms = llm.extract_terms()
         instructions = llm.extract_instructions()
         commands = llm.extract_commands()
+        api_endpoints = parser.extract_api_endpoints()
+        api_functions = parser.extract_api_functions()
         analysis = llm.analyze()
         # Merge regex tags + LLM suggested tags
         regex_tags = parser.extract_tags()
@@ -837,6 +910,8 @@ def ingest_document(
         terms = parser.extract_terms()
         instructions = parser.extract_instructions()
         commands = parser.extract_commands()
+        api_endpoints = parser.extract_api_endpoints()
+        api_functions = parser.extract_api_functions()
         tags = parser.extract_tags()
         analysis = {}
 
@@ -847,6 +922,8 @@ def ingest_document(
         "terms": len(terms),
         "instructions": len(instructions),
         "commands": len(commands),
+        "api_endpoints": len(api_endpoints),
+        "api_functions": len(api_functions),
         "tags": tags,
         "analysis": analysis,
         "mode": "llm" if use_llm else "regex",
@@ -877,6 +954,7 @@ def ingest_document(
         "title": title,
         "doc_type": "markdown",
         "tags": ",".join(tags),
+        "verification_status": "unverified",
     }
     if analysis:
         doc_metadata["summary"] = analysis.get("summary", "")
@@ -888,6 +966,7 @@ def ingest_document(
         content,
         metadata=doc_metadata,
         no_graph=True,
+        dedup=False,  # Always store full document
     )
     result["stored_ids"].append(doc_id)
 
@@ -915,6 +994,7 @@ def ingest_document(
                 "pattern": term.get("pattern", "unknown"),
                 "source": source,
                 "tags": ",".join(tags),
+                "verification_status": "unverified",
             },
             no_graph=True,
         )
@@ -940,6 +1020,7 @@ def ingest_document(
                 "has_steps": str(inst.get("has_steps", False)),
                 "source": source,
                 "tags": ",".join(tags),
+                "verification_status": "unverified",
             },
             no_graph=True,
         )
@@ -959,6 +1040,7 @@ def ingest_document(
                 "language": cmd.get("language", "text"),
                 "source": source,
                 "tags": ",".join(tags),
+                "verification_status": "unverified",
             },
             no_graph=True,
         )
@@ -967,6 +1049,48 @@ def ingest_document(
         if engine:
             engine.add_edge(doc_id, cmd_id, "has_command")
             result["edges_created"].append(f"{doc_id} --has_command--> {cmd_id}")
+
+    # 4b. Store API endpoints as 'knowledge' entries
+    for ep in api_endpoints:
+        ep_id = store_entry(
+            "knowledge",
+            f"API Endpoint: {ep['method']} {ep['path']}",
+            metadata={
+                "term": ep["endpoint"][:100],
+                "pattern": "api_endpoint",
+                "method": ep["method"],
+                "path": ep["path"],
+                "source": source,
+                "tags": ",".join(tags),
+                "verification_status": "unverified",
+            },
+            no_graph=True,
+        )
+        result["stored_ids"].append(ep_id)
+        if engine:
+            engine.add_edge(doc_id, ep_id, "has_api_endpoint")
+            result["edges_created"].append(f"{doc_id} --has_api_endpoint--> {ep_id}")
+
+    # 4c. Store API functions as 'knowledge' entries
+    for fn in api_functions:
+        fn_id = store_entry(
+            "knowledge",
+            f"API Function: {fn['name']}\n{fn['signature']}",
+            metadata={
+                "term": fn["name"],
+                "pattern": "api_function",
+                "language": fn.get("language", "typescript"),
+                "context": fn.get("context", ""),
+                "source": source,
+                "tags": ",".join(tags),
+                "verification_status": "unverified",
+            },
+            no_graph=True,
+        )
+        result["stored_ids"].append(fn_id)
+        if engine:
+            engine.add_edge(doc_id, fn_id, "has_api_function")
+            result["edges_created"].append(f"{doc_id} --has_api_function--> {fn_id}")
 
     # 5. Create tag edges (doc --tagged_with--> tag)
     if engine:

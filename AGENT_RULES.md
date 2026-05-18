@@ -208,7 +208,7 @@ These skills are provided by the Z.ai platform. They do NOT have ZAI- IDs.
 | `z-ai-web-dev-sdk` | SDK | Chat, image gen, web search via z-ai-web-dev-sdk |
 | `doc-gen` | Documents | Generating PDF, DOCX, XLSX documents |
 | `c4-architecture` | Architecture | C4 architecture diagrams with Mermaid |
-| `anti-monolith` | Architecture | Enforcing modular architecture |
+| `anti-monolith` | Architecture | Enforcing modular architecture (ZAI-ARCH-002, auto-triggers on file > 250 lines, 3+ useState) |
 
 ## 9. Instructions to Follow
 

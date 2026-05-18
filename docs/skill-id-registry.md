@@ -66,6 +66,7 @@ These domains contain skills that belong to the Zai-agent-toolkit repository:
 | ID | Skill | Version | Author | Status | Compatibility |
 |----|-------|---------|--------|--------|---------------|
 | ZAI-ARCH-001 | mermaid-diagrams | 1.0 | STS | Active | both |
+| ZAI-ARCH-002 | anti-monolith | 1.0 | STS | Active | both |
 
 ### QA Domain
 
