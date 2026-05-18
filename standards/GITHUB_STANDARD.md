@@ -417,17 +417,7 @@ Every PR MUST pass this checklist:
 
 ---
 
-## 10. Cross-References
-
-| Standard | Relationship |
-|----------|-------------|
-| STD-GIT-002 | Sandbox git safety (deadlock, recovery, network failures) |
-| STD-AGENT-001 | Subagent commit protocol |
-| STD-FE-001 | Post-refactor commit rules |
-
----
-
-## 11. Log Everything
+## 10. Log Everything
 
 After every git operation, log to `worklog.md`:
 
@@ -438,6 +428,16 @@ After every git operation, log to `worklog.md`:
 - **Result**: success / failed / conflicted
 - **Details**: <what happened>
 ```
+
+---
+
+## 11. Cross-References
+
+| Standard | Relationship |
+|----------|-------------|
+| STD-GIT-002 | Sandbox git safety (deadlock, recovery, network failures) |
+| STD-AGENT-001 | Subagent commit protocol |
+| STD-FE-001 | Post-refactor commit rules |
 
 ---
 

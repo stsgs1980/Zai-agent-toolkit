@@ -611,18 +611,7 @@ export function getUserMessage(error: ApplicationError): string {
 
 ---
 
-## 7. Cross-References
-
-| Standard | Relationship |
-|----------|-------------|
-| STD-ERR-002 | Recovery strategies (retry, circuit breaker, fallback, monitoring) |
-| STD-SEC-001 | Security error handling (no info leaks in error responses) |
-| STD-AGENT-001 | Subagent error contract (failure reporting) |
-| STD-AGENT-002 | Orchestration error propagation (escalation ladder) |
-
----
-
-## 8. Checklist
+## 7. Checklist
 
 ### Before Deployment
 
@@ -644,6 +633,17 @@ export function getUserMessage(error: ApplicationError): string {
 - [ ] Error context is sufficient for debugging
 - [ ] User messages are helpful
 - [ ] Recovery strategies are appropriate
+
+---
+
+## 8. Cross-References
+
+| Standard | Relationship |
+|----------|-------------|
+| STD-ERR-002 | Recovery strategies (retry, circuit breaker, fallback, monitoring) |
+| STD-SEC-001 | Security error handling (no info leaks in error responses) |
+| STD-AGENT-001 | Subagent error contract (failure reporting) |
+| STD-AGENT-002 | Orchestration error propagation (escalation ladder) |
 
 ---
 

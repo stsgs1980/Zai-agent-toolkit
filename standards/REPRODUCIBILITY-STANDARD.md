@@ -163,7 +163,8 @@ The following standards contain rules that support reproducibility within their 
 
 | Domain | Standard | Relevant Sections |
 |--------|----------|-------------------|
-| Error handling | STD-ERR-001 | Section 5.2 (no internal error leaks), Section 7.3 (fallback mechanisms) |
+| Error handling | STD-ERR-001 | Section 5.2 (no internal error leaks) |
+| Error recovery | STD-ERR-002 | Section 4 (fallback mechanisms) |
 | Security | STD-SEC-001 | Section 2.1 (env validation), Section 2.2 (.env management) |
 | Git operations | STD-GIT-001 | Section 5 (push policy), Section 8 (.gitignore), Section 6 (versioning) |
 | Frontend | STD-FE-001 | Section 10.5 (auto-backup), Section 10.6 (deduplication) |

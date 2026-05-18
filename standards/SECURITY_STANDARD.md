@@ -352,7 +352,7 @@ These sections apply to every project, including sandbox prototypes:
 
 ---
 
-## Cross-References
+## 9. Cross-References
 
 | Standard | Relationship |
 |----------|-------------|
@@ -362,7 +362,7 @@ These sections apply to every project, including sandbox prototypes:
 
 ---
 
-## Version History
+## 10. Version History
 
 | Version | Date | Changes |
 |---------|------|---------|

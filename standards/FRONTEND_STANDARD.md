@@ -332,7 +332,7 @@ return NextResponse.json(
 
 ### 10.3. Input Validation
 
-All input MUST be validated with Zod before processing. For comprehensive validation schemas and security considerations, see **STD-SEC-001 Section 5.1** (validation schemas, SQL injection prevention) and **STD-FE-001 Section 10.4** (error handling).
+All input MUST be validated with Zod before processing. For comprehensive validation schemas and security considerations, see **STD-SEC-001 Section 3.1** (validation schemas, SQL injection prevention) and **STD-FE-001 Section 10.4** (error handling).
 
 ```typescript
 import { z } from 'zod'
@@ -361,7 +361,7 @@ export async function POST(request: Request) {
 
 ### 10.4. Error Handling
 
-API routes MUST NOT leak internal error details to clients. For complete error handling patterns, see **STD-ERR-001 Section 5.2** (error handler middleware) and **STD-SEC-001 Section 12.4** (sandbox core checklist).
+API routes MUST NOT leak internal error details to clients. For complete error handling patterns, see **STD-ERR-001 Section 5.2** (error handler middleware) and **STD-SEC-001 Section 8** (sandbox core checklist).
 
 ### 10.5. Auto-Backup Before Mutations
 
@@ -493,7 +493,7 @@ When possible, prefer soft-delete (archive) over hard-delete. See STD-FE-001 sec
 
 ---
 
-## Cross-References
+## 13. Cross-References
 
 | Standard | Relationship |
 |----------|-------------|

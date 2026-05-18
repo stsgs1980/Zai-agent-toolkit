@@ -7,7 +7,7 @@
 
 This template defines the mandatory structure for all project README files.
 
-## Mandatory Sections
+## 1. Mandatory Sections
 
 Every README.md must contain the following sections in order:
 
@@ -26,7 +26,7 @@ Every README.md must contain the following sections in order:
 | 11 | Agent Rules | Conditional | Required if `AGENT_RULES.md` exists in project root |
 | 12 | Stack Signature | Yes | Mandatory footer |
 
-## Template
+## 2. Template
 
 ````markdown
 # Project Name
@@ -121,7 +121,7 @@ Built with: Next.js 16 + TypeScript + Tailwind CSS
 
 Note: The stack signature above is the default for Next.js projects. Replace with the actual project stack if using a different technology. Format: `Built with: <Framework> + <Language> + <Styling>` (see MARKDOWN_STANDARD v2.1, section 7).
 
-## Checklist
+## 3. Checklist
 
 Before submitting, verify:
 
@@ -134,7 +134,7 @@ Before submitting, verify:
 - [ ] Agent Rules section present if AGENT_RULES.md exists
 - [ ] Code blocks have language specified
 
-## Example Compliance
+## 4. Example Compliance
 
 ### Correct
 
@@ -158,7 +158,7 @@ Note: `->` as a separator in list items violates the list marker rule. Em dash `
 
 ---
 
-## Cross-References
+## 5. Cross-References
 
 | Standard | Relationship |
 |----------|-------------|

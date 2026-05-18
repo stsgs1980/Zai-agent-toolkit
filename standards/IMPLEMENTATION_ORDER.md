@@ -9,7 +9,7 @@ This document describes the implementation order for all project documents — f
 
 ---
 
-## Project Documents
+## 1. Project Documents
 
 ### Group B: Standards (governance)
 
@@ -58,7 +58,7 @@ Work tools. Copied into the project and used from day one.
 
 ---
 
-## Full Sequence (6 Steps)
+## 2. Full Sequence (6 Steps)
 
 ### Step 1: Accept Standards (Group B)
 
@@ -160,7 +160,7 @@ Work tools. Copied into the project and used from day one.
 
 ---
 
-## Dependency Diagram
+## 3. Dependency Diagram
 
 ```text
 Step 1: Standards (Group B)          Read, accept rules
@@ -184,7 +184,7 @@ Step 6: README_TEMPLATE              Assemble README from template
 
 ---
 
-## What Happens When Order is Violated
+## 4. What Happens When Order is Violated
 
 | Mistake | Consequence |
 |---------|-------------|
@@ -198,7 +198,7 @@ Step 6: README_TEMPLATE              Assemble README from template
 
 ---
 
-## Key Rules
+## 5. Key Rules
 
 1. **Layers:** Each step is a layer. The lower layer must be stable before laying the next. Otherwise layers will have to be relaid.
 
@@ -210,7 +210,7 @@ Step 6: README_TEMPLATE              Assemble README from template
 
 ---
 
-## Path B: Existing Project Integration
+## 6. Path B: Existing Project Integration
 
 The 6-step sequence above assumes a project built from scratch. When integrating zai-agent-toolkit into an **existing project**, the order must adapt — you cannot start from nothing when code already exists.
 
@@ -275,7 +275,7 @@ For existing projects, this step becomes a remediation phase:
 
 ---
 
-## Cross-References
+## 7. Cross-References
 
 | Standard | Relationship |
 |----------|-------------|

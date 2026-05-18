@@ -6,6 +6,52 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2.0.3] - 2026-05-18
+
+### Changed — Section Numbering Unification
+
+Unified section numbering format across all 19 standards. Every `##` heading now uses the `## N. Title` format with sequential numbers starting from 1. No unnumbered H2 sections remain. Cross-references, Version History, and other metadata sections also receive numbers.
+
+**Principle:** Content sections first, metadata sections last (References -> Cross-References -> Version History).
+
+#### Partially numbered -> fully numbered (11 standards)
+
+Added section numbers to previously unnumbered Cross-References, Version History, References sections:
+
+- **STD-SEC-002** (Security Extended): Cross-References -> Section 12, Version History -> Section 13
+- **STD-DOC-003** (Unicode Policy): Cross-References -> Section 16
+- **STD-DOC-002** (Markdown Standard): Cross-References -> Section 14
+- **STD-ENV-002** (Z.ai Integration): SDK Integration -> Section 9 (reordered before Version History), Version History -> Section 10, Cross-References -> Section 11
+- **STD-A11Y-001** (WCAG): Cross-References -> Section 9
+- **STD-SEC-001** (Security Core): Cross-References -> Section 9, Version History -> Section 10
+- **STD-META-001** (Standard ID System): Cross-References -> Section 12
+- **STD-FE-001** (Frontend Standard): Cross-References -> Section 13
+- **STD-AGENT-001** (Subagent Standard): Cross-References -> Section 11
+- **STD-TEST-001** (Testing Standard): References -> Section 12, Cross-References -> Section 13
+- **STD-AGENT-002** (Orchestration Standard): Cross-References -> Section 12
+
+#### Unnumbered -> fully numbered (3 standards)
+
+- **STD-DOC-005** (Code Examples Guide): Full renumbering (16 sections). Removed "Part N." prefixes, replaced with standard `## N.` format. All ### sub-sections renumbered to match parent sections.
+- **STD-ARCH-001** (Implementation Order): Full renumbering (7 sections)
+- **STD-DOC-004** (README Template): Full renumbering (5 sections)
+
+#### Section reordering (content before metadata)
+
+- **STD-GIT-001** (GitHub Core): Moved Log Everything (content) before Cross-References (metadata). New order: 10. Log Everything, 11. Cross-References, 12. Version History
+- **STD-ERR-001** (Error Handling Core): Moved Checklist (content) before Cross-References (metadata). New order: 7. Checklist, 8. Cross-References, 9. Version History
+- **STD-ENV-002** (Z.ai Integration): Moved SDK Integration (content) before Version History (metadata). New order: 9. SDK Integration, 10. Version History, 11. Cross-References
+
+### Fixed — Broken Cross-References (5 references)
+
+- **STD-DOC-002** Section 9.2: "see section 11" -> "see section 12" (Pre-merge Checklist moved after Badges section was added)
+- **STD-FE-001** Section 10.3: "STD-SEC-001 Section 5.1" -> "STD-SEC-001 Section 3.1" (validation schemas, not dependency auditing)
+- **STD-FE-001** Section 10.4: "STD-SEC-001 Section 12.4" -> "STD-SEC-001 Section 8" (sandbox core checklist; STD-SEC-001 only has 10 sections)
+- **STD-ENV-001** Section 6: "STD-ERR-001 Section 7.3 (fallback mechanisms)" -> "STD-ERR-002 Section 4 (fallback mechanisms)" (fallback extracted to STD-ERR-002 in v2.0)
+- **STD-ENV-002** Section 11: "STD-ENV-001 Section 3.1" -> "STD-ENV-001 Section 1.2" (path rules, not version control)
+
+---
+
 ## [2.0.2] - 2026-05-18
 
 ### Changed — Cross-References Format Unification

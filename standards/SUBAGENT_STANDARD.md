@@ -310,7 +310,7 @@ Subagent outputs MUST comply with:
 
 ---
 
-## Cross-References
+## 11. Cross-References
 
 | Standard | Relationship |
 |----------|-------------|

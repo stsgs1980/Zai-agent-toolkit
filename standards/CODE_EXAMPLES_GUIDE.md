@@ -8,7 +8,7 @@
 
 ---
 
-## Unified Educational Document (Full Version)
+## 1. Introduction
 
 **Document Purpose:** Learn to create code examples that:
 - Are understandable at first glance
@@ -19,9 +19,9 @@
 
 ---
 
-## Part 1. Basic Formatting Principles
+## 2. Basic Formatting Principles
 
-### 1.1. Syntax Highlighting
+### 2.1. Syntax Highlighting
 
 **What it is:** Different colors for keywords, strings, comments.
 
@@ -40,7 +40,7 @@ def greet(name):
 
 ---
 
-### 1.2. Code Formatting
+### 2.2. Code Formatting
 
 **What it is:** Proper indentation, spaces, line breaks.
 
@@ -59,7 +59,7 @@ def add(x, y):
 
 ---
 
-### 1.3. Code Style
+### 2.3. Code Style
 
 **What it is:** Unified rules for the entire project or language.
 
@@ -81,9 +81,9 @@ def calculate_sum(a, b):
 
 ---
 
-## Part 2. Copy and Use Principles
+## 3. Copy and Use Principles
 
-### 2.1. Copy-Paste Ready Example
+### 3.1. Copy-Paste Ready Example
 
 **What it is:** Code can be copied and pasted without removing extra characters.
 
@@ -111,7 +111,7 @@ python script.py
 
 ---
 
-### 2.2. Self-Contained Example
+### 3.2. Self-Contained Example
 
 **What it is:** Code works immediately after pasting, does not require external files, network, or database.
 
@@ -133,7 +133,7 @@ print(result)  # [2, 4, 6, 8, 10]
 
 ---
 
-### 2.3. Idempotent Example
+### 3.3. Idempotent Example
 
 **What it is:** Example can be run many times — result is the same each time.
 
@@ -150,7 +150,7 @@ print(2 + 2)  # always 4
 
 ---
 
-### 2.4. Executable / Testable Example
+### 3.4. Executable / Testable Example
 
 **What it is:** Code from documentation is automatically checked during build.
 
@@ -168,9 +168,9 @@ def multiply(a, b):
 
 ---
 
-## Part 3. Showing Changes and Output
+## 4. Showing Changes and Output
 
-### 3.1. Diff / Patch — Showing Changes
+### 4.1. Diff / Patch — Showing Changes
 
 **When needed:** Explaining what changed between two versions.
 
@@ -185,7 +185,7 @@ Green (`+`) — added, red (`-`) — removed.
 
 ---
 
-### 3.2. Code Blocks with Output (REPL-style)
+### 4.2. Code Blocks with Output (REPL-style)
 
 **When needed:** Show not only code but also its result.
 
@@ -213,9 +213,9 @@ print(squares)
 
 ---
 
-## Part 4. Annotations and Explanations
+## 5. Annotations and Explanations
 
-### 4.1. Comments and Arrows (Decorating Code)
+### 5.1. Comments and Arrows (Decorating Code)
 
 **When needed:** Explain a specific place in a long example.
 
@@ -233,7 +233,7 @@ def process(user_data):
 
 ---
 
-### 4.2. Accessibility
+### 5.2. Accessibility
 
 **Problem:** Not all users see colors or use screen readers.
 
@@ -256,9 +256,9 @@ api_key = "your-key-here"
 
 ---
 
-## Part 5. Minimization and Cleanliness
+## 6. Minimization and Cleanliness
 
-### 5.1. Minimal Reproduction
+### 6.1. Minimal Reproduction
 
 **Principle:** Example should be **minimal** but **sufficient**.
 
@@ -285,7 +285,7 @@ print(result)  # 6
 
 ---
 
-### 5.2. Case Sensitivity
+### 6.2. Case Sensitivity
 
 **Problem:** Many languages (Python, Java, C, Go) are case-sensitive.
 
@@ -301,9 +301,9 @@ print("Hello")
 
 ---
 
-## Part 6. Multilingual and Versioning
+## 7. Multilingual and Versioning
 
-### 6.1. Polyglot Examples
+### 7.1. Polyglot Examples
 
 When you need to show **the same algorithm** in multiple languages:
 
@@ -325,7 +325,7 @@ echo "Hello, world!"
 
 ---
 
-### 6.2. Versioning (language / library versions)
+### 7.2. Versioning (language / library versions)
 
 Example may work in Python 3.11 but not in 3.7.
 
@@ -342,9 +342,9 @@ match value:
 
 ---
 
-## Part 7. Folding and Security
+## 8. Folding and Security
 
-### 7.1. Collapsible Long Code
+### 8.1. Collapsible Long Code
 
 When example is long but not all is needed for understanding:
 
@@ -370,7 +370,7 @@ if __name__ == '__main__':
 
 ---
 
-### 7.2. Example Security
+### 8.2. Example Security
 
 **Problem:** User might copy and run dangerous code.
 
@@ -394,9 +394,9 @@ DROP DATABASE IF EXISTS test_db;
 
 ---
 
-## Part 8. Advanced Techniques
+## 9. Advanced Techniques
 
-### 8.1. Live / Interactive Code
+### 9.1. Live / Interactive Code
 
 **What it is:** Code that can be run directly in the browser.
 
@@ -409,7 +409,7 @@ DROP DATABASE IF EXISTS test_db;
 
 ---
 
-### 8.2. Auto-generating Examples from Real Code (Single source of truth)
+### 9.2. Auto-generating Examples from Real Code (Single source of truth)
 
 In professional documentation, code in Markdown is **not written by hand**, but **imported** from the repository.
 
@@ -433,7 +433,7 @@ import CodeBlock from '@theme/CodeBlock';
 
 ---
 
-### 8.3. License and Attribution (legal aspect)
+### 9.3. License and Attribution (legal aspect)
 
 When you take someone else's code for an educational document:
 
@@ -453,9 +453,9 @@ response = requests.get('https://api.github.com')
 
 ---
 
-## Part 9. Tool Markup
+## 10. Tool Markup
 
-### 9.1. Copy Button Attributes
+### 10.1. Copy Button Attributes
 
 On websites there is often a "Copy" button. For it to work correctly:
 
@@ -467,7 +467,7 @@ In Markdown this is not always supported, but the principle: **code block should
 
 ---
 
-## Part 10. Anti-patterns (what NOT to do)
+## 11. Anti-patterns
 
 | Do Not | Do This Instead |
 |--------|-----------------|
@@ -481,7 +481,7 @@ In Markdown this is not always supported, but the principle: **code block should
 
 ---
 
-## Practical Exercise
+## 12. Practical Exercise
 
 Format the following example correctly:
 
@@ -523,7 +523,7 @@ print(result)  # 8
 
 ---
 
-## Cheat Sheet (Markdown Reference)
+## 13. Cheat Sheet
 
 | Task | Syntax |
 |------|--------|
@@ -536,7 +536,7 @@ print(result)  # 8
 
 ---
 
-## Summary: Checklist for Good Code Example
+## 14. Checklist for Good Code Example
 
 - [ ] Syntax highlighting present (language specified)
 - [ ] Indentation and line breaks correct
@@ -552,7 +552,7 @@ print(result)  # 8
 
 ---
 
-## Glossary (Quick Term Reference)
+## 15. Glossary
 
 | Term | Meaning |
 |------|---------|
@@ -577,7 +577,7 @@ print(result)  # 8
 **File is fully ready to use.** Save as `code-examples-guide.md`.
 
 ---
-## Cross-References
+## 16. Cross-References
 
 | Standard | Relationship |
 |----------|-------------|

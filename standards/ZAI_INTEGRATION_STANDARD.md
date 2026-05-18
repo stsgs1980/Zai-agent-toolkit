@@ -169,16 +169,7 @@ When calling chat.z.ai:
 
 ---
 
-## Version History
-
-| Version | Date | Changes |
-|--------|------|---------|
-| 1.1 | 2026-05-14 | Added SDK Integration section with 10 usage rules |
-| 1.0 | 2026-05 | Initial standard extracted from AGENT_RULES.md |
-
----
-
-## v1.1 -- SDK Integration (2026-05-14)
+## 9. SDK Integration
 
 ### SDK Usage Rules
 
@@ -199,11 +190,20 @@ When calling chat.z.ai:
 
 ---
 
-## Cross-References
+## 10. Version History
+
+| Version | Date | Changes |
+|--------|------|---------|
+| 1.1 | 2026-05-14 | Added SDK Integration section with 10 usage rules |
+| 1.0 | 2026-05 | Initial standard extracted from AGENT_RULES.md |
+
+---
+
+## 11. Cross-References
 
 | Standard | Relationship |
 |----------|-------------|
-| STD-ENV-001 | Reproducibility Standard: path rules (Section 3.1 cross-references sandbox path allowance) |
+| STD-ENV-001 | Reproducibility Standard: path rules (Section 1.2 cross-references sandbox path allowance) |
 
 ---
 

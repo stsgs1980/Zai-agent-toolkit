@@ -284,7 +284,7 @@ A: Yes. For example, a linter can output: `Error: STD-FE-001 violation — compo
 
 ---
 
-## Cross-References
+## 12. Cross-References
 
 | Standard | Relationship |
 |----------|-------------|

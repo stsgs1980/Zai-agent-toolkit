@@ -574,7 +574,7 @@ Document skipped E2E with a comment in the test configuration:
 
 ---
 
-## References
+## 12. References
 
 - Jest Documentation: https://jestjs.io/
 - Vitest Documentation: https://vitest.dev/
@@ -584,7 +584,7 @@ Document skipped E2E with a comment in the test configuration:
 
 ---
 
-## Cross-References
+## 13. Cross-References
 
 | Standard | Relationship |
 |----------|-------------|

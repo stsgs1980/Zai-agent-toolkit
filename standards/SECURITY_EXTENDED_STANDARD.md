@@ -601,7 +601,7 @@ Is this project in Z.ai sandbox (prototype/MVP)?
 
 ---
 
-## Cross-References
+## 12. Cross-References
 
 | Standard | Relationship |
 |----------|-------------|
@@ -611,7 +611,7 @@ Is this project in Z.ai sandbox (prototype/MVP)?
 
 ---
 
-## Version History
+## 13. Version History
 
 | Version | Date | Changes |
 |---------|------|---------|

@@ -287,7 +287,7 @@ Filled values MUST show ratio >= 4.5:1 for normal text.
 
 ---
 
-## Cross-References
+## 9. Cross-References
 
 | Standard | Relationship |
 |----------|-------------|

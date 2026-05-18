@@ -310,7 +310,7 @@ For the default value in this stack, see `README_TEMPLATE.md`.
 
 **Process:**
 
-1. Validation by checklist (see section 11)
+1. Validation by checklist (see section 12)
 2. Fix violations
 3. Add stack signature (if root file)
 4. Review in Code Review
@@ -458,7 +458,7 @@ Client          Server          Database
 
 ---
 
-## Cross-References
+## 14. Cross-References
 
 | Standard | Relationship |
 |----------|-------------|
