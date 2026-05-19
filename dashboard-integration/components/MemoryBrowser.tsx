@@ -228,9 +228,9 @@ export function MemoryBrowser() {
         <div
           className="rounded-lg p-4 space-y-3"
           style={{
-            background: 'linear-gradient(135deg, #0f172a, #1e293b)',
+            background: '#0f172a',
             border: `1px solid ${activeTypeConf?.color || '#a855f7'}33`,
-            boxShadow: `0 0 20px ${activeTypeConf?.color || '#a855f7'}11`,
+            boxShadow: 'none',
           }}
         >
           <div className="flex items-center gap-2">
@@ -307,8 +307,8 @@ export function MemoryBrowser() {
             key={entry.id}
             className="rounded-lg p-3 transition-all hover:border-zinc-600"
             style={{
-              background: 'linear-gradient(135deg, #0f172a, #1e293b)',
-              border: `1px solid ${typeConf ? `${typeConf.color}22` : '#1e293b55'}`,
+              background: '#0f172a',
+              border: `1px solid ${typeConf ? `${typeConf.color}22` : '#1e293b'}`,
             }}
           >
             <div className="flex items-start justify-between gap-2">
@@ -365,8 +365,8 @@ export function MemoryBrowser() {
             key={result.id}
             className="rounded-lg p-3 transition-all hover:border-sky-500/30"
             style={{
-              background: 'linear-gradient(135deg, #0f172a, #1e293b)',
-              border: '1px solid #1e293b55',
+              background: '#0f172a',
+              border: '1px solid #1e293b',
             }}
           >
             <div className="flex items-start justify-between gap-2 mb-2">

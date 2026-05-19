@@ -62,10 +62,10 @@ export function DashboardHome() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 rounded animate-pulse" style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b)' }} />
+        <div className="h-8 w-48 rounded animate-pulse" style={{ background: '#0f172a' }} />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-24 rounded-lg animate-pulse" style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b)' }} />
+            <div key={i} className="h-24 rounded-lg animate-pulse" style={{ background: '#0f172a' }} />
           ))}
         </div>
       </div>
@@ -91,14 +91,13 @@ export function DashboardHome() {
         <div
           className="rounded-lg p-4 relative overflow-hidden"
           style={{
-            background: 'linear-gradient(135deg, #0f172a, #1e293b)',
-            border: '1px solid #38bdf833',
-            boxShadow: '0 0 20px #38bdf808',
+            background: '#0f172a',
+            border: '1px solid #1e293b',
           }}
         >
           <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, #38bdf8, transparent)' }} />
           <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-mono mb-1">Total Entries</div>
-          <div className="text-2xl font-mono font-bold text-sky-400" style={{ textShadow: '0 0 12px #38bdf844' }}>
+          <div className="text-2xl font-mono font-bold text-sky-400">
             {stats.entries.total}
           </div>
         </div>
@@ -107,14 +106,13 @@ export function DashboardHome() {
         <div
           className="rounded-lg p-4 relative overflow-hidden"
           style={{
-            background: 'linear-gradient(135deg, #0f172a, #1e293b)',
-            border: '1px solid #a855f733',
-            boxShadow: '0 0 20px #a855f708',
+            background: '#0f172a',
+            border: '1px solid #1e293b',
           }}
         >
           <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, #a855f7, transparent)' }} />
           <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-mono mb-1">Graph Nodes</div>
-          <div className="text-2xl font-mono font-bold text-purple-400" style={{ textShadow: '0 0 12px #a855f744' }}>
+          <div className="text-2xl font-mono font-bold text-purple-400">
             {stats.graph.nodeCount}
           </div>
           <div className="text-[10px] text-zinc-600 font-mono">{stats.graph.edgeCount} edges</div>
@@ -124,14 +122,13 @@ export function DashboardHome() {
         <div
           className="rounded-lg p-4 relative overflow-hidden"
           style={{
-            background: 'linear-gradient(135deg, #0f172a, #1e293b)',
-            border: '1px solid #4ade8033',
-            boxShadow: '0 0 20px #4ade8008',
+            background: '#0f172a',
+            border: '1px solid #1e293b',
           }}
         >
           <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, #4ade80, transparent)' }} />
           <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-mono mb-1">Experiences</div>
-          <div className="text-2xl font-mono font-bold text-emerald-400" style={{ textShadow: '0 0 12px #4ade8044' }}>
+          <div className="text-2xl font-mono font-bold text-emerald-400">
             {stats.experience.total}
           </div>
           <div className="text-[10px] text-zinc-600 font-mono">
@@ -143,16 +140,15 @@ export function DashboardHome() {
         <div
           className="rounded-lg p-4 relative overflow-hidden"
           style={{
-            background: 'linear-gradient(135deg, #0f172a, #1e293b)',
-            border: `1px solid ${stats.experience.conflict > 0 ? '#ef444433' : '#1e293b55'}`,
-            boxShadow: `0 0 20px ${stats.experience.conflict > 0 ? '#ef444408' : 'transparent'}`,
+            background: '#0f172a',
+            border: `1px solid ${stats.experience.conflict > 0 ? '#ef444433' : '#1e293b'}`,
           }}
         >
           <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: `linear-gradient(90deg, ${stats.experience.conflict > 0 ? '#ef4444' : '#374151'}, transparent)` }} />
           <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-mono mb-1">Conflicts</div>
           <div
             className="text-2xl font-mono font-bold"
-            style={{ color: stats.experience.conflict > 0 ? '#f87171' : '#4b5563', textShadow: stats.experience.conflict > 0 ? '0 0 12px #ef444444' : 'none' }}
+            style={{ color: stats.experience.conflict > 0 ? '#f87171' : '#4b5563' }}
           >
             {stats.experience.conflict}
           </div>
@@ -165,10 +161,10 @@ export function DashboardHome() {
       {/* ── Entry type breakdown ── */}
       <div
         className="rounded-lg p-4"
-        style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b)', border: '1px solid #1e293b55' }}
+        style={{ background: '#0f172a', border: '1px solid #1e293b' }}
       >
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-1.5 h-1.5 rounded-full bg-purple-400" style={{ boxShadow: '0 0 4px #a855f788' }} />
+          <div className="w-1.5 h-1.5 rounded-full bg-purple-400" />
           <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-mono">Entries by Type</span>
         </div>
 
@@ -203,10 +199,10 @@ export function DashboardHome() {
       {graphEdgeTypes.length > 0 && (
         <div
           className="rounded-lg p-4"
-          style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b)', border: '1px solid #1e293b55' }}
+          style={{ background: '#0f172a', border: '1px solid #1e293b55' }}
         >
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-sky-400" style={{ boxShadow: '0 0 4px #38bdf888' }} />
+            <div className="w-1.5 h-1.5 rounded-full bg-sky-400" />
             <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-mono">Graph Edge Types</span>
           </div>
 
@@ -215,7 +211,7 @@ export function DashboardHome() {
               <div
                 key={type}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-                style={{ background: '#0f172acc', border: '1px solid #1e293b55' }}
+                style={{ background: '#0f172a', border: '1px solid #1e293b55' }}
               >
                 <span className="text-xs text-zinc-400 font-mono">{type}</span>
                 <span className="text-xs font-mono font-bold text-zinc-200">{count}</span>

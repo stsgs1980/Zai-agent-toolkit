@@ -27,7 +27,7 @@ export function InputArea({
   return (
     <div
       className="rounded-lg overflow-hidden"
-      style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b)', border: '1px solid #33415544' }}
+      style={{ background: '#0f172a', border: '1px solid #1e293b' }}
     >
       {/* Header bar */}
       <div className="flex items-center gap-2 px-3 py-2 border-b border-zinc-800">

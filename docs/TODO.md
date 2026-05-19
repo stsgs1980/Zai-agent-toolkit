@@ -1,6 +1,6 @@
 # TODO: Zai-agent-toolkit
 
-> Last updated: 2026-05-18
+> Last updated: 2026-05-19
 
 ---
 
@@ -510,6 +510,109 @@ Translated to English (v2.0.5).
 | P3 | Fact-checking pipeline (verify extracted knowledge) | experience system | Pending |
 | P3 | Auto-generate session summary on sandbox exit | session_summary.py | Pending |
 | P4 | Mixed languages in docs | -- | Done |
+| P3 | Clean dead folders (.zcode\hooks, .zcode\session-automation) | -- | Done (2026-05-19) |
+| P3 | Fix sync_index.py role detection (0 "other" from 83) | -- | Done (2026-05-19) |
+| P3 | Add Sync-Index + Check-IndexSync to $PROFILE | -- | Done (2026-05-19) |
+| P3 | Install dashboard integration on Windows (install.ps1) | -- | Pending |
+| P3 | Run graph-scan on project folders | install.ps1 | Pending |
+
+---
+
+## 8. Multi-Project Architecture (PLANNED — Phase 2)
+
+> Depends on: Section 1 (Git Submodule Conversion)
+
+### Current State (Single Project)
+
+All memory infrastructure serves only `Zai-agent-toolkit`. When 50+ projects connect as submodules, each will need indexing and cross-project search.
+
+### Architecture
+
+```text
+C:\Users\stsgr\.zcode\
+  memory\
+    chromadb\                    <- SHARED: vectors for all projects
+      collections:
+        knowledge                <- Cross-project terms, patterns
+        experience               <- Cross-project lessons learned
+        skills                   <- Shared skill registry
+        commands                 <- Shared command library
+        troubleshooting          <- Shared troubleshooting
+        architecture             <- Shared architecture patterns
+        project_index            <- File index (ALL projects, tagged by project)
+    project-index\
+      zai-toolkit-index.json     <- Index metadata per project
+      project-a-index.json
+      project-b-index.json
+    graph.json                   <- SHARED: edges with same_project grouping
+    sessions\
+    knowledge\
+
+C:\Users\stsgr\projects\
+  project-a\
+    Zai-agent-toolkit\           <- git submodule
+  project-b\
+    Zai-agent-toolkit\           <- git submodule (same version)
+```
+
+### Key Principles
+
+| Principle | Rule | Reason |
+|-----------|------|--------|
+| Shared knowledge base | One ChromaDB, entries tagged `project:XXX` | Cross-project search: "how did I solve this before?" |
+| Per-project file indexes | Separate JSON files per project | Fast incremental sync, no cross-contamination |
+| Unified graph | One graph.json with `same_project` edges | Navigate relationships across projects |
+| Submodule dedup | Toolkit indexed once, not per-project | Same toolkit in 50 projects = 1 index, not 50 |
+
+### Required Changes
+
+| # | Change | File | Status |
+|---|--------|------|--------|
+| 1 | Add `--root` parameter to sync_index.py | sync_index.py | Pending |
+| 2 | Add `project` tag to all ChromaDB entries | sync_index.py, memory_cli.py | Pending |
+| 3 | Add `same_project` edge type to graph_engine.py | graph_engine.py | Pending |
+| 4 | Auto-detect project name from git remote or folder name | sync_index.py | Pending |
+| 5 | Create `Sync-AllIndexes` PS function | session-functions.ps1 | Pending |
+| 6 | Per-project JSON index files | sync_index.py | Pending |
+| 7 | Dashboard filter by project | dashboard components | Pending |
+
+### `same_project` Edge Type
+
+```python
+# In graph_engine.py EDGE_TYPES
+"same_project": {
+    "description": "Files belong to same project",
+    "direction": "bidirectional",
+    "color": "#8B5CF6",  # purple
+    "auto": True  # created by sync_index.py when --project is set
+}
+```
+
+### Sync-AllIndexes Logic
+
+```powershell
+function Sync-AllIndexes {
+    $projects = @(
+        @{Name="zai-toolkit"; Path="$env:USERPROFILE\.zcode\Zai-agent-toolkit"},
+        # Auto-discover: all folders with Zai-agent-toolkit submodule
+        # Get-ChildItem "$env:USERPROFILE\projects" -Directory |
+        #   Where-Object { Test-Path "$_\Zai-agent-toolkit" }
+    )
+    foreach ($p in $projects) {
+        Write-Host "[$($p.Name)]" -ForegroundColor Cyan
+        python sync_index.py --root $p.Path --project $p.Name
+    }
+}
+```
+
+### Risks
+
+| Risk | Probability | Mitigation |
+|------|------------|------------|
+| ChromaDB grows too large (50 projects x 200 files) | Medium | 10K entries is fine for ChromaDB (handles 1M+) |
+| Same file indexed from multiple projects | High | Hash-based dedup in project_index collection |
+| Toolkit files appear in every project index | High | Index toolkit once with `project:zai-toolkit`, skip in project scans |
+| Graph becomes too connected | Medium | Filter by `same_project` edge in dashboard |
 
 ---
 

@@ -162,8 +162,8 @@ export function HotCommandsView() {
       <div
         className="rounded-lg overflow-hidden"
         style={{
-          background: 'linear-gradient(135deg, #0f172a, #1e293b)',
-          border: '1px solid #1e293b55',
+          background: '#0f172a',
+          border: '1px solid #1e293b',
         }}
       >
         {/* Header */}
@@ -172,7 +172,7 @@ export function HotCommandsView() {
           style={{
             gridTemplateColumns: mode === 'commands' ? '1fr 1.5fr 2fr' : '1fr 1.5fr 1fr',
             background: '#0f172a',
-            borderBottom: '1px solid #1e293b55',
+            borderBottom: '1px solid #1e293b',
           }}
         >
           <span className="text-zinc-500">Name</span>

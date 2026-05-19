@@ -88,6 +88,7 @@ Z.ai sandbox provides system skills in `/home/z/my-project/skills/`. They do NOT
 | `doc-gen` | Documents | PDF, DOCX, XLSX generation |
 | `c4-architecture` | Architecture | C4 model diagrams with Mermaid |
 | `anti-monolith` | Architecture | Modular architecture enforcement |
+| `session-experience` | Session | Auto-save session experience to ChromaDB |
 | `session-handoff` | Session | Context handoff between sessions |
 | `session-resume` | Session | Session recovery after restart |
 | `ui-ux-pro-max` | Design | Advanced UI/UX patterns |
@@ -128,6 +129,7 @@ Z.ai sandbox provides system skills in `/home/z/my-project/skills/`. They do NOT
 |----|------------|---------|--------|
 | ZAI-SESSION-001 | session-log | 1.1 | Active |
 | ZAI-SESSION-002 | context-consolidation | 1.0 | Active |
+| ZAI-SESSION-003 | session-experience | 1.0 | Active |
 
 ### 5.4. Development (DEV)
 
