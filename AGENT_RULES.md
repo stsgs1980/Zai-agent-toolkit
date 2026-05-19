@@ -181,6 +181,7 @@ See `instructions/writing-plans.md` for full details.
 | ZAI-STS-004 | `frontend-styling-expert_sts` | CSS/styling specialist for responsive design |
 | ZAI-STS-005 | `phi-layout_sts` | Proportional CSS Grid layouts using golden ratio |
 | ZAI-STS-006 | `zai-ui-composer_sts` | Production UI composition with zai-ui-kit tokens |
+| ZAI-STS-007 | `workflow-discipline_sts` | MANDATORY: 7 workflow rules, ALWAYS active, auto-trigger at session start |
 
 ### 8.2 System Skills (Z.ai sandbox only)
 
@@ -336,6 +337,69 @@ Key rules:
 - Always close stdin: `</dev/null`
 - Always use `127.0.0.1` for health checks (not `localhost` -- IPv6 issues)
 - Server lives ~5 min; watchdog should check every 5 min
+
+## 15. Workflow Communication Rules
+
+**NON-NEGOTIABLE.** These rules apply to EVERY response, EVERY task, EVERY instruction.
+Violating any rule is a critical error. See skill `ZAI-STS-007` (`workflow-discipline_sts`) for full details.
+
+### 15.1 Explain WHY Before HOW
+
+Before giving ANY command or instruction, state:
+- **WHAT** the goal is
+- **WHY** it's needed
+- **WHAT to expect** as result
+
+Never give a bare command without context.
+
+### 15.2 One Task = One Complete Command
+
+Every instruction must include ALL context:
+- Which directory (or absolute path)
+- Prerequisites (server running? which port? which terminal?)
+- The EXACT command to copy-paste
+- What output to expect (success/failure signals)
+
+Never give multi-step sequences as one lump.
+
+### 15.3 Check Environment Before Instructing
+
+Before telling the user to run anything, verify what you can:
+- Is the server running? On which port?
+- Is the current directory correct?
+- Are dependencies installed?
+- Is git clean?
+
+If you cannot verify: say so explicitly.
+
+### 15.4 Never Break Working Things
+
+If something works, do NOT refactor, rename, restructure, or replace it
+unless explicitly asked. Stability over elegance.
+
+### 15.5 Test Before Push
+
+Never push code that hasn't been verified:
+- Run build/typecheck before committing
+- Verify the change does what it's supposed to
+- If you can't test: say so and ask the user to verify
+
+### 15.6 No Parallel Structures
+
+Do NOT create alternatives alongside existing systems:
+- If a file exists, EXTEND it — don't create a v2
+- If a config is in place, MODIFY it — don't add a competing one
+- If a utility exists, USE it — don't write a similar one
+
+Before creating any new file: "Does something exist that I should extend?"
+
+### 15.7 Report Failures Honestly
+
+When something goes wrong:
+- State WHAT failed (specific error)
+- State WHY it failed (root cause)
+- State WHAT you'll do about it
+- Never hide errors or move on without addressing them
 
 ---
 
