@@ -15,6 +15,7 @@ interface SkillEntry {
   name: string
   description: string
   trigger: string
+  command: string
   category: string
 }
 
@@ -49,15 +50,15 @@ const COMMANDS: CommandEntry[] = [
 ]
 
 const SKILLS: SkillEntry[] = [
-  { name: 'anti-monolith', description: 'Декомпозиция больших файлов и компонентов', trigger: 'ZAI-ARCH-002', category: 'Architecture' },
-  { name: 'session-experience', description: 'Автосохранение опыта сессии в ChromaDB', trigger: 'ZAI-SESSION-003', category: 'Session' },
-  { name: 'memory-store', description: 'Сохранение записей в память', trigger: 'ZAI-MEM-001', category: 'Memory' },
-  { name: 'memory-query', description: 'Поиск по памяти', trigger: 'ZAI-MEM-002', category: 'Memory' },
-  { name: 'folder-indexer', description: 'Индексация файлов и зависимостей', trigger: 'ZAI-FS-001', category: 'FileSystem' },
-  { name: 'session-log', description: 'Логирование сессии', trigger: 'ZAI-SESSION-001', category: 'Session' },
-  { name: 'context-consolidation', description: 'Сжатие контекста при переполнении', trigger: 'ZAI-SESSION-002', category: 'Session' },
-  { name: 'doc-intelligence', description: 'AI-экстракция из документов', trigger: 'DocIntel', category: 'AI' },
-  { name: 'graph-engine', description: 'Граф зависимостей и связей', trigger: 'GraphEngine', category: 'Graph' },
+  { name: 'anti-monolith', description: 'Декомпозиция больших файлов и компонентов', trigger: 'ZAI-ARCH-002', command: '$anti-monolith', category: 'Architecture' },
+  { name: 'session-experience', description: 'Автосохранение опыта сессии в ChromaDB', trigger: 'ZAI-SESSION-003', command: '$session-experience', category: 'Session' },
+  { name: 'memory-store', description: 'Сохранение записей в память', trigger: 'ZAI-MEM-001', command: '$memory-store', category: 'Memory' },
+  { name: 'memory-query', description: 'Поиск по памяти', trigger: 'ZAI-MEM-002', command: '$memory-query', category: 'Memory' },
+  { name: 'folder-indexer', description: 'Индексация файлов и зависимостей', trigger: 'ZAI-FS-001', command: '$folder-indexer', category: 'FileSystem' },
+  { name: 'session-log', description: 'Логирование сессии', trigger: 'ZAI-SESSION-001', command: '$session-log', category: 'Session' },
+  { name: 'context-consolidation', description: 'Сжатие контекста при переполнении', trigger: 'ZAI-SESSION-002', command: '$context-consolidation', category: 'Session' },
+  { name: 'doc-intelligence', description: 'AI-экстракция из документов', trigger: 'DocIntel', command: '$doc-intelligence', category: 'AI' },
+  { name: 'graph-engine', description: 'Граф зависимостей и связей', trigger: 'GraphEngine', command: '$graph-engine', category: 'Graph' },
 ]
 
 // ── Category colors ──
@@ -170,7 +171,7 @@ export function HotCommandsView() {
         <div
           className="grid gap-2 px-4 py-2.5 text-[10px] font-mono uppercase tracking-wider"
           style={{
-            gridTemplateColumns: mode === 'commands' ? '1fr 1.5fr 2fr' : '1fr 1.5fr 1fr',
+            gridTemplateColumns: mode === 'commands' ? '1fr 1.5fr 2fr' : '1fr 1.5fr 0.8fr 1.2fr',
             background: '#0f172a',
             borderBottom: '1px solid #1e293b',
           }}
@@ -178,6 +179,7 @@ export function HotCommandsView() {
           <span className="text-zinc-500">Name</span>
           <span className="text-zinc-500">Description</span>
           <span className="text-zinc-500">{mode === 'commands' ? 'Command' : 'Trigger ID'}</span>
+          {mode === 'skills' && <span className="text-zinc-500">Command</span>}
         </div>
 
         {/* Rows */}
@@ -190,7 +192,7 @@ export function HotCommandsView() {
               key={i}
               className="grid gap-2 px-4 py-2.5 text-xs transition-colors hover:bg-zinc-800/30"
               style={{
-                gridTemplateColumns: mode === 'commands' ? '1fr 1.5fr 2fr' : '1fr 1.5fr 1fr',
+                gridTemplateColumns: mode === 'commands' ? '1fr 1.5fr 2fr' : '1fr 1.5fr 0.8fr 1.2fr',
                 borderBottom: i < filteredItems.length - 1 ? '1px solid #1e293b33' : 'none',
               }}
             >
@@ -208,13 +210,25 @@ export function HotCommandsView() {
               {/* Description */}
               <span className="text-zinc-400 text-[11px]">{item.description}</span>
 
-              {/* Command / Trigger */}
+              {/* Trigger ID (skills) or Command (commands) */}
               <code
                 className="text-[11px] px-2 py-0.5 rounded bg-zinc-900/80 text-emerald-400 border border-emerald-500/15 font-mono truncate"
                 style={{ maxWidth: '100%', display: 'inline-block' }}
               >
                 {mode === 'commands' ? (item as CommandEntry).command : (item as SkillEntry).trigger}
               </code>
+
+              {/* Command for copy&paste (skills only) */}
+              {mode === 'skills' && (
+                <code
+                  className="text-[11px] px-2 py-0.5 rounded bg-zinc-900/80 text-amber-400 border border-amber-500/15 font-mono truncate cursor-pointer hover:bg-zinc-800/80 transition-colors"
+                  style={{ maxWidth: '100%', display: 'inline-block' }}
+                  onClick={() => navigator.clipboard.writeText((item as SkillEntry).command)}
+                  title="Click to copy"
+                >
+                  {(item as SkillEntry).command}
+                </code>
+              )}
             </div>
           )
         })}
@@ -225,7 +239,7 @@ export function HotCommandsView() {
         <span className="text-[10px] text-zinc-700 font-mono">
           {mode === 'commands'
             ? 'Click command to copy | Run in PowerShell or terminal'
-            : 'Skills auto-activate by triggers or call by ID'}
+            : 'Click Command to copy | Call skill by $name or Trigger ID'}
         </span>
       </div>
     </div>
