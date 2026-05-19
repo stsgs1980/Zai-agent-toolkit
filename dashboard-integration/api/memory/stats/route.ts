@@ -1,41 +1,10 @@
 import { NextResponse } from "next/server";
-import { execFile } from "child_process";
 import path from "path";
 import fs from "fs";
+import { runPython } from "@/lib/memory/bridge";
+import { MemoryCache } from "@/lib/memory/cache";
 
-// ── Python bridge ──────────────────────────────────────────
-
-function getToolPath(tool: string): string {
-  const home = process.env.USERPROFILE || process.env.HOME || "";
-  const toolkitPath = process.env.ZAI_TOOLKIT_PATH || path.join(home, ".zcode", "Zai-agent-toolkit");
-  const userToolsPath = path.join(home, ".zcode", "tools");
-
-  const userTool = path.join(userToolsPath, tool);
-  const toolkitTool = path.join(toolkitPath, "tools", tool);
-
-  if (fs.existsSync(userTool)) return userTool;
-  if (fs.existsSync(toolkitTool)) return toolkitTool;
-  return toolkitTool;
-}
-
-function runPython(tool: string, args: string[]): Promise<string> {
-  const toolPath = getToolPath(tool);
-  return new Promise((resolve, reject) => {
-    execFile("python", [toolPath, ...args], {
-      maxBuffer: 10 * 1024 * 1024,
-      timeout: 30000,
-      windowsHide: true,
-      encoding: "utf-8",
-      env: { ...process.env, PYTHONIOENCODING: "utf-8" },
-    }, (err, stdout, stderr) => {
-      if (err) {
-        reject(new Error(stderr || err.message));
-        return;
-      }
-      resolve(stdout);
-    });
-  });
-}
+const cache = MemoryCache.getInstance();
 
 // ── Graph.json reader (for fast stats, no Python needed) ───
 
@@ -65,60 +34,64 @@ function readGraphData(): GraphData | null {
 
 export async function GET() {
   try {
-    // 1. Count entries per type using export (fast, reliable JSON)
-    const types = ["knowledge", "pattern", "command", "project", "session", "template", "experience"];
-    const typeCounts: Record<string, number> = {};
+    return await cache.getOrFetch("stats", async () => {
+      // 1. Count entries per type using export (fast, reliable JSON)
+      const types = ["knowledge", "pattern", "command", "project", "session", "template", "experience"];
+      const typeCounts: Record<string, number> = {};
 
-    // Run exports in parallel
-    const exportPromises = types.map(async (type) => {
-      try {
-        const output = await runPython("memory_cli.py", ["export", type]);
-        const data = JSON.parse(output) as { count: number };
-        typeCounts[type] = data.count || 0;
-      } catch {
-        typeCounts[type] = 0;
-      }
-    });
-
-    await Promise.all(exportPromises);
-
-    const totalEntries = Object.values(typeCounts).reduce((a, b) => a + b, 0);
-
-    // 2. Graph stats (fast, from file — no Python needed)
-    const graphData = readGraphData();
-    const graphStats = graphData
-      ? {
-          nodeCount: new Set([
-            ...graphData.edges.map(e => e.from),
-            ...graphData.edges.map(e => e.to),
-            ...(graphData.isolated_nodes || []),
-          ]).size,
-          edgeCount: graphData.edges.length,
-          edgeTypes: graphData.edges.reduce<Record<string, number>>((acc, e) => {
-            acc[e.type] = (acc[e.type] || 0) + 1;
-            return acc;
-          }, {}),
+      // Run exports in parallel
+      const exportPromises = types.map(async (type) => {
+        try {
+          const output = await runPython("memory_cli.py", ["export", type]);
+          const data = JSON.parse(output) as { count: number };
+          typeCounts[type] = data.count || 0;
+        } catch {
+          typeCounts[type] = 0;
         }
-      : { nodeCount: 0, edgeCount: 0, edgeTypes: {} };
+      });
 
-    // 3. Experience stats
-    let experienceStats = { total: 0, verified: 0, unverified: 0, conflict: 0 };
-    try {
-      const expOutput = await runPython("session_summary.py", ["list"]);
-      const lines = expOutput.split("\n").filter(l => l.trim());
-      experienceStats.total = lines.filter(l => l.match(/^\[/)).length;
-      experienceStats.verified = lines.filter(l => l.includes("verified")).length;
-      experienceStats.unverified = lines.filter(l => l.includes("unverified")).length;
-      experienceStats.conflict = lines.filter(l => l.includes("conflict")).length;
-    } catch {
-      // session_summary.py may not have entries yet
-    }
+      await Promise.all(exportPromises);
 
-    return NextResponse.json({
-      entries: { byType: typeCounts, total: totalEntries },
-      graph: graphStats,
-      experience: experienceStats,
-      timestamp: new Date().toISOString(),
+      const totalEntries = Object.values(typeCounts).reduce((a, b) => a + b, 0);
+
+      // 2. Graph stats (fast, from file — no Python needed)
+      const graphData = readGraphData();
+      const graphStats = graphData
+        ? {
+            nodeCount: new Set([
+              ...graphData.edges.map(e => e.from),
+              ...graphData.edges.map(e => e.to),
+              ...(graphData.isolated_nodes || []),
+            ]).size,
+            edgeCount: graphData.edges.length,
+            edgeTypes: graphData.edges.reduce<Record<string, number>>((acc, e) => {
+              acc[e.type] = (acc[e.type] || 0) + 1;
+              return acc;
+            }, {}),
+          }
+        : { nodeCount: 0, edgeCount: 0, edgeTypes: {} };
+
+      // 3. Experience stats
+      let experienceStats = { total: 0, verified: 0, unverified: 0, conflict: 0 };
+      try {
+        const expOutput = await runPython("session_summary.py", ["list"]);
+        const lines = expOutput.split("\n").filter(l => l.trim());
+        experienceStats.total = lines.filter(l => l.match(/^\[/)).length;
+        experienceStats.verified = lines.filter(l => l.includes("verified")).length;
+        experienceStats.unverified = lines.filter(l => l.includes("unverified")).length;
+        experienceStats.conflict = lines.filter(l => l.includes("conflict")).length;
+      } catch {
+        // session_summary.py may not have entries yet
+      }
+
+      const result = {
+        entries: { byType: typeCounts, total: totalEntries },
+        graph: graphStats,
+        experience: experienceStats,
+        timestamp: new Date().toISOString(),
+      };
+
+      return NextResponse.json(result);
     });
   } catch (err) {
     console.error("[stats/route.ts] GET error:", err);

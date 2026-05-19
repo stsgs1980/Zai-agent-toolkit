@@ -90,7 +90,7 @@ These domains contain skills that belong to the Zai-agent-toolkit repository:
 | ZAI-STS-004 | frontend-styling-expert_sts | 1.0 | STS | Active | both |
 | ZAI-STS-005 | phi-layout_sts | 3.0 | STS | Active | both |
 | ZAI-STS-006 | zai-ui-composer_sts | 1.1.2 | STS | Active | sandbox |
-| ZAI-STS-007 | (available) | - | - | - | - |
+| ZAI-STS-007 | workflow-discipline_sts | 1.0 | STS | Active | both |
 
 ---
 
@@ -149,7 +149,7 @@ Next available IDs by domain:
 | ARCH | ZAI-ARCH-002 |
 | QA | ZAI-QA-002 |
 | REQ | ZAI-REQ-002 |
-| STS | ZAI-STS-007 |
+| STS | ZAI-STS-008 |
 
 ---
 

@@ -1,41 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { execFile } from "child_process";
-import path from "path";
-import fs from "fs";
-
-// ── Python bridge ──────────────────────────────────────────
-
-function getToolPath(tool: string): string {
-  const home = process.env.USERPROFILE || process.env.HOME || "";
-  const toolkitPath = process.env.ZAI_TOOLKIT_PATH || path.join(home, ".zcode", "Zai-agent-toolkit");
-  const userToolsPath = path.join(home, ".zcode", "tools");
-
-  const userTool = path.join(userToolsPath, tool);
-  const toolkitTool = path.join(toolkitPath, "tools", tool);
-
-  if (fs.existsSync(userTool)) return userTool;
-  if (fs.existsSync(toolkitTool)) return toolkitTool;
-  return toolkitTool;
-}
-
-function runPython(tool: string, args: string[]): Promise<string> {
-  const toolPath = getToolPath(tool);
-  return new Promise((resolve, reject) => {
-    execFile("python", [toolPath, ...args], {
-      maxBuffer: 10 * 1024 * 1024,
-      timeout: 30000,
-      windowsHide: true,
-      encoding: "utf-8",
-      env: { ...process.env, PYTHONIOENCODING: "utf-8" },
-    }, (err, stdout, stderr) => {
-      if (err) {
-        reject(new Error(stderr || err.message));
-        return;
-      }
-      resolve(stdout);
-    });
-  });
-}
+import { runPython } from "@/lib/memory/bridge";
 
 // ── Types ───────────────────────────────────────────────────
 
@@ -157,6 +121,8 @@ function parseQueryOutput(output: string): SearchResult[] {
 
 // ── GET: Semantic search ────────────────────────────────────
 // ?q=search+query&type=knowledge&limit=10
+// NOTE: Search is not cached — queries are dynamic and unpredictable.
+// The Python bridge itself is warmed by preload for faster cold starts.
 
 export async function GET(request: NextRequest) {
   try {

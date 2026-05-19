@@ -67,14 +67,14 @@ The AI agent will:
 ---
 name: your-skill-name_sts
 description: What this skill does and when to use it
-id: ZAI-STS-007
+id: ZAI-STS-008
 version: 1.0
 trigger: keyword1, keyword2
 ---
 
 # Skill: Your Skill Name v1.0
 
-> ID: ZAI-STS-007
+> ID: ZAI-STS-008
 > Version: 1.0
 > Last Updated: 2026-05
 
@@ -156,7 +156,7 @@ trigger: keyword1, keyword2
 | ZAI-STS-004 | frontend-styling-expert_sts | 2026-05 |
 | ZAI-STS-005 | phi-layout_sts | 2026-05 |
 | ZAI-STS-006 | zai-ui-composer_sts | 2026-05 |
-| ZAI-STS-007 | (available) | - |
+| ZAI-STS-007 | workflow-discipline_sts | 2026-05 |
 
 ### Naming Convention
 

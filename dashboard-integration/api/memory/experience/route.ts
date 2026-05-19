@@ -1,41 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { execFile } from "child_process";
-import path from "path";
-import fs from "fs";
+import { runPython } from "@/lib/memory/bridge";
+import { MemoryCache } from "@/lib/memory/cache";
 
-// ── Python bridge ──────────────────────────────────────────
-
-function getToolPath(tool: string): string {
-  const home = process.env.USERPROFILE || process.env.HOME || "";
-  const toolkitPath = process.env.ZAI_TOOLKIT_PATH || path.join(home, ".zcode", "Zai-agent-toolkit");
-  const userToolsPath = path.join(home, ".zcode", "tools");
-
-  const userTool = path.join(userToolsPath, tool);
-  const toolkitTool = path.join(toolkitPath, "tools", tool);
-
-  if (fs.existsSync(userTool)) return userTool;
-  if (fs.existsSync(toolkitTool)) return toolkitTool;
-  return toolkitTool;
-}
-
-function runPython(tool: string, args: string[]): Promise<string> {
-  const toolPath = getToolPath(tool);
-  return new Promise((resolve, reject) => {
-    execFile("python", [toolPath, ...args], {
-      maxBuffer: 10 * 1024 * 1024,
-      timeout: 30000,
-      windowsHide: true,
-      encoding: "utf-8",
-      env: { ...process.env, PYTHONIOENCODING: "utf-8" },
-    }, (err, stdout, stderr) => {
-      if (err) {
-        reject(new Error(stderr || err.message));
-        return;
-      }
-      resolve(stdout);
-    });
-  });
-}
+const cache = MemoryCache.getInstance();
 
 // ── Parse session_summary.py list output ───────────────────
 // Format:
@@ -152,8 +119,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ entries, count: entries.length, query });
     }
 
-    // Default: list all
-    const output = await runPython("session_summary.py", ["list"]);
+    // Default: list all — cached (preload warms this)
+    const output = await cache.getOrFetch("experience:list", async () => {
+      return await runPython("session_summary.py", ["list"]);
+    });
     const result = parseExperienceList(output);
     return NextResponse.json({ entries: result.entries, count: result.count });
   } catch (err) {
@@ -180,6 +149,10 @@ export async function POST(request: NextRequest) {
       }
 
       const output = await runPython("session_summary.py", ["verify", id, "--status", status]);
+
+      // Invalidate experience cache after verification
+      cache.invalidate("experience:list");
+
       return NextResponse.json({ message: "Verification updated", output });
     }
 
@@ -200,6 +173,10 @@ export async function POST(request: NextRequest) {
       ];
 
       const output = await runPython("session_summary.py", args);
+
+      // Invalidate experience cache after creation
+      cache.invalidate("experience:list");
+
       return NextResponse.json({ message: "Experience created", output });
     }
 

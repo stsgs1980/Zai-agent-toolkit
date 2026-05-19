@@ -397,7 +397,7 @@ For user-created skills, always use `STS` domain (with `_sts` suffix in folder n
 #### Step 2: Get Next ID
 
 Check the registry in `docs/skill-id-registry.md` for the next available STS ID.
-Currently ZAI-STS-007 is the next available.
+Currently ZAI-STS-008 is the next available.
 
 #### Step 3: Create Directory
 
@@ -468,7 +468,7 @@ Edit `skills/skill-id-system/SKILL.md`:
 
 | ID | Skill Name | Version |
 |----|------------|---------|
-| ZAI-STS-007 | my-skill-name_sts | 1.0 |
+| ZAI-STS-008 | my-skill-name_sts | 1.0 |
 ```
 
 #### Step 6: Commit and Push

@@ -1,41 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { execFile } from "child_process";
-import path from "path";
-import fs from "fs";
+import { runPython } from "@/lib/memory/bridge";
+import { MemoryCache } from "@/lib/memory/cache";
 
-// ── Python bridge helper ───────────────────────────────────
-
-function getToolPath(tool: string): string {
-  const home = process.env.USERPROFILE || process.env.HOME || "";
-  const toolkitPath = process.env.ZAI_TOOLKIT_PATH || path.join(home, ".zcode", "Zai-agent-toolkit");
-  const userToolsPath = path.join(home, ".zcode", "tools");
-
-  const userTool = path.join(userToolsPath, tool);
-  const toolkitTool = path.join(toolkitPath, "tools", tool);
-
-  if (fs.existsSync(userTool)) return userTool;
-  if (fs.existsSync(toolkitTool)) return toolkitTool;
-  return toolkitTool;
-}
-
-function runPython(tool: string, args: string[]): Promise<string> {
-  const toolPath = getToolPath(tool);
-  return new Promise((resolve, reject) => {
-    execFile("python", [toolPath, ...args], {
-      maxBuffer: 10 * 1024 * 1024,
-      timeout: 30000,
-      windowsHide: true,
-      encoding: "utf-8",
-      env: { ...process.env, PYTHONIOENCODING: "utf-8" },
-    }, (err, stdout, stderr) => {
-      if (err) {
-        reject(new Error(stderr || err.message));
-        return;
-      }
-      resolve(stdout);
-    });
-  });
-}
+const cache = MemoryCache.getInstance();
 
 // ── Types ───────────────────────────────────────────────────
 
@@ -69,10 +36,12 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type") || "knowledge";
     const limit = parseInt(searchParams.get("limit") || "50", 10);
+    const cacheKey = `entries:${type}`;
 
-    // Use export command for reliable JSON output
-    const output = await runPython("memory_cli.py", ["export", type]);
-    const data = JSON.parse(output) as { type: string; count: number; entries: ExportEntry[] };
+    const data = await cache.getOrFetch(cacheKey, async () => {
+      const output = await runPython("memory_cli.py", ["export", type]);
+      return JSON.parse(output) as { type: string; count: number; entries: ExportEntry[] };
+    });
 
     const entries: MemoryEntry[] = (data.entries || [])
       .slice(0, limit)
@@ -140,6 +109,9 @@ export async function POST(request: NextRequest) {
     // memory_cli.py store outputs something like: "Stored: knowledge_20260518_123456"
     const idMatch = output.match(/Stored:\s*(\S+)/i);
     const newId = idMatch ? idMatch[1] : "";
+
+    // Invalidate cache for this type so next GET reflects the new entry
+    cache.invalidate(`entries:${type}`);
 
     return NextResponse.json({
       message: "Entry created",

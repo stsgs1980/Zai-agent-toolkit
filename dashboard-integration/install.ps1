@@ -1,5 +1,5 @@
 # ============================================================
-# Dashboard Integration — Install Script (v2)
+# Dashboard Integration — Install Script (v3)
 # ============================================================
 #
 # Run this script from your memory-dashboard project root:
@@ -35,7 +35,7 @@ Write-Host ""
 
 # --- Step 1: Verify we are in a Next.js project ---
 
-Write-Host "[1/8] Checking project structure..." -ForegroundColor Yellow
+Write-Host "[1/10] Checking project structure..." -ForegroundColor Yellow
 
 $packageJson = Join-Path $DashboardDir "package.json"
 if (-not (Test-Path $packageJson)) {
@@ -55,7 +55,7 @@ Write-Host "  OK: Found package.json and prisma/" -ForegroundColor Green
 
 # --- Step 2: Detect src/ layout ---
 
-Write-Host "[2/8] Detecting project layout..." -ForegroundColor Yellow
+Write-Host "[2/10] Detecting project layout..." -ForegroundColor Yellow
 
 # Some Next.js projects use src/ directory, others put app/ at root
 $SrcDir = Join-Path $DashboardDir "src"
@@ -71,7 +71,7 @@ Write-Host "  Base dir for app/components/lib: $BaseDir" -ForegroundColor Gray
 
 # --- Step 3: Copy API routes ---
 
-Write-Host "[3/8] Copying API routes..." -ForegroundColor Yellow
+Write-Host "[3/10] Copying API routes..." -ForegroundColor Yellow
 
 $apiMappings = @(
     # Graph (existing)
@@ -134,7 +134,7 @@ Write-Host "  Total API routes copied: $copiedApi" -ForegroundColor Cyan
 
 # --- Step 4: Copy components ---
 
-Write-Host "[4/8] Copying components..." -ForegroundColor Yellow
+Write-Host "[4/10] Copying components..." -ForegroundColor Yellow
 
 $componentMappings = @(
     # Graph (existing)
@@ -227,7 +227,7 @@ Write-Host "  Total components copied: $copiedComp" -ForegroundColor Cyan
 
 # --- Step 5: Copy lib ---
 
-Write-Host "[5/8] Copying lib/ files..." -ForegroundColor Yellow
+Write-Host "[5/10] Copying lib/ files..." -ForegroundColor Yellow
 
 $libMappings = @(
     @{
@@ -241,6 +241,19 @@ $libMappings = @(
     @{
         Src = Join-Path $IntegrationDir "lib\constants.ts"
         Dst = Join-Path $BaseDir "lib\constants.ts"
+    },
+    # Memory bridge + cache + preload (shared Python bridge, eliminates duplicated inline code)
+    @{
+        Src = Join-Path $IntegrationDir "lib\memory\bridge.ts"
+        Dst = Join-Path $BaseDir "lib\memory\bridge.ts"
+    },
+    @{
+        Src = Join-Path $IntegrationDir "lib\memory\cache.ts"
+        Dst = Join-Path $BaseDir "lib\memory\cache.ts"
+    },
+    @{
+        Src = Join-Path $IntegrationDir "lib\memory\preload.ts"
+        Dst = Join-Path $BaseDir "lib\memory\preload.ts"
     }
 )
 
@@ -265,9 +278,23 @@ foreach ($mapping in $libMappings) {
 }
 Write-Host "  Total lib files copied: $copiedLib" -ForegroundColor Cyan
 
-# --- Step 6: Update Prisma schema ---
+# --- Step 6: Copy instrumentation.ts ---
 
-Write-Host "[6/8] Updating Prisma schema..." -ForegroundColor Yellow
+Write-Host "[6/10] Copying instrumentation.ts..." -ForegroundColor Yellow
+
+$instrSrc = Join-Path $IntegrationDir "instrumentation.ts"
+$instrDst = Join-Path $BaseDir "instrumentation.ts"
+
+if (Test-Path $instrSrc) {
+    Copy-Item -Path $instrSrc -Destination $instrDst -Force
+    Write-Host "  Copied: instrumentation.ts (auto-preload on server start)" -ForegroundColor Green
+} else {
+    Write-Host "  SKIP: instrumentation.ts not found in integration dir" -ForegroundColor DarkGray
+}
+
+# --- Step 7: Update Prisma schema ---
+
+Write-Host "[7/10] Updating Prisma schema..." -ForegroundColor Yellow
 
 $schemaPath = Join-Path $DashboardDir "prisma\schema.prisma"
 $schemaAddition = Join-Path $IntegrationDir "prisma\schema-addition.prisma"
@@ -361,9 +388,9 @@ if (Test-Path $schemaPath) {
     Write-Host "  ERROR: prisma/schema.prisma not found at $schemaPath" -ForegroundColor Red
 }
 
-# --- Step 7: Update page.tsx to use MemoryDashboard ---
+# --- Step 8: Update page.tsx to use MemoryDashboard ---
 
-Write-Host "[7/8] Updating page.tsx..." -ForegroundColor Yellow
+Write-Host "[8/10] Updating page.tsx..." -ForegroundColor Yellow
 
 $pagePath = Join-Path $BaseDir "app\page.tsx"
 
@@ -389,9 +416,9 @@ export default function Home() {
     Write-Host "  WARN: page.tsx not found at $pagePath" -ForegroundColor Yellow
 }
 
-# --- Step 8: Verify graph.json and Python deps ---
+# --- Step 9: Verify graph.json and Python deps ---
 
-Write-Host "[8/8] Verifying graph.json and dependencies..." -ForegroundColor Yellow
+Write-Host "[9/10] Verifying graph.json and dependencies..." -ForegroundColor Yellow
 
 if (Test-Path $GraphJsonPath) {
     Write-Host "  OK: graph.json exists at $GraphJsonPath" -ForegroundColor Green
@@ -442,6 +469,31 @@ if ($missingTools.Count -gt 0) {
     Write-Host "  OK: All 4 Python tools found in .zcode\tools\" -ForegroundColor Green
 }
 
+# --- Step 10: Verify preload infrastructure ---
+
+Write-Host "[10/10] Verifying preload infrastructure..." -ForegroundColor Yellow
+
+$bridgePath = Join-Path $BaseDir "lib\memory\bridge.ts"
+$cachePath = Join-Path $BaseDir "lib\memory\cache.ts"
+$preloadPath = Join-Path $BaseDir "lib\memory\preload.ts"
+$instrPath = Join-Path $BaseDir "instrumentation.ts"
+
+$preloadOk = $true
+foreach ($f in @($bridgePath, $cachePath, $preloadPath, $instrPath)) {
+    if (Test-Path $f) {
+        Write-Host "  OK: $(Split-Path -Leaf $f)" -ForegroundColor Green
+    } else {
+        Write-Host "  MISSING: $f" -ForegroundColor Red
+        $preloadOk = $false
+    }
+}
+
+if ($preloadOk) {
+    Write-Host "  Preload infrastructure: OK (6s cold start -> ~55ms cached)" -ForegroundColor Green
+} else {
+    Write-Host "  WARN: Some preload files missing. Dashboard will work but first API call will be slow." -ForegroundColor Yellow
+}
+
 # --- Done ---
 
 Write-Host ""
@@ -456,10 +508,13 @@ Write-Host "  Graph         - Interactive graph visualization" -ForegroundColor 
 Write-Host "  Intelligence  - AI-powered document extraction" -ForegroundColor White
 Write-Host "  Experience    - Good/bad experience browser" -ForegroundColor White
 Write-Host ""
+Write-Host "Preload: Server startup auto-warms cache (6s cold -> 55ms cached)." -ForegroundColor Cyan
+Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "  1. Start dev:      npm run dev" -ForegroundColor White
 Write-Host "  2. Open:           http://localhost:3000" -ForegroundColor White
 Write-Host "  3. Test API:       http://localhost:3000/api/memory/stats" -ForegroundColor White
+Write-Host "  4. Check preload:  Look for [preload] messages in server console" -ForegroundColor White
 Write-Host ""
 Write-Host "To populate memory with data:" -ForegroundColor Cyan
 Write-Host "  python .zcode\tools\memory_cli.py graph stats" -ForegroundColor White

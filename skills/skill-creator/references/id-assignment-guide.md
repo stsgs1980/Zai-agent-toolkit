@@ -77,7 +77,7 @@ This distinguishes them from toolkit skills and prevents conflicts.
 | ZAI-STS-004 | frontend-styling-expert_sts | Active |
 | ZAI-STS-005 | phi-layout_sts | Active |
 | ZAI-STS-006 | zai-ui-composer_sts | Active |
-| ZAI-STS-007 | (available) | - |
+| ZAI-STS-007 | workflow-discipline_sts | Active |
 
 When creating a user skill:
 1. Find first available ZAI-STS-XXX
@@ -142,7 +142,7 @@ After creating a skill with an ID:
 
 **Decision:** STS (user-created takes priority for custom skills)
 
-**ID:** ZAI-STS-007, folder: `weekly-report_sts/`
+**ID:** ZAI-STS-008, folder: `weekly-report_sts/`
 
 ### Example 3: Memory Backup Skill
 
