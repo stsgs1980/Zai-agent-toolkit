@@ -174,7 +174,7 @@ Z.ai sandbox provides system skills in `/home/z/my-project/skills/`. They do NOT
 | ZAI-STS-004 | frontend-styling-expert_sts | 1.0 | Active |
 | ZAI-STS-005 | phi-layout_sts | 3.0 | Active |
 | ZAI-STS-006 | zai-ui-composer_sts | 1.1.2 | Active |
-| ZAI-STS-007 | (available) | - | - |
+| ZAI-STS-007 | workflow-discipline_sts | 1.0 | Active |
 
 ---
 
