@@ -269,6 +269,7 @@ $apiMappings = @(
     @{ Src = Join-Path $IntegrationDir "api\memory\search\route.ts";          Dst = Join-Path $BaseDir "app\api\memory\search\route.ts" }
     @{ Src = Join-Path $IntegrationDir "api\memory\experience\route.ts";      Dst = Join-Path $BaseDir "app\api\memory\experience\route.ts" }
     @{ Src = Join-Path $IntegrationDir "api\memory\stats\route.ts";           Dst = Join-Path $BaseDir "app\api\memory\stats\route.ts" }
+    @{ Src = Join-Path $IntegrationDir "api\memory\commands\route.ts";        Dst = Join-Path $BaseDir "app\api\memory\commands\route.ts" }
 )
 
 foreach ($mapping in $apiMappings) {
@@ -287,6 +288,7 @@ $componentMappings = @(
     @{ Src = Join-Path $IntegrationDir "components\MemoryBrowser.tsx";        Dst = Join-Path $BaseDir "components\MemoryBrowser.tsx" }
     @{ Src = Join-Path $IntegrationDir "components\ExperienceView.tsx";       Dst = Join-Path $BaseDir "components\ExperienceView.tsx" }
     @{ Src = Join-Path $IntegrationDir "components\MemoryDashboard.tsx";      Dst = Join-Path $BaseDir "components\MemoryDashboard.tsx" }
+    @{ Src = Join-Path $IntegrationDir "components\HotCommandsView.tsx";      Dst = Join-Path $BaseDir "components\HotCommandsView.tsx" }
     @{ Src = Join-Path $IntegrationDir "components\graph\colors.ts";          Dst = Join-Path $BaseDir "components\graph\colors.ts" }
     @{ Src = Join-Path $IntegrationDir "components\graph\NodeDetail.tsx";     Dst = Join-Path $BaseDir "components\graph\NodeDetail.tsx" }
     @{ Src = Join-Path $IntegrationDir "components\graph\EdgeFilter.tsx";     Dst = Join-Path $BaseDir "components\graph\EdgeFilter.tsx" }

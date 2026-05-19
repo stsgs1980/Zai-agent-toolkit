@@ -1,156 +1,142 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
-// ── Data ──────────────────────────────────────────────────────
+// ── Types ────────────────────────────────────────────────────
 
-interface CommandEntry {
-  name: string
-  description: string
-  command: string
-  category: string
+interface SkillCommand {
+  phrase: string
+  action: string
 }
 
-interface SkillEntry {
+interface SkillMeta {
   name: string
+  id: string
+  version: string
   description: string
   trigger: string
-  command: string
-  category: string
+  folder: string
+  commands: SkillCommand[]
 }
 
-const COMMANDS: CommandEntry[] = [
-  // ── PowerShell ──
-  { name: 'Save-Session', description: 'Сохранить опыт сессии', command: 'ss', category: 'PowerShell' },
-  { name: 'Get-Memory', description: 'Поиск по памяти', command: 'gmem <query>', category: 'PowerShell' },
-  { name: 'List-Memory', description: 'Список записей памяти', command: 'lm', category: 'PowerShell' },
-  { name: 'Sync-Index', description: 'Синхронизировать индекс файлов', command: 'Sync-Index', category: 'PowerShell' },
-  { name: 'Check-IndexSync', description: 'Проверить актуальность индекса', command: 'Check-IndexSync', category: 'PowerShell' },
-  { name: 'Stop-SessionTimer', description: 'Остановить таймер автосохранения', command: 'Stop-SessionTimer', category: 'PowerShell' },
-  // ── Memory CLI ──
-  { name: 'Stats', description: 'Статистика ChromaDB', command: 'python memory_cli.py stats', category: 'Memory CLI' },
-  { name: 'Store Entry', description: 'Сохранить запись', command: 'python memory_cli.py store <type> --content "..."', category: 'Memory CLI' },
-  { name: 'Query Memory', description: 'Семантический поиск', command: 'python memory_cli.py query <text>', category: 'Memory CLI' },
-  { name: 'Graph Scan', description: 'Индексация графа зависимостей', command: 'python folder_indexer.py graph-scan', category: 'Memory CLI' },
-  { name: 'Sync Files', description: 'Синхронизация файлов в индекс', command: 'python sync_index.py', category: 'Memory CLI' },
-  // ── Session Summary ──
-  { name: 'Save Experience', description: 'Сохранить опыт вручную', command: 'python session_summary.py manual --title "..." --good "..." --bad "..."', category: 'Session' },
-  { name: 'From Worklog', description: 'Сгенерировать опыт из worklog', command: 'python session_summary.py from-worklog <path>', category: 'Session' },
-  { name: 'List Experiences', description: 'Список опыта', command: 'python session_summary.py list', category: 'Session' },
-  { name: 'Verify Experience', description: 'Подтвердить запись опыта', command: 'python session_summary.py verify <id> --status verified', category: 'Session' },
-  // ── Git ──
-  { name: 'Pull Toolkit', description: 'Обновить toolkit', command: 'cd ~/.zcode/Zai-agent-toolkit; git pull', category: 'Git' },
-  { name: 'Push Changes', description: 'Закоммитить и запушить', command: 'git add .; git commit -m "..."; git push', category: 'Git' },
-  { name: 'Check Status', description: 'Статус репозитория', command: 'git status --short', category: 'Git' },
-  { name: 'Recent Commits', description: 'Последние коммиты', command: 'git log --oneline -10', category: 'Git' },
-  // ── Dashboard ──
-  { name: 'Start Dashboard', description: 'Запустить дашборд', command: 'cd ~/.zcode/memory-dashboard; npm run dev', category: 'Dashboard' },
-  { name: 'Bridge Stats', description: 'Статистика через bridge', command: 'python memory_bridge.py stats', category: 'Dashboard' },
-  { name: 'Bridge Search', description: 'Поиск через bridge', command: 'python memory_bridge.py search <query>', category: 'Dashboard' },
-]
+// ── Color tokens ─────────────────────────────────────────────
 
-const SKILLS: SkillEntry[] = [
-  { name: 'anti-monolith', description: 'Декомпозиция больших файлов и компонентов', trigger: 'ZAI-ARCH-002', command: '$anti-monolith', category: 'Architecture' },
-  { name: 'session-experience', description: 'Автосохранение опыта сессии в ChromaDB', trigger: 'ZAI-SESSION-003', command: '$session-experience', category: 'Session' },
-  { name: 'memory-store', description: 'Сохранение записей в память', trigger: 'ZAI-MEM-001', command: '$memory-store', category: 'Memory' },
-  { name: 'memory-query', description: 'Поиск по памяти', trigger: 'ZAI-MEM-002', command: '$memory-query', category: 'Memory' },
-  { name: 'folder-indexer', description: 'Индексация файлов и зависимостей', trigger: 'ZAI-FS-001', command: '$folder-indexer', category: 'FileSystem' },
-  { name: 'session-log', description: 'Логирование сессии', trigger: 'ZAI-SESSION-001', command: '$session-log', category: 'Session' },
-  { name: 'context-consolidation', description: 'Сжатие контекста при переполнении', trigger: 'ZAI-SESSION-002', command: '$context-consolidation', category: 'Session' },
-  { name: 'doc-intelligence', description: 'AI-экстракция из документов', trigger: 'DocIntel', command: '$doc-intelligence', category: 'AI' },
-  { name: 'graph-engine', description: 'Граф зависимостей и связей', trigger: 'GraphEngine', command: '$graph-engine', category: 'Graph' },
-]
-
-// ── Category colors ──
-
-const CAT_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  'PowerShell':   { bg: '#0ea5e915', text: '#38bdf8', border: '#0ea5e933' },
-  'Memory CLI':   { bg: '#a855f715', text: '#c084fc', border: '#a855f733' },
-  'Session':      { bg: '#4ade8015', text: '#4ade80', border: '#4ade8033' },
-  'Git':          { bg: '#f8717115', text: '#f87171', border: '#f8717133' },
-  'Dashboard':    { bg: '#fbbf2415', text: '#fbbf24', border: '#fbbf2433' },
-  'Architecture': { bg: '#f59e0b15', text: '#f59e0b', border: '#f59e0b33' },
-  'Memory':       { bg: '#a855f715', text: '#c084fc', border: '#a855f733' },
-  'FileSystem':   { bg: '#2dd4bf15', text: '#2dd4bf', border: '#2dd4bf33' },
-  'AI':           { bg: '#e879f915', text: '#e879f9', border: '#e879f933' },
-  'Graph':        { bg: '#2dd4bf15', text: '#2dd4bf', border: '#2dd4bf33' },
+const C = {
+  bg:        '#0a0e17',
+  card:      '#111827',
+  cardHover: '#1a2235',
+  border:    '#1e293b',
+  accent:    '#f59e0b',
+  red:       '#ef4444',
+  yellow:    '#fbbf24',
+  text:      '#e2e8f0',
+  textDim:   '#94a3b8',
+  textMuted: '#64748b',
+  tagBg:     '#1e293b',
+  tagActive: '#fbbf2420',
 }
 
-// ── Component ────────────────────────────────────────────────
+// ── Category extraction ──────────────────────────────────────
+
+function getCategory(name: string, id: string): string {
+  if (id.startsWith('ZAI-STS')) return 'Styles'
+  if (id.startsWith('ZAI-DEV')) return 'Dev'
+  if (id.startsWith('ZAI-SESSION')) return 'Session'
+  if (id.startsWith('ZAI-OPS')) return 'Ops'
+  if (name.includes('memory') || name.includes('session')) return 'Memory'
+  return 'Tool'
+}
+
+const CATEGORIES = ['All', 'Styles', 'Dev', 'Memory', 'Session', 'Ops', 'Tool']
+
+// ── Main component ──────────────────────────────────────────
 
 export function HotCommandsView() {
-  const [filter, setFilter] = useState<string>('all')
-  const [mode, setMode] = useState<'commands' | 'skills'>('commands')
+  const [skills, setSkills] = useState<SkillMeta[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [query, setQuery] = useState('')
+  const [category, setCategory] = useState('All')
+  const [expanded, setExpanded] = useState<string | null>(null)
 
-  const allCategories = mode === 'commands'
-    ? [...new Set(COMMANDS.map(c => c.category))]
-    : [...new Set(SKILLS.map(s => s.category))]
+  const fetchSkills = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const q = query ? `&q=${encodeURIComponent(query)}` : ''
+      const res = await fetch(`/api/memory/commands?_t=${Date.now()}${q}`)
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const data = await res.json()
+      setSkills(data.skills || [])
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load')
+    } finally {
+      setLoading(false)
+    }
+  }, [query])
 
-  const filteredItems = mode === 'commands'
-    ? COMMANDS.filter(c => filter === 'all' || c.category === filter)
-    : SKILLS.filter(s => filter === 'all' || s.category === filter)
+  useEffect(() => { fetchSkills() }, [fetchSkills])
+
+  // Debounced search
+  const [inputVal, setInputVal] = useState('')
+  useEffect(() => {
+    const t = setTimeout(() => setQuery(inputVal), 300)
+    return () => clearTimeout(t)
+  }, [inputVal])
+
+  // Filter by category
+  const filtered = category === 'All'
+    ? skills
+    : skills.filter(s => getCategory(s.name, s.id) === category)
+
+  // Stats
+  const totalCommands = skills.reduce((acc, s) => acc + s.commands.length, 0)
 
   return (
     <div className="space-y-4">
-      {/* ── Mode toggle ── */}
+      {/* ── Search bar ── */}
       <div className="flex items-center gap-2">
-        <button
-          onClick={() => { setMode('commands'); setFilter('all') }}
-          className="h-9 px-4 text-xs rounded-lg font-medium transition-all"
-          style={{
-            background: mode === 'commands' ? 'linear-gradient(180deg, #f59e0b, #d97706)' : '#1e293b',
-            color: mode === 'commands' ? '#fff' : '#64748b',
-            border: `1px solid ${mode === 'commands' ? '#f59e0b55' : '#334155'}`,
-            boxShadow: mode === 'commands' ? '0 0 10px #f59e0b33' : 'none',
-          }}
+        <div
+          className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg"
+          style={{ background: C.card, border: `1px solid ${C.border}` }}
         >
-          Commands
-        </button>
-        <button
-          onClick={() => { setMode('skills'); setFilter('all') }}
-          className="h-9 px-4 text-xs rounded-lg font-medium transition-all"
-          style={{
-            background: mode === 'skills' ? 'linear-gradient(180deg, #e879f9, #a855f7)' : '#1e293b',
-            color: mode === 'skills' ? '#fff' : '#64748b',
-            border: `1px solid ${mode === 'skills' ? '#e879f955' : '#334155'}`,
-            boxShadow: mode === 'skills' ? '0 0 10px #e879f933' : 'none',
-          }}
-        >
-          Skills
-        </button>
-
-        <div className="flex-1" />
-
-        <span className="text-[10px] text-zinc-600 font-mono">
-          {filteredItems.length} {mode === 'commands' ? 'commands' : 'skills'}
+          <svg width="16" height="16" fill="none" stroke={C.textMuted} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            value={inputVal}
+            onChange={e => setInputVal(e.target.value)}
+            placeholder="Semantic search across all skills and commands..."
+            className="flex-1 bg-transparent text-sm outline-none"
+            style={{ color: C.text, caretColor: C.accent }}
+          />
+          {inputVal && (
+            <button onClick={() => { setInputVal(''); setQuery('') }} className="cursor-pointer" style={{ color: C.textMuted }}>
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+        <span className="text-xs whitespace-nowrap" style={{ color: C.textMuted }}>
+          {skills.length} skills · {totalCommands} commands
         </span>
       </div>
 
-      {/* ── Category filter ── */}
-      <div className="flex flex-wrap gap-1.5">
-        <button
-          onClick={() => setFilter('all')}
-          className="px-2.5 py-1 rounded-full text-[10px] font-medium transition-all"
-          style={{
-            backgroundColor: filter === 'all' ? '#334155' : '#0f172a',
-            border: `1px solid ${filter === 'all' ? '#475569' : '#1e293b'}`,
-            color: filter === 'all' ? '#e2e8f0' : '#475569',
-          }}
-        >
-          All
-        </button>
-        {allCategories.map(cat => {
-          const colors = CAT_COLORS[cat] || { bg: '#334155', text: '#94a3b8', border: '#475569' }
-          const isActive = filter === cat
+      {/* ── Category pills ── */}
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {CATEGORIES.map(cat => {
+          const isActive = category === cat
           return (
             <button
               key={cat}
-              onClick={() => setFilter(cat)}
-              className="px-2.5 py-1 rounded-full text-[10px] font-medium transition-all"
+              onClick={() => setCategory(cat)}
+              className="px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer"
               style={{
-                backgroundColor: isActive ? colors.bg : '#0f172a',
-                border: `1px solid ${isActive ? colors.border : '#1e293b'}`,
-                color: isActive ? colors.text : '#475569',
+                background: isActive ? C.tagActive : C.tagBg,
+                border: `1px solid ${isActive ? C.accent + '44' : C.border}`,
+                color: isActive ? C.yellow : C.textMuted,
               }}
             >
               {cat}
@@ -159,89 +145,174 @@ export function HotCommandsView() {
         })}
       </div>
 
-      {/* ── Table ── */}
-      <div
-        className="rounded-lg overflow-hidden"
-        style={{
-          background: '#0f172a',
-          border: '1px solid #1e293b',
-        }}
-      >
-        {/* Header */}
-        <div
-          className="grid gap-2 px-4 py-2.5 text-[10px] font-mono uppercase tracking-wider"
-          style={{
-            gridTemplateColumns: mode === 'commands' ? '1fr 1.5fr 2fr' : '1fr 1.5fr 0.8fr 1.2fr',
-            background: '#0f172a',
-            borderBottom: '1px solid #1e293b',
-          }}
-        >
-          <span className="text-zinc-500">Name</span>
-          <span className="text-zinc-500">Description</span>
-          <span className="text-zinc-500">{mode === 'commands' ? 'Command' : 'Trigger ID'}</span>
-          {mode === 'skills' && <span className="text-zinc-500">Command</span>}
+      {/* ── Error ── */}
+      {error && (
+        <div className="px-3 py-2 rounded-md text-sm" style={{ background: '#3b1a1c', border: `1px solid ${C.red}44`, color: C.red }}>
+          Failed to load: {error}
         </div>
+      )}
 
-        {/* Rows */}
-        {filteredItems.map((item, i) => {
-          const cat = 'category' in item ? (item as CommandEntry | SkillEntry).category : ''
-          const colors = CAT_COLORS[cat] || { bg: '#33415515', text: '#94a3b8', border: '#47556933' }
+      {/* ── Loading ── */}
+      {loading && (
+        <div className="text-center py-12" style={{ color: C.textMuted }}>
+          <div className="animate-pulse text-sm">Loading skills...</div>
+        </div>
+      )}
 
-          return (
-            <div
-              key={i}
-              className="grid gap-2 px-4 py-2.5 text-xs transition-colors hover:bg-zinc-800/30"
-              style={{
-                gridTemplateColumns: mode === 'commands' ? '1fr 1.5fr 2fr' : '1fr 1.5fr 0.8fr 1.2fr',
-                borderBottom: i < filteredItems.length - 1 ? '1px solid #1e293b33' : 'none',
-              }}
+      {/* ── Empty state ── */}
+      {!loading && !error && filtered.length === 0 && (
+        <div className="text-center py-12" style={{ color: C.textMuted }}>
+          <svg className="mx-auto mb-3" width="40" height="40" fill="none" stroke={C.border} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <p className="text-sm">No skill entries found</p>
+          {query && <p className="text-xs mt-1" style={{ color: C.textMuted }}>Try a different search query</p>}
+        </div>
+      )}
+
+      {/* ── Skill cards (vertical) ── */}
+      {!loading && filtered.map(skill => {
+        const isExpanded = expanded === skill.folder
+        const cat = getCategory(skill.name, skill.id)
+        const catColors: Record<string, string> = {
+          Styles: '#a855f7',
+          Dev: '#38bdf8',
+          Memory: '#2dd4bf',
+          Session: '#fbbf24',
+          Ops: '#f87171',
+          Tool: '#94a3b8',
+        }
+        const catColor = catColors[cat] || C.textMuted
+
+        return (
+          <div
+            key={skill.folder}
+            className="rounded-lg overflow-hidden transition-all"
+            style={{
+              background: C.card,
+              border: `1px solid ${isExpanded ? C.accent + '33' : C.border}`,
+              boxShadow: isExpanded ? `0 0 20px ${C.accent}08` : 'none',
+            }}
+          >
+            {/* ── Card header (click to expand) ── */}
+            <button
+              onClick={() => setExpanded(isExpanded ? null : skill.folder)}
+              className="w-full px-4 py-3 flex items-start gap-3 text-left cursor-pointer"
+              style={{ background: isExpanded ? C.cardHover : 'transparent' }}
             >
-              {/* Name */}
-              <div className="flex items-center gap-2 min-w-0">
-                <span
-                  className="px-1.5 py-0.5 rounded text-[9px] font-medium shrink-0"
-                  style={{ backgroundColor: colors.bg, color: colors.text, border: `1px solid ${colors.border}` }}
-                >
-                  {cat}
-                </span>
-                <span className="text-zinc-200 font-mono truncate">{item.name}</span>
+              {/* Category dot */}
+              <div
+                className="w-2 h-2 rounded-full mt-1.5 shrink-0"
+                style={{ background: catColor }}
+              />
+
+              {/* Name + description */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm font-semibold" style={{ color: C.text }}>
+                    {skill.name}
+                  </span>
+                  {skill.id && (
+                    <span
+                      className="text-[10px] font-mono px-1.5 py-0.5 rounded"
+                      style={{ background: C.tagBg, color: catColor }}
+                    >
+                      {skill.id}
+                    </span>
+                  )}
+                  {skill.version && (
+                    <span className="text-[10px] font-mono" style={{ color: C.textMuted }}>
+                      v{skill.version}
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs mt-1 line-clamp-2" style={{ color: C.textDim }}>
+                  {skill.description}
+                </p>
               </div>
 
-              {/* Description */}
-              <span className="text-zinc-400 text-[11px]">{item.description}</span>
-
-              {/* Trigger ID (skills) or Command (commands) */}
-              <code
-                className="text-[11px] px-2 py-0.5 rounded bg-zinc-900/80 text-emerald-400 border border-emerald-500/15 font-mono truncate"
-                style={{ maxWidth: '100%', display: 'inline-block' }}
+              {/* Expand chevron */}
+              <svg
+                width="16" height="16" fill="none" stroke={C.textMuted} viewBox="0 0 24 24"
+                className="shrink-0 mt-1 transition-transform"
+                style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
               >
-                {mode === 'commands' ? (item as CommandEntry).command : (item as SkillEntry).trigger}
-              </code>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
 
-              {/* Command for copy&paste (skills only) */}
-              {mode === 'skills' && (
-                <code
-                  className="text-[11px] px-2 py-0.5 rounded bg-zinc-900/80 text-amber-400 border border-amber-500/15 font-mono truncate cursor-pointer hover:bg-zinc-800/80 transition-colors"
-                  style={{ maxWidth: '100%', display: 'inline-block' }}
-                  onClick={() => navigator.clipboard.writeText((item as SkillEntry).command)}
-                  title="Click to copy"
-                >
-                  {(item as SkillEntry).command}
-                </code>
-              )}
-            </div>
-          )
-        })}
-      </div>
+            {/* ── Expanded content ── */}
+            {isExpanded && (
+              <div className="px-4 pb-4 space-y-3">
+                {/* Triggers */}
+                {skill.trigger && (
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: C.red }}>
+                      Triggers
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {skill.trigger.split(',').map(t => (
+                        <span
+                          key={t.trim()}
+                          className="text-[11px] px-2 py-0.5 rounded-md font-mono"
+                          style={{ background: C.tagBg, color: C.yellow }}
+                        >
+                          {t.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-      {/* ── Hint ── */}
-      <div className="text-center py-2">
-        <span className="text-[10px] text-zinc-700 font-mono">
-          {mode === 'commands'
-            ? 'Click command to copy | Run in PowerShell or terminal'
-            : 'Click Command to copy | Call skill by $name or Trigger ID'}
-        </span>
-      </div>
+                {/* Hot Commands */}
+                {skill.commands.length > 0 && (
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: C.red }}>
+                      $skill command
+                    </div>
+                    <div className="space-y-1">
+                      {skill.commands.map((cmd, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center gap-2 px-2.5 py-1.5 rounded-md"
+                          style={{ background: '#0d1117' }}
+                        >
+                          <code className="text-[11px] font-mono" style={{ color: C.yellow }}>
+                            {cmd.phrase}
+                          </code>
+                          <span className="text-[11px]" style={{ color: C.textMuted }}>—</span>
+                          <span className="text-[11px] flex-1" style={{ color: C.textDim }}>
+                            {cmd.action}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* No commands */}
+                {skill.commands.length === 0 && (
+                  <div className="text-[11px] italic" style={{ color: C.textMuted }}>
+                    No hot commands defined for this skill
+                  </div>
+                )}
+
+                {/* Description (full) */}
+                {skill.description.length > 120 && (
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: C.textMuted }}>
+                      Full description
+                    </div>
+                    <p className="text-xs leading-relaxed" style={{ color: C.textDim }}>
+                      {skill.description}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }
