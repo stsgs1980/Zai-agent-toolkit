@@ -1,11 +1,14 @@
 # ============================================================
-# Dashboard Integration — Install Script (v3)
+# Dashboard Integration — Install Script (v4 — Safe-Copy)
 # ============================================================
 #
 # Run this script from your memory-dashboard project root:
 #
 #   cd C:\Users\stsgr\.zcode\memory-dashboard
 #   & "C:\Users\stsgr\.zcode\Zai-agent-toolkit\dashboard-integration\install.ps1"
+#
+# v4: Safe-Copy enforcement — reads destination before writing,
+#     reports diffs, prompts on conflict. Never silently overwrites.
 #
 # ============================================================
 
@@ -23,14 +26,202 @@ $DashboardDir = Get-Location
 $HomeDir = $env:USERPROFILE
 $GraphJsonPath = Join-Path $HomeDir ".zcode\memory\graph.json"
 
+# Conflict resolution mode (can be overridden via -Mode parameter)
+#   "ask"    — prompt for each conflicting file (default)
+#   "overwrite" — overwrite all without asking (use with caution)
+#   "skip"   — skip all conflicting files, only copy new ones
+#   "diff"   — only show diffs, don't copy anything (dry run)
+param(
+    [ValidateSet("ask", "overwrite", "skip", "diff")]
+    [string]$Mode = "ask"
+)
+
+# --- Safe-Copy function (ENFORCEMENT MECHANISM) ---
+# This function replaces all raw Copy-Item calls.
+# It physically cannot overwrite a file without first comparing.
+
+$script:conflictCount = 0
+$script:copiedCount = 0
+$script:skippedCount = 0
+$script:newCount = 0
+
+function Safe-Copy {
+    param(
+        [Parameter(Mandatory)][string]$Src,
+        [Parameter(Mandatory)][string]$Dst
+    )
+
+    # Source must exist
+    if (-not (Test-Path $Src)) {
+        Write-Host "  SKIP: Source not found: $Src" -ForegroundColor DarkGray
+        return
+    }
+
+    # Create destination directory if needed
+    $dstDir = Split-Path -Parent $Dst
+    if (-not (Test-Path $dstDir)) {
+        New-Item -ItemType Directory -Path $dstDir -Force | Out-Null
+        Write-Host "  Created dir: $dstDir" -ForegroundColor DarkGray
+    }
+
+    $fileName = Split-Path -Leaf $Dst
+
+    # NEW file — destination doesn't exist — safe to create
+    if (-not (Test-Path $Dst)) {
+        if ($Mode -eq "diff") {
+            Write-Host "  [NEW] $fileName (would create)" -ForegroundColor Blue
+        } else {
+            Copy-Item -Path $Src -Destination $Dst -Force
+            Write-Host "  [NEW] $fileName" -ForegroundColor Green
+        }
+        $script:newCount++
+        return
+    }
+
+    # Destination EXISTS — compare content
+    $srcHash = (Get-FileHash -Path $Src -Algorithm SHA256).Hash
+    $dstHash = (Get-FileHash -Path $Dst -Algorithm SHA256).Hash
+
+    # Files are identical — skip
+    if ($srcHash -eq $dstHash) {
+        Write-Host "  [SAME] $fileName" -ForegroundColor DarkGray
+        return
+    }
+
+    # Files DIFFER — conflict!
+    $script:conflictCount++
+
+    # Count line differences
+    $srcContent = Get-Content -Path $Src -ErrorAction SilentlyContinue
+    $dstContent = Get-Content -Path $Dst -ErrorAction SilentlyContinue
+    $srcLines = if ($srcContent) { $srcContent.Count } else { 0 }
+    $dstLines = if ($dstContent) { $dstContent.Count } else { 0 }
+
+    Write-Host ""
+    Write-Host "  ┌─ CONFLICT: $fileName" -ForegroundColor Red
+    Write-Host "  │  Source (git repo): $srcLines lines" -ForegroundColor Yellow
+    Write-Host "  │  Destination (WIN): $dstLines lines" -ForegroundColor Yellow
+    Write-Host "  │  Content differs — local changes will be LOST if overwritten" -ForegroundColor Red
+
+    # Show first 5 differing lines
+    $maxLines = [Math]::Max($srcLines, $dstLines)
+    $diffShown = 0
+    for ($i = 0; $i -lt $maxLines -and $diffShown -lt 5; $i++) {
+        $s = if ($i -lt $srcLines) { $srcContent[$i] } else { "" }
+        $d = if ($i -lt $dstLines) { $dstContent[$i] } else { "" }
+        if ($s -ne $d) {
+            Write-Host "  │  Line $($i+1): repo=[$s] win=[$d]" -ForegroundColor DarkYellow
+            $diffShown++
+        }
+    }
+    Write-Host "  └─" -ForegroundColor Red
+
+    # Handle based on mode
+    switch ($Mode) {
+        "diff" {
+            Write-Host "  [CONFLICT] $fileName (diff mode — not copied)" -ForegroundColor Red
+            return
+        }
+        "skip" {
+            Write-Host "  [SKIP] $fileName (skip mode — preserved local)" -ForegroundColor Yellow
+            $script:skippedCount++
+            return
+        }
+        "overwrite" {
+            # Backup before overwriting
+            $backupDir = Join-Path $DashboardDir ".install-backup"
+            if (-not (Test-Path $backupDir)) {
+                New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
+            }
+            $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+            $backupName = "$fileName.$timestamp.bak"
+            Copy-Item -Path $Dst -Destination (Join-Path $backupDir $backupName) -Force
+            Write-Host "  [BACKUP] Saved local version to .install-backup\$backupName" -ForegroundColor Magenta
+
+            Copy-Item -Path $Src -Destination $Dst -Force
+            Write-Host "  [OVERWRITE] $fileName (overwrite mode)" -ForegroundColor Red
+            $script:copiedCount++
+            return
+        }
+        "ask" {
+            # Backup first
+            $backupDir = Join-Path $DashboardDir ".install-backup"
+            if (-not (Test-Path $backupDir)) {
+                New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
+            }
+            $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+            $backupName = "$fileName.$timestamp.bak"
+            Copy-Item -Path $Dst -Destination (Join-Path $backupDir $backupName) -Force
+            Write-Host "  [BACKUP] Saved local version to .install-backup\$backupName" -ForegroundColor Magenta
+
+            Write-Host ""
+            Write-Host "  Choose action for $fileName :" -ForegroundColor Cyan
+            Write-Host "    [O] Overwrite (replace with git version, backup saved)" -ForegroundColor White
+            Write-Host "    [S] Skip (keep local version)" -ForegroundColor White
+            Write-Host "    [A] Overwrite ALL remaining conflicts" -ForegroundColor White
+            Write-Host "    [K] Skip ALL remaining conflicts" -ForegroundColor White
+            Write-Host "    [D] Show full diff" -ForegroundColor White
+            Write-Host ""
+
+            $answered = $false
+            while (-not $answered) {
+                $choice = Read-Host "  Your choice [O/S/A/K/D]"
+                switch ($choice.ToUpper()) {
+                    "O" {
+                        Copy-Item -Path $Src -Destination $Dst -Force
+                        Write-Host "  [OVERWRITE] $fileName" -ForegroundColor Red
+                        $script:copiedCount++
+                        $answered = $true
+                    }
+                    "S" {
+                        Write-Host "  [SKIP] $fileName (kept local)" -ForegroundColor Yellow
+                        $script:skippedCount++
+                        $answered = $true
+                    }
+                    "A" {
+                        $Mode = "overwrite"
+                        Copy-Item -Path $Src -Destination $Dst -Force
+                        Write-Host "  [OVERWRITE] $filename (mode → overwrite all)" -ForegroundColor Red
+                        $script:copiedCount++
+                        $answered = $true
+                    }
+                    "K" {
+                        $Mode = "skip"
+                        Write-Host "  [SKIP] $filename (mode → skip all)" -ForegroundColor Yellow
+                        $script:skippedCount++
+                        $answered = $true
+                    }
+                    "D" {
+                        Write-Host ""
+                        Write-Host "  === FULL DIFF: $fileName ===" -ForegroundColor Cyan
+                        Write-Host "  --- git (source) ---" -ForegroundColor Yellow
+                        $srcContent | Select-Object -First 30 | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
+                        if ($srcLines -gt 30) { Write-Host "  ... ($srcLines lines total)" -ForegroundColor DarkGray }
+                        Write-Host "  +++ local (WIN) +++" -ForegroundColor Yellow
+                        $dstContent | Select-Object -First 30 | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
+                        if ($dstLines -gt 30) { Write-Host "  ... ($dstLines lines total)" -ForegroundColor DarkGray }
+                        Write-Host "  === END DIFF ===" -ForegroundColor Cyan
+                        Write-Host ""
+                    }
+                    default {
+                        Write-Host "  Invalid choice. Use O/S/A/K/D" -ForegroundColor Red
+                    }
+                }
+            }
+        }
+    }
+}
+
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  Memory Dashboard — Full Integration" -ForegroundColor Cyan
+Write-Host "  Install Script v4 (Safe-Copy)" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Integration dir: $IntegrationDir" -ForegroundColor Gray
 Write-Host "Dashboard dir:   $DashboardDir" -ForegroundColor Gray
 Write-Host "graph.json:      $GraphJsonPath" -ForegroundColor Gray
+Write-Host "Mode:            $Mode" -ForegroundColor $(if ($Mode -eq "overwrite") { "Red" } else { "Cyan" })
 Write-Host ""
 
 # --- Step 1: Verify we are in a Next.js project ---
@@ -69,216 +260,69 @@ if (Test-Path $SrcDir) {
 
 Write-Host "  Base dir for app/components/lib: $BaseDir" -ForegroundColor Gray
 
-# --- Step 3: Copy API routes ---
+# --- Step 3: Copy API routes (Safe-Copy) ---
 
 Write-Host "[3/10] Copying API routes..." -ForegroundColor Yellow
 
 $apiMappings = @(
-    # Graph (existing)
-    @{
-        Src = Join-Path $IntegrationDir "api\memory\graph\route.ts"
-        Dst = Join-Path $BaseDir "app\api\memory\graph\route.ts"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "api\memory\graph\vis\route.ts"
-        Dst = Join-Path $BaseDir "app\api\memory\graph\vis\route.ts"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "api\memory\related-graph\route.ts"
-        Dst = Join-Path $BaseDir "app\api\memory\related-graph\route.ts"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "api\memory\doc-intelligence\route.ts"
-        Dst = Join-Path $BaseDir "app\api\memory\doc-intelligence\route.ts"
-    },
-    # New: Entries, Search, Experience, Stats
-    @{
-        Src = Join-Path $IntegrationDir "api\memory\entries\route.ts"
-        Dst = Join-Path $BaseDir "app\api\memory\entries\route.ts"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "api\memory\search\route.ts"
-        Dst = Join-Path $BaseDir "app\api\memory\search\route.ts"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "api\memory\experience\route.ts"
-        Dst = Join-Path $BaseDir "app\api\memory\experience\route.ts"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "api\memory\stats\route.ts"
-        Dst = Join-Path $BaseDir "app\api\memory\stats\route.ts"
-    }
+    @{ Src = Join-Path $IntegrationDir "api\memory\graph\route.ts";           Dst = Join-Path $BaseDir "app\api\memory\graph\route.ts" }
+    @{ Src = Join-Path $IntegrationDir "api\memory\graph\vis\route.ts";       Dst = Join-Path $BaseDir "app\api\memory\graph\vis\route.ts" }
+    @{ Src = Join-Path $IntegrationDir "api\memory\related-graph\route.ts";   Dst = Join-Path $BaseDir "app\api\memory\related-graph\route.ts" }
+    @{ Src = Join-Path $IntegrationDir "api\memory\doc-intelligence\route.ts";Dst = Join-Path $BaseDir "app\api\memory\doc-intelligence\route.ts" }
+    @{ Src = Join-Path $IntegrationDir "api\memory\entries\route.ts";         Dst = Join-Path $BaseDir "app\api\memory\entries\route.ts" }
+    @{ Src = Join-Path $IntegrationDir "api\memory\search\route.ts";          Dst = Join-Path $BaseDir "app\api\memory\search\route.ts" }
+    @{ Src = Join-Path $IntegrationDir "api\memory\experience\route.ts";      Dst = Join-Path $BaseDir "app\api\memory\experience\route.ts" }
+    @{ Src = Join-Path $IntegrationDir "api\memory\stats\route.ts";           Dst = Join-Path $BaseDir "app\api\memory\stats\route.ts" }
 )
 
-$copiedApi = 0
 foreach ($mapping in $apiMappings) {
-    $src = $mapping.Src
-    $dst = $mapping.Dst
-
-    if (-not (Test-Path $src)) {
-        Write-Host "  SKIP: Source not found: $src" -ForegroundColor DarkGray
-        continue
-    }
-
-    $dstDir = Split-Path -Parent $dst
-    if (-not (Test-Path $dstDir)) {
-        New-Item -ItemType Directory -Path $dstDir -Force | Out-Null
-        Write-Host "  Created: $dstDir" -ForegroundColor DarkGray
-    }
-
-    Copy-Item -Path $src -Destination $dst -Force
-    Write-Host "  Copied: $(Split-Path -Leaf $dst)" -ForegroundColor Green
-    $copiedApi++
+    Safe-Copy -Src $mapping.Src -Dst $mapping.Dst
 }
-Write-Host "  Total API routes copied: $copiedApi" -ForegroundColor Cyan
 
-# --- Step 4: Copy components ---
+# --- Step 4: Copy components (Safe-Copy) ---
 
 Write-Host "[4/10] Copying components..." -ForegroundColor Yellow
 
 $componentMappings = @(
-    # Graph (existing)
-    @{
-        Src = Join-Path $IntegrationDir "components\GraphViewer.tsx"
-        Dst = Join-Path $BaseDir "components\GraphViewer.tsx"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "components\GraphStats.tsx"
-        Dst = Join-Path $BaseDir "components\GraphStats.tsx"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "components\DocIntelligenceView.tsx"
-        Dst = Join-Path $BaseDir "components\DocIntelligenceView.tsx"
-    },
-    # New: Dashboard, Browser, Experience
-    @{
-        Src = Join-Path $IntegrationDir "components\DashboardHome.tsx"
-        Dst = Join-Path $BaseDir "components\DashboardHome.tsx"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "components\MemoryBrowser.tsx"
-        Dst = Join-Path $BaseDir "components\MemoryBrowser.tsx"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "components\ExperienceView.tsx"
-        Dst = Join-Path $BaseDir "components\ExperienceView.tsx"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "components\MemoryDashboard.tsx"
-        Dst = Join-Path $BaseDir "components\MemoryDashboard.tsx"
-    },
-    # Graph sub-components
-    @{
-        Src = Join-Path $IntegrationDir "components\graph\colors.ts"
-        Dst = Join-Path $BaseDir "components\graph\colors.ts"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "components\graph\NodeDetail.tsx"
-        Dst = Join-Path $BaseDir "components\graph\NodeDetail.tsx"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "components\graph\EdgeFilter.tsx"
-        Dst = Join-Path $BaseDir "components\graph\EdgeFilter.tsx"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "components\graph\useForceGraph.ts"
-        Dst = Join-Path $BaseDir "components\graph\useForceGraph.ts"
-    },
-    # Doc Intelligence sub-components
-    @{
-        Src = Join-Path $IntegrationDir "components\doc-intelligence\types.ts"
-        Dst = Join-Path $BaseDir "components\doc-intelligence\types.ts"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "components\doc-intelligence\InputArea.tsx"
-        Dst = Join-Path $BaseDir "components\doc-intelligence\InputArea.tsx"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "components\doc-intelligence\ResultsPanel.tsx"
-        Dst = Join-Path $BaseDir "components\doc-intelligence\ResultsPanel.tsx"
-    },
-    # UI primitives
-    @{
-        Src = Join-Path $IntegrationDir "components\ui\index.tsx"
-        Dst = Join-Path $BaseDir "components\ui\index.tsx"
-    }
+    @{ Src = Join-Path $IntegrationDir "components\GraphViewer.tsx";          Dst = Join-Path $BaseDir "components\GraphViewer.tsx" }
+    @{ Src = Join-Path $IntegrationDir "components\GraphStats.tsx";           Dst = Join-Path $BaseDir "components\GraphStats.tsx" }
+    @{ Src = Join-Path $IntegrationDir "components\DocIntelligenceView.tsx";   Dst = Join-Path $BaseDir "components\DocIntelligenceView.tsx" }
+    @{ Src = Join-Path $IntegrationDir "components\DashboardHome.tsx";        Dst = Join-Path $BaseDir "components\DashboardHome.tsx" }
+    @{ Src = Join-Path $IntegrationDir "components\MemoryBrowser.tsx";        Dst = Join-Path $BaseDir "components\MemoryBrowser.tsx" }
+    @{ Src = Join-Path $IntegrationDir "components\ExperienceView.tsx";       Dst = Join-Path $BaseDir "components\ExperienceView.tsx" }
+    @{ Src = Join-Path $IntegrationDir "components\MemoryDashboard.tsx";      Dst = Join-Path $BaseDir "components\MemoryDashboard.tsx" }
+    @{ Src = Join-Path $IntegrationDir "components\graph\colors.ts";          Dst = Join-Path $BaseDir "components\graph\colors.ts" }
+    @{ Src = Join-Path $IntegrationDir "components\graph\NodeDetail.tsx";     Dst = Join-Path $BaseDir "components\graph\NodeDetail.tsx" }
+    @{ Src = Join-Path $IntegrationDir "components\graph\EdgeFilter.tsx";     Dst = Join-Path $BaseDir "components\graph\EdgeFilter.tsx" }
+    @{ Src = Join-Path $IntegrationDir "components\graph\useForceGraph.ts";   Dst = Join-Path $BaseDir "components\graph\useForceGraph.ts" }
+    @{ Src = Join-Path $IntegrationDir "components\doc-intelligence\types.ts"; Dst = Join-Path $BaseDir "components\doc-intelligence\types.ts" }
+    @{ Src = Join-Path $IntegrationDir "components\doc-intelligence\InputArea.tsx"; Dst = Join-Path $BaseDir "components\doc-intelligence\InputArea.tsx" }
+    @{ Src = Join-Path $IntegrationDir "components\doc-intelligence\ResultsPanel.tsx"; Dst = Join-Path $BaseDir "components\doc-intelligence\ResultsPanel.tsx" }
+    @{ Src = Join-Path $IntegrationDir "components\ui\index.tsx";             Dst = Join-Path $BaseDir "components\ui\index.tsx" }
 )
 
-$copiedComp = 0
 foreach ($mapping in $componentMappings) {
-    $src = $mapping.Src
-    $dst = $mapping.Dst
-
-    if (-not (Test-Path $src)) {
-        Write-Host "  SKIP: Source not found: $src" -ForegroundColor DarkGray
-        continue
-    }
-
-    $dstDir = Split-Path -Parent $dst
-    if (-not (Test-Path $dstDir)) {
-        New-Item -ItemType Directory -Path $dstDir -Force | Out-Null
-    }
-
-    Copy-Item -Path $src -Destination $dst -Force
-    Write-Host "  Copied: $(Split-Path -Leaf $dst)" -ForegroundColor Green
-    $copiedComp++
+    Safe-Copy -Src $mapping.Src -Dst $mapping.Dst
 }
-Write-Host "  Total components copied: $copiedComp" -ForegroundColor Cyan
 
-# --- Step 5: Copy lib ---
+# --- Step 5: Copy lib (Safe-Copy) ---
 
 Write-Host "[5/10] Copying lib/ files..." -ForegroundColor Yellow
 
 $libMappings = @(
-    @{
-        Src = Join-Path $IntegrationDir "lib\graph-client.ts"
-        Dst = Join-Path $BaseDir "lib\graph-client.ts"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "lib\types.ts"
-        Dst = Join-Path $BaseDir "lib\types.ts"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "lib\constants.ts"
-        Dst = Join-Path $BaseDir "lib\constants.ts"
-    },
-    # Memory bridge + cache + preload (shared Python bridge, eliminates duplicated inline code)
-    @{
-        Src = Join-Path $IntegrationDir "lib\memory\bridge.ts"
-        Dst = Join-Path $BaseDir "lib\memory\bridge.ts"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "lib\memory\cache.ts"
-        Dst = Join-Path $BaseDir "lib\memory\cache.ts"
-    },
-    @{
-        Src = Join-Path $IntegrationDir "lib\memory\preload.ts"
-        Dst = Join-Path $BaseDir "lib\memory\preload.ts"
-    }
+    @{ Src = Join-Path $IntegrationDir "lib\graph-client.ts";  Dst = Join-Path $BaseDir "lib\graph-client.ts" }
+    @{ Src = Join-Path $IntegrationDir "lib\types.ts";         Dst = Join-Path $BaseDir "lib\types.ts" }
+    @{ Src = Join-Path $IntegrationDir "lib\constants.ts";     Dst = Join-Path $BaseDir "lib\constants.ts" }
+    @{ Src = Join-Path $IntegrationDir "lib\memory\bridge.ts"; Dst = Join-Path $BaseDir "lib\memory\bridge.ts" }
+    @{ Src = Join-Path $IntegrationDir "lib\memory\cache.ts";  Dst = Join-Path $BaseDir "lib\memory\cache.ts" }
+    @{ Src = Join-Path $IntegrationDir "lib\memory\preload.ts";Dst = Join-Path $BaseDir "lib\memory\preload.ts" }
 )
 
-$copiedLib = 0
 foreach ($mapping in $libMappings) {
-    $src = $mapping.Src
-    $dst = $mapping.Dst
-
-    if (-not (Test-Path $src)) {
-        Write-Host "  SKIP: Source not found: $src" -ForegroundColor DarkGray
-        continue
-    }
-
-    $dstDir = Split-Path -Parent $dst
-    if (-not (Test-Path $dstDir)) {
-        New-Item -ItemType Directory -Path $dstDir -Force | Out-Null
-    }
-
-    Copy-Item -Path $src -Destination $dst -Force
-    Write-Host "  Copied: $(Split-Path -Leaf $dst)" -ForegroundColor Green
-    $copiedLib++
+    Safe-Copy -Src $mapping.Src -Dst $mapping.Dst
 }
-Write-Host "  Total lib files copied: $copiedLib" -ForegroundColor Cyan
 
-# --- Step 6: Copy instrumentation.ts ---
+# --- Step 6: Copy instrumentation.ts (Safe-Copy) ---
 
 Write-Host "[6/10] Copying instrumentation.ts..." -ForegroundColor Yellow
 
@@ -286,8 +330,7 @@ $instrSrc = Join-Path $IntegrationDir "instrumentation.ts"
 $instrDst = Join-Path $BaseDir "instrumentation.ts"
 
 if (Test-Path $instrSrc) {
-    Copy-Item -Path $instrSrc -Destination $instrDst -Force
-    Write-Host "  Copied: instrumentation.ts (auto-preload on server start)" -ForegroundColor Green
+    Safe-Copy -Src $instrSrc -Dst $instrDst
 } else {
     Write-Host "  SKIP: instrumentation.ts not found in integration dir" -ForegroundColor DarkGray
 }
@@ -489,35 +532,32 @@ foreach ($f in @($bridgePath, $cachePath, $preloadPath, $instrPath)) {
 }
 
 if ($preloadOk) {
-    Write-Host "  Preload infrastructure: OK (6s cold start -> ~55ms cached)" -ForegroundColor Green
+    Write-Host "  Preload infrastructure: OK" -ForegroundColor Green
 } else {
     Write-Host "  WARN: Some preload files missing. Dashboard will work but first API call will be slow." -ForegroundColor Yellow
 }
 
-# --- Done ---
+# --- Summary ---
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Green
 Write-Host "  Installation complete!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "Dashboard has 5 tabs:" -ForegroundColor Cyan
-Write-Host "  Dashboard     - Stats overview (entries, graph, experience)" -ForegroundColor White
-Write-Host "  Memory        - Browse & search ChromaDB entries" -ForegroundColor White
-Write-Host "  Graph         - Interactive graph visualization" -ForegroundColor White
-Write-Host "  Intelligence  - AI-powered document extraction" -ForegroundColor White
-Write-Host "  Experience    - Good/bad experience browser" -ForegroundColor White
+Write-Host "Safe-Copy Report:" -ForegroundColor Cyan
+Write-Host "  New files:      $script:newCount" -ForegroundColor Green
+Write-Host "  Overwritten:    $script:copiedCount" -ForegroundColor $(if ($script:copiedCount -gt 0) { "Red" } else { "Green" })
+Write-Host "  Skipped (diff): $script:skippedCount" -ForegroundColor Yellow
+Write-Host "  Conflicts:      $script:conflictCount" -ForegroundColor $(if ($script:conflictCount -gt 0) { "Red" } else { "Green" })
+if ($script:conflictCount -gt 0) {
+    Write-Host "  Backups saved:  .install-backup\ in project root" -ForegroundColor Magenta
+}
 Write-Host ""
-Write-Host "Preload: Server startup auto-warms cache (6s cold -> 55ms cached)." -ForegroundColor Cyan
+Write-Host "Dashboard tabs: Dashboard | Memory | Graph | Intelligence" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "Next steps:" -ForegroundColor Cyan
-Write-Host "  1. Start dev:      npm run dev" -ForegroundColor White
-Write-Host "  2. Open:           http://localhost:3000" -ForegroundColor White
-Write-Host "  3. Test API:       http://localhost:3000/api/memory/stats" -ForegroundColor White
-Write-Host "  4. Check preload:  Look for [preload] messages in server console" -ForegroundColor White
-Write-Host ""
-Write-Host "To populate memory with data:" -ForegroundColor Cyan
-Write-Host "  python .zcode\tools\memory_cli.py graph stats" -ForegroundColor White
-Write-Host "  python .zcode\tools\folder_indexer.py graph-scan C:\path\to\project" -ForegroundColor White
-Write-Host "  python .zcode\tools\session_summary.py list" -ForegroundColor White
+Write-Host "Modes for next run:" -ForegroundColor Cyan
+Write-Host "  & `"...install.ps1`" -Mode diff       # Show conflicts only (dry run)" -ForegroundColor Gray
+Write-Host "  & `"...install.ps1`" -Mode ask        # Ask on each conflict (default)" -ForegroundColor Gray
+Write-Host "  & `"...install.ps1`" -Mode skip       # Keep local, only add new files" -ForegroundColor Gray
+Write-Host "  & `"...install.ps1`" -Mode overwrite  # Overwrite all (with backup)" -ForegroundColor Gray
 Write-Host ""

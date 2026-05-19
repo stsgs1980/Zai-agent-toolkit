@@ -1,15 +1,15 @@
 ---
 name: workflow-discipline_sts
-description: "MANDATORY workflow discipline rules. This skill MUST auto-activate at the start of every session and before every task. Enforces 7 non-negotiable communication and execution rules: 1) Explain WHY before HOW — always state the reason and goal before giving commands or instructions, 2) One task = one complete command — never give multi-step sequences without full context (which window, prerequisites, expected output), 3) Check environment before instructing — verify server status, running processes, current directory, and tool availability before telling the user to run anything, 4) Never break working things — if something works, do not refactor, rename, or restructure unless explicitly asked; preserve stability, 5) Test before push — run build/typecheck/lint locally before committing; never push broken code, 6) No parallel structures — do not create duplicate files, overlapping configs, or alternative implementations alongside existing ones; extend what exists, 7) Report failures honestly — say what went wrong and why, not just what to do next. Triggers: session start, begin work, task, command, instruction, fix, implement, create, build, deploy, update, run, next step, continue, давай, сделай, исправь, обнови, запусти, дальше, на, вперёд. This skill is ALWAYS active — it applies to every agent action and response."
+description: "MANDATORY workflow discipline rules. This skill MUST auto-activate at the start of every session and before every task. Enforces 8 non-negotiable rules: 1) Explain WHY before HOW, 2) One task = one complete command, 3) Check environment before instructing, 4) Never break working things, 5) Test before push, 6) No parallel structures, 7) Report failures honestly, 8) READ BEFORE WRITE — never overwrite a file on the target environment without first reading and comparing the existing version. This rule is ABSOLUTE for install scripts, copy operations, and any deployment action. Triggers: session start, begin work, task, command, instruction, fix, implement, create, build, deploy, update, run, next step, continue, давай, сделай, исправь, обнови, запусти, дальше, на, вперёд. This skill is ALWAYS active."
 id: ZAI-STS-007
-version: 1.0
+version: 2.0
 trigger: session start, task, command, instruction, fix, implement, build, deploy, update, run, continue, давай, сделай, исправь
 ---
 
-# Skill: Workflow Discipline v1.0
+# Skill: Workflow Discipline v2.0
 
 > ID: ZAI-STS-007
-> Version: 1.0
+> Version: 2.0
 > Last Updated: 2026-05
 
 **Mandatory behavioral rules for the Z.ai agent.** These rules are non-negotiable and apply to EVERY response, EVERY task, and EVERY instruction the agent gives. Violation of any rule is a critical error.
@@ -28,7 +28,7 @@ This skill is **ALWAYS ACTIVE**. It must be followed:
 
 ---
 
-## The 7 Rules
+## The 8 Rules
 
 ### Rule 1: Explain WHY Before HOW
 
@@ -100,7 +100,54 @@ Wait for "Ready in" message, then test.
 
 **Exception:** Security vulnerabilities, critical bugs, or things that WILL break soon (deprecation warnings with timeline).
 
-### Rule 5: Test Before Push
+### Rule 5: Read Before Write (CRITICAL — Deployment Safety)
+
+**NEVER overwrite a file on the target environment without first reading and comparing.**
+
+This is the single most important rule for any deployment, install script, or copy operation:
+
+- **ALWAYS** read the destination file BEFORE writing to it
+- **COMPARE** source vs destination — identify differences
+- **MERGE** — preserve local changes that don't exist in source
+- **REPORT** — show the user exactly what will change before changing it
+- **ASK** — get explicit approval before overwriting when differences exist
+
+**MANDATORY pre-write checklist:**
+1. Read the destination file (if it exists)
+2. If destination differs from source → show diff to user
+3. Ask: "Overwrite? / Merge? / Skip?"
+4. Only write after explicit approval
+
+**This applies to:**
+- `install.ps1` / `install.sh` copy operations
+- `Copy-Item` / `cp` commands
+- Any git pull that overwrites local changes
+- Any file sync between environments
+
+**The ONLY exception:** New files that don't exist at destination — these can be created without comparison.
+
+**BAD:**
+```
+install.ps1  # blindly overwrites all files
+```
+
+**GOOD:**
+```
+Before running install.ps1, I need to check what files have been
+modified locally on WIN that differ from the git repo.
+
+Let me read the current MemoryDashboard.tsx on WIN first...
+[Differences found: WIN has additional feature X]
+
+Options:
+  A) Overwrite — lose local changes
+  B) Merge — keep local changes + apply new fixes
+  C) Skip — don't touch this file
+
+Which do you prefer?
+```
+
+### Rule 6: Test Before Push
 
 **NEVER push code that hasn't been verified:**
 - Run `npm run build` (or equivalent) before committing
@@ -111,7 +158,7 @@ Wait for "Ready in" message, then test.
 
 **If build fails:** Fix it FIRST. Do not push with "it should work."
 
-### Rule 6: No Parallel Structures
+### Rule 7: No Parallel Structures
 
 **Do NOT create alternatives alongside existing systems:**
 - If a file exists, EXTEND it — don't create a v2 alongside it
@@ -121,7 +168,7 @@ Wait for "Ready in" message, then test.
 
 **Before creating any new file:** Ask yourself — "Does something already exist that I should extend instead?"
 
-### Rule 7: Report Failures Honestly
+### Rule 8: Report Failures Honestly
 
 **When something goes wrong:**
 - State WHAT failed (the specific error)
@@ -152,6 +199,7 @@ Before sending any response, verify:
 - [ ] Did I explain WHY before giving commands?
 - [ ] Is every instruction complete with full context?
 - [ ] Did I check what I can about the environment?
+- [ ] **Did I READ the destination file before writing? (Rule 5 — CRITICAL)**
 - [ ] Am I modifying something that already works? (If yes — stop and explain)
 - [ ] Would this code pass a build/test? (If unsure — say so)
 - [ ] Am I creating a new file when I should extend an existing one?
@@ -166,6 +214,7 @@ Before sending any response, verify:
 | "check discipline" | Agent runs self-check on current task |
 | "which rule?" | Agent identifies which rule was violated |
 | "rule N" | Agent explains and demonstrates Rule N |
+| "read first" | Agent stops and reads all destination files before any write |
 
 ---
 
@@ -177,6 +226,13 @@ These rules take priority over efficiency. It is BETTER to:
 - Say "I'm not sure" than to guess and be wrong
 - Extend existing code than to create something new alongside it
 - Report a failure than to hide it
+- **Read the destination file than to overwrite and destroy local work**
+
+**Rule 5 (Read Before Write) has ZERO-TOLERANCE enforcement:**
+- Violating Rule 5 is an **immediate stop** — the agent MUST halt the current operation
+- The agent MUST report exactly what was overwritten and what local changes were lost
+- The agent MUST propose a recovery plan before continuing
+- Repeat violations indicate the skill needs harder enforcement mechanisms
 
 **Violation of these rules is a critical error that must be corrected immediately.**
 
