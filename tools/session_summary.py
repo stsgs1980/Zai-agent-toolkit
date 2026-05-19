@@ -491,6 +491,83 @@ def create_manual_experience(
     return store_experience_report(report)
 
 
+# ── Session Log Entry ─────────────────────────────────────
+
+def create_session_log(
+    title: str,
+    tasks: str = "",
+    errors: str = "",
+    files: str = "",
+    duration: str = "",
+    result: str = "partial",
+) -> str:
+    """
+    Create a session log entry (stored in 'session' collection).
+    This is a factual record of what was done, not lessons learned.
+    """
+    parts = [f"# {title}", ""]
+
+    if tasks:
+        parts.append("## Tasks")
+        for line in tasks.replace("\\n", "|").split("|"):
+            line = line.strip()
+            if line:
+                parts.append(f"  - {line}")
+        parts.append("")
+
+    if errors:
+        parts.append("## Errors")
+        for line in errors.replace("\\n", "|").split("|"):
+            line = line.strip()
+            if line:
+                parts.append(f"  ! {line}")
+        parts.append("")
+
+    if files:
+        parts.append("## Files Modified")
+        for line in files.replace("\\n", "|").split("|"):
+            line = line.strip()
+            if line:
+                parts.append(f"  * {line}")
+        parts.append("")
+
+    parts.append(f"Duration: {duration or 'unknown'}")
+    parts.append(f"Result: {result}")
+
+    log_text = "\n".join(parts)
+
+    task_count = len([l for l in tasks.replace("\\n", "|").split("|") if l.strip()]) if tasks else 0
+    error_count = len([l for l in errors.replace("\\n", "|").split("|") if l.strip()]) if errors else 0
+
+    metadata = {
+        "source": "manual_log",
+        "type": "session",
+        "session_type": "log",
+        "result": result,
+        "duration": duration,
+        "tasks_count": str(task_count),
+        "errors_count": str(error_count),
+        "tags": f"session_log,{result}",
+    }
+
+    # Store in 'session' collection
+    client = get_client()
+    collection = client.get_or_create_collection(name="session", metadata={"type": "session"})
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    entry_id = f"session_{timestamp}"
+
+    metadata["created_at"] = datetime.now().isoformat()
+
+    collection.add(
+        documents=[log_text],
+        metadatas=[metadata],
+        ids=[entry_id],
+    )
+
+    return entry_id
+
+
 # ── CLI ───────────────────────────────────────────────────
 
 def main():
@@ -539,6 +616,17 @@ Examples:
     v_p.add_argument("--status", required=True,
                      choices=["verified", "unverified", "conflict"],
                      help="New verification status")
+
+    # log
+    log_p = subparsers.add_parser("log", help="Create session log entry (factual record)")
+    log_p.add_argument("--title", required=True, help="Short summary of session focus")
+    log_p.add_argument("--tasks", default="", help="What was attempted (| separated)")
+    log_p.add_argument("--errors", default="", help="What went wrong (| separated)")
+    log_p.add_argument("--files", default="", help="Files modified (| separated)")
+    log_p.add_argument("--duration", default="", help="Approximate time (e.g. 3h)")
+    log_p.add_argument("--result", default="partial",
+                       choices=["completed", "partial", "blocked", "abandoned"],
+                       help="Overall outcome")
 
     args = parser.parse_args()
 
@@ -593,6 +681,18 @@ Examples:
 
     elif args.command == "verify":
         verify_experience(args.entry_id, args.status)
+
+    elif args.command == "log":
+        entry_id = create_session_log(
+            title=args.title,
+            tasks=args.tasks,
+            errors=args.errors,
+            files=args.files,
+            duration=args.duration,
+            result=args.result,
+        )
+        print(f"[LOG] Saved: \"{args.title}\" ({args.tasks.count(chr(124))+1 if args.tasks else 0} tasks, {args.errors.count(chr(124))+1 if args.errors else 0} errors, {args.result})")
+        print(f"Stored as: {entry_id}")
 
 
 if __name__ == "__main__":
