@@ -12,6 +12,12 @@
 #
 # ============================================================
 
+# param() MUST be first executable statement in PowerShell script
+param(
+    [ValidateSet("ask", "overwrite", "skip", "diff")]
+    [string]$Mode = "ask"
+)
+
 $ErrorActionPreference = "Stop"
 
 # --- Configuration ---
@@ -25,16 +31,6 @@ $DashboardDir = Get-Location
 # Path to graph.json
 $HomeDir = $env:USERPROFILE
 $GraphJsonPath = Join-Path $HomeDir ".zcode\memory\graph.json"
-
-# Conflict resolution mode (can be overridden via -Mode parameter)
-#   "ask"    — prompt for each conflicting file (default)
-#   "overwrite" — overwrite all without asking (use with caution)
-#   "skip"   — skip all conflicting files, only copy new ones
-#   "diff"   — only show diffs, don't copy anything (dry run)
-param(
-    [ValidateSet("ask", "overwrite", "skip", "diff")]
-    [string]$Mode = "ask"
-)
 
 # --- Safe-Copy function (ENFORCEMENT MECHANISM) ---
 # This function replaces all raw Copy-Item calls.
