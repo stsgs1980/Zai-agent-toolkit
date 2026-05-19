@@ -1,9 +1,11 @@
 # Agent Rules
 
-> Toolkit version: **v2.0.4**
+> Toolkit version: **v2.0.5**
 >
 > Mandatory rules for AI agents working with this toolkit.
 > Read before starting work on any project.
+>
+> **STEP 0 — BEFORE ANYTHING ELSE**: Invoke `Skill(command="workflow-discipline_sts")` to load the 7 workflow discipline rules. This is NON-NEGOTIABLE and applies to EVERY session, EVERY task, EVERY response.
 
 ---
 
@@ -26,6 +28,7 @@ If the toolkit needs updates, clone a fresh copy from the repository.
 When entering a project (new chat, session restart, context loss),
 you MUST complete the onboarding protocol before starting any work:
 
+0. **Invoke `Skill(command="workflow-discipline_sts")`** — load 7 workflow discipline rules (NON-NEGOTIABLE)
 1. Read `AGENT_RULES.md` (this file)
 2. Read `PROJECT_CONFIG.md` (project-specific settings) -- if exists
 3. Read `worklog.md` (previous session history)
