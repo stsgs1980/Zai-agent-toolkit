@@ -1,188 +1,143 @@
 ---
 name: session-log
-id: ZAI-SESSION-001
-version: 1.1
+version: 1.0
 compatibility: both
-description: >
-  AUTOMATIC session knowledge capture. Creates snapshots without user action.
-  Triggers: every 15 min, after every commit, after 5+ file changes, on problem solved,
-  on decision made. User can also manually trigger: "create session log", "log this".
-  Builds KNOWLEDGE_BASE.md automatically for future reference and best practices.
-trigger: session log, create session log, log this, knowledge base
+description: "Auto-log session activity to ChromaDB. Logs what was done, what tools were used, what files were changed, what errors occurred. Always active — every session gets a log entry. This is NOT experience (lessons learned), this is a factual record of activity. Triggers: session end, autosave timer, 'лог', 'log session', 'что делали', context full. Use this skill whenever a session is ending, wrapping up, or periodically to save progress."
+id: ZAI-SESSION-001
+author: STS
+trigger: session log, лог сессии, что делали, log activity, autosave, session end, wrap-up, до завтра, на этом пока
+license: MIT
 ---
 
-# Skill: Session Log v1.1
+# Session Log v1.0
 
 > ID: ZAI-SESSION-001
-> Version: 1.1
-> Last Updated: 2026-05
+> Version: 1.0
 
-**AUTOMATIC** knowledge capture from AI sessions. No need to remember to log -
-the system creates snapshots automatically at key moments.
+This skill logs session activity — what was done, what changed, what errors happened. It always saves, even if there's nothing to "learn". A session without lessons still has value as a record.
 
-## Automatic Triggers (No User Action Required)
+## LOG vs EXPERIENCE
 
-| Trigger | Frequency | Action |
-|---------|-----------|--------|
-| **Time-based** | Every 15 minutes | Auto-snapshot |
-| **Commit** | After every `git commit` | Log commit details |
-| **Files changed** | After 5+ file modifications | Auto-snapshot |
-| **Problem solved** | When error fixed | Log problem + solution |
-| **Decision made** | When choice explained | Log decision + rationale |
-| **Push** | After every `git push` | Log delivery milestone |
-| **Handoff** | Before session handoff | Full session capture |
+This skill logs facts. The session-experience skill extracts lessons. They are different:
 
-## How It Works
+```
+LOG:  "Редактировали HotCommandsView.tsx, добавили колонку Command"
+EXP:  "PS -replace ломает hex-opacity, используй Set-Content"
 
-### State Tracking
+LOG:  "ChromaDB путь исправлен с chroma_data на memory/chromadb"
+EXP:  "Проверять PersistentClient path перед работой с ChromaDB"
 
-The skill tracks session state in `.session-log-state.json`:
-
-```json
-{
-  "session_id": "web-c28243c7...",
-  "last_snapshot": "2026-05-17T09:30:00Z",
-  "files_changed_since_snapshot": 3,
-  "commits_since_snapshot": 1,
-  "problems_solved": [],
-  "decisions_made": []
-}
+LOG:  "3 часа потратили на glassmorphism"
+EXP:  (может не быть — если нет урока)
 ```
 
-### Auto-Snapshot Logic
+**Log = what happened. Experience = what was learned. Log always saves. Experience only when there's a lesson.**
 
-```text
-IF time_since_last_snapshot > 15 min
-   OR files_changed >= 5
-   OR commit_just_happened
-   OR problem_just_solved
-   OR decision_just_made
-THEN
-   create_mini_snapshot()
-   append_to(KNOWLEDGE_BASE.md)
-   reset_counters()
+## What to Log
+
+Every log entry captures:
+
+| Field | What it contains | Example |
+|-------|-----------------|---------|
+| **title** | Short summary of session focus | "Dashboard: HotCommands + glassmorphism removal" |
+| **tasks** | What was attempted | "Added Command column to Skills table\|Removed glassmorphism from all components\|Fixed session-experience skill v2.0" |
+| **errors** | What went wrong | "PowerShell -replace failed on hex-opacity codes\|Next.js cache not updating\|.next folder needed manual deletion" |
+| **files** | Files modified | "HotCommandsView.tsx\|MemoryDashboard.tsx\|MemoryBrowser.tsx\|SKILL.md" |
+| **duration** | Approximate time spent | "3h" |
+| **result** | Overall outcome | partial, completed, blocked, abandoned |
+
+## Auto-Activation
+
+This skill ALWAYS activates on session end or timer. No conditions — just save.
+
+| Condition | Priority |
+|-----------|----------|
+| Session ending ("до завтра", goodbye) | [C] Must |
+| Context filling | [C] Must |
+| User asks ("лог", "log session") | [C] Must |
+| Autosave timer (30 min) | [W] Should |
+| After major milestone | [I] Consider |
+
+## How to Save
+
+```bash
+# Windows:
+python C:\Users\stsgr\.zcode\tools\session_summary.py log ^
+  --title "Краткое описание фокуса сессии" ^
+  --tasks "Задача 1|Задача 2|Задача 3" ^
+  --errors "Ошибка 1|Ошибка 2" ^
+  --files "file1.tsx|file2.py|file3.md" ^
+  --duration "3h" ^
+  --result partial
+
+# Linux:
+python tools/session_summary.py log \
+  --title "Short session focus" \
+  --tasks "Task 1|Task 2|Task 3" \
+  --errors "Error 1|Error 2" \
+  --files "file1.tsx|file2.py" \
+  --duration "3h" \
+  --result partial
 ```
 
-### Snapshot Types
+## Log Entry Examples
 
-| Type | When | Content |
-|------|------|---------|
-| Mini | Auto (time/files) | Timestamp + current work summary |
-| Commit | After commit | Commit message + files changed |
-| Problem | After fix | Problem + solution + prevention |
-| Decision | After choice | Decision + rationale + alternatives |
-| Full | Manual/handoff | Complete session report |
+### Example 1: Productive session
 
-## Automatic Capture Examples
-
-### After Commit (Auto)
-
-```markdown
-### [09:45] Commit: feat(skills): add session-log
-
-**Files**: 3 changed
-**Summary**: Created session-log skill with auto triggers
-**Key Changes**: SKILL.md, templates.md, KNOWLEDGE_BASE.md
+```
+Title: Dashboard: HotCommands + glassmorphism removal
+Tasks: Added Command column to Skills table|Removed glassmorphism from 6 components|Rewrote session-experience v2.0
+Errors: PowerShell -replace failed on hex-opacity codes 3 times|Next.js .next cache required manual deletion
+Files: HotCommandsView.tsx|MemoryDashboard.tsx|MemoryBrowser.tsx|ResultsPanel.tsx|InputArea.tsx|SKILL.md
+Duration: 4h
+Result: partial (commands done, styling cleanup ongoing)
 ```
 
-### After Problem Solved (Auto)
+### Example 2: Debugging session
 
-```markdown
-### [09:42] Problem Solved: CI Trailing Whitespace
-
-**Problem**: Toolkit Validation failing - trailing whitespace
-**Solution**: Fixed `sync-toolkit_sts/SKILL.md` - removed trailing spaces
-**Prevention**: Run `grep -rn ' $'` before commits
+```
+Title: ChromaDB path mismatch debugging
+Tasks: Found sync_index.py and memory_bridge.py use different paths|Fixed bridge path to memory/chromadb|Verified 13 collections now accessible
+Errors: Bridge returned empty results for project_index|ChromaDB data was in ~/.zcode/memory/chromadb not ~/.zcode/chroma_data
+Files: memory_bridge.py
+Duration: 1h
+Result: completed
 ```
 
-### Time-based Mini Snapshot (Auto)
+### Example 3: Blocked session (like today)
 
-```markdown
-### [09:30] Snapshot
-
-**Work in Progress**: Creating session-log skill
-**Files Modified**: 2 (SKILL.md, templates.md)
-**Status**: 60% complete - need to add auto-trigger logic
+```
+Title: Glassmorphism removal — repeated failures
+Tasks: Attempted to remove glassmorphism from all components|Tried PowerShell -replace (failed multiple times)|Used Set-Content for full file replacement (worked)
+Errors: -replace regex didn't match hex-opacity patterns|Multiple -replace passes needed for each opacity variant|Next.js cache required .next deletion every time
+Files: HotCommandsView.tsx|MemoryDashboard.tsx|MemoryBrowser.tsx|DashboardHome.tsx|ExperienceView.tsx|DocIntelligenceView.tsx|InputArea.tsx|ResultsPanel.tsx|ui/index.tsx
+Duration: 3h
+Result: partial (glassmorphism removed, but took far too long due to tooling issues)
 ```
 
-## Manual Triggers (Optional)
+## Result Values
 
-| User Says | Action |
-|-----------|--------|
-| `"create session log"` | Full session capture NOW |
-| `"log this: <note>"` | Add specific note |
-| `"log problem: <desc>"` | Add problem entry |
-| `"log decision: <desc>"` | Add decision entry |
-| `"show knowledge base"` | Display current KNOWLEDGE_BASE.md |
-| `"pause auto log"` | Temporarily stop auto-capture |
-| `"resume auto log"` | Resume auto-capture |
+- **completed** — All tasks done
+- **partial** — Some done, some not
+- **blocked** — Could not proceed
+- **abandoned** — Gave up
 
-## Knowledge Base Structure
+## Quick Reference
 
-```markdown
-# Knowledge Base
+```
+LOG = facts about what happened (always save)
+EXPERIENCE = lessons learned (save only when there's a lesson)
 
-> Auto-generated by session-log skill
+Every session gets a log. Not every session gets experience.
 
-## Today: [DATE]
-
-### [TIME] Snapshot (Auto)
-...
-
-### [TIME] Problem Solved (Auto)
-...
-
-### [TIME] Decision (Auto)
-...
-
----
-
-## Best Practices (Accumulated)
-...
-
-## Common Problems (Accumulated)
-...
+Separator: | (pipe)
+Results: completed, partial, blocked, abandoned
+Store: ChromaDB 'session' collection
+Tool: python tools/session_summary.py log --title "..." --tasks "..." --errors "..." --files "..." --duration "..." --result partial
 ```
 
-## Implementation for Agent
+## Communication
 
-The agent should automatically:
-
-1. **After each git commit**:
-   - Read `.session-log-state.json`
-   - Update `commits_since_snapshot`
-   - Create commit snapshot in KNOWLEDGE_BASE.md
-
-2. **Every 15 minutes** (check on each user message):
-   - Compare current time vs `last_snapshot`
-   - If > 15 min, create mini snapshot
-
-3. **After 5+ file changes**:
-   - Track file modifications
-   - Create snapshot when threshold reached
-
-4. **When detecting problem solved**:
-   - Pattern: "fixed", "resolved", "solved", "error -> working"
-   - Create problem-solution entry
-
-5. **When detecting decision made**:
-   - Pattern: "chose X because", "decided to", "we'll use X"
-   - Create decision entry
-
-## File Locations
-
-| File | Purpose |
-|------|---------|
-| `docs/KNOWLEDGE_BASE.md` | Main knowledge storage (committed to git) |
-| `.session-log-state.json` | Session state tracking (gitignored) |
-
-## Integration
-
-- **git-checkpoint**: After checkpoint, create snapshot
-- **session-handoff**: Include full KNOWLEDGE_BASE.md in handoff
-- **commit-work**: Auto-log after successful commit
-- **worklog.md**: Cross-reference entries
-
----
-
-Built with: Z.ai Agent Toolkit
+- `[LOG] Saved: "Dashboard work" (5 tasks, 3 errors, partial)`
+- `[LOG] Autosave: saving session progress...`
+- `[LOG] Session ending — logging activity before close`
