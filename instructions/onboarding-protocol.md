@@ -15,6 +15,25 @@ Failure to onboard = acting blind = high risk of breaking existing code.
 
 ## Onboarding Steps (execute in order)
 
+### Step 0: Load Workflow Discipline Rules
+
+**NON-NEGOTIABLE. Execute BEFORE any other step.**
+
+```text
+Invoke: Skill(command="workflow-discipline_sts")
+```
+
+This loads the 7 mandatory workflow rules that apply to EVERY action:
+1. Explain WHY before HOW
+2. One task = one complete command
+3. Check environment before instructing
+4. Never break working things
+5. Test before push
+6. No parallel structures
+7. Report failures honestly
+
+Skipping this step = violating ALL workflow rules = critical error.
+
 ### Step 1: Read Agent Rules
 
 ```text
@@ -124,7 +143,7 @@ Ready. What would you like to work on?
 ## Partial Onboarding
 
 If the user explicitly says "skip onboarding" or "just fix X quickly":
-- Still run Step 1 (AGENT_RULES.md) and Step 3 (git state) -- these are NON-SKIPPABLE
+- Still run Step 0 (workflow-discipline_sts) and Step 1 (AGENT_RULES.md) and Step 3 (git state) -- these are NON-SKIPPABLE
 - Skip Steps 2, 4, 5, 6 only with user confirmation
 - Note in worklog: "Partial onboarding per user request"
 
@@ -142,6 +161,7 @@ When a conversation is continued from a summary:
 ## Example: Correct Onboarding
 
 ```text
+[Agent invokes Skill(command="workflow-discipline_sts") — loads 7 rules]
 [Agent reads AGENT_RULES.md]
 [Agent reads worklog.md - 3 sessions, last update 2026-04-17]
 [Agent checks git: commit ee0baba, main branch, clean]
@@ -154,6 +174,7 @@ When a conversation is continued from a summary:
 
 ```text
 [Agent starts coding immediately without reading anything]
+[Agent does NOT invoke workflow-discipline_sts first]
 [Agent deletes file that was added in previous session]
 [Agent force pushes without checking current branch]
 ```
