@@ -1,18 +1,18 @@
 ---
 name: session-log
-version: 1.0
+version: 1.1
 compatibility: both
-description: "Auto-log session activity to ChromaDB. Logs what was done, what tools were used, what files were changed, what errors occurred. Always active — every session gets a log entry. This is NOT experience (lessons learned), this is a factual record of activity. Triggers: session end, autosave timer, 'лог', 'log session', 'что делали', context full. Use this skill whenever a session is ending, wrapping up, or periodically to save progress."
+description: "Auto-log session activity to ChromaDB. Logs what was done, what tools were used, what files were changed, what errors occurred. Always active — every session gets a log entry. This is NOT experience (lessons learned), this is a factual record of activity. Triggers: session end, autosave timer, explicit user request TO agent. Max 1024 chars per field."
 id: ZAI-SESSION-001
 author: STS
 trigger: session log, лог сессии, что делали, log activity, autosave, session end, wrap-up, до завтра, на этом пока
 license: MIT
 ---
 
-# Session Log v1.0
+# Session Log v1.1
 
 > ID: ZAI-SESSION-001
-> Version: 1.0
+> Version: 1.1
 
 This skill logs session activity — what was done, what changed, what errors happened. It always saves, even if there's nothing to "learn". A session without lessons still has value as a record.
 
@@ -37,47 +37,49 @@ EXP:  (может не быть — если нет урока)
 
 Every log entry captures:
 
-| Field | What it contains | Example |
-|-------|-----------------|---------|
-| **title** | Short summary of session focus | "Dashboard: HotCommands + glassmorphism removal" |
-| **tasks** | What was attempted | "Added Command column to Skills table\|Removed glassmorphism from all components\|Fixed session-experience skill v2.0" |
-| **errors** | What went wrong | "PowerShell -replace failed on hex-opacity codes\|Next.js cache not updating\|.next folder needed manual deletion" |
-| **files** | Files modified | "HotCommandsView.tsx\|MemoryDashboard.tsx\|MemoryBrowser.tsx\|SKILL.md" |
-| **duration** | Approximate time spent | "3h" |
-| **result** | Overall outcome | partial, completed, blocked, abandoned |
+| Field | What it contains | Max length | Example |
+|-------|-----------------|------------|---------|
+| **title** | Short summary of session focus | 1024 chars | "Dashboard: HotCommands + glassmorphism removal" |
+| **tasks** | What was attempted | 1024 chars | "Added Command column\|Removed glassmorphism\|Fixed session-experience skill v2.0" |
+| **errors** | What went wrong | 1024 chars | "PowerShell -replace failed on hex-opacity codes\|Next.js cache not updating" |
+| **files** | Files modified | 1024 chars | "HotCommandsView.tsx\|MemoryDashboard.tsx\|SKILL.md" |
+| **duration** | Approximate time spent | 32 chars | "3h" |
+| **result** | Overall outcome | 16 chars | partial, completed, blocked, abandoned |
 
-## Auto-Activation
+## Auto-Activation (context-aware)
 
-This skill ALWAYS activates on session end or timer. No conditions — just save.
+This skill ALWAYS activates on session end or timer. But triggers only when user is clearly addressing the agent:
 
-| Condition | Priority |
-|-----------|----------|
-| Session ending ("до завтра", goodbye) | [C] Must |
-| Context filling | [C] Must |
-| User asks ("лог", "log session") | [C] Must |
-| Autosave timer (30 min) | [W] Should |
-| After major milestone | [I] Consider |
+| Condition | Trigger | Priority |
+|-----------|---------|----------|
+| Session ending | "до завтра, агент", "на этом пока, запомни" | [C] Must |
+| Context filling | Agent warns about context limits | [C] Must |
+| User asks agent | "лог", "log session", "что делали" | [C] Must |
+| Autosave timer (30 min) | Every 30 min | [W] Should |
+| After major milestone | Feature done, bug fixed | [I] Consider |
+
+**False positive prevention:** "до завтра" in casual chat does NOT trigger. Only when user is wrapping up a work session with the agent.
 
 ## How to Save
 
+### Using alias (recommended):
+
+```bash
+# Add to PowerShell profile:
+function slog { python $env:USERPROFILE\.zcode\Zai-agent-toolkit\tools\session_summary.py log @args }
+
+# Then use short command:
+slog --title "Session focus" --tasks "Task 1|Task 2" --errors "Error 1" --files "file1.tsx|file2.py" --duration "3h" --result partial
+```
+
+### Full command (no alias):
+
 ```bash
 # Windows:
-python C:\Users\stsgr\.zcode\tools\session_summary.py log ^
-  --title "Краткое описание фокуса сессии" ^
-  --tasks "Задача 1|Задача 2|Задача 3" ^
-  --errors "Ошибка 1|Ошибка 2" ^
-  --files "file1.tsx|file2.py|file3.md" ^
-  --duration "3h" ^
-  --result partial
+python $env:USERPROFILE\.zcode\Zai-agent-toolkit\tools\session_summary.py log --title "Session focus" --tasks "Task 1|Task 2" --errors "Error 1" --files "file1.tsx|file2.py" --duration "3h" --result partial
 
 # Linux:
-python tools/session_summary.py log \
-  --title "Short session focus" \
-  --tasks "Task 1|Task 2|Task 3" \
-  --errors "Error 1|Error 2" \
-  --files "file1.tsx|file2.py" \
-  --duration "3h" \
-  --result partial
+python tools/session_summary.py log --title "Session focus" --tasks "Task 1|Task 2" --errors "Error 1" --files "file1.tsx|file2.py" --duration "3h" --result partial
 ```
 
 ## Log Entry Examples
@@ -104,7 +106,7 @@ Duration: 1h
 Result: completed
 ```
 
-### Example 3: Blocked session (like today)
+### Example 3: Blocked session
 
 ```
 Title: Glassmorphism removal — repeated failures
@@ -129,11 +131,11 @@ LOG = facts about what happened (always save)
 EXPERIENCE = lessons learned (save only when there's a lesson)
 
 Every session gets a log. Not every session gets experience.
-
+MAX 1024 chars per field — split if longer
 Separator: | (pipe)
 Results: completed, partial, blocked, abandoned
 Store: ChromaDB 'session' collection
-Tool: python tools/session_summary.py log --title "..." --tasks "..." --errors "..." --files "..." --duration "..." --result partial
+Alias: slog --title "..." --tasks "..." --errors "..." --files "..." --duration "..." --result partial
 ```
 
 ## Communication
