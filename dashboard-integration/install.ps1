@@ -494,8 +494,8 @@ Write-Host "  Memory categories: Knowledge, Patterns, Commands, Projects, Sessio
 Write-Host "  Tool views:        Graph, Skills, Doc Intel" -ForegroundColor White
 Write-Host ""
 Write-Host "Modes for next run:" -ForegroundColor Cyan
-Write-Host "  & `"...install.ps1`" -Mode diff       # Show conflicts only (dry run)" -ForegroundColor Gray
-Write-Host "  & `"...install.ps1`" -Mode ask        # Ask on each conflict (default)" -ForegroundColor Gray
-Write-Host "  & `"...install.ps1`" -Mode skip       # Keep local, only add new files" -ForegroundColor Gray
-Write-Host "  & `"...install.ps1`" -Mode overwrite  # Overwrite all (with backup)" -ForegroundColor Gray
+Write-Host '  & "...install.ps1" -Mode diff       # Show conflicts only (dry run)' -ForegroundColor Gray
+Write-Host '  & "...install.ps1" -Mode ask        # Ask on each conflict (default)' -ForegroundColor Gray
+Write-Host '  & "...install.ps1" -Mode skip       # Keep local, only add new files' -ForegroundColor Gray
+Write-Host '  & "...install.ps1" -Mode overwrite  # Overwrite all (with backup)' -ForegroundColor Gray
 Write-Host ""
