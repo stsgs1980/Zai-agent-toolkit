@@ -314,7 +314,7 @@ Write-Host "[5/10] Copying lib/ files..." -ForegroundColor Yellow
 $libMappings = @(
     @{ Src = Join-Path $IntegrationDir "lib\graph-client.ts";  Dst = Join-Path $BaseDir "lib\graph-client.ts" },
     @{ Src = Join-Path $IntegrationDir "lib\types.ts";         Dst = Join-Path $BaseDir "lib\types.ts" },
-    @{ Src = Join-Path $IntegrationDir "lib\constants.ts";     Dst = Join-Path $BaseDir "lib\constants.ts" },
+    @{ Src = Join-Path $IntegrationDir "lib\constants.tsx";    Dst = Join-Path $BaseDir "lib\constants.tsx" },
     @{ Src = Join-Path $IntegrationDir "lib\memory\bridge.ts"; Dst = Join-Path $BaseDir "lib\memory\bridge.ts" },
     @{ Src = Join-Path $IntegrationDir "lib\memory\cache.ts";  Dst = Join-Path $BaseDir "lib\memory\cache.ts" },
     @{ Src = Join-Path $IntegrationDir "lib\memory\preload.ts"; Dst = Join-Path $BaseDir "lib\memory\preload.ts" }
