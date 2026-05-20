@@ -73,10 +73,14 @@ function Step-CopyComponents {
         # Legacy (kept for reference, not imported by default)
         @{ Src = Join-Path $IntegrationDir "components\DashboardHome.tsx";    Dst = Join-Path $script:BaseDir "components\DashboardHome.tsx" },
         @{ Src = Join-Path $IntegrationDir "components\MemoryBrowser.tsx";    Dst = Join-Path $script:BaseDir "components\MemoryBrowser.tsx" },
-        # Experience (decomposed into 3 modules)
+        # Experience (decomposed into modules)
         @{ Src = Join-Path $IntegrationDir "components\ExperienceView.tsx";   Dst = Join-Path $script:BaseDir "components\ExperienceView.tsx" },
         @{ Src = Join-Path $IntegrationDir "components\ExperienceBrowse.tsx"; Dst = Join-Path $script:BaseDir "components\ExperienceBrowse.tsx" },
         @{ Src = Join-Path $IntegrationDir "components\ExperienceExtract.tsx"; Dst = Join-Path $script:BaseDir "components\ExperienceExtract.tsx" },
+        @{ Src = Join-Path $IntegrationDir "components\ExperienceEntryCard.tsx"; Dst = Join-Path $script:BaseDir "components\ExperienceEntryCard.tsx" },
+        @{ Src = Join-Path $IntegrationDir "components\ExperienceNewForm.tsx"; Dst = Join-Path $script:BaseDir "components\ExperienceNewForm.tsx" },
+        @{ Src = Join-Path $IntegrationDir "components\ExtractTerminalInput.tsx"; Dst = Join-Path $script:BaseDir "components\ExtractTerminalInput.tsx" },
+        @{ Src = Join-Path $IntegrationDir "components\ExtractedEntryCard.tsx"; Dst = Join-Path $script:BaseDir "components\ExtractedEntryCard.tsx" },
         # Graph sub-components
         @{ Src = Join-Path $IntegrationDir "components\graph\colors.ts";      Dst = Join-Path $script:BaseDir "components\graph\colors.ts" },
         @{ Src = Join-Path $IntegrationDir "components\graph\NodeDetail.tsx"; Dst = Join-Path $script:BaseDir "components\graph\NodeDetail.tsx" },
