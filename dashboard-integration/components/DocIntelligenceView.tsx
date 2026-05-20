@@ -16,6 +16,24 @@ export function DocIntelligenceView() {
   const [error, setError] = useState('')
   const [subTab, setSubTab] = useState<SubTab>('terms')
   const [dragOver, setDragOver] = useState(false)
+  const [healthStatus, setHealthStatus] = useState<Record<string, any> | null>(null)
+  const [checkingHealth, setCheckingHealth] = useState(false)
+
+  // ── Health Check ──
+
+  const handleHealthCheck = useCallback(async () => {
+    setCheckingHealth(true)
+    setHealthStatus(null)
+    try {
+      const res = await fetch('/api/memory/doc-intelligence')
+      const data = await res.json()
+      setHealthStatus(data)
+    } catch (e: any) {
+      setHealthStatus({ status: 'error', error: e.message })
+    } finally {
+      setCheckingHealth(false)
+    }
+  }, [])
 
   // ── Extract ──
 
@@ -30,12 +48,13 @@ export function DocIntelligenceView() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content, mode: 'all' }),
       })
+      const data = await res.json()
       if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.error || 'Extraction failed')
+        // Show detailed error with stack if available
+        const detail = data.details ? `${data.error}: ${data.details}` : (data.error || 'Extraction failed')
+        throw new Error(detail)
       }
-      const data: ExtractionResult = await res.json()
-      setResult(data)
+      setResult(data as ExtractionResult)
     } catch (e: any) {
       setError(e.message || 'Unknown error')
     } finally {
@@ -122,7 +141,64 @@ export function DocIntelligenceView() {
         onFile={handleFile}
       />
 
-      {error && <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">{error}</div>}
+      {/* Health Check Button */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={handleHealthCheck}
+          disabled={checkingHealth}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded font-medium transition-all"
+          style={{
+            background: checkingHealth ? '#334155' : '#1e293b',
+            border: '1px solid #334155',
+            color: checkingHealth ? '#64748b' : '#94a3b8',
+          }}
+        >
+          {checkingHealth ? 'Checking...' : 'SDK Health Check'}
+        </button>
+        {healthStatus && (
+          <span
+            className="text-xs font-mono px-2 py-1 rounded"
+            style={{
+              color: healthStatus.status === 'healthy' ? '#4ade80' : healthStatus.status === 'degraded' ? '#fbbf24' : '#f87171',
+              background: healthStatus.status === 'healthy' ? '#16a34a22' : healthStatus.status === 'degraded' ? '#ca8a0422' : '#ef444422',
+            }}
+          >
+            {healthStatus.status === 'healthy' ? 'SDK OK' : healthStatus.status === 'degraded' ? 'Degraded' : 'Broken'}
+            {healthStatus.model && ` (${healthStatus.model})`}
+            {healthStatus.error && `: ${String(healthStatus.error).substring(0, 80)}`}
+          </span>
+        )}
+      </div>
+
+      {/* Error banner */}
+      {error && (
+        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-mono break-all">
+          {error}
+        </div>
+      )}
+
+      {/* AI extraction errors */}
+      {result?.errors && Object.keys(result.errors).length > 0 && (
+        <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 text-sm font-mono">
+          <div className="font-semibold mb-1">AI extraction errors:</div>
+          {Object.entries(result.errors).map(([mode, msg]) => (
+            <div key={mode} className="mb-0.5">&#8226; {mode}: {String(msg)}</div>
+          ))}
+          <div className="mt-2 text-amber-500/60 text-xs">
+            Tip: Try &quot;SDK Health Check&quot; above to diagnose, or paste shorter content.
+          </div>
+        </div>
+      )}
+
+      {result?.html_stripped && (
+        <div className="px-3 py-1.5 rounded-md text-xs font-mono flex items-center gap-2"
+          style={{ background: '#0f172a', border: '1px solid #1e293b', color: '#22d3ee' }}>
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          HTML auto-stripped to {result.clean_length?.toLocaleString()} chars clean text
+        </div>
+      )}
 
       {result && (
         <ResultsPanel
