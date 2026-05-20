@@ -220,12 +220,19 @@ function parseContent(raw: string): ContentBlock[] {
   const lines = raw.split('\n')
   let i = 0
 
+  // CLI command prefixes (auto-detect unfenced shell commands)
+  const CLI_RE = /^(mkdir|cd |cd$|ls |cat |cp |mv |rm |chmod|chown|ln |git |python |python3|pip |pip3|npm |npx |yarn |pnpm |docker |curl |wget |ssh |scp |tar |echo |export |source |sudo |apt |brew |choco|winget|pow|\.\/|bash |sh |zsh |node |nvm |rbenv|make |cmake|gcc |cargo|rustup|go |dotnet|java |javac|code |nano |vim |cat$|grep |sed |awk |find |xargs|jq |yq |terraform|kubectl|helm |aws |gcloud|az )/
+
+  // Comment line: # something (but NOT markdown heading #)
+  const COMMENT_RE = /^#\s/
+
   while (i < lines.length) {
     const line = lines[i]
+    const trimmed = line.trim()
 
     // Fenced code block: ```lang ... ```
-    if (line.trimStart().startsWith('```')) {
-      const lang = line.trim().slice(3).trim()
+    if (trimmed.startsWith('```')) {
+      const lang = trimmed.slice(3).trim()
       const codeLines: string[] = []
       i++
       while (i < lines.length && !lines[i].trimStart().startsWith('```')) {
@@ -238,7 +245,7 @@ function parseContent(raw: string): ContentBlock[] {
     }
 
     // Indented code block (4+ spaces, common in CLI recipes)
-    if (line.startsWith('    ') && line.trim().length > 0) {
+    if (line.startsWith('    ') && trimmed.length > 0) {
       const codeLines: string[] = []
       while (i < lines.length && lines[i].startsWith('    ') && lines[i].trim().length > 0) {
         codeLines.push(lines[i].slice(4))
@@ -248,11 +255,30 @@ function parseContent(raw: string): ContentBlock[] {
       continue
     }
 
-    // Markdown heading
-    const headingMatch = line.match(/^(#{1,4})\s+(.+)/)
+    // Markdown heading (## Title, not # comment)
+    const headingMatch = line.match(/^(#{2,4})\s+(.+)/)
     if (headingMatch) {
       blocks.push({ type: 'heading', value: headingMatch[2], level: headingMatch[1].length })
       i++
+      continue
+    }
+
+    // Auto-detect consecutive CLI/command lines as code block
+    if ((CLI_RE.test(trimmed) || COMMENT_RE.test(trimmed)) && trimmed.length > 0) {
+      const codeLines: string[] = []
+      while (i < lines.length) {
+        const t = lines[i].trim()
+        if (t.length === 0) { i++; break } // blank line ends the block
+        if (CLI_RE.test(t) || COMMENT_RE.test(t) || t.startsWith('|') || t.startsWith('&&') || t.startsWith('||')) {
+          codeLines.push(lines[i])
+          i++
+        } else {
+          break
+        }
+      }
+      if (codeLines.length > 0) {
+        blocks.push({ type: 'code', value: codeLines.join('\n'), lang: 'bash' })
+      }
       continue
     }
 
