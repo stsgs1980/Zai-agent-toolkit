@@ -1,129 +1,412 @@
 'use client'
 
-import { useState } from 'react'
-import { DashboardHome } from './DashboardHome'
-import { MemoryBrowser } from './MemoryBrowser'
+import { useState, useEffect, useCallback } from 'react'
+import { P, CATEGORY_CONFIG } from '@/lib/constants'
+import type { CategoryKey, DashboardStats, UnifiedEntry } from '@/lib/types'
+import { Sidebar } from './Sidebar'
+import { ItemList } from './ItemList'
+import { ItemDetail } from './ItemDetail'
+import { NewEntryDialog } from './NewEntryDialog'
 import { GraphViewer } from './GraphViewer'
 import { GraphStats } from './GraphStats'
-import { DocIntelligenceView } from './DocIntelligenceView'
 import { HotCommandsView } from './HotCommandsView'
+import { DocIntelligenceView } from './DocIntelligenceView'
 
-// ── Tab config ──────────────────────────────────────────────
+// ── Helpers ─────────────────────────────────────────────────
 
-type TabKey = 'home' | 'memory' | 'graph' | 'intelligence' | 'commands'
-
-interface Tab {
-  key: TabKey
-  label: string
-  icon: string
-  color: string
-  glow: string
+function isMemoryCategory(cat: CategoryKey): boolean {
+  return CATEGORY_CONFIG[cat]?.group === 'memory'
 }
 
-const TABS: Tab[] = [
-  { key: 'home',         label: 'Dashboard',  icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', color: '#38bdf8', glow: '#7dd3fc' },
-  { key: 'memory',       label: 'Memory',     icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253', color: '#a855f7', glow: '#c084fc' },
-  { key: 'graph',        label: 'Graph',      icon: 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1', color: '#2dd4bf', glow: '#5eead4' },
-  { key: 'intelligence', label: 'Intelligence',icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z', color: '#fbbf24', glow: '#fde68a' },
-  { key: 'commands',     label: 'Skills',     icon: 'M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', color: '#f59e0b', glow: '#fbbf24' },
-]
-
-// ── SVG icon component ──────────────────────────────────────
-
-function TabIcon({ path, size = 18 }: { path: string; size?: number }) {
-  return (
-    <svg width={size} height={size} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={path} />
-    </svg>
-  )
-}
-
-// ── Main dashboard layout ───────────────────────────────────
+// ── Main layout ─────────────────────────────────────────────
 
 export function MemoryDashboard() {
-  const [activeTab, setActiveTab] = useState<TabKey>('home')
-  const activeTabConf = TABS.find(t => t.key === activeTab) || TABS[0]
+  // ── State ────────────────────────────────────────────────
+  const [activeCategory, setActiveCategory] = useState<CategoryKey>('knowledge')
+  const [stats, setStats] = useState<DashboardStats | null>(null)
+  const [entries, setEntries] = useState<UnifiedEntry[]>([])
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isSearchMode, setIsSearchMode] = useState(false)
+  const [showNewDialog, setShowNewDialog] = useState(false)
 
+  // ── Load stats ───────────────────────────────────────────
+  const loadStats = useCallback(async () => {
+    try {
+      const res = await fetch('/api/memory/stats')
+      if (res.ok) {
+        const data = await res.json()
+        setStats(data)
+      }
+    } catch {
+      // silent
+    }
+  }, [])
+
+  useEffect(() => { loadStats() }, [loadStats])
+
+  // ── Load entries for memory categories ────────────────────
+  const loadEntries = useCallback(async (category: CategoryKey) => {
+    if (!isMemoryCategory(category)) return
+    setLoading(true)
+    setSelectedId(null)
+    setIsSearchMode(false)
+    try {
+      // Experience uses a different endpoint
+      if (category === 'experience') {
+        const res = await fetch('/api/memory/experience')
+        if (!res.ok) throw new Error('Failed to load')
+        const data = await res.json()
+        setEntries(
+          (data.entries || []).map((e: any) => ({
+            id: e.id,
+            type: 'experience',
+            tags: e.tags || [],
+            source: '',
+            verification_status: e.verification_status || 'unverified',
+            content: e.preview || '',
+            raw: e.preview || '',
+            title: e.title,
+            good_count: e.good_count,
+            bad_count: e.bad_count,
+            preview: e.preview,
+          }))
+        )
+      } else {
+        const res = await fetch(`/api/memory/entries?type=${category}&limit=50`)
+        if (!res.ok) throw new Error('Failed to load')
+        const data = await res.json()
+        setEntries(
+          (data.entries || []).map((e: any) => ({
+            id: e.id,
+            type: e.type || category,
+            tags: e.tags || [],
+            source: e.source || '',
+            verification_status: e.verification_status || 'unverified',
+            content: e.content || '',
+            raw: e.raw || '',
+          }))
+        )
+      }
+    } catch {
+      setEntries([])
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  // ── Semantic search ──────────────────────────────────────
+  const handleSearch = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setIsSearchMode(false)
+      loadEntries(activeCategory)
+      return
+    }
+    setLoading(true)
+    setSelectedId(null)
+    setIsSearchMode(true)
+    try {
+      const res = await fetch(`/api/memory/search?q=${encodeURIComponent(query)}&limit=30`)
+      if (!res.ok) throw new Error('Search failed')
+      const data = await res.json()
+      setEntries(
+        (data.results || []).map((r: any) => ({
+          id: r.id,
+          type: r.type,
+          tags: r.tags || [],
+          source: r.source || '',
+          verification_status: r.verification_status || 'unverified',
+          content: r.content || '',
+          raw: '',
+          distance: r.distance,
+        }))
+      )
+    } catch {
+      setEntries([])
+    } finally {
+      setLoading(false)
+    }
+  }, [activeCategory, loadEntries])
+
+  // ── Debounced search ─────────────────────────────────────
+  useEffect(() => {
+    const t = setTimeout(() => handleSearch(searchQuery), 300)
+    return () => clearTimeout(t)
+  }, [searchQuery, handleSearch])
+
+  // ── Switch category ──────────────────────────────────────
+  const handleCategoryChange = useCallback((cat: CategoryKey) => {
+    setActiveCategory(cat)
+    setSearchQuery('')
+    setIsSearchMode(false)
+    if (isMemoryCategory(cat)) {
+      loadEntries(cat)
+    }
+  }, [loadEntries])
+
+  // ── Verify entry ─────────────────────────────────────────
+  const handleVerify = useCallback(async (id: string, status: string) => {
+    try {
+      const res = await fetch('/api/memory/experience', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'verify', id, status }),
+      })
+      if (res.ok) {
+        setEntries((prev) =>
+          prev.map((e) => (e.id === id ? { ...e, verification_status: status } : e))
+        )
+      }
+    } catch {
+      // silent
+    }
+  }, [])
+
+  // ── Load on mount ────────────────────────────────────────
+  useEffect(() => {
+    loadEntries('knowledge')
+  }, [loadEntries])
+
+  // ── Selected entry ───────────────────────────────────────
+  const selectedEntry = selectedId ? entries.find((e) => e.id === selectedId) || null : null
+
+  const isMemory = isMemoryCategory(activeCategory)
+  const catConf = CATEGORY_CONFIG[activeCategory]
+
+  // ── Render ───────────────────────────────────────────────
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#020617' }}>
-      {/* ── Header ── */}
-      <header
-        className="sticky top-0 z-50 px-4 py-3"
+    <div
+      style={{
+        display: 'flex',
+        height: '100vh',
+        width: '100%',
+        background: P.bgBody,
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'PingFang SC', 'SF Pro Display', 'Inter', sans-serif",
+        color: P.text,
+        overflow: 'hidden',
+      }}
+    >
+      {/* Custom scrollbar CSS */}
+      <style>{`
+        .sidebar-scroll::-webkit-scrollbar,
+        .item-list-scroll::-webkit-scrollbar {
+          width: 4px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-thumb,
+        .item-list-scroll::-webkit-scrollbar-thumb {
+          background: ${P.border};
+          border-radius: 2px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-track,
+        .item-list-scroll::-webkit-scrollbar-track {
+          background: transparent;
+        }
+      `}</style>
+
+      {/* ═══ SIDEBAR ═══ */}
+      <Sidebar
+        activeCategory={activeCategory}
+        onCategoryChange={handleCategoryChange}
+        stats={stats}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
+
+      {/* ═══ MAIN ═══ */}
+      <div
         style={{
-          background: '#0f172a',
-          borderBottom: '1px solid #1e293b55',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
         }}
       >
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center"
+        {/* ── Toolbar ── */}
+        <div
+          style={{
+            padding: '12px 24px',
+            borderBottom: `1px solid ${P.borderDim}`,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            background: P.bgBody,
+          }}
+        >
+          {/* Breadcrumb */}
+          <div style={{ fontSize: 13, color: P.muted, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span>Memory</span>
+            <span style={{ color: P.border }}>/</span>
+            <span style={{ color: P.dim, fontWeight: 500 }}>{catConf?.label || activeCategory}</span>
+            {selectedEntry && (
+              <>
+                <span style={{ color: P.border }}> / </span>
+                <span style={{ color: P.blue, fontWeight: 500 }}>{selectedEntry.title || selectedEntry.id}</span>
+              </>
+            )}
+          </div>
+
+          {/* Right actions */}
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
+            {/* + New entry button (memory categories only) */}
+            {isMemory && (
+              <button
+                onClick={() => setShowNewDialog(true)}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: 6,
+                  fontSize: 12,
+                  fontWeight: 500,
+                  background: P.bgSidebar,
+                  border: `1px solid ${P.border}`,
+                  color: P.dim,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 5,
+                }}
+              >
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                New
+              </button>
+            )}
+
+            {/* Refresh */}
+            <button
+              onClick={() => {
+                if (isMemory) loadEntries(activeCategory)
+                loadStats()
+              }}
               style={{
-                background: 'linear-gradient(135deg, #38bdf8, #a855f7)',
-                boxShadow: 'none',
+                padding: '6px 12px',
+                borderRadius: 6,
+                fontSize: 12,
+                fontWeight: 500,
+                background: P.bgSidebar,
+                border: `1px solid ${P.border}`,
+                color: P.dim,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
               }}
             >
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
-            </div>
-            <div>
-              <h1 className="text-sm font-semibold text-zinc-100 tracking-tight">Memory Dashboard</h1>
-              <p className="text-[10px] text-zinc-500 font-mono">Zai-agent-toolkit</p>
-            </div>
+              Refresh
+            </button>
+
+            {/* Search mode indicator */}
+            {isSearchMode && (
+              <button
+                onClick={() => {
+                  setSearchQuery('')
+                  setIsSearchMode(false)
+                  loadEntries(activeCategory)
+                }}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: 6,
+                  fontSize: 12,
+                  fontWeight: 500,
+                  background: '#1E3A5F',
+                  border: `1px solid ${P.blue}44`,
+                  color: P.blue,
+                  cursor: 'pointer',
+                }}
+              >
+                Clear search
+              </button>
+            )}
           </div>
-
-          {/* Tab navigation */}
-          <nav className="flex items-center gap-1">
-            {TABS.map((tab) => {
-              const isActive = activeTab === tab.key
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer"
-                  style={{
-                    backgroundColor: isActive ? `${tab.color}15` : 'transparent',
-                    border: `1px solid ${isActive ? `${tab.color}33` : 'transparent'}`,
-                    color: isActive ? tab.glow : '#64748b',
-                    boxShadow: isActive ? `0 0 12px ${tab.color}11` : 'none',
-                  }}
-                >
-                  <TabIcon path={tab.icon} size={14} />
-                  <span className="hidden sm:inline">{tab.label}</span>
-                </button>
-              )
-            })}
-          </nav>
         </div>
-      </header>
 
-      {/* ── Accent line ── */}
-      <div className="h-0.5" style={{ background: `linear-gradient(90deg, ${activeTabConf.color}44, ${activeTabConf.glow}22, transparent)` }} />
-
-      {/* ── Content ── */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-6">
-        {activeTab === 'home' && <DashboardHome />}
-        {activeTab === 'memory' && <MemoryBrowser />}
-        {activeTab === 'graph' && (
-          <div className="space-y-4">
-            <GraphStats />
-            <GraphViewer />
+        {/* ── Content area ── */}
+        {isMemory ? (
+          /* ── Memory: split layout (ItemList + ItemDetail) ── */
+          <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+            <ItemList
+              entries={entries}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+              loading={loading}
+              category={activeCategory}
+              isSearchMode={isSearchMode}
+            />
+            <ItemDetail
+              entry={selectedEntry}
+              onVerify={handleVerify}
+            />
+          </div>
+        ) : (
+          /* ── Tools: full-width layout ── */
+          <div style={{ flex: 1, overflow: 'auto', padding: 16 }}>
+            {activeCategory === 'graph' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, height: '100%' }}>
+                <GraphStats />
+                <GraphViewer />
+              </div>
+            )}
+            {activeCategory === 'skills' && <HotCommandsView />}
+            {activeCategory === 'docintel' && <DocIntelligenceView />}
           </div>
         )}
-        {activeTab === 'intelligence' && <DocIntelligenceView />}
-        {activeTab === 'commands' && <HotCommandsView />}
-      </main>
 
-      {/* ── Footer ── */}
-      <footer
-        className="mt-auto px-4 py-3 text-center"
-        style={{ borderTop: '1px solid #1e293b44' }}
-      >
-        <p className="text-[10px] text-zinc-700 font-mono">
-          Memory Dashboard &middot; ChromaDB + NetworkX + z-ai-web-dev-sdk
-        </p>
-      </footer>
+        {/* ── Status bar ── */}
+        <div
+          style={{
+            height: 28,
+            padding: '0 16px',
+            background: P.bgSidebar,
+            borderTop: `1px solid ${P.border}`,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 16,
+            fontSize: 11,
+            color: P.faint,
+          }}
+        >
+          <div
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              background: '#10B981',
+            }}
+          />
+          <span>ChromaDB</span>
+          <span style={{ color: P.border }}>.</span>
+          <span>
+            {stats ? `${stats.entries.total} entries` : '-- entries'}
+          </span>
+          {stats && stats.graph.nodeCount > 0 && (
+            <>
+              <span style={{ color: P.border }}>.</span>
+              <span>{stats.graph.nodeCount} nodes / {stats.graph.edgeCount} edges</span>
+            </>
+          )}
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 12 }}>
+            <span>NetworkX</span>
+            <span style={{ color: P.border }}>.</span>
+            <span>z-ai-web-dev-sdk</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── New entry dialog ── */}
+      {showNewDialog && isMemory && (
+        <NewEntryDialog
+          category={activeCategory}
+          onClose={() => setShowNewDialog(false)}
+          onCreated={() => {
+            loadEntries(activeCategory)
+            loadStats()
+          }}
+        />
+      )}
     </div>
   )
 }
