@@ -156,17 +156,23 @@ export function DocIntelligenceView() {
           {checkingHealth ? 'Checking...' : 'SDK Health Check'}
         </button>
         {healthStatus && (
-          <span
-            className="text-xs font-mono px-2 py-1 rounded"
+          <div className="text-xs font-mono px-3 py-2 rounded max-w-2xl overflow-auto"
             style={{
               color: healthStatus.status === 'healthy' ? '#4ade80' : healthStatus.status === 'degraded' ? '#fbbf24' : '#f87171',
               background: healthStatus.status === 'healthy' ? '#16a34a22' : healthStatus.status === 'degraded' ? '#ca8a0422' : '#ef444422',
+              border: `1px solid ${healthStatus.status === 'healthy' ? '#16a34a44' : healthStatus.status === 'degraded' ? '#ca8a0444' : '#ef444444'}`,
             }}
           >
-            {healthStatus.status === 'healthy' ? 'SDK OK' : healthStatus.status === 'degraded' ? 'Degraded' : 'Broken'}
-            {healthStatus.model && ` (${healthStatus.model})`}
-            {healthStatus.error && `: ${String(healthStatus.error).substring(0, 80)}`}
-          </span>
+            <div className="font-bold mb-1">
+              {healthStatus.status === 'healthy' ? 'HEALTHY' : healthStatus.status === 'degraded' ? 'DEGRADED' : 'BROKEN'}
+              {healthStatus.model && ` | model: ${healthStatus.model}`}
+              {healthStatus.config && ` | config: ${healthStatus.config}`}
+            </div>
+            {healthStatus.ai_call && <div>ai_call: {String(healthStatus.ai_call)}</div>}
+            {healthStatus.baseUrl && <div>baseUrl: {healthStatus.baseUrl}</div>}
+            {healthStatus.error && <div>error: {String(healthStatus.error)}</div>}
+            {healthStatus.raw_response && <div className="mt-1 text-[10px] opacity-60 break-all">raw: {String(healthStatus.raw_response).substring(0, 500)}</div>}
+          </div>
         )}
       </div>
 
