@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { readFileSync, existsSync } from 'fs'
+import { join } from 'path'
+import { homedir } from 'os'
 
 // ── Helper: HTML → Clean Text ───────────────────────────────
 
@@ -59,6 +62,62 @@ function decodeHtmlEntities(str: string): string {
 
 function isHtmlContent(text: string): boolean {
   return /<[a-zA-Z][^>]*>/.test(text.substring(0, 2000))
+}
+
+// ── AI Config: Multi-source (env > .z-ai-config > fallback) ──
+
+interface AIConfig {
+  baseUrl: string
+  apiKey: string
+  chatId?: string
+  userId?: string
+  token?: string
+  source: string
+}
+
+function loadAIConfig(): AIConfig {
+  // 1. Environment variables (highest priority — works on any machine)
+  const envBaseUrl = process.env.ZAI_BASE_URL
+  const envApiKey = process.env.ZAI_API_KEY
+  if (envBaseUrl && envApiKey) {
+    console.log('[DocIntel] Using env vars ZAI_BASE_URL + ZAI_API_KEY')
+    return {
+      baseUrl: envBaseUrl,
+      apiKey: envApiKey,
+      chatId: process.env.ZAI_CHAT_ID,
+      userId: process.env.ZAI_USER_ID,
+      token: process.env.ZAI_TOKEN,
+      source: 'env',
+    }
+  }
+
+  // 2. .z-ai-config file (same as SDK uses)
+  const configPaths = [
+    join(process.cwd(), '.z-ai-config'),
+    join(homedir(), '.z-ai-config'),
+    '/etc/.z-ai-config',
+  ]
+
+  for (const configPath of configPaths) {
+    try {
+      if (existsSync(configPath)) {
+        const raw = readFileSync(configPath, 'utf8')
+        const cfg = JSON.parse(raw)
+        if (cfg.baseUrl && cfg.apiKey) {
+          console.log(`[DocIntel] Using .z-ai-config from ${configPath}`)
+          return { ...cfg, source: `file:${configPath}` }
+        }
+      }
+    } catch {
+      // Skip to next path
+    }
+  }
+
+  // 3. No config found — return error marker
+  throw new Error(
+    'No AI config found. Create .env.local with ZAI_BASE_URL and ZAI_API_KEY, ' +
+    'or .z-ai-config file. Get API key at https://z.ai/manage-apikey/apikey-list'
+  )
 }
 
 // ── Prompt Templates ────────────────────────────────────────
@@ -151,31 +210,52 @@ function parseAIResponse(raw: string): any {
   throw new Error('No JSON found in AI response. Raw: ' + raw.substring(0, 200))
 }
 
-// ── Helper: Call AI via SDK (dynamic import) ────────────────
+// ── Helper: Call AI via direct fetch (no SDK dependency) ────
 
-async function callAI(mode: ExtractMode, content: string): Promise<any> {
+async function callAI(mode: ExtractMode, content: string, config: AIConfig): Promise<any> {
   const prompt = PROMPTS[mode]
   const truncated = content.substring(0, prompt.maxContent)
 
-  console.log(`[DocIntel] callAI('${mode}') — content ${truncated.length} chars`)
+  console.log(`[DocIntel] callAI('${mode}') — content ${truncated.length} chars, baseUrl: ${config.baseUrl}`)
 
-  // Dynamic import — same pattern as working Wiki-Codex-v2 routes
-  const ZAI = (await import('z-ai-web-dev-sdk')).default
-  console.log(`[DocIntel] SDK imported OK`)
+  const url = `${config.baseUrl}/chat/completions`
 
-  const zai = await ZAI.create()
-  console.log(`[DocIntel] ZAI instance created OK`)
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${config.apiKey}`,
+    'X-Z-AI-From': 'Z',
+  }
+  if (config.chatId) headers['X-Chat-Id'] = config.chatId
+  if (config.userId) headers['X-User-Id'] = config.userId
+  if (config.token) headers['X-Token'] = config.token
 
-  const completion = await zai.chat.completions.create({
+  const body = {
     messages: [
       { role: 'system', content: prompt.system },
       { role: 'user', content: truncated },
     ],
     temperature: 0.2,
+    thinking: { type: 'disabled' },
+  }
+
+  console.log(`[DocIntel] POST ${url}`)
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body),
   })
+
+  if (!response.ok) {
+    const errorBody = await response.text()
+    console.error(`[DocIntel] API error ${response.status}: ${errorBody.substring(0, 300)}`)
+    throw new Error(`API ${response.status}: ${errorBody.substring(0, 200)}`)
+  }
+
+  const completion = await response.json()
   console.log(`[DocIntel] AI completion received, model: ${completion?.model || 'unknown'}`)
 
-  const raw = completion.choices[0]?.message?.content || ''
+  const raw = completion.choices?.[0]?.message?.content || ''
   if (!raw.trim()) {
     throw new Error('AI returned empty response')
   }
@@ -188,38 +268,54 @@ async function callAI(mode: ExtractMode, content: string): Promise<any> {
 export async function GET() {
   const health: Record<string, any> = {
     status: 'checking',
-    sdk: 'unknown',
     config: 'unknown',
     ai_call: 'unknown',
     timestamp: new Date().toISOString(),
   }
 
   try {
-    // Test SDK import
-    const ZAI = (await import('z-ai-web-dev-sdk')).default
-    health.sdk = 'imported'
-
-    // Test ZAI.create()
-    const zai = await ZAI.create()
-    health.config = 'loaded'
+    const config = loadAIConfig()
+    health.config = config.source
+    health.baseUrl = config.baseUrl
 
     // Test a simple AI call
-    const completion = await zai.chat.completions.create({
-      messages: [
-        { role: 'system', content: 'Return exactly: [{"status":"ok"}]' },
-        { role: 'user', content: 'test' },
-      ],
-      temperature: 0,
+    const url = `${config.baseUrl}/chat/completions`
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${config.apiKey}`,
+      'X-Z-AI-From': 'Z',
+    }
+    if (config.chatId) headers['X-Chat-Id'] = config.chatId
+    if (config.userId) headers['X-User-Id'] = config.userId
+    if (config.token) headers['X-Token'] = config.token
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        messages: [
+          { role: 'system', content: 'Return exactly: [{"status":"ok"}]' },
+          { role: 'user', content: 'test' },
+        ],
+        temperature: 0,
+        thinking: { type: 'disabled' },
+      }),
     })
 
-    const raw = completion.choices[0]?.message?.content || ''
-    health.ai_call = raw.includes('ok') ? 'working' : `unexpected: ${raw.substring(0, 100)}`
-    health.model = completion?.model || 'unknown'
-    health.status = health.ai_call === 'working' ? 'healthy' : 'degraded'
+    if (!response.ok) {
+      const errText = await response.text()
+      health.ai_call = `API ${response.status}: ${errText.substring(0, 100)}`
+      health.status = 'unhealthy'
+    } else {
+      const completion = await response.json()
+      const raw = completion.choices?.[0]?.message?.content || ''
+      health.ai_call = raw.includes('ok') ? 'working' : `unexpected: ${raw.substring(0, 100)}`
+      health.model = completion?.model || 'unknown'
+      health.status = health.ai_call === 'working' ? 'healthy' : 'degraded'
+    }
   } catch (e: any) {
     health.status = 'unhealthy'
     health.error = e.message
-    health.error_stack = e.stack?.substring(0, 500)
   }
 
   const statusCode = health.status === 'healthy' ? 200 : 503
@@ -230,6 +326,9 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Load AI config (env vars or .z-ai-config)
+    const config = loadAIConfig()
+
     const body = await request.json()
     const { content, mode } = body as { content: string; mode: ExtractMode | 'all' }
 
@@ -251,7 +350,7 @@ export async function POST(request: NextRequest) {
       console.log(`[DocIntel] Plain text, ${content.length} chars`)
     }
 
-    // If mode is 'all', run extractions SEQUENTIALLY (not parallel — avoids overwhelming the API)
+    // If mode is 'all', run extractions SEQUENTIALLY
     if (mode === 'all') {
       const errors: Record<string, string> = {}
       let terms: any[] = []
@@ -259,9 +358,8 @@ export async function POST(request: NextRequest) {
       let commands: any[] = []
       let analysis: any = {}
 
-      // Sequential extraction with error isolation
       try {
-        terms = await callAI('terms', cleanContent)
+        terms = await callAI('terms', cleanContent, config)
         if (!Array.isArray(terms)) terms = []
         console.log(`[DocIntel] terms: ${terms.length} extracted`)
       } catch (e: any) {
@@ -270,7 +368,7 @@ export async function POST(request: NextRequest) {
       }
 
       try {
-        instructions = await callAI('instructions', cleanContent)
+        instructions = await callAI('instructions', cleanContent, config)
         if (!Array.isArray(instructions)) instructions = []
         console.log(`[DocIntel] instructions: ${instructions.length} extracted`)
       } catch (e: any) {
@@ -279,7 +377,7 @@ export async function POST(request: NextRequest) {
       }
 
       try {
-        commands = await callAI('commands', cleanContent)
+        commands = await callAI('commands', cleanContent, config)
         if (!Array.isArray(commands)) commands = []
         console.log(`[DocIntel] commands: ${commands.length} extracted`)
       } catch (e: any) {
@@ -288,7 +386,7 @@ export async function POST(request: NextRequest) {
       }
 
       try {
-        analysis = await callAI('analyze', cleanContent)
+        analysis = await callAI('analyze', cleanContent, config)
         if (!analysis || typeof analysis !== 'object') analysis = {}
         console.log(`[DocIntel] analysis: done`)
       } catch (e: any) {
@@ -320,7 +418,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const result = await callAI(mode, cleanContent)
+    const result = await callAI(mode, cleanContent, config)
 
     return NextResponse.json({
       mode,
