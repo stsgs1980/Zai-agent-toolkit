@@ -38,11 +38,13 @@ export function MemoryDashboard() {
   useEffect(() => { applyTheme(theme) }, [theme])
 
   // ── Load stats ───────────────────────────────────────────
-  const loadStats = useCallback(async () => {
+  const loadStats = useCallback(async (bustCache = false) => {
     try {
-      const res = await fetch('/api/memory/stats')
+      const url = bustCache ? '/api/memory/stats?nocache=1' : '/api/memory/stats'
+      const res = await fetch(url)
       if (res.ok) {
         const data = await res.json()
+        console.log('[MD] stats.tools =', data?.tools)
         setStats(data)
       }
     } catch {
@@ -261,7 +263,7 @@ export function MemoryDashboard() {
             <button
               onClick={() => {
                 if (isMemory) loadEntries(activeCategory)
-                loadStats()
+                loadStats(true)  // bust cache on manual refresh
               }}
               style={{
                 padding: '6px 12px',

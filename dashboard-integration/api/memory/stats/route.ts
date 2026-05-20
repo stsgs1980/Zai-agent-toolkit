@@ -58,8 +58,13 @@ async function countSkills(): Promise<number> {
 
 // ── GET: Dashboard stats ───────────────────────────────────
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    // ?nocache=1 bypasses cache — use after code updates
+    const url = new URL(req.url);
+    const nocache = url.searchParams.get('nocache') === '1';
+    if (nocache) cache.invalidate('stats');
+
     return await cache.getOrFetch("stats", async () => {
       // 1. Count entries per type using export (fast, reliable JSON)
       const types = ["knowledge", "pattern", "command", "project", "session", "template", "experience"];
@@ -136,15 +141,22 @@ export async function GET() {
       }
 
       // 4. Tools counts (filesystem, no Python)
-      const skillsCount = await countSkills();
+      let skillsCount = 0;
+      try {
+        skillsCount = await countSkills();
+      } catch (e) {
+        console.warn("[stats] countSkills failed:", e);
+      }
 
       const result = {
         entries: { byType: typeCounts, total: totalEntries, todayByType: todayCounts, today: totalToday },
-        graph: graphStats,
+        graph: { nodeCount: graphStats.nodeCount, edgeCount: graphStats.edgeCount },
         experience: experienceStats,
         tools: { skills: skillsCount, graphNodes: graphStats.nodeCount, graphEdges: graphStats.edgeCount },
         timestamp: new Date().toISOString(),
       };
+
+      console.log(`[stats] tools: skills=${skillsCount}, graphNodes=${graphStats.nodeCount}, graphEdges=${graphStats.edgeCount}`);
 
       return NextResponse.json(result);
     });

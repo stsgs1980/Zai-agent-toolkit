@@ -214,8 +214,10 @@ function getTodayCount(key: string, stats: DashboardStats | null): number {
 
 function getToolCount(key: string, stats: DashboardStats | null): number | undefined {
   if (!stats) return undefined
-  if (key === 'graph') return stats.tools.graphNodes
-  if (key === 'skills') return stats.tools.skills
+  const tools = (stats as any).tools
+  if (!tools) return undefined
+  if (key === 'graph') return tools.graphNodes ?? 0
+  if (key === 'skills') return tools.skills ?? 0
   return undefined  // docintel has no count
 }
 
