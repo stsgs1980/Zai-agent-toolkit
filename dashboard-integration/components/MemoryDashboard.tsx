@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { P, CATEGORY_CONFIG } from '@/lib/constants'
-import type { CategoryKey, DashboardStats, UnifiedEntry } from '@/lib/types'
+import { P, CATEGORY_CONFIG, DESIGN_TOKENS_CSS, getInitialTheme, applyTheme, F } from '@/lib/constants'
+import type { CategoryKey, ThemeMode } from '@/lib/constants'
+import type { DashboardStats, UnifiedEntry } from '@/lib/types'
 import { Sidebar } from './Sidebar'
 import { ItemList } from './ItemList'
 import { ItemDetail } from './ItemDetail'
@@ -31,6 +32,10 @@ export function MemoryDashboard() {
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearchMode, setIsSearchMode] = useState(false)
   const [showNewDialog, setShowNewDialog] = useState(false)
+  const [theme, setTheme] = useState<ThemeMode>(getInitialTheme)
+
+  // ── Apply theme on mount + change ──
+  useEffect(() => { applyTheme(theme) }, [theme])
 
   // ── Load stats ───────────────────────────────────────────
   const loadStats = useCallback(async () => {
@@ -161,20 +166,20 @@ export function MemoryDashboard() {
         height: '100vh',
         width: '100%',
         background: P.bgBody,
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'PingFang SC', 'SF Pro Display', 'Inter', sans-serif",
+        fontFamily: F.sans,
         color: P.text,
         overflow: 'hidden',
       }}
     >
-      {/* Custom scrollbar CSS */}
-      <style>{`
+      {/* Design system tokens + scrollbar CSS */}
+      <style>{DESIGN_TOKENS_CSS}{`
         .sidebar-scroll::-webkit-scrollbar,
         .item-list-scroll::-webkit-scrollbar {
           width: 4px;
         }
         .sidebar-scroll::-webkit-scrollbar-thumb,
         .item-list-scroll::-webkit-scrollbar-thumb {
-          background: ${P.border};
+          background: var(--md-border, #334155);
           border-radius: 2px;
         }
         .sidebar-scroll::-webkit-scrollbar-track,
@@ -276,6 +281,35 @@ export function MemoryDashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
               Refresh
+            </button>
+
+            {/* Theme toggle */}
+            <button
+              onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+              title={theme === 'dark' ? 'Switch to light' : 'Switch to dark'}
+              style={{
+                padding: '6px 8px',
+                borderRadius: 6,
+                fontSize: 12,
+                fontWeight: 500,
+                background: P.bgSidebar,
+                border: `1px solid ${P.border}`,
+                color: P.dim,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+              }}
+            >
+              {theme === 'dark' ? (
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              ) : (
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+              )}
             </button>
 
             {/* Search mode indicator */}

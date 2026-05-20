@@ -1,31 +1,172 @@
 // ── Shared constants for Memory Dashboard ──────────────────
+//
+// Design token system based on ui-clarity_sts / design-system-unify
+// Color tokens use CSS custom properties (var(--md-*)) with hex fallbacks.
+// This enables dark/light theme switching via a single class toggle.
 
-// ── Color Palette (Component Browser wireframe) ───────────
+// ── Design Token CSS ──────────────────────────────────────
+// Inject this <style> block in the root layout component.
+// It defines all semantic tokens for both themes.
+
+export const DESIGN_TOKENS_CSS = `
+:root {
+  /* ── Backgrounds ── */
+  --md-bg-body:      #0F172A;
+  --md-bg-sidebar:   #1E293B;
+  --md-bg-hover:     #334155;
+  --md-bg-input:     #1E293B;
+  --md-bg-card:      #0F172A;
+  --md-bg-elevated:  #1E293B;
+
+  /* ── Borders ── */
+  --md-border:       #334155;
+  --md-border-dim:   rgba(30, 41, 59, 0.33);
+  --md-border-faint: rgba(30, 41, 59, 0.27);
+
+  /* ── Text ── */
+  --md-text:         #F1F5F9;
+  --md-text-dim:     #CBD5E1;
+  --md-text-muted:   #94A3B8;
+  --md-text-faint:   #64748B;
+
+  /* ── Accents ── */
+  --md-blue:         #3B82F6;
+  --md-purple:       #8B5CF6;
+  --md-amber:        #F59E0B;
+  --md-green:        #10B981;
+  --md-cyan:         #06B6D4;
+
+  /* ── Status ── */
+  --md-ok:           #10B981;
+  --md-warn:         #F59E0B;
+  --md-err:          #EF4444;
+
+  /* ── Alpha variants (common opacity levels) ── */
+  --md-blue-a15:     rgba(59, 130, 246, 0.08);
+  --md-blue-a44:     rgba(59, 130, 246, 0.27);
+  --md-purple-a15:   rgba(139, 92, 246, 0.08);
+  --md-purple-a33:   rgba(139, 92, 246, 0.20);
+  --md-purple-a44:   rgba(139, 92, 246, 0.27);
+  --md-green-a15:    rgba(16, 185, 129, 0.08);
+  --md-green-a44:    rgba(16, 185, 129, 0.27);
+  --md-amber-a15:    rgba(245, 158, 11, 0.08);
+  --md-amber-a44:    rgba(245, 158, 11, 0.27);
+  --md-cyan-a15:     rgba(6, 182, 212, 0.08);
+  --md-cyan-a44:     rgba(6, 182, 212, 0.27);
+  --md-err-a15:      rgba(239, 68, 68, 0.08);
+  --md-err-a44:      rgba(239, 68, 68, 0.27);
+
+  /* ── Radius scale (ui-clarity convention) ── */
+  --md-radius-sm:    4px;
+  --md-radius:       6px;
+  --md-radius-md:    8px;
+  --md-radius-lg:    10px;
+  --md-radius-xl:    14px;
+
+  /* ── Typography (ui-clarity convention) ── */
+  --md-font-sans:    -apple-system, BlinkMacSystemFont, 'PingFang SC', 'SF Pro Display', 'Inter', sans-serif;
+  --md-font-mono:    'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', monospace;
+
+  /* ── Shadows ── */
+  --md-shadow-sm:    0 1px 2px rgba(0,0,0,0.3);
+  --md-shadow:       0 4px 12px rgba(0,0,0,0.4);
+  --md-shadow-lg:    0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* ── Light theme ── */
+:root.md-light {
+  --md-bg-body:      #F8FAFC;
+  --md-bg-sidebar:   #FFFFFF;
+  --md-bg-hover:     #F1F5F9;
+  --md-bg-input:     #F1F5F9;
+  --md-bg-card:      #FFFFFF;
+  --md-bg-elevated:  #F8FAFC;
+
+  --md-border:       #E2E8F0;
+  --md-border-dim:   rgba(226, 232, 240, 0.5);
+  --md-border-faint: rgba(226, 232, 240, 0.33);
+
+  --md-text:         #0F172A;
+  --md-text-dim:     #334155;
+  --md-text-muted:   #64748B;
+  --md-text-faint:   #94A3B8;
+
+  /* Accents stay the same in light mode */
+  --md-blue-a15:     rgba(59, 130, 246, 0.06);
+  --md-purple-a15:   rgba(139, 92, 246, 0.06);
+  --md-green-a15:    rgba(16, 185, 129, 0.06);
+  --md-amber-a15:    rgba(245, 158, 11, 0.06);
+  --md-cyan-a15:     rgba(6, 182, 212, 0.06);
+  --md-err-a15:      rgba(239, 68, 68, 0.06);
+
+  --md-shadow-sm:    0 1px 2px rgba(0,0,0,0.06);
+  --md-shadow:       0 4px 12px rgba(0,0,0,0.08);
+  --md-shadow-lg:    0 8px 32px rgba(0,0,0,0.12);
+}
+`
+
+// ── Color Palette — reads from CSS custom properties ──────
+// Fallback hex values ensure rendering even before CSS loads.
 
 export const P = {
   // Backgrounds
-  bgBody:    '#0F172A',
-  bgSidebar: '#1E293B',
-  bgHover:   '#334155',
-  bgInput:   '#1E293B',
+  bgBody:     'var(--md-bg-body, #0F172A)',
+  bgSidebar:  'var(--md-bg-sidebar, #1E293B)',
+  bgHover:    'var(--md-bg-hover, #334155)',
+  bgInput:    'var(--md-bg-input, #1E293B)',
+  bgCard:     'var(--md-bg-card, #0F172A)',
+  bgElevated: 'var(--md-bg-elevated, #1E293B)',
   // Borders
-  border:    '#334155',
-  borderDim: '#1E293B55',
+  border:     'var(--md-border, #334155)',
+  borderDim:  'var(--md-border-dim, rgba(30,41,59,0.33))',
+  borderFaint:'var(--md-border-faint, rgba(30,41,59,0.27))',
   // Text
-  text:      '#F1F5F9',
-  dim:       '#CBD5E1',
-  muted:     '#94A3B8',
-  faint:     '#64748B',
+  text:       'var(--md-text, #F1F5F9)',
+  dim:        'var(--md-text-dim, #CBD5E1)',
+  muted:      'var(--md-text-muted, #94A3B8)',
+  faint:      'var(--md-text-faint, #64748B)',
   // Accents
-  blue:      '#3B82F6',
-  purple:    '#8B5CF6',
-  amber:     '#F59E0B',
-  green:     '#10B981',
-  cyan:      '#06B6D4',
+  blue:       'var(--md-blue, #3B82F6)',
+  purple:     'var(--md-purple, #8B5CF6)',
+  amber:      'var(--md-amber, #F59E0B)',
+  green:      'var(--md-green, #10B981)',
+  cyan:       'var(--md-cyan, #06B6D4)',
   // Status
-  ok:        '#10B981',
-  warn:      '#F59E0B',
-  err:       '#EF4444',
+  ok:         'var(--md-ok, #10B981)',
+  warn:       'var(--md-warn, #F59E0B)',
+  err:        'var(--md-err, #EF4444)',
+} as const
+
+// ── Alpha tokens (for bg/border with opacity) ─────────────
+export const PA = {
+  blue15:     'var(--md-blue-a15, rgba(59,130,246,0.08))',
+  blue44:     'var(--md-blue-a44, rgba(59,130,246,0.27))',
+  purple15:   'var(--md-purple-a15, rgba(139,92,246,0.08))',
+  purple33:   'var(--md-purple-a33, rgba(139,92,246,0.20))',
+  purple44:   'var(--md-purple-a44, rgba(139,92,246,0.27))',
+  green15:    'var(--md-green-a15, rgba(16,185,129,0.08))',
+  green44:    'var(--md-green-a44, rgba(16,185,129,0.27))',
+  amber15:    'var(--md-amber-a15, rgba(245,158,11,0.08))',
+  amber44:    'var(--md-amber-a44, rgba(245,158,11,0.27))',
+  cyan15:     'var(--md-cyan-a15, rgba(6,182,212,0.08))',
+  cyan44:     'var(--md-cyan-a44, rgba(6,182,212,0.27))',
+  err15:      'var(--md-err-a15, rgba(239,68,68,0.08))',
+  err44:      'var(--md-err-a44, rgba(239,68,68,0.27))',
+} as const
+
+// ── Radius tokens ─────────────────────────────────────────
+export const R = {
+  sm:   'var(--md-radius-sm, 4px)',
+  base: 'var(--md-radius, 6px)',
+  md:   'var(--md-radius-md, 8px)',
+  lg:   'var(--md-radius-lg, 10px)',
+  xl:   'var(--md-radius-xl, 14px)',
+} as const
+
+// ── Font tokens ───────────────────────────────────────────
+export const F = {
+  sans: "var(--md-font-sans, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'SF Pro Display', 'Inter', sans-serif)",
+  mono: "var(--md-font-mono, 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', monospace)",
 } as const
 
 // ── Category Configuration ────────────────────────────────
@@ -90,4 +231,34 @@ export const Icons = {
   Graph: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>,
   List: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>,
   Database: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>,
+  Sun: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>,
+  Moon: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>,
+}
+
+// ── Theme Hook ────────────────────────────────────────────
+
+export type ThemeMode = 'dark' | 'light'
+
+const THEME_STORAGE_KEY = 'md-theme'
+
+export function getInitialTheme(): ThemeMode {
+  if (typeof window === 'undefined') return 'dark'
+  try {
+    const stored = localStorage.getItem(THEME_STORAGE_KEY)
+    if (stored === 'light' || stored === 'dark') return stored
+  } catch { /* ignore */ }
+  return 'dark'
+}
+
+export function applyTheme(mode: ThemeMode) {
+  if (typeof document === 'undefined') return
+  const root = document.documentElement
+  if (mode === 'light') {
+    root.classList.add('md-light')
+  } else {
+    root.classList.remove('md-light')
+  }
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, mode)
+  } catch { /* ignore */ }
 }
