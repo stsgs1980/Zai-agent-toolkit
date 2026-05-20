@@ -111,7 +111,7 @@ function loadAIConfig(): AIConfig {
     return {
       baseUrl: envBaseUrl,
       apiKey: asciiOnly(jwtKey),
-      model: sanitize(process.env.ZAI_MODEL || 'glm-4-plus'),
+      model: sanitize(process.env.ZAI_MODEL || 'glm-4.5-flash'),
       chatId: sanitize(process.env.ZAI_CHAT_ID || ''),
       userId: sanitize(process.env.ZAI_USER_ID || ''),
       token: sanitize(process.env.ZAI_TOKEN || ''),
