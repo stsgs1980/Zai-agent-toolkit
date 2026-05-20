@@ -58,6 +58,14 @@ export function HotCommandsView() {
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('All')
   const [expanded, setExpanded] = useState<string | null>(null)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  const copyToClipboard = useCallback((text: string, id: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedId(id)
+      setTimeout(() => setCopiedId(null), 1200)
+    })
+  }, [])
 
   const fetchSkills = useCallback(async () => {
     setLoading(true)
@@ -212,6 +220,18 @@ export function HotCommandsView() {
                   <span className="text-sm font-semibold" style={{ color: C.text }}>
                     {skill.name}
                   </span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); copyToClipboard(skill.name, skill.folder) }}
+                    className="shrink-0 cursor-pointer transition-colors"
+                    style={{ color: copiedId === skill.folder ? '#4ade80' : C.textMuted, padding: '2px 4px', borderRadius: 4 }}
+                    title="Copy skill name"
+                  >
+                    {copiedId === skill.folder ? (
+                      <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                    ) : (
+                      <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                    )}
+                  </button>
                   {skill.id && (
                     <span
                       className="text-[10px] font-mono px-1.5 py-0.5 rounded"
@@ -274,12 +294,24 @@ export function HotCommandsView() {
                       {skill.commands.map((cmd, i) => (
                         <div
                           key={i}
-                          className="flex items-center gap-2 px-2.5 py-1.5 rounded-md"
+                          className="flex items-center gap-2 px-2.5 py-1.5 rounded-md group"
                           style={{ background: '#0d1117' }}
                         >
                           <code className="text-[11px] font-mono" style={{ color: C.yellow }}>
                             {cmd.phrase}
                           </code>
+                          <button
+                            onClick={() => copyToClipboard(cmd.phrase, `cmd-${skill.folder}-${i}`)}
+                            className="shrink-0 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
+                            style={{ color: copiedId === `cmd-${skill.folder}-${i}` ? '#4ade80' : C.textMuted, padding: '1px 3px', borderRadius: 3 }}
+                            title="Copy command"
+                          >
+                            {copiedId === `cmd-${skill.folder}-${i}` ? (
+                              <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                            ) : (
+                              <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                            )}
+                          </button>
                           <span className="text-[11px]" style={{ color: C.textMuted }}>—</span>
                           <span className="text-[11px] flex-1" style={{ color: C.textDim }}>
                             {cmd.action}
