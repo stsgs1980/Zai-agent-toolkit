@@ -144,6 +144,9 @@ export function Sidebar({
         <StatChip label={stats?.experience.verified ?? 0} text="verified" color={P.ok} />
         <StatChip label={stats?.experience.unverified ?? 0} text="pending" color={P.warn} />
         <StatChip label={stats?.experience.conflict ?? 0} text="conflict" color={P.err} />
+        {(stats?.entries.today ?? 0) > 0 && (
+          <StatChip label={`+${stats?.entries.today}`} text="today" color="#06B6D4" />
+        )}
       </div>
 
       {/* ── Category list ── */}
@@ -160,6 +163,25 @@ export function Sidebar({
         {memoryKeys.map((key) => {
           const cfg = CATEGORY_CONFIG[key]
           const count = getCategoryCount(key, stats)
+          const today = getTodayCount(key, stats)
+          return (
+            <CategoryItem
+              key={key}
+              label={cfg.label}
+              color={cfg.color}
+              count={count}
+              today={today}
+              active={activeCategory === key}
+              onClick={() => onCategoryChange(key)}
+            />
+          )
+        })}
+
+        {/* Tools group */}
+        <GroupLabel>Tools</GroupLabel>
+        {toolKeys.map((key) => {
+          const cfg = CATEGORY_CONFIG[key]
+          const count = getToolCount(key, stats)
           return (
             <CategoryItem
               key={key}
@@ -171,27 +193,12 @@ export function Sidebar({
             />
           )
         })}
-
-        {/* Tools group */}
-        <GroupLabel>Tools</GroupLabel>
-        {toolKeys.map((key) => {
-          const cfg = CATEGORY_CONFIG[key]
-          return (
-            <CategoryItem
-              key={key}
-              label={cfg.label}
-              color={cfg.color}
-              active={activeCategory === key}
-              onClick={() => onCategoryChange(key)}
-            />
-          )
-        })}
       </div>
     </div>
   )
 }
 
-// ── Helper ──────────────────────────────────────────────────
+// ── Helpers ────────────────────────────────────────────────
 
 function getCategoryCount(key: string, stats: DashboardStats | null): number | undefined {
   if (!stats) return undefined
@@ -199,9 +206,22 @@ function getCategoryCount(key: string, stats: DashboardStats | null): number | u
   return stats.entries.byType[key] ?? 0
 }
 
-// ── Sub-components ──────────────────────────────────────────
+function getTodayCount(key: string, stats: DashboardStats | null): number {
+  if (!stats) return 0
+  if (key === 'experience') return stats.experience.today
+  return stats.entries.todayByType[key] ?? 0
+}
 
-function StatChip({ label, text, color }: { label: number; text: string; color?: string }) {
+function getToolCount(key: string, stats: DashboardStats | null): number | undefined {
+  if (!stats) return undefined
+  if (key === 'graph') return stats.tools.graphNodes
+  if (key === 'skills') return stats.tools.skills
+  return undefined  // docintel has no count
+}
+
+// ── Sub-components ─────────────────────────────────────────
+
+function StatChip({ label, text, color }: { label: number | string; text: string; color?: string }) {
   return (
     <div
       style={{
@@ -239,12 +259,14 @@ function CategoryItem({
   label,
   color,
   count,
+  today,
   active,
   onClick,
 }: {
   label: string
   color: string
   count?: number
+  today?: number
   active: boolean
   onClick: () => void
 }) {
@@ -277,16 +299,33 @@ function CategoryItem({
       />
       <div style={{ flex: 1 }}>{label}</div>
       {count !== undefined && (
-        <div
-          style={{
-            fontSize: 11,
-            fontWeight: 600,
-            minWidth: 20,
-            textAlign: 'right',
-            color: active ? P.muted : P.faint,
-          }}
-        >
-          {count}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          {(today ?? 0) > 0 && (
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                color: '#06B6D4',
+                background: '#06B6D415',
+                border: '1px solid #06B6D444',
+                borderRadius: 4,
+                padding: '1px 4px',
+              }}
+            >
+              +{today}
+            </span>
+          )}
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              minWidth: 20,
+              textAlign: 'right',
+              color: active ? P.muted : P.faint,
+            }}
+          >
+            {count}
+          </span>
         </div>
       )}
     </div>

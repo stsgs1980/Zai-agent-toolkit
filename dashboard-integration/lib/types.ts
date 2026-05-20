@@ -38,16 +38,24 @@ export interface DashboardStats {
   entries: {
     total: number
     byType: Record<string, number>
+    todayByType: Record<string, number>
+    today: number
   }
   experience: {
     total: number
     verified: number
     unverified: number
     conflict: number
+    today: number
   }
   graph: {
     nodeCount: number
     edgeCount: number
+  }
+  tools: {
+    skills: number
+    graphNodes: number
+    graphEdges: number
   }
 }
 
