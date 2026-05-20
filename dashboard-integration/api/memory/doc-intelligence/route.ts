@@ -68,6 +68,10 @@ function isHtmlContent(text: string): boolean {
 // ── Z.ai API Key → JWT conversion ────────────────────────────
 // Z.ai keys come in format "id.secret" and must be converted to JWT
 
+function toBase64Url(buf: Buffer): string {
+  return buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
 function generateZaiJWT(apiKey: string): string {
   const parts = apiKey.split('.')
   if (parts.length !== 2) {
@@ -79,18 +83,20 @@ function generateZaiJWT(apiKey: string): string {
   const now = Date.now()
 
   // JWT header
-  const header = Buffer.from(JSON.stringify({ alg: 'HS256', sign_type: 'SIGN' })).toString('base64url')
+  const header = toBase64Url(Buffer.from(JSON.stringify({ alg: 'HS256', sign_type: 'SIGN' })))
   // JWT payload — exp = now + 1 hour
-  const payload = Buffer.from(JSON.stringify({
+  const payload = toBase64Url(Buffer.from(JSON.stringify({
     api_key: id,
     exp: now + 3600 * 1000,
     timestamp: now,
-  })).toString('base64url')
+  })))
 
   // Signature
-  const signature = createHmac('sha256', secret)
-    .update(`${header}.${payload}`)
-    .digest('base64url')
+  const signature = toBase64Url(
+    createHmac('sha256', secret)
+      .update(`${header}.${payload}`)
+      .digest()
+  )
 
   return `${header}.${payload}.${signature}`
 }
