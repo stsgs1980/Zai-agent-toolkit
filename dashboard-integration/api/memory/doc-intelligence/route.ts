@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { readFileSync, existsSync } from 'fs'
-import { join } from 'path'
-import { homedir } from 'os'
-import { createHmac } from 'crypto'
-import https from 'node:https'
-import http from 'node:http'
+import {
+  loadAIConfig,
+  callAI,
+  healthCheck,
+} from '@/lib/ai-bridge'
 
 // FORCE Node.js runtime
 export const runtime = 'nodejs'
+
+const LOG_TAG = 'DocIntel'
 
 // ── Helper: HTML → Clean Text ───────────────────────────────
 
@@ -41,148 +42,6 @@ function decodeHtmlEntities(str: string): string {
 
 function isHtmlContent(text: string): boolean {
   return /<[a-zA-Z][^>]*>/.test(text.substring(0, 2000))
-}
-
-// ── Z.ai API Key → JWT conversion ────────────────────────────
-
-function toBase64Url(buf: Buffer): string {
-  return buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-}
-
-function generateZaiJWT(apiKey: string): string {
-  const parts = apiKey.split('.')
-  if (parts.length !== 2) return apiKey
-
-  const [id, secret] = parts
-  const now = Date.now()
-
-  const header = toBase64Url(Buffer.from(JSON.stringify({ alg: 'HS256', sign_type: 'SIGN' })))
-  const payload = toBase64Url(Buffer.from(JSON.stringify({
-    api_key: id,
-    exp: Math.floor(now / 1000) + 3600,
-    timestamp: now,
-  })))
-  const signature = toBase64Url(
-    createHmac('sha256', secret).update(`${header}.${payload}`).digest()
-  )
-
-  return `${header}.${payload}.${signature}`
-}
-
-// ── AI Config ────────────────────────────────────────────────
-
-interface AIConfig {
-  baseUrl: string
-  apiKey: string
-  model: string
-  chatId?: string
-  userId?: string
-  token?: string
-  source: string
-}
-
-// Strip BOM, zero-width chars, and any non-printable garbage
-function sanitize(str: string): string {
-  return str
-    .replace(/[\uFEFF\u200B\u200C\u200D\u00AD]/g, '') // BOM + zero-width chars
-    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')   // control chars except tab/newline
-    .trim()
-}
-
-// Force ASCII-only for HTTP header values (node:http rejects non-latin1)
-function asciiOnly(str: string): string {
-  return str.replace(/[^\x20-\x7E]/g, '')
-}
-
-function loadAIConfig(): AIConfig {
-  const envBaseUrl = sanitize(process.env.ZAI_BASE_URL || '')
-  const envApiKey = sanitize(process.env.ZAI_API_KEY || '')
-  if (envBaseUrl && envApiKey) {
-    const jwtKey = generateZaiJWT(envApiKey)
-    const converted = jwtKey !== envApiKey
-    // Debug: dump JWT char codes to catch any remaining invalid chars
-    const authValue = `Bearer ${jwtKey}`
-    const badChars = [...authValue].map((c, i) => c.charCodeAt(0) > 127 ? ` [${i}]='${c}'(0x${c.charCodeAt(0).toString(16)})` : '').filter(Boolean).join('')
-    if (badChars) {
-      console.error(`[DocIntel] WARNING: non-ASCII in Authorization:${badChars}`)
-    }
-    console.log(`[DocIntel] Using env vars${converted ? ' (id.secret → JWT)' : ''}, auth header length=${authValue.length}`)
-    console.log(`[DocIntel] JWT preview: ${jwtKey.substring(0, 20)}...${jwtKey.substring(jwtKey.length - 10)}`)
-    return {
-      baseUrl: envBaseUrl,
-      apiKey: asciiOnly(jwtKey),
-      model: sanitize(process.env.ZAI_MODEL || 'glm-4.5'),
-      chatId: sanitize(process.env.ZAI_CHAT_ID || ''),
-      userId: sanitize(process.env.ZAI_USER_ID || ''),
-      token: sanitize(process.env.ZAI_TOKEN || ''),
-      source: 'env',
-    }
-  }
-
-  const configPaths = [
-    join(process.cwd(), '.z-ai-config'),
-    join(homedir(), '.z-ai-config'),
-    '/etc/.z-ai-config',
-  ]
-  for (const configPath of configPaths) {
-    try {
-      if (existsSync(configPath)) {
-        const raw = readFileSync(configPath, 'utf8')
-        const cfg = JSON.parse(raw)
-        if (cfg.baseUrl && cfg.apiKey) {
-          console.log(`[DocIntel] Using .z-ai-config from ${configPath}`)
-          return { ...cfg, source: `file:${configPath}` }
-        }
-      }
-    } catch { /* skip */ }
-  }
-
-  throw new Error(
-    'No AI config found. Create .env.local with ZAI_BASE_URL and ZAI_API_KEY.'
-  )
-}
-
-// ── Node.js HTTPS/HTTP request (bypasses Web Fetch API ByteString validation) ──
-
-function nodePost(urlStr: string, headerObj: Record<string, string>, bodyObj: any): Promise<{ status: number; body: string }> {
-  return new Promise((resolve, reject) => {
-    // Build body ONCE, compute Content-Length from it
-    const bodyStr = JSON.stringify(bodyObj)
-    const bodyBuf = Buffer.from(bodyStr, 'utf-8')
-
-    // Sanitize ALL header values to pure ASCII
-    const safeHeaders: Record<string, string | number> = {}
-    for (const [k, v] of Object.entries(headerObj)) {
-      const clean = asciiOnly(v)
-      if (clean !== v) {
-        console.warn(`[DocIntel] Header '${k}' had non-ASCII chars — sanitized`)
-      }
-      safeHeaders[k] = clean
-    }
-    safeHeaders['Content-Length'] = bodyBuf.length
-
-    const url = new URL(urlStr)
-    const isHttps = url.protocol === 'https:'
-    const lib = isHttps ? https : http
-
-    const options = {
-      hostname: url.hostname,
-      port: url.port || (isHttps ? 443 : 80),
-      path: url.pathname + url.search,
-      method: 'POST',
-      headers: safeHeaders,
-    }
-
-    const req = lib.request(options, (res) => {
-      let data = ''
-      res.on('data', (chunk: Buffer) => { data += chunk.toString() })
-      res.on('end', () => { resolve({ status: res.statusCode || 0, body: data }) })
-    })
-
-    req.on('error', reject)
-    req.write(bodyBuf)
-    req.end()
-  })
 }
 
 // ── Prompt Templates ────────────────────────────────────────
@@ -242,116 +101,10 @@ Return ONLY valid JSON, no markdown fences:
 
 type ExtractMode = keyof typeof PROMPTS
 
-// ── Helper: Parse AI JSON Response ──────────────────────────
-
-function parseAIResponse(raw: string): any {
-  console.log(`[DocIntel] Raw AI response (${raw.length} chars): ${raw.substring(0, 300)}...`)
-  const cleaned = raw.replace(/```json\s*/gi, '').replace(/```json?\s*/g, '').replace(/```/g, '')
-  try { return JSON.parse(cleaned.trim()) } catch { /* continue */ }
-  const jsonMatch = cleaned.match(/[\[{][\s\S]*[\]}]/)
-  if (jsonMatch) {
-    try { return JSON.parse(jsonMatch[0]) }
-    catch (e: any) { throw new Error(`JSON parse error: ${e.message}`) }
-  }
-  throw new Error('No JSON found in AI response. Raw: ' + raw.substring(0, 200))
-}
-
-// ── Helper: Call AI via Node.js http/https (NO Web Fetch API) ──
-
-async function callAI(mode: ExtractMode, content: string, config: AIConfig): Promise<any> {
-  const prompt = PROMPTS[mode]
-  const truncated = content.substring(0, prompt.maxContent)
-
-  console.log(`[DocIntel] callAI('${mode}') — ${truncated.length} chars, baseUrl: ${config.baseUrl}`)
-
-  const url = `${config.baseUrl}/chat/completions`
-
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${config.apiKey}`,
-  }
-
-  const bodyObj = {
-    model: config.model,
-    messages: [
-      { role: 'system', content: prompt.system },
-      { role: 'user', content: truncated },
-    ],
-    temperature: 0.2,
-    thinking: { type: 'disabled' },
-  }
-
-  console.log(`[DocIntel] POST ${url}`)
-
-  const { status, body } = await nodePost(url, headers, bodyObj)
-
-  if (status !== 200) {
-    console.error(`[DocIntel] API error ${status}: ${body.substring(0, 300)}`)
-    throw new Error(`API ${status}: ${body.substring(0, 200)}`)
-  }
-
-  const completion = JSON.parse(body)
-  console.log(`[DocIntel] AI completion received, model: ${completion?.model || 'unknown'}`)
-
-  const raw = completion.choices?.[0]?.message?.content || ''
-  if (!raw.trim()) throw new Error('AI returned empty response')
-
-  return parseAIResponse(raw)
-}
-
 // ── GET: Health Check ───────────────────────────────────────
 
 export async function GET() {
-  const health: Record<string, any> = {
-    status: 'checking',
-    config: 'unknown',
-    ai_call: 'unknown',
-    timestamp: new Date().toISOString(),
-  }
-
-  try {
-    const config = loadAIConfig()
-    health.config = config.source
-    health.baseUrl = config.baseUrl
-
-    const url = `${config.baseUrl}/chat/completions`
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${config.apiKey}`,
-    }
-
-    const bodyObj = {
-      model: config.model,
-      messages: [
-        { role: 'system', content: 'Return exactly: [{"status":"ok"}]' },
-        { role: 'user', content: 'test' },
-      ],
-      temperature: 0,
-    }
-
-    const { status, body } = await nodePost(url, headers, bodyObj)
-
-    if (status !== 200) {
-      health.ai_call = `API ${status}: ${body.substring(0, 200)}`
-      health.status = 'unhealthy'
-    } else {
-      try {
-        const completion = JSON.parse(body)
-        const raw = completion.choices?.[0]?.message?.content || ''
-        health.ai_call = raw.includes('ok') ? 'working' : `unexpected: ${raw.substring(0, 150)}`
-        health.model = completion?.model || 'unknown'
-        health.raw_response = body.substring(0, 300)
-        health.status = health.ai_call === 'working' ? 'healthy' : 'degraded'
-      } catch (parseErr: any) {
-        health.ai_call = `Parse error: ${body.substring(0, 200)}`
-        health.status = 'unhealthy'
-      }
-    }
-  } catch (e: any) {
-    health.status = 'unhealthy'
-    health.error = e.message
-  }
-
+  const health = await healthCheck(LOG_TAG)
   const statusCode = health.status === 'healthy' ? 200 : 503
   return NextResponse.json(health, { status: statusCode })
 }
@@ -360,7 +113,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const config = loadAIConfig()
+    const config = loadAIConfig(LOG_TAG)
 
     const body = await request.json()
     const { content, mode } = body as { content: string; mode: ExtractMode | 'all' }
@@ -374,9 +127,9 @@ export async function POST(request: NextRequest) {
     if (isHtmlContent(content)) {
       cleanContent = stripHtml(content)
       wasHtml = true
-      console.log(`[DocIntel] HTML detected, stripped ${content.length} → ${cleanContent.length} chars`)
+      console.log(`[${LOG_TAG}] HTML detected, stripped ${content.length} → ${cleanContent.length} chars`)
     } else {
-      console.log(`[DocIntel] Plain text, ${content.length} chars`)
+      console.log(`[${LOG_TAG}] Plain text, ${content.length} chars`)
     }
 
     if (mode === 'all') {
@@ -386,17 +139,25 @@ export async function POST(request: NextRequest) {
       let commands: any[] = []
       let analysis: any = {}
 
-      try { terms = await callAI('terms', cleanContent, config); if (!Array.isArray(terms)) terms = [] }
-      catch (e: any) { errors.terms = e.message }
+      try {
+        terms = await callAI({ systemPrompt: PROMPTS.terms.system, userContent: cleanContent, maxContent: PROMPTS.terms.maxContent, logTag: LOG_TAG }, config)
+        if (!Array.isArray(terms)) terms = []
+      } catch (e: any) { errors.terms = e.message }
 
-      try { instructions = await callAI('instructions', cleanContent, config); if (!Array.isArray(instructions)) instructions = [] }
-      catch (e: any) { errors.instructions = e.message }
+      try {
+        instructions = await callAI({ systemPrompt: PROMPTS.instructions.system, userContent: cleanContent, maxContent: PROMPTS.instructions.maxContent, logTag: LOG_TAG }, config)
+        if (!Array.isArray(instructions)) instructions = []
+      } catch (e: any) { errors.instructions = e.message }
 
-      try { commands = await callAI('commands', cleanContent, config); if (!Array.isArray(commands)) commands = [] }
-      catch (e: any) { errors.commands = e.message }
+      try {
+        commands = await callAI({ systemPrompt: PROMPTS.commands.system, userContent: cleanContent, maxContent: PROMPTS.commands.maxContent, logTag: LOG_TAG }, config)
+        if (!Array.isArray(commands)) commands = []
+      } catch (e: any) { errors.commands = e.message }
 
-      try { analysis = await callAI('analyze', cleanContent, config); if (!analysis || typeof analysis !== 'object') analysis = {} }
-      catch (e: any) { errors.analyze = e.message }
+      try {
+        analysis = await callAI({ systemPrompt: PROMPTS.analyze.system, userContent: cleanContent, maxContent: PROMPTS.analyze.maxContent, logTag: LOG_TAG }, config)
+        if (!analysis || typeof analysis !== 'object') analysis = {}
+      } catch (e: any) { errors.analyze = e.message }
 
       return NextResponse.json({
         terms, instructions, commands, analysis,
@@ -414,7 +175,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const result = await callAI(mode, cleanContent, config)
+    const prompt = PROMPTS[mode]
+    const result = await callAI({
+      systemPrompt: prompt.system,
+      userContent: cleanContent,
+      maxContent: prompt.maxContent,
+      logTag: LOG_TAG,
+    }, config)
+
     return NextResponse.json({
       mode,
       items: Array.isArray(result) ? result : [result],
@@ -424,7 +192,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('[DocIntel] POST error:', error)
+    console.error(`[${LOG_TAG}] POST error:`, error)
     return NextResponse.json(
       { error: 'Extraction failed', details: error.message, stack: error.stack?.substring(0, 300) },
       { status: 500 }

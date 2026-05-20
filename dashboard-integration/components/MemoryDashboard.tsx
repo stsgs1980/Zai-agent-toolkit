@@ -11,6 +11,7 @@ import { GraphViewer } from './GraphViewer'
 import { GraphStats } from './GraphStats'
 import { HotCommandsView } from './HotCommandsView'
 import { DocIntelligenceView } from './DocIntelligenceView'
+import { ExperienceView } from './ExperienceView'
 
 // ── Helpers ─────────────────────────────────────────────────
 
@@ -46,49 +47,27 @@ export function MemoryDashboard() {
 
   useEffect(() => { loadStats() }, [loadStats])
 
-  // ── Load entries for memory categories ────────────────────
+  // ── Load entries for memory categories (NOT experience — handled by ExperienceView) ──
   const loadEntries = useCallback(async (category: CategoryKey) => {
-    if (!isMemoryCategory(category)) return
+    if (!isMemoryCategory(category) || category === 'experience') return
     setLoading(true)
     setSelectedId(null)
     setIsSearchMode(false)
     try {
-      // Experience uses a different endpoint
-      if (category === 'experience') {
-        const res = await fetch('/api/memory/experience')
-        if (!res.ok) throw new Error('Failed to load')
-        const data = await res.json()
-        setEntries(
-          (data.entries || []).map((e: any) => ({
-            id: e.id,
-            type: 'experience',
-            tags: e.tags || [],
-            source: '',
-            verification_status: e.verification_status || 'unverified',
-            content: e.preview || '',
-            raw: e.preview || '',
-            title: e.title,
-            good_count: e.good_count,
-            bad_count: e.bad_count,
-            preview: e.preview,
-          }))
-        )
-      } else {
-        const res = await fetch(`/api/memory/entries?type=${category}&limit=50`)
-        if (!res.ok) throw new Error('Failed to load')
-        const data = await res.json()
-        setEntries(
-          (data.entries || []).map((e: any) => ({
-            id: e.id,
-            type: e.type || category,
-            tags: e.tags || [],
-            source: e.source || '',
-            verification_status: e.verification_status || 'unverified',
-            content: e.content || '',
-            raw: e.raw || '',
-          }))
-        )
-      }
+      const res = await fetch(`/api/memory/entries?type=${category}&limit=50`)
+      if (!res.ok) throw new Error('Failed to load')
+      const data = await res.json()
+      setEntries(
+        (data.entries || []).map((e: any) => ({
+          id: e.id,
+          type: e.type || category,
+          tags: e.tags || [],
+          source: e.source || '',
+          verification_status: e.verification_status || 'unverified',
+          content: e.content || '',
+          raw: e.raw || '',
+        }))
+      )
     } catch {
       setEntries([])
     } finally {
@@ -248,8 +227,8 @@ export function MemoryDashboard() {
 
           {/* Right actions */}
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
-            {/* + New entry button (memory categories only) */}
-            {isMemory && (
+            {/* + New entry button (memory categories only, experience has its own) */}
+            {isMemory && activeCategory !== 'experience' && (
               <button
                 onClick={() => setShowNewDialog(true)}
                 style={{
@@ -325,7 +304,12 @@ export function MemoryDashboard() {
         </div>
 
         {/* ── Content area ── */}
-        {isMemory ? (
+        {activeCategory === 'experience' ? (
+          /* ── Experience: full-width specialized view ── */
+          <div style={{ flex: 1, overflow: 'auto', padding: 16 }}>
+            <ExperienceView />
+          </div>
+        ) : isMemory ? (
           /* ── Memory: split layout (ItemList + ItemDetail) ── */
           <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
             <ItemList
@@ -397,7 +381,7 @@ export function MemoryDashboard() {
       </div>
 
       {/* ── New entry dialog ── */}
-      {showNewDialog && isMemory && (
+      {showNewDialog && isMemory && activeCategory !== 'experience' && (
         <NewEntryDialog
           category={activeCategory}
           onClose={() => setShowNewDialog(false)}
