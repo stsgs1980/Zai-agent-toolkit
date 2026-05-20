@@ -74,6 +74,7 @@ function generateZaiJWT(apiKey: string): string {
 interface AIConfig {
   baseUrl: string
   apiKey: string
+  model: string
   chatId?: string
   userId?: string
   token?: string
@@ -109,7 +110,8 @@ function loadAIConfig(): AIConfig {
     console.log(`[DocIntel] JWT preview: ${jwtKey.substring(0, 20)}...${jwtKey.substring(jwtKey.length - 10)}`)
     return {
       baseUrl: envBaseUrl,
-      apiKey: asciiOnly(jwtKey),  // GUARANTEE: no non-ASCII in header value
+      apiKey: asciiOnly(jwtKey),
+      model: sanitize(process.env.ZAI_MODEL || 'glm-4-plus'),
       chatId: sanitize(process.env.ZAI_CHAT_ID || ''),
       userId: sanitize(process.env.ZAI_USER_ID || ''),
       token: sanitize(process.env.ZAI_TOKEN || ''),
@@ -270,7 +272,7 @@ async function callAI(mode: ExtractMode, content: string, config: AIConfig): Pro
   }
 
   const bodyObj = {
-    model: 'glm-4-flash',
+    model: config.model,
     messages: [
       { role: 'system', content: prompt.system },
       { role: 'user', content: truncated },
@@ -318,7 +320,7 @@ export async function GET() {
     }
 
     const bodyObj = {
-      model: 'glm-4-flash',
+      model: config.model,
       messages: [
         { role: 'system', content: 'Return exactly: [{"status":"ok"}]' },
         { role: 'user', content: 'test' },
