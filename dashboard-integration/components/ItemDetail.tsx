@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { P, CATEGORY_CONFIG } from '@/lib/constants'
-import type { UnifiedEntry, RelatedNode } from '@/lib/types'
+import type { CategoryKey, UnifiedEntry, RelatedNode } from '@/lib/types'
 
 // ── Props ───────────────────────────────────────────────────
 
@@ -44,7 +44,7 @@ export function ItemDetail({ entry, onVerify }: ItemDetailProps) {
     )
   }
 
-  const typeConf = CATEGORY_CONFIG[entry.type]
+  const typeConf = CATEGORY_CONFIG[entry.type as CategoryKey]
   const content = entry.content || entry.raw || entry.preview || ''
   const statusTag = getStatusTag(entry.verification_status)
   const isExperience = entry.type === 'experience'

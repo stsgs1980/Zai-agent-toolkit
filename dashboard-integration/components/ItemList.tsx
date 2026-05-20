@@ -79,7 +79,7 @@ export function ItemList({
 
       {entries.map((entry) => {
         const isActive = selectedId === entry.id
-        const typeConf = CATEGORY_CONFIG[entry.type]
+        const typeConf = CATEGORY_CONFIG[entry.type as CategoryKey]
         const statusTag = getStatusTag(entry.verification_status)
 
         return (

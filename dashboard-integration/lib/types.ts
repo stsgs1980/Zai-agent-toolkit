@@ -51,4 +51,13 @@ export interface DashboardStats {
   }
 }
 
+export interface RelatedNode {
+  id: string
+  edgeType: string
+  direction: 'incoming' | 'outgoing'
+  weight: number
+  sourceType?: string
+  targetType?: string
+}
+
 export type { CategoryKey }
