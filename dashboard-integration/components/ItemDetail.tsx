@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { P, CATEGORY_CONFIG } from '@/lib/constants'
 import type { CategoryKey, UnifiedEntry, RelatedNode } from '@/lib/types'
 
@@ -121,9 +121,7 @@ export function ItemDetail({ entry, onVerify }: ItemDetailProps) {
                 )}
               </div>
             )}
-            <pre style={{ fontSize: 12, lineHeight: 1.7, color: P.dim, fontFamily: "'SF Mono', 'Fira Code', 'Cascadia Code', monospace", whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0 }}>
-              {content || '(empty)'}
-            </pre>
+            <SmartContent content={content || '(empty)'} />
           </div>
         )}
 
@@ -193,4 +191,228 @@ function MetaRow({ label, value }: { label: string; value: string }) {
       <div style={{ flex: 1, fontSize: 12, color: P.dim, fontFamily: 'monospace' }}>{value || '--'}</div>
     </div>
   )
+}
+
+// ── SmartContent: renders markdown-like content with copyable code blocks ──
+
+function SmartContent({ content }: { content: string }) {
+  const blocks = parseContent(content)
+  return (
+    <div style={{ fontSize: 13, lineHeight: 1.7, color: P.dim }}>
+      {blocks.map((block, i) => {
+        if (block.type === 'code') return <CodeBlock key={i} code={block.value} lang={block.lang} />
+        if (block.type === 'heading') return <HeadingBlock key={i} level={block.level} text={block.value} />
+        return <ProseLine key={i} text={block.value} />
+      })}
+    </div>
+  )
+}
+
+// ── Content parser ──
+
+type ContentBlock =
+  | { type: 'text'; value: string }
+  | { type: 'code'; value: string; lang: string }
+  | { type: 'heading'; value: string; level: number }
+
+function parseContent(raw: string): ContentBlock[] {
+  const blocks: ContentBlock[] = []
+  const lines = raw.split('\n')
+  let i = 0
+
+  while (i < lines.length) {
+    const line = lines[i]
+
+    // Fenced code block: ```lang ... ```
+    if (line.trimStart().startsWith('```')) {
+      const lang = line.trim().slice(3).trim()
+      const codeLines: string[] = []
+      i++
+      while (i < lines.length && !lines[i].trimStart().startsWith('```')) {
+        codeLines.push(lines[i])
+        i++
+      }
+      i++ // skip closing ```
+      blocks.push({ type: 'code', value: codeLines.join('\n'), lang })
+      continue
+    }
+
+    // Indented code block (4+ spaces, common in CLI recipes)
+    if (line.startsWith('    ') && line.trim().length > 0) {
+      const codeLines: string[] = []
+      while (i < lines.length && lines[i].startsWith('    ') && lines[i].trim().length > 0) {
+        codeLines.push(lines[i].slice(4))
+        i++
+      }
+      blocks.push({ type: 'code', value: codeLines.join('\n'), lang: '' })
+      continue
+    }
+
+    // Markdown heading
+    const headingMatch = line.match(/^(#{1,4})\s+(.+)/)
+    if (headingMatch) {
+      blocks.push({ type: 'heading', value: headingMatch[2], level: headingMatch[1].length })
+      i++
+      continue
+    }
+
+    // Numbered step: "1. Clone toolkit..." or "1) Clone..."
+    const stepMatch = line.match(/^(\d+)[.)]\s+(.+)/)
+    if (stepMatch) {
+      blocks.push({ type: 'text', value: line })
+      i++
+      continue
+    }
+
+    // Regular text line
+    blocks.push({ type: 'text', value: line })
+    i++
+  }
+
+  return blocks
+}
+
+// ── Code block with copy button ──
+
+function CodeBlock({ code, lang }: { code: string; lang: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(code).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    })
+  }, [code])
+
+  return (
+    <div style={{ position: 'relative', margin: '10px 0', borderRadius: 8, overflow: 'hidden', border: `1px solid ${P.border}`, background: '#0d1117' }}>
+      {/* Header bar */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 12px', background: '#161b22', borderBottom: `1px solid ${P.border}` }}>
+        <span style={{ fontSize: 10, color: P.muted, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          {lang || 'code'}
+        </span>
+        <button
+          onClick={handleCopy}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 4,
+            padding: '2px 8px', borderRadius: 4, fontSize: 10,
+            background: copied ? '#064E3B' : 'transparent',
+            color: copied ? '#34D399' : P.muted,
+            border: `1px solid ${copied ? '#34D39944' : P.border}`,
+            cursor: 'pointer', transition: 'all 0.15s',
+          }}
+        >
+          {copied ? (
+            <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+          ) : (
+            <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+          )}
+          {copied ? 'Copied' : 'Copy'}
+        </button>
+      </div>
+      {/* Code body */}
+      <pre style={{ margin: 0, padding: '12px 16px', fontSize: 12, lineHeight: 1.6, color: '#c9d1d9', fontFamily: "'SF Mono','Fira Code','Cascadia Code',monospace", whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowX: 'auto' }}>
+        {code}
+      </pre>
+    </div>
+  )
+}
+
+// ── Heading block ──
+
+function HeadingBlock({ level, text }: { level: number; text: string }) {
+  const sizes: Record<number, number> = { 1: 16, 2: 15, 3: 14, 4: 13 }
+  return (
+    <div style={{ fontSize: sizes[level] || 13, fontWeight: 700, color: P.text, marginTop: level === 1 ? 16 : 12, marginBottom: 4 }}>
+      {renderInline(text)}
+    </div>
+  )
+}
+
+// ── Prose line with inline code highlighting ──
+
+function ProseLine({ text }: { text: string }) {
+  if (!text.trim()) return <div style={{ height: 8 }} />
+  return <div style={{ marginBottom: 2 }}>{renderInline(text)}</div>
+}
+
+// ── Inline renderer: `code`, **bold**, - list items, numbered steps ──
+
+function renderInline(text: string): React.ReactNode[] {
+  const parts: React.ReactNode[] = []
+  // Split on inline code (`...`), bold (**...**), and preserve everything else
+  const regex = /(`[^`]+`|\*\*[^*]+\*\*)/g
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+  let key = 0
+
+  while ((match = regex.exec(text)) !== null) {
+    // Text before the match
+    if (match.index > lastIndex) {
+      parts.push(...renderPlainText(text.slice(lastIndex, match.index), key))
+      key += 100
+    }
+
+    const segment = match[0]
+    if (segment.startsWith('`')) {
+      // Inline code
+      const codeText = segment.slice(1, -1)
+      parts.push(
+        <code key={`ic-${key++}`} style={{
+          padding: '1px 5px', borderRadius: 4, fontSize: 12,
+          background: '#1e293b', color: '#e2b55a',
+          border: `1px solid #334155`, fontFamily: 'monospace',
+        }}>
+          {codeText}
+        </code>
+      )
+    } else if (segment.startsWith('**')) {
+      // Bold
+      const boldText = segment.slice(2, -2)
+      parts.push(<strong key={`b-${key++}`} style={{ color: P.text, fontWeight: 600 }}>{boldText}</strong>)
+    }
+
+    lastIndex = match.index + segment.length
+  }
+
+  // Remaining text after last match
+  if (lastIndex < text.length) {
+    parts.push(...renderPlainText(text.slice(lastIndex), key))
+  }
+
+  return parts.length > 0 ? parts : [<span key="empty">{text}</span>]
+}
+
+function renderPlainText(text: string, keyOffset: number): React.ReactNode[] {
+  const nodes: React.ReactNode[] = []
+  // Detect numbered steps: "1. ..." or "1) ..."
+  const stepMatch = text.match(/^(\s*)(\d+)([.)]\s+)/)
+  if (stepMatch) {
+    const [, indent, num, sep] = stepMatch
+    const rest = text.slice(indent.length + num.length + sep.length)
+    nodes.push(
+      <span key={`step-${keyOffset}`} style={{ color: '#e2b55a', fontWeight: 600, fontFamily: 'monospace' }}>
+        {indent}{num}{sep}
+      </span>
+    )
+    nodes.push(...renderInline(rest))
+    return nodes
+  }
+
+  // Detect list items: "- " or "* "
+  const listMatch = text.match(/^(\s*)([-*]\s+)/)
+  if (listMatch) {
+    const [, indent, bullet] = listMatch
+    const rest = text.slice(indent.length + bullet.length)
+    nodes.push(
+      <span key={`li-${keyOffset}`} style={{ color: P.muted }}>
+        {indent}{bullet}
+      </span>
+    )
+    nodes.push(...renderInline(rest))
+    return nodes
+  }
+
+  nodes.push(<span key={`txt-${keyOffset}`}>{text}</span>)
+  return nodes
 }
