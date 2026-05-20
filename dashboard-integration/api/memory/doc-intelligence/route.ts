@@ -278,6 +278,7 @@ async function callAI(mode: ExtractMode, content: string, config: AIConfig): Pro
       { role: 'user', content: truncated },
     ],
     temperature: 0.2,
+    thinking: { type: 'disabled' },
   }
 
   console.log(`[DocIntel] POST ${url}`)
