@@ -270,12 +270,12 @@ async function callAI(mode: ExtractMode, content: string, config: AIConfig): Pro
   }
 
   const bodyObj = {
+    model: 'glm-4-flash',
     messages: [
       { role: 'system', content: prompt.system },
       { role: 'user', content: truncated },
     ],
     temperature: 0.2,
-    thinking: { type: 'disabled' },
   }
 
   console.log(`[DocIntel] POST ${url}`)
@@ -318,25 +318,31 @@ export async function GET() {
     }
 
     const bodyObj = {
+      model: 'glm-4-flash',
       messages: [
         { role: 'system', content: 'Return exactly: [{"status":"ok"}]' },
         { role: 'user', content: 'test' },
       ],
       temperature: 0,
-      thinking: { type: 'disabled' },
     }
 
     const { status, body } = await nodePost(url, headers, bodyObj)
 
     if (status !== 200) {
-      health.ai_call = `API ${status}: ${body.substring(0, 100)}`
+      health.ai_call = `API ${status}: ${body.substring(0, 200)}`
       health.status = 'unhealthy'
     } else {
-      const completion = JSON.parse(body)
-      const raw = completion.choices?.[0]?.message?.content || ''
-      health.ai_call = raw.includes('ok') ? 'working' : `unexpected: ${raw.substring(0, 100)}`
-      health.model = completion?.model || 'unknown'
-      health.status = health.ai_call === 'working' ? 'healthy' : 'degraded'
+      try {
+        const completion = JSON.parse(body)
+        const raw = completion.choices?.[0]?.message?.content || ''
+        health.ai_call = raw.includes('ok') ? 'working' : `unexpected: ${raw.substring(0, 150)}`
+        health.model = completion?.model || 'unknown'
+        health.raw_response = body.substring(0, 300)
+        health.status = health.ai_call === 'working' ? 'healthy' : 'degraded'
+      } catch (parseErr: any) {
+        health.ai_call = `Parse error: ${body.substring(0, 200)}`
+        health.status = 'unhealthy'
+      }
     }
   } catch (e: any) {
     health.status = 'unhealthy'
