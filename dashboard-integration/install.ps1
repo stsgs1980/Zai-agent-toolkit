@@ -262,6 +262,7 @@ $apiMappings = @(
     @{ Src = Join-Path $IntegrationDir "api\memory\entries\route.ts";         Dst = Join-Path $BaseDir "app\api\memory\entries\route.ts" },
     @{ Src = Join-Path $IntegrationDir "api\memory\search\route.ts";          Dst = Join-Path $BaseDir "app\api\memory\search\route.ts" },
     @{ Src = Join-Path $IntegrationDir "api\memory\experience\route.ts";      Dst = Join-Path $BaseDir "app\api\memory\experience\route.ts" },
+    @{ Src = Join-Path $IntegrationDir "api\memory\experience\extract\route.ts"; Dst = Join-Path $BaseDir "app\api\memory\experience\extract\route.ts" },
     @{ Src = Join-Path $IntegrationDir "api\memory\stats\route.ts";           Dst = Join-Path $BaseDir "app\api\memory\stats\route.ts" },
     @{ Src = Join-Path $IntegrationDir "api\memory\commands\route.ts";        Dst = Join-Path $BaseDir "app\api\memory\commands\route.ts" }
 )
@@ -315,6 +316,7 @@ $libMappings = @(
     @{ Src = Join-Path $IntegrationDir "lib\graph-client.ts";  Dst = Join-Path $BaseDir "lib\graph-client.ts" },
     @{ Src = Join-Path $IntegrationDir "lib\types.ts";         Dst = Join-Path $BaseDir "lib\types.ts" },
     @{ Src = Join-Path $IntegrationDir "lib\constants.tsx";    Dst = Join-Path $BaseDir "lib\constants.tsx" },
+    @{ Src = Join-Path $IntegrationDir "lib\ai-bridge.ts";     Dst = Join-Path $BaseDir "lib\ai-bridge.ts" },
     @{ Src = Join-Path $IntegrationDir "lib\memory\bridge.ts"; Dst = Join-Path $BaseDir "lib\memory\bridge.ts" },
     @{ Src = Join-Path $IntegrationDir "lib\memory\cache.ts";  Dst = Join-Path $BaseDir "lib\memory\cache.ts" },
     @{ Src = Join-Path $IntegrationDir "lib\memory\preload.ts"; Dst = Join-Path $BaseDir "lib\memory\preload.ts" }
