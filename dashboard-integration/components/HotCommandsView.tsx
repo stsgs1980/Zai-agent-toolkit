@@ -203,8 +203,11 @@ export function HotCommandsView() {
             }}
           >
             {/* ── Card header (click to expand) ── */}
-            <button
+            <div
+              role="button"
+              tabIndex={0}
               onClick={() => setExpanded(isExpanded ? null : skill.folder)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpanded(isExpanded ? null : skill.folder) } }}
               className="w-full px-4 py-3 flex items-start gap-3 text-left cursor-pointer"
               style={{ background: isExpanded ? C.cardHover : 'transparent' }}
             >
@@ -259,7 +262,7 @@ export function HotCommandsView() {
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
-            </button>
+            </div>
 
             {/* ── Expanded content ── */}
             {isExpanded && (

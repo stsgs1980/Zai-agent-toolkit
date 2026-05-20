@@ -23,21 +23,6 @@ export interface SimEdge {
   glow: string;
 }
 
-// ── Subtle grid background ─────────────────────────────────
-
-function drawGrid(ctx: CanvasRenderingContext2D, w: number, h: number) {
-  const gridSize = 40;
-  ctx.strokeStyle = "#ffffff06";
-  ctx.lineWidth = 1;
-  for (let x = gridSize; x < w; x += gridSize) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
-  for (let y = gridSize; y < h; y += gridSize) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
-  ctx.strokeStyle = "#ffffff0a";
-  ctx.beginPath();
-  ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h);
-  ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2);
-  ctx.stroke();
-}
-
 // ── Main hook ──────────────────────────────────────────────
 
 interface UseForceGraphOptions {
@@ -207,8 +192,6 @@ export function useForceGraph({
       bg.addColorStop(1, "#020617");
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, w, h);
-
-      drawGrid(ctx, w, h);
 
       ctx.save();
       ctx.translate(pan.x, pan.y);
