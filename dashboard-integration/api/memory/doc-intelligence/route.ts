@@ -1,6 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server'
 import ZAI from 'z-ai-web-dev-sdk'
 
+// ── HTML→Text Stripper ──────────────────────────────────────
+
+function stripHtml(html: string): string {
+  // Remove <style> and <script> blocks entirely
+  let text = html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+  text = text.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+  // Convert <br>, <p>, <div>, <li>, <tr>, <h1-6> to newlines
+  text = text.replace(/<\/(p|div|li|tr|h[1-6]|br|blockquote|pre|section|article|header|footer|nav|aside)>/gi, '\n')
+  text = text.replace(/<br\s*\/?>/gi, '\n')
+  // Remove all remaining HTML tags
+  text = text.replace(/<[^>]+>/g, '')
+  // Decode common HTML entities
+  text = text.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+  text = text.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ')
+  text = text.replace(/&#(\d+);/g, (_, n) => String.fromCharCode(parseInt(n)))
+  // Collapse 3+ blank lines into 2
+  text = text.replace(/\n{3,}/g, '\n\n')
+  return text.trim()
+}
+
+function preprocessContent(raw: string): string {
+  // Auto-detect HTML: if content starts with < or contains <html>/<body>/<div> tags
+  const looksLikeHtml = /^\s*</.test(raw) || /<(html|body|div|p|span|head|table)\b/i.test(raw.substring(0, 500))
+  if (looksLikeHtml) {
+    console.log('[doc-intelligence] Detected HTML input, stripping tags')
+    return stripHtml(raw)
+  }
+  return raw
+}
+
 // ── Prompt Templates ────────────────────────────────────────
 
 const PROMPTS = {
@@ -106,13 +136,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Auto-strip HTML if detected
+    const cleanContent = preprocessContent(content)
+
     // If mode is 'all', run all extractions in parallel
     if (mode === 'all') {
       const [terms, instructions, commands, analysis] = await Promise.all([
-        callAI('terms', content).catch(() => []),
-        callAI('instructions', content).catch(() => []),
-        callAI('commands', content).catch(() => []),
-        callAI('analyze', content).catch(() => ({})),
+        callAI('terms', cleanContent).catch(() => []),
+        callAI('instructions', cleanContent).catch(() => []),
+        callAI('commands', cleanContent).catch(() => []),
+        callAI('analyze', cleanContent).catch(() => ({})),
       ])
 
       return NextResponse.json({
@@ -136,7 +169,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const result = await callAI(mode, content)
+    const result = await callAI(mode, cleanContent)
 
     return NextResponse.json({
       mode,

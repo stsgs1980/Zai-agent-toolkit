@@ -448,6 +448,29 @@ if ($preloadOk) {
     Write-Host "  WARN: Some preload files missing. Dashboard will work but first API call will be slow." -ForegroundColor Yellow
 }
 
+# --- Step 10b: Ensure z-ai-web-dev-sdk is installed ---
+
+Write-Host ""
+Write-Host "  Checking z-ai-web-dev-sdk..." -ForegroundColor Gray
+$pkgJson = Get-Content -Path $packageJson -Raw | ConvertFrom-Json
+$sdkInstalled = $false
+if ($pkgJson.dependencies.'z-ai-web-dev-sdk') {
+    $sdkInstalled = $true
+}
+if (-not $sdkInstalled -and ($pkgJson.devDependencies.'z-ai-web-dev-sdk')) {
+    $sdkInstalled = $true
+}
+
+if ($sdkInstalled) {
+    Write-Host "  OK: z-ai-web-dev-sdk found in package.json" -ForegroundColor Green
+} else {
+    Write-Host "  Installing z-ai-web-dev-sdk (required for Doc Intel AI extraction)..." -ForegroundColor Yellow
+    Push-Location $DashboardDir
+    npm install z-ai-web-dev-sdk 2>&1 | ForEach-Object { Write-Host "    $_" -ForegroundColor Gray }
+    Pop-Location
+    Write-Host "  Done: z-ai-web-dev-sdk installed" -ForegroundColor Green
+}
+
 # --- Summary ---
 
 Write-Host ""
