@@ -129,6 +129,17 @@ export function DocIntelligenceView() {
     reader.readAsText(file)
   }, [sourceTag])
 
+  // ── Clear All ──
+
+  const handleClear = useCallback(() => {
+    setContent('')
+    setSourceTag('')
+    setResult(null)
+    setError('')
+    setSubTab('terms')
+    setHealthStatus(null)
+  }, [])
+
   // ── Render ──
 
   return (
@@ -141,7 +152,7 @@ export function DocIntelligenceView() {
         onFile={handleFile}
       />
 
-      {/* Health Check Button */}
+      {/* Health Check + Clear Buttons */}
       <div className="flex items-center gap-2">
         <button
           onClick={handleHealthCheck}
@@ -154,6 +165,17 @@ export function DocIntelligenceView() {
           }}
         >
           {checkingHealth ? 'Checking...' : 'SDK Health Check'}
+        </button>
+        <button
+          onClick={handleClear}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded font-medium transition-all"
+          style={{
+            background: '#1e293b',
+            border: '1px solid #334155',
+            color: '#94a3b8',
+          }}
+        >
+          Clear
         </button>
         {healthStatus && (
           <div className="text-xs font-mono px-3 py-2 rounded max-w-2xl overflow-auto"
