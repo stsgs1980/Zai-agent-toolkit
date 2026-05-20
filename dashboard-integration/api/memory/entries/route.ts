@@ -39,8 +39,15 @@ export async function GET(request: NextRequest) {
     const cacheKey = `entries:${type}`;
 
     const data = await cache.getOrFetch(cacheKey, async () => {
-      const output = await runPython("memory_cli.py", ["export", type]);
-      return JSON.parse(output) as { type: string; count: number; entries: ExportEntry[] };
+      try {
+        const output = await runPython("memory_cli.py", ["export", type]);
+        return JSON.parse(output) as { type: string; count: number; entries: ExportEntry[] };
+      } catch (pyErr) {
+        // Python CLI may not support this type (e.g. 'command' in older versions)
+        // Return empty result instead of crashing
+        console.warn(`[entries] Python export failed for type '${type}', returning empty`);
+        return { type, count: 0, entries: [] as ExportEntry[] };
+      }
     });
 
     const entries: MemoryEntry[] = (data.entries || [])
@@ -109,6 +116,14 @@ export async function POST(request: NextRequest) {
     // memory_cli.py store outputs something like: "Stored: knowledge_20260518_123456"
     const idMatch = output.match(/Stored:\s*(\S+)/i);
     const newId = idMatch ? idMatch[1] : "";
+
+    // If store failed (old CLI version), report clearly
+    if (!newId && output.includes("invalid choice")) {
+      return NextResponse.json(
+        { error: `Type '${type}' not supported by installed memory_cli.py. Run install.ps1 to update.`, rawOutput: output },
+        { status: 400 }
+      );
+    }
 
     // Invalidate cache for this type so next GET reflects the new entry
     cache.invalidate(`entries:${type}`);

@@ -23,9 +23,9 @@ export function ItemDetail({ entry, onVerify }: ItemDetailProps) {
     if (!entry || activeTab !== 'related') return
     let cancelled = false
     setLoadingRelated(true)
-    fetch(`/api/memory/related-graph?node=${encodeURIComponent(entry.id)}`)
-      .then((r) => (r.ok ? r.json() : { nodes: [] }))
-      .then((data) => { if (!cancelled) setRelatedNodes(data.nodes || []) })
+    fetch(`/api/memory/related-graph?id=${encodeURIComponent(entry.id)}`)
+      .then((r) => (r.ok ? r.json() : { related: [] }))
+      .then((data) => { if (!cancelled) setRelatedNodes(data.related || []) })
       .catch(() => { if (!cancelled) setRelatedNodes([]) })
       .finally(() => { if (!cancelled) setLoadingRelated(false) })
     return () => { cancelled = true }

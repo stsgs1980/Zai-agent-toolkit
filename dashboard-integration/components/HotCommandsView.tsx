@@ -322,12 +322,35 @@ export function HotCommandsView() {
                   </div>
                 )}
 
-                {/* No commands — show trigger-based usage hint */}
-                {skill.commands.length === 0 && (
-                  <div className="text-[11px]" style={{ color: C.textMuted }}>
-                    Say <span className="font-mono" style={{ color: C.yellow }}>{skill.trigger.split(',')[0].trim()}</span> to activate — or use any trigger keyword above
-                  </div>
-                )}
+                {/* No explicit commands — generate from triggers */}
+                {skill.commands.length === 0 && skill.trigger && (() => {
+                  const triggerCmds = skill.trigger.split(',').map(t => t.trim()).filter(Boolean)
+                  return (
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: C.textMuted }}>
+                        Activation phrases
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {triggerCmds.map(t => (
+                          <button
+                            key={t}
+                            onClick={() => copyToClipboard(t, `trigger-${skill.folder}-${t}`)}
+                            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md cursor-pointer transition-all hover:brightness-125"
+                            style={{ background: '#0d1117', border: `1px solid ${C.border}` }}
+                            title="Click to copy"
+                          >
+                            <code className="text-[11px] font-mono" style={{ color: C.yellow }}>{t}</code>
+                            {copiedId === `trigger-${skill.folder}-${t}` ? (
+                              <svg width="10" height="10" fill="none" stroke="#4ade80" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                            ) : (
+                              <svg width="10" height="10" fill="none" stroke={C.textMuted} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })()}
 
                 {/* Description (full) */}
                 {skill.description.length > 120 && (

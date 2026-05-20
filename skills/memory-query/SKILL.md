@@ -17,6 +17,15 @@ trigger: query memory, search memory, find in memory, recall, remember
 
 Search the ZCode memory system using semantic search.
 
+## Hot Commands
+
+| Phrase | Action |
+|--------|--------|
+| query memory | Search ChromaDB using a natural language query |
+| search memory | Find relevant sessions, knowledge, or patterns from previous work |
+| recall | Retrieve stored information matching a description or topic |
+| find in memory | Look up specific entries by type, keyword, or semantic match |
+
 ## Purpose
 
 Find relevant sessions, knowledge, patterns, and templates

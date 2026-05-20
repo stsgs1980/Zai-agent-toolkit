@@ -16,6 +16,17 @@ license: MIT
 
 This skill extracts lessons from sessions and stores them in ChromaDB. A LOG tells what happened. An EXPERIENCE tells what was learned and how to act differently next time.
 
+## Hot Commands
+
+| Phrase | Action |
+|--------|--------|
+| save experience | Extract and store lessons from the current session to ChromaDB |
+| запомни | Save experience (Russian: "remember this") |
+| lessons learned | Review and store what worked, what failed, and why |
+| remember this | Store a specific insight or lesson for future sessions |
+| save experience [NO SAVE] | Acknowledge but skip saving per user override |
+| verify experience | Confirm or mark a stored experience as verified or conflicted |
+
 ## The Most Important Rule
 
 **No lesson = no entry.** If you cannot fill all three fields (good, bad, why) with specific actionable content, do not save. A vague entry is worse than no entry because it pollutes search results.

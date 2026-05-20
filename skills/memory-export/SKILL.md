@@ -17,6 +17,15 @@ trigger: export memory, backup memory, download memory, save memory to file
 
 Export entries from the ZCode memory system (ChromaDB) to JSON.
 
+## Hot Commands
+
+| Phrase | Action |
+|--------|--------|
+| export memory | Export all or filtered ChromaDB entries to JSON |
+| backup memory | Save a complete snapshot of stored memory to a file |
+| download memory | Export memory entries for transfer or offline analysis |
+| save memory to file | Write selected memory entries to a JSON output file |
+
 ## Usage
 
 ```bash

@@ -19,6 +19,17 @@ trigger: context, memory, consolidate, summarize, compress, token limit, long co
 
 Context and memory management for long-running agent sessions.
 
+## Hot Commands
+
+| Phrase | Action |
+|--------|--------|
+| consolidate | Compress conversation context, preserving critical items and summarizing low-priority ones |
+| summarize context | Create a structured summary of the current session context |
+| compress memory | Aggressively reduce token usage by discarding Tier 4 and summarizing Tier 3 items |
+| cleanup session | Remove noise from conversation: greetings, repeated clarifications, abandoned attempts |
+| optimize context | Assess context size and apply appropriate level of consolidation |
+| what were we doing | Restore context awareness by summarizing key decisions and active files |
+
 ---
 
 ## When to Activate

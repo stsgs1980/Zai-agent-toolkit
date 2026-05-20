@@ -17,6 +17,15 @@ trigger: store memory, save to memory, remember this, memorize
 
 Store information in the ZCode memory system (ChromaDB).
 
+## Hot Commands
+
+| Phrase | Action |
+|--------|--------|
+| store memory | Save information to ChromaDB with specified type and optional metadata |
+| remember this | Store a piece of knowledge or insight for future reference |
+| memorize | Persist a pattern, session, or project detail to memory |
+| save to memory | Store content with type (session, knowledge, pattern, project, template) |
+
 ## Purpose
 
 Save sessions, knowledge, patterns, project structures, and templates

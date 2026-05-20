@@ -17,6 +17,16 @@ trigger: index folder, scan directory, folder index, list files, organize files
 
 Create searchable indexes for any folder with thousands of files.
 
+## Hot Commands
+
+| Phrase | Action |
+|--------|--------|
+| index folder | Scan a directory and create an _index.json with file descriptions and tags |
+| scan directory | Recursively catalog all files in a folder with metadata |
+| update index | Refresh an existing index while preserving manual descriptions |
+| search index | Find files in a folder index by name, tag, or category |
+| organize files | Create and manage searchable indexes for large file collections |
+
 ## Problem Solved
 
 When you have folders with hundreds or thousands of files, finding the right document becomes painful. This skill creates an index file that lists all files with descriptions and tags.

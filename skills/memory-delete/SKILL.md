@@ -17,6 +17,15 @@ trigger: delete memory, remove from memory, forget, clear memory
 
 Delete entries from the ZCode memory system (ChromaDB).
 
+## Hot Commands
+
+| Phrase | Action |
+|--------|--------|
+| delete memory | Remove a specific entry from ChromaDB by its ID |
+| forget | Delete an outdated or incorrect memory entry |
+| remove from memory | Clear a stored item permanently from the knowledge base |
+| clear memory | Delete entries (use with caution — permanent action) |
+
 ## Usage
 
 ```bash

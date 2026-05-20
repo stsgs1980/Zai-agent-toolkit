@@ -15,6 +15,16 @@ trigger: commit, create commit, conventional commit, stage changes, write commit
 > Version: 1.0
 > Last Updated: 2026-05
 
+## Hot Commands
+
+| Phrase | Action |
+|--------|--------|
+| commit | Review staged changes and create a well-structured commit |
+| stage changes | Selectively stage files or hunks for the next commit |
+| write commit message | Craft a Conventional Commits message describing what and why |
+| create commit | Execute the full commit workflow: inspect, stage, review, commit |
+| split commits | Divide mixed changes into multiple logically scoped commits |
+
 ## Goal
 Make commits that are easy to review and safe to ship:
 - only intended changes are included

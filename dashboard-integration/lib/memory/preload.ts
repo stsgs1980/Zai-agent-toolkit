@@ -17,9 +17,12 @@ const PRELOAD_TASKS = [
   { path: "/api/memory/entries?type=knowledge", name: "entries:knowledge" },
   { path: "/api/memory/entries?type=session", name: "entries:session" },
   { path: "/api/memory/entries?type=project", name: "entries:project" },
+  { path: "/api/memory/entries?type=pattern", name: "entries:pattern" },
+  { path: "/api/memory/entries?type=command", name: "entries:command" },
+  { path: "/api/memory/entries?type=template", name: "entries:template" },
+  { path: "/api/memory/entries?type=experience", name: "entries:experience" },
   { path: "/api/memory/stats", name: "stats" },
-  // NOTE: "experience" type is NOT preloaded because memory_cli.py export
-  // does not support it yet. Add when export command adds experience support.
+  { path: "/api/memory/commands", name: "commands" },
 ];
 
 let preloaded = false;

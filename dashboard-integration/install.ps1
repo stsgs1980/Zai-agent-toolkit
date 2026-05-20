@@ -390,15 +390,37 @@ if ($pythonCheck -match "OK") {
 }
 
 $zcodeToolsDir = Join-Path $HomeDir ".zcode\tools"
-$requiredTools = @("graph_engine.py", "memory_cli.py", "folder_indexer.py", "session_summary.py")
-$missingTools = @()
-foreach ($tool in $requiredTools) {
-    if (-not (Test-Path (Join-Path $zcodeToolsDir $tool))) { $missingTools += $tool }
+if (-not (Test-Path $zcodeToolsDir)) { New-Item -ItemType Directory -Path $zcodeToolsDir -Force | Out-Null }
+
+# Copy Python tools from git repo to ~/.zcode/tools/ (keeps them up-to-date)
+$toolkitToolsDir = Join-Path $IntegrationDir "..\tools"
+$pythonTools = @("graph_engine.py", "memory_cli.py", "folder_indexer.py", "session_summary.py")
+foreach ($tool in $pythonTools) {
+    $srcTool = Join-Path $toolkitToolsDir $tool
+    $dstTool = Join-Path $zcodeToolsDir $tool
+    if (Test-Path $srcTool) {
+        Safe-Copy -Src $srcTool -Dst $dstTool
+    } else {
+        # Also check Zai-agent-toolkit/tools/ directly
+        $altSrc = Join-Path $HomeDir ".zcode\Zai-agent-toolkit\tools\$tool"
+        if (Test-Path $altSrc) {
+            Safe-Copy -Src $altSrc -Dst $dstTool
+        } else {
+            Write-Host "  WARN: $tool not found in any source" -ForegroundColor Yellow
+        }
+    }
 }
-if ($missingTools.Count -gt 0) {
-    Write-Host "  WARN: Missing tools: $($missingTools -join ', ')" -ForegroundColor Yellow
+
+# --- Step 9b: Ensure all 7 ChromaDB collections exist ---
+# If the user had an old memory_cli.py with only 5 types, collections
+# 'command' and 'experience' won't exist yet. Run init to create them.
+
+Write-Host "  Ensuring all 7 ChromaDB collections exist..." -ForegroundColor Gray
+$initResult = python (Join-Path $zcodeToolsDir "memory_cli.py") init 2>&1
+if ($initResult -match "ERROR") {
+    Write-Host "  WARN: DB init failed — $initResult" -ForegroundColor Yellow
 } else {
-    Write-Host "  OK: All 4 Python tools found" -ForegroundColor Green
+    Write-Host "  OK: All collections verified" -ForegroundColor Green
 }
 
 # --- Step 10: Verify preload infrastructure ---

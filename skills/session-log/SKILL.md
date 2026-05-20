@@ -16,6 +16,16 @@ license: MIT
 
 This skill logs session activity — what was done, what changed, what errors happened. It always saves, even if there's nothing to "learn". A session without lessons still has value as a record.
 
+## Hot Commands
+
+| Phrase | Action |
+|--------|--------|
+| log session | Record current session activity: tasks, errors, files changed, and outcome |
+| что делали | Show what was done in this session (Russian trigger) |
+| autosave | Trigger an automatic session log checkpoint |
+| session wrap-up | Finalize and save a complete session log before ending |
+| log progress | Save a mid-session progress snapshot |
+
 ## LOG vs EXPERIENCE
 
 This skill logs facts. The session-experience skill extracts lessons. They are different:
