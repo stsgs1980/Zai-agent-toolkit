@@ -37,7 +37,13 @@ async function countSkills(): Promise<number> {
   const home = process.env.USERPROFILE || process.env.HOME || "";
   const candidates = [
     path.join(home, ".zcode", "Zai-agent-toolkit", "skills"),
+    // Also try common alternative paths
+    path.join(home, "Zai-agent-toolkit", "skills"),
+    path.join(home, "Projects", "Zai-agent-toolkit", "skills"),
   ];
+
+  console.log(`[stats/countSkills] home=${home}, candidates=`, candidates);
+
   for (const dir of candidates) {
     try {
       const entries = await readdir(dir);
@@ -50,8 +56,11 @@ async function countSkills(): Promise<number> {
           count++;
         } catch { /* not a skill dir */ }
       }
+      console.log(`[stats/countSkills] ${dir}: found ${count} skills (out of ${entries.length} entries)`);
       return count;
-    } catch { /* next candidate */ }
+    } catch (e) {
+      console.log(`[stats/countSkills] ${dir}: not found or not readable`);
+    }
   }
   return 0;
 }
@@ -111,20 +120,20 @@ export async function GET(req: Request) {
 
       // 2. Graph stats (fast, from file — no Python needed)
       const graphData = readGraphData();
-      const graphStats = graphData
-        ? {
-            nodeCount: new Set([
-              ...graphData.edges.map(e => e.from),
-              ...graphData.edges.map(e => e.to),
-              ...(graphData.isolated_nodes || []),
-            ]).size,
-            edgeCount: graphData.edges.length,
-            edgeTypes: graphData.edges.reduce<Record<string, number>>((acc, e) => {
-              acc[e.type] = (acc[e.type] || 0) + 1;
-              return acc;
-            }, {}),
-          }
-        : { nodeCount: 0, edgeCount: 0, edgeTypes: {} };
+      const graphNodeCount = graphData
+        ? new Set([
+            ...graphData.edges.map(e => e.from),
+            ...graphData.edges.map(e => e.to),
+            ...(graphData.isolated_nodes || []),
+          ]).size
+        : 0;
+      const graphEdgeCount = graphData ? graphData.edges.length : 0;
+      const graphEdgeTypes = graphData
+        ? graphData.edges.reduce<Record<string, number>>((acc, e) => {
+            acc[e.type] = (acc[e.type] || 0) + 1;
+            return acc;
+          }, {})
+        : {};
 
       // 3. Experience stats
       let experienceStats = { total: 0, verified: 0, unverified: 0, conflict: 0, today: 0 };
@@ -150,13 +159,13 @@ export async function GET(req: Request) {
 
       const result = {
         entries: { byType: typeCounts, total: totalEntries, todayByType: todayCounts, today: totalToday },
-        graph: { nodeCount: graphStats.nodeCount, edgeCount: graphStats.edgeCount },
+        graph: { nodeCount: graphNodeCount, edgeCount: graphEdgeCount, edgeTypes: graphEdgeTypes },
         experience: experienceStats,
-        tools: { skills: skillsCount, graphNodes: graphStats.nodeCount, graphEdges: graphStats.edgeCount },
+        tools: { skills: skillsCount, graphNodes: graphNodeCount, graphEdges: graphEdgeCount },
         timestamp: new Date().toISOString(),
       };
 
-      console.log(`[stats] tools: skills=${skillsCount}, graphNodes=${graphStats.nodeCount}, graphEdges=${graphStats.edgeCount}`);
+      console.log(`[stats] RESULT → tools:`, JSON.stringify(result.tools));
 
       return NextResponse.json(result);
     });

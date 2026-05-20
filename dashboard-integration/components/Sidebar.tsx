@@ -13,6 +13,28 @@ interface SidebarProps {
   onSearchChange: (q: string) => void
 }
 
+// ── Safe stats extractor (works with ANY API response shape) ──
+
+function safeTools(stats: any): { skills: number; graphNodes: number; graphEdges: number } {
+  // Try stats.tools first (new API)
+  if (stats?.tools && typeof stats.tools === 'object') {
+    return {
+      skills: typeof stats.tools.skills === 'number' ? stats.tools.skills : 0,
+      graphNodes: typeof stats.tools.graphNodes === 'number' ? stats.tools.graphNodes : 0,
+      graphEdges: typeof stats.tools.graphEdges === 'number' ? stats.tools.graphEdges : 0,
+    }
+  }
+  // Fallback: extract from stats.graph (old API or missing tools)
+  if (stats?.graph && typeof stats.graph === 'object') {
+    return {
+      skills: 0,
+      graphNodes: typeof stats.graph.nodeCount === 'number' ? stats.graph.nodeCount : 0,
+      graphEdges: typeof stats.graph.edgeCount === 'number' ? stats.graph.edgeCount : 0,
+    }
+  }
+  return { skills: 0, graphNodes: 0, graphEdges: 0 }
+}
+
 // ── Component ───────────────────────────────────────────────
 
 export function Sidebar({
@@ -24,6 +46,9 @@ export function Sidebar({
 }: SidebarProps) {
   const memoryKeys = CATEGORY_KEYS.filter(k => CATEGORY_CONFIG[k].group === 'memory')
   const toolKeys = CATEGORY_KEYS.filter(k => CATEGORY_CONFIG[k].group === 'tools')
+
+  // Extract tools counts safely — works with any API shape
+  const tools = stats ? safeTools(stats) : null
 
   return (
     <div
@@ -140,12 +165,19 @@ export function Sidebar({
 
       {/* ── Stat chips ── */}
       <div style={{ padding: '8px 16px', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-        <StatChip label={stats?.entries.total ?? 0} text="total" />
-        <StatChip label={stats?.experience.verified ?? 0} text="verified" color={P.ok} />
-        <StatChip label={stats?.experience.unverified ?? 0} text="pending" color={P.warn} />
-        <StatChip label={stats?.experience.conflict ?? 0} text="conflict" color={P.err} />
-        {(stats?.entries.today ?? 0) > 0 && (
-          <StatChip label={`+${stats?.entries.today}`} text="today" color="#06B6D4" />
+        <StatChip label={stats?.entries?.total ?? 0} text="total" />
+        <StatChip label={stats?.experience?.verified ?? 0} text="verified" color={P.ok} />
+        <StatChip label={stats?.experience?.unverified ?? 0} text="pending" color={P.warn} />
+        <StatChip label={stats?.experience?.conflict ?? 0} text="conflict" color={P.err} />
+        {(stats?.entries?.today ?? 0) > 0 && (
+          <StatChip label={`+${stats?.entries?.today}`} text="today" color="#06B6D4" />
+        )}
+        {/* Debug: show tools counts as chips */}
+        {tools && (
+          <>
+            <StatChip label={tools.graphNodes} text="nodes" color="#2DD4BF" />
+            <StatChip label={tools.skills} text="skills" color="#F59E0B" />
+          </>
         )}
       </div>
 
@@ -181,7 +213,7 @@ export function Sidebar({
         <GroupLabel>Tools</GroupLabel>
         {toolKeys.map((key) => {
           const cfg = CATEGORY_CONFIG[key]
-          const count = getToolCount(key, stats)
+          const count = tools ? getToolCount(key, tools) : undefined
           return (
             <CategoryItem
               key={key}
@@ -202,21 +234,29 @@ export function Sidebar({
 
 function getCategoryCount(key: string, stats: DashboardStats | null): number | undefined {
   if (!stats) return undefined
-  if (key === 'experience') return stats.experience.total
-  return stats.entries.byType[key] ?? 0
+  const entries = (stats as any).entries
+  if (!entries) return undefined
+  if (key === 'experience') {
+    const exp = (stats as any).experience
+    return exp?.total ?? 0
+  }
+  return entries.byType?.[key] ?? 0
 }
 
 function getTodayCount(key: string, stats: DashboardStats | null): number {
   if (!stats) return 0
-  if (key === 'experience') return stats.experience.today
-  return stats.entries.todayByType[key] ?? 0
+  const entries = (stats as any).entries
+  if (!entries) return 0
+  if (key === 'experience') {
+    const exp = (stats as any).experience
+    return exp?.today ?? 0
+  }
+  return entries.todayByType?.[key] ?? 0
 }
 
-function getToolCount(key: string, stats: DashboardStats | null): number | undefined {
-  if (!stats) return undefined
-  // stats is always normalized by MemoryDashboard.normalizeStats()
-  if (key === 'graph') return stats.tools?.graphNodes ?? 0
-  if (key === 'skills') return stats.tools?.skills ?? 0
+function getToolCount(key: string, tools: { skills: number; graphNodes: number; graphEdges: number }): number | undefined {
+  if (key === 'graph') return tools.graphNodes
+  if (key === 'skills') return tools.skills
   return undefined  // docintel has no count
 }
 
