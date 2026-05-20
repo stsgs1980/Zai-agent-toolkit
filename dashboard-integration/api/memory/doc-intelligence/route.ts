@@ -4,6 +4,9 @@ import { join } from 'path'
 import { homedir } from 'os'
 import { createHmac } from 'crypto'
 
+// FORCE Node.js runtime — Edge Runtime lacks crypto.createHmac and has strict ByteString header validation
+export const runtime = 'nodejs'
+
 // ── Helper: HTML → Clean Text ───────────────────────────────
 
 function stripHtml(html: string): string {
@@ -84,10 +87,10 @@ function generateZaiJWT(apiKey: string): string {
 
   // JWT header
   const header = toBase64Url(Buffer.from(JSON.stringify({ alg: 'HS256', sign_type: 'SIGN' })))
-  // JWT payload — exp = now + 1 hour
+  // JWT payload — exp in SECONDS (not ms), +1 hour
   const payload = toBase64Url(Buffer.from(JSON.stringify({
     api_key: id,
-    exp: now + 3600 * 1000,
+    exp: Math.floor(now / 1000) + 3600,
     timestamp: now,
   })))
 
