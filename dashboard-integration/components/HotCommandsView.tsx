@@ -322,10 +322,10 @@ export function HotCommandsView() {
                   </div>
                 )}
 
-                {/* No commands */}
+                {/* No commands — show trigger-based usage hint */}
                 {skill.commands.length === 0 && (
-                  <div className="text-[11px] italic" style={{ color: C.textMuted }}>
-                    No hot commands defined for this skill
+                  <div className="text-[11px]" style={{ color: C.textMuted }}>
+                    Say <span className="font-mono" style={{ color: C.yellow }}>{skill.trigger.split(',')[0].trim()}</span> to activate — or use any trigger keyword above
                   </div>
                 )}
 
