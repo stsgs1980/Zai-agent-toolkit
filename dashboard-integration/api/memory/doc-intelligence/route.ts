@@ -80,19 +80,39 @@ interface AIConfig {
   source: string
 }
 
+// Strip BOM, zero-width chars, and any non-printable garbage
+function sanitize(str: string): string {
+  return str
+    .replace(/[\uFEFF\u200B\u200C\u200D\u00AD]/g, '') // BOM + zero-width chars
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')   // control chars except tab/newline
+    .trim()
+}
+
+// Force ASCII-only for HTTP header values (node:http rejects non-latin1)
+function asciiOnly(str: string): string {
+  return str.replace(/[^\x20-\x7E]/g, '')
+}
+
 function loadAIConfig(): AIConfig {
-  const envBaseUrl = (process.env.ZAI_BASE_URL || '').trim()
-  const envApiKey = (process.env.ZAI_API_KEY || '').trim()
+  const envBaseUrl = sanitize(process.env.ZAI_BASE_URL || '')
+  const envApiKey = sanitize(process.env.ZAI_API_KEY || '')
   if (envBaseUrl && envApiKey) {
     const jwtKey = generateZaiJWT(envApiKey)
     const converted = jwtKey !== envApiKey
-    console.log(`[DocIntel] Using env vars${converted ? ' (id.secret → JWT)' : ''}`)
+    // Debug: dump JWT char codes to catch any remaining invalid chars
+    const authValue = `Bearer ${jwtKey}`
+    const badChars = [...authValue].map((c, i) => c.charCodeAt(0) > 127 ? ` [${i}]='${c}'(0x${c.charCodeAt(0).toString(16)})` : '').filter(Boolean).join('')
+    if (badChars) {
+      console.error(`[DocIntel] WARNING: non-ASCII in Authorization:${badChars}`)
+    }
+    console.log(`[DocIntel] Using env vars${converted ? ' (id.secret → JWT)' : ''}, auth header length=${authValue.length}`)
+    console.log(`[DocIntel] JWT preview: ${jwtKey.substring(0, 20)}...${jwtKey.substring(jwtKey.length - 10)}`)
     return {
       baseUrl: envBaseUrl,
-      apiKey: jwtKey,
-      chatId: process.env.ZAI_CHAT_ID,
-      userId: process.env.ZAI_USER_ID,
-      token: process.env.ZAI_TOKEN,
+      apiKey: asciiOnly(jwtKey),  // GUARANTEE: no non-ASCII in header value
+      chatId: sanitize(process.env.ZAI_CHAT_ID || ''),
+      userId: sanitize(process.env.ZAI_USER_ID || ''),
+      token: sanitize(process.env.ZAI_TOKEN || ''),
       source: 'env',
     }
   }
@@ -122,8 +142,23 @@ function loadAIConfig(): AIConfig {
 
 // ── Node.js HTTPS/HTTP request (bypasses Web Fetch API ByteString validation) ──
 
-function nodePost(urlStr: string, headers: Record<string, string>, bodyObj: any): Promise<{ status: number; body: string }> {
+function nodePost(urlStr: string, headerObj: Record<string, string>, bodyObj: any): Promise<{ status: number; body: string }> {
   return new Promise((resolve, reject) => {
+    // Build body ONCE, compute Content-Length from it
+    const bodyStr = JSON.stringify(bodyObj)
+    const bodyBuf = Buffer.from(bodyStr, 'utf-8')
+
+    // Sanitize ALL header values to pure ASCII
+    const safeHeaders: Record<string, string | number> = {}
+    for (const [k, v] of Object.entries(headerObj)) {
+      const clean = asciiOnly(v)
+      if (clean !== v) {
+        console.warn(`[DocIntel] Header '${k}' had non-ASCII chars — sanitized`)
+      }
+      safeHeaders[k] = clean
+    }
+    safeHeaders['Content-Length'] = bodyBuf.length
+
     const url = new URL(urlStr)
     const isHttps = url.protocol === 'https:'
     const lib = isHttps ? https : http
@@ -133,10 +168,7 @@ function nodePost(urlStr: string, headers: Record<string, string>, bodyObj: any)
       port: url.port || (isHttps ? 443 : 80),
       path: url.pathname + url.search,
       method: 'POST',
-      headers: {
-        ...headers,
-        'Content-Length': Buffer.byteLength(JSON.stringify(bodyObj)),
-      },
+      headers: safeHeaders,
     }
 
     const req = lib.request(options, (res) => {
@@ -146,7 +178,7 @@ function nodePost(urlStr: string, headers: Record<string, string>, bodyObj: any)
     })
 
     req.on('error', reject)
-    req.write(JSON.stringify(bodyObj))
+    req.write(bodyBuf)
     req.end()
   })
 }
