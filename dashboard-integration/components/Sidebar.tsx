@@ -214,10 +214,9 @@ function getTodayCount(key: string, stats: DashboardStats | null): number {
 
 function getToolCount(key: string, stats: DashboardStats | null): number | undefined {
   if (!stats) return undefined
-  const tools = (stats as any).tools
-  if (!tools) return undefined
-  if (key === 'graph') return tools.graphNodes ?? 0
-  if (key === 'skills') return tools.skills ?? 0
+  // stats is always normalized by MemoryDashboard.normalizeStats()
+  if (key === 'graph') return stats.tools?.graphNodes ?? 0
+  if (key === 'skills') return stats.tools?.skills ?? 0
   return undefined  // docintel has no count
 }
 

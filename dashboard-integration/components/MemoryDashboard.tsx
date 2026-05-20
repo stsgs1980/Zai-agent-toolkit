@@ -20,6 +20,22 @@ function isMemoryCategory(cat: CategoryKey): boolean {
   return CATEGORY_CONFIG[cat]?.group === 'memory'
 }
 
+/** Ensure stats.tools always exists even if API returns old format without it */
+function normalizeStats(raw: any): DashboardStats {
+  const tools = raw?.tools
+  const graph = raw?.graph
+  return {
+    entries: raw?.entries ?? { byType: {}, total: 0, todayByType: {}, today: 0 },
+    experience: raw?.experience ?? { total: 0, verified: 0, unverified: 0, conflict: 0, today: 0 },
+    graph: { nodeCount: graph?.nodeCount ?? 0, edgeCount: graph?.edgeCount ?? 0 },
+    tools: {
+      skills: tools?.skills ?? 0,
+      graphNodes: tools?.graphNodes ?? graph?.nodeCount ?? 0,
+      graphEdges: tools?.graphEdges ?? graph?.edgeCount ?? 0,
+    },
+  }
+}
+
 // ── Main layout ─────────────────────────────────────────────
 
 export function MemoryDashboard() {
@@ -43,9 +59,10 @@ export function MemoryDashboard() {
       const url = bustCache ? '/api/memory/stats?nocache=1' : '/api/memory/stats'
       const res = await fetch(url)
       if (res.ok) {
-        const data = await res.json()
-        console.log('[MD] stats.tools =', data?.tools)
-        setStats(data)
+        const raw = await res.json()
+        const normalized = normalizeStats(raw)
+        console.log('[MD] raw.tools =', raw?.tools, '→ normalized.tools =', normalized.tools)
+        setStats(normalized)
       }
     } catch {
       // silent
