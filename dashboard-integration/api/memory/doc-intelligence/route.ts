@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { readFileSync, existsSync } from 'fs'
 import { join } from 'path'
 import { homedir } from 'os'
+import { createHmac } from 'crypto'
 
 // ── Helper: HTML → Clean Text ───────────────────────────────
 
@@ -64,6 +65,36 @@ function isHtmlContent(text: string): boolean {
   return /<[a-zA-Z][^>]*>/.test(text.substring(0, 2000))
 }
 
+// ── Z.ai API Key → JWT conversion ────────────────────────────
+// Z.ai keys come in format "id.secret" and must be converted to JWT
+
+function generateZaiJWT(apiKey: string): string {
+  const parts = apiKey.split('.')
+  if (parts.length !== 2) {
+    // Already a JWT or other token format — use as-is
+    return apiKey
+  }
+
+  const [id, secret] = parts
+  const now = Date.now()
+
+  // JWT header
+  const header = Buffer.from(JSON.stringify({ alg: 'HS256', sign_type: 'SIGN' })).toString('base64url')
+  // JWT payload — exp = now + 1 hour
+  const payload = Buffer.from(JSON.stringify({
+    api_key: id,
+    exp: now + 3600 * 1000,
+    timestamp: now,
+  })).toString('base64url')
+
+  // Signature
+  const signature = createHmac('sha256', secret)
+    .update(`${header}.${payload}`)
+    .digest('base64url')
+
+  return `${header}.${payload}.${signature}`
+}
+
 // ── AI Config: Multi-source (env > .z-ai-config > fallback) ──
 
 interface AIConfig {
@@ -80,10 +111,13 @@ function loadAIConfig(): AIConfig {
   const envBaseUrl = process.env.ZAI_BASE_URL
   const envApiKey = process.env.ZAI_API_KEY
   if (envBaseUrl && envApiKey) {
-    console.log('[DocIntel] Using env vars ZAI_BASE_URL + ZAI_API_KEY')
+    // Auto-convert "id.secret" format to JWT
+    const jwtKey = generateZaiJWT(envApiKey)
+    const converted = jwtKey !== envApiKey
+    console.log(`[DocIntel] Using env vars ZAI_BASE_URL + ZAI_API_KEY${converted ? ' (converted id.secret → JWT)' : ''}`)
     return {
       baseUrl: envBaseUrl,
-      apiKey: envApiKey,
+      apiKey: jwtKey,
       chatId: process.env.ZAI_CHAT_ID,
       userId: process.env.ZAI_USER_ID,
       token: process.env.ZAI_TOKEN,
