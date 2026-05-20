@@ -69,3 +69,26 @@ export interface RelatedNode {
 }
 
 export type { CategoryKey }
+
+// ── Experience types ────────────────────────────────────────
+
+export interface ExperienceEntry {
+  id: string
+  title: string
+  experience_type: string
+  verification_status: string
+  good_count: number
+  bad_count: number
+  source_type: string
+  preview: string
+  tags: string[]
+}
+
+export interface ExtractedEntry {
+  title: string
+  good: string
+  bad: string
+  why: string
+  verdict: string
+  tech: string[]
+}
